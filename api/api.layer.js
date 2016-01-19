@@ -173,7 +173,9 @@ module.exports = api.layer = {
 
 		var layerUuid 	= req.body.layer || false;
 		var user 	= req.user;
-		
+
+		console.log('layerUuid', layerUuid, user.username, req.body);
+
 		// error if no project or user
 		if (!layerUuid) return api.error.missingInformation(req, res);
 

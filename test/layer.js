@@ -17,7 +17,6 @@ describe('Layer', function () {
     describe('/api/layers/new', function () {
         
         var newLayer = {
-            // uuid: 'new mocha test layer uuid',   // layer uuid
             title: 'new mocha test layer title',
             description: 'new mocha test layer description',   // html
         };
@@ -30,13 +29,13 @@ describe('Layer', function () {
         });
 
         it('should respond with status code 200 and create new layer', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 if (err) {
                     return done(err);
                 }
 
+                newLayer.access_token = access_token;
                 api.post('/api/layers/new')
-                    .set('Authorization', 'Bearer ' + token)
                     .send(newLayer)
                     .expect(200)
                     .end(function (err, res) {
@@ -45,28 +44,15 @@ describe('Layer', function () {
                         }
 
                         var result = helpers.parse(res.text);
-                        // expect(result.uuid).to.be.equal(newLayer.uuid);
                         expect(_.size(result.uuid)).to.be.equal(42);
                         expect(result.title).to.be.equal(newLayer.title);
                         expect(result.description).to.be.equal(newLayer.description);
+
+                        newLayer.uuid = result.uuid;
                         done();
                     });
             });
         });
-
-        // it('should respond with status code 422 and error if layer with such uuid already exist', function (done) {
-        //     token(function (err, token) {
-        //         if (err) {
-        //             return done(err);
-        //         }
-
-        //         api.post('/api/layers/new')
-        //                .set('Authorization', 'Bearer ' + token)
-        //             .send(newLayer)
-        //             .expect(422, expected.layer_already_exist)
-        //             .end(done);
-        //     });
-        // });
 
         after(function (done) {
             Layer.findOne({uuid : newLayer.uuid})
@@ -76,10 +62,11 @@ describe('Layer', function () {
 
     });
 
-    describe('/api/layer/update', function () {
+    // skipping for now, because we need to make HUGE changes on the layer specs.. @igor: interested?
+    describe.skip('/api/layer/update', function () {
 
         var newLayerParameters = {
-            uuid: 'new mocha test layer uuid',
+            uuid: 'new mocha test layer uuid', // @igor: it should throw error if trying to update uuid. need a test for this.
             title: 'new mocha test layer title',
             description: 'new mocha test layer description'
         };
@@ -107,7 +94,7 @@ describe('Layer', function () {
                     mapbox      : 'update mocha test layer mapbox',       // mapbox id: rawger.geography-class
                     cartodb     : 'update mocha test layer cartodb',       // cartodb id: 
                     osm         : 'update mocha test layer osm',       // osm id?
-                    norkart         : 'update mocha test layer norkart',
+                    norkart     : 'update mocha test layer norkart',
                     google      : 'update mocha test layer google',
 
                     postgis : {
@@ -157,44 +144,50 @@ describe('Layer', function () {
         });
 
         it('should respond with status code 422 and error if layer doesn\'t exist in request body', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 if (err) {
                     return done(err);
                 }
 
                 api.post('/api/layer/update')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({})
+                    .send({access_token : access_token})
                     .expect(422, expected.missing_information)
                     .end(done);                
             });
         });
 
         it('should respond with status code 422 and error if layer doesn\'t exist', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 if (err) {
                     return done(err);
                 }
 
                 api.post('/api/layer/update')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({layer: 'bad layer'})
+                    .send({
+                        layer: 'bad layer',
+                        access_token : access_token
+                    })
                     .expect(422, expected.missing_information)
                     .end(done);
             });
         });
 
+      
         it('should respond with status code 200 and update layer correctly', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 if (err) {
                     return done(err);
                 }
 
                 var ops = [];
 
+                layerUpdates.access_token = access_token;
+                layerUpdates.layer = tmpLayer.layer;
+
+                console.log('layerUpdates', tmpLayer);
+
                 ops.push(function (callback) {
                     api.post('/api/layer/update')
-                        .set('Authorization', 'Bearer ' + token)
                         .send(layerUpdates)
                         .expect(200)
                         .end(function (err, res) {

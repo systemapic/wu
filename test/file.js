@@ -22,10 +22,8 @@ describe('File', function () {
 
     before(function(done) {
         helpers.create_file(function (err, result) {
-                if (err) return done(err);
-
                 testFile = result;
-                done();
+                done(err);
             });
     });
 
@@ -43,21 +41,20 @@ describe('File', function () {
         });
 
         it('should respond with status code 422 if fileUuid doesn\'t exist in request body', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/file/update')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({})
+                    .send({access_token : access_token})
                     .expect(422, expected.missing_information)
                     .end(done);
             });
         });
 
         it('should respond with status code 422 and error if file doesn\'t exist', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/file/update')
-                    .set('Authorization', 'Bearer ' + token)
                     .send({
-                    	uuid: "invalid file id"
+                    	uuid: "invalid file id",
+                        access_token : access_token
                     })
                     .expect(422, expected.bad_file_uuid)
                     .end(done);
@@ -72,20 +69,21 @@ describe('File', function () {
             helpers.delete_user_by_id(second_test_user.uuid, done);
         });
 
-        it('should respond with status code 422 and error if not authenticated', function (done) {
-            helpers.users_token(second_test_user, function (err, token) {
+        it('should respond with status code 401 and error if not authenticated', function (done) {
+            helpers.users_token(second_test_user, function (err, access_token) {
                 api.post('/api/file/update')
-                    .set('Authorization', 'Bearer ' + token)
                     .send({
-                        uuid: testFile.uuid
+                        uuid: testFile.uuid,
+                        access_token : access_token
                     })
-                    .expect(422, expected.no_access)
+                    .expect(401, expected.invalid_token)
                     .end(done);
             });
         });
 
         it('should respond with status code 200 and update file correctly', function (done) {
-            var fileUpdates = {
+            helpers.token(function (err, access_token) {
+                var options = {
                     uuid: testFile.uuid,
                     name: 'new name', 
                     description: 'new description', 
@@ -108,10 +106,9 @@ describe('File', function () {
                         }
                     }
                 };
-            helpers.token(function (err, token) {
+                options.access_token = access_token;
                 api.post('/api/file/update')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send(fileUpdates)
+                    .send(options)
                     .expect(200)
                     .end(function (err, res) {
                         if (err) {
@@ -128,27 +125,27 @@ describe('File', function () {
                         expect(result.updated).to.include('version');
                         expect(result.updated).to.include('copyright');
                         expect(result.updated).to.include('data');
-                        expect(result.file.name).to.be.equal(fileUpdates.name);
-                        expect(result.file.description).to.be.equal(fileUpdates.description);
-                        expect(result.file.keywords[0]).to.be.equal(fileUpdates.keywords[0]);
-                        expect(result.file.status).to.be.equal(fileUpdates.status);
-                        expect(result.file.category).to.be.equal(fileUpdates.category);
-                        expect(result.file.version).to.be.equal(fileUpdates.version);
-                        expect(result.file.copyright).to.be.equal(fileUpdates.copyright);
-                        expect(result.file.data.postgis.database_name).to.be.equal(fileUpdates.data.postgis.database_name);
-                        expect(result.file.data.postgis.table_name).to.be.equal(fileUpdates.data.postgis.table_name);
-                        expect(result.file.data.postgis.data_type).to.be.equal(fileUpdates.data.postgis.data_type);
-                        expect(result.file.data.postgis.original_format).to.be.equal(fileUpdates.data.postgis.original_format);
-                        expect(result.file.data.postgis.metadata).to.be.equal(fileUpdates.data.postgis.metadata);
-                        expect(result.file.data.raster.file_id).to.be.equal(fileUpdates.data.raster.file_id);
-                        expect(result.file.data.raster.metadata).to.be.equal(fileUpdates.data.raster.metadata);
+                        expect(result.file.name).to.be.equal(options.name);
+                        expect(result.file.description).to.be.equal(options.description);
+                        expect(result.file.keywords[0]).to.be.equal(options.keywords[0]);
+                        expect(result.file.status).to.be.equal(options.status);
+                        expect(result.file.category).to.be.equal(options.category);
+                        expect(result.file.version).to.be.equal(options.version);
+                        expect(result.file.copyright).to.be.equal(options.copyright);
+                        expect(result.file.data.postgis.database_name).to.be.equal(options.data.postgis.database_name);
+                        expect(result.file.data.postgis.table_name).to.be.equal(options.data.postgis.table_name);
+                        expect(result.file.data.postgis.data_type).to.be.equal(options.data.postgis.data_type);
+                        expect(result.file.data.postgis.original_format).to.be.equal(options.data.postgis.original_format);
+                        expect(result.file.data.postgis.metadata).to.be.equal(options.data.postgis.metadata);
+                        expect(result.file.data.raster.file_id).to.be.equal(options.data.raster.file_id);
+                        expect(result.file.data.raster.metadata).to.be.equal(options.data.raster.metadata);
                         done();
                     });
             });
         });
 	});
 
-    describe('/api/file/getLayers`', function () {
+    describe('/api/file/getLayers', function () {
 
         before(function (done) {
             helpers.createLayer(done);
@@ -166,10 +163,12 @@ describe('File', function () {
         });
         
         it('should respond with status code 422 and error if type is not postgis or raster', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/file/getLayers')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({type: 'not postgis or raster'})
+                    .send({
+                        type: 'not postgis or raster',
+                        access_token : access_token
+                    })
                     .expect(422, expected.missing_information)
                     .end(done);
             });
@@ -177,11 +176,11 @@ describe('File', function () {
 
         context('when type is raster', function () {
             it('should respond with status code 422 and error if data.file_id doesn\'t exist in request body', function (done) {
-                token(function (err, token) {
+                token(function (err, access_token) {
                     api.post('/api/file/getLayers')
-                        .set('Authorization', 'Bearer ' + token)
                         .send({
-                            type: 'raster'
+                            type: 'raster',
+                            access_token : access_token
                         })
                         .expect(422, {"error": format(expected.missing_request_parameters, 'data.file_id')})
                         .end(done);
@@ -189,12 +188,12 @@ describe('File', function () {
             });
 
             it('should respond with status code 200 and empty array of layers if layers with specific file doesn\'t exist', function (done) {
-               token(function (err, token) {
+               token(function (err, access_token) {
                     api.post('/api/file/getLayers')
-                        .set('Authorization', 'Bearer ' + token)
                         .send({
                             type: 'raster',
-                            data: {file_id: 'some file id'}
+                            data: {file_id: 'some file id'},
+                            access_token : access_token
                         })
                         .expect(200)
                         .end(function (err, res) {
@@ -212,12 +211,12 @@ describe('File', function () {
             });
 
             it('should respond with status code 200 and array of layers if type is raster and all parameters are correct', function (done) {
-               token(function (err, token) {
+               token(function (err, access_token) {
                     api.post('/api/file/getLayers')
-                        .set('Authorization', 'Bearer ' + token)
                         .send({
                             type: 'raster',
-                            data: {file_id: helpers.test_layer.file}
+                            data: {file_id: helpers.test_layer.file},
+                            access_token : access_token
                         })
                         .expect(200)
                         .end(function (err, res) {
@@ -238,12 +237,12 @@ describe('File', function () {
         context('when type is postgis', function () {
 
             it('should respond with status code 422 and error if table_name doesn\'t exist in request parameters', function (done) {
-                token(function (err, token) {
+                token(function (err, access_token) {
                     api.post('/api/file/getLayers')
-                        .set('Authorization', 'Bearer ' + token)
                         .send({
                             type: 'postgis',
-                            data: {database_name: 'some database_name'}
+                            data: {database_name: 'some database_name'},
+                            access_token : access_token
                         })
                         .expect(422, expected.missing_information)
                         .end(done);
@@ -251,12 +250,12 @@ describe('File', function () {
             });
 
             it('should respond with status code 422 and error if database_name doesn\'t exist in request parameters', function (done) {
-                token(function (err, token) {
+                token(function (err, access_token) {
                     api.post('/api/file/getLayers')
-                        .set('Authorization', 'Bearer ' + token)
                         .send({
                             type: 'postgis',
-                            data: {table_name: 'some table_name'}
+                            data: {table_name: 'some table_name'},
+                            access_token : access_token
                         })
                         .expect(422, expected.missing_information)
                         .end(done);
@@ -265,12 +264,12 @@ describe('File', function () {
 
 
             it('should respond with status code 200 and empty array of layers if layers with specific table_name doesn\'t exist', function (done) {
-                token(function (err, token) {
+                token(function (err, access_token) {
                     api.post('/api/file/getLayers')
-                        .set('Authorization', 'Bearer ' + token)
                         .send({
                             type: 'postgis',
-                            data: {table_name: 'some table_name', database_name: 'some database_name'}
+                            data: {table_name: 'some table_name', database_name: 'some database_name'},
+                            access_token : access_token
                         })
                         .expect(200)
                         .end(function (err, res) {
@@ -289,12 +288,12 @@ describe('File', function () {
             });
 
             it('should respond with status code 200 and array of specific layers if and all parameters are correctly', function (done) {
-               token(function (err, token) {
+               token(function (err, access_token) {
                     api.post('/api/file/getLayers')
-                        .set('Authorization', 'Bearer ' + token)
                         .send({
                             type: 'postgis',
-                            data: {table_name: helpers.test_layer.data.postgis.table_name, database_name: 'some database_name'}
+                            data: {table_name: helpers.test_layer.data.postgis.table_name, database_name: 'some database_name'},
+                            access_token : access_token
                         })
                         .expect(200)
                         .end(function (err, res) {
