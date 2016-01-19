@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors')
 
 
 // api
@@ -45,18 +46,25 @@ module.exports = api.layer = {
 
 	// create layer
 	create : function (req, res) {
-
-
 		var options = req.body;
+		var ops = [];
+		// res.json(options);
+		// ops.push(function (callback) {
+		// 	api.layer._checkExistingLayer(options, callback);
+		// });
 
-		api.layer.createModel(options, function (err, doc) {
+		ops.push(function (callback) {
+			api.layer.createModel(options, callback);
+		});
+
+		async.waterfall(ops, function (err, doc) {
 			console.log('create layer, err, doc', err, doc);
 
-			if (err) return api.error.general(res, err);
+			console.log(err);
+			if (err) return api.error.general(req, res, err);
 
 			res.json(doc);
 		});
-
 	},
 
 
@@ -578,16 +586,31 @@ module.exports = api.layer = {
 
 	},
 
+	_checkExistingLayer : function (options, callback) {
+		if (options.uuid) {
+			Layer.findOne({uuid : options.uuid})
+				.exec(function (err, layer) {
+					if (err || !layer) {
+						return callback(null, options);
+					}
+
+					return callback(new Error(errors.layer_already_exist.error));
+				});
+		} else {
+			return callback(null, options);
+		}
+	},
 
 	createModel : function (options, callback) {
 
 		// metadata sometimes come as object... todo: check why!
-		if (typeof(options.metadata) == 'object') {
+		if (_.isObject(options.metadata)) {
 			options.metadata = JSON.stringify(options.metadata);
 		}
 
 		var layer 		= new Layer();
-		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
+		// layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
+		layer.uuid 		= 'layer-' + uuid.v4(), 
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';
