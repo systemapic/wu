@@ -29,6 +29,8 @@ ENCODING="-W 'LATIN1"
 ENCODING=$5
 
 echo "Importing shapefile, SRID: $SRID"
+echo $1
+echo $2
 
 
 # import shapefile

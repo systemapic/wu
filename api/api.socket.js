@@ -44,7 +44,6 @@ module.exports = api.socket = {
 
 
 	send : function (channel, user_id, data) {
-
 		console.log('socket send', channel, user_id, data);
 
 		var sock = api.socket._getSocket(user_id);
@@ -53,9 +52,7 @@ module.exports = api.socket = {
 		sock && sock.emit(channel, {
 			data : data
 		});
-
 	},
-
 
 	getServerStats : function (req) {
 
@@ -66,17 +63,13 @@ module.exports = api.socket = {
 				server_stats : stats
 			});
 		});
-
 	},
 
-
 	userEvent :function (req) {
-
 		var options = req.data;
 
 		// send to slack
 		api.slack.userEvent(options);
-
 	},
 
 	sendError : function (userId, err) {
@@ -88,9 +81,6 @@ module.exports = api.socket = {
 		});
 	},
 
-
-
-
 	downloadReady : function (options) {
 
 		// get socket
@@ -99,7 +89,6 @@ module.exports = api.socket = {
 		// send to user
 		socket && socket.emit('downloadReady', options.status);
 	},
-
 
 	uploadDone : function (options) {
 
@@ -159,7 +148,6 @@ module.exports = api.socket = {
 		res.end();
 	},
 
-
 	grindDone : function (req, res) {
 		var fileUuid = req.body.fileUuid,
 		    process = api.socket._getProcessing(fileUuid),
@@ -182,7 +170,6 @@ module.exports = api.socket = {
 		res.end();
 	},
 
-
 	getSocket : function (options) {
 		var userId = api.socket._getUserId(options);
 		var sock = api.socket._getSocket(userId);
@@ -196,16 +183,16 @@ module.exports = api.socket = {
 
 	_getSocket : function (userId) {
 		var session = api.socket._getSession(userId);
-		if (!session) return console.log('ERR 125: no session'.red);;
+		if (!session) return;
 		var sock = api.app.io.sockets.sockets[session];
-		if (!sock) return console.log('ERR 120: no sock'.red);
+		if (!sock) return;
 		return sock;
 	},
 
 	_getSession : function (userId) {
 		var session = _.findKey(api.app.io.handshaken, function (s) {
-			if (!s || !s.session || !s.session.passport) return false;
-			return s.session.passport.user == userId;
+			if (!s || !s.session || !s.session.user_id) return false;
+			return (s.session.user_id.toString() === userId.toString());
 		});
 		return session;
 	},
@@ -218,6 +205,5 @@ module.exports = api.socket = {
 	_getProcessing : function (id) {
 		return api.socket._processing[id];
 	},
-
 	
 }
