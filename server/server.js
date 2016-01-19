@@ -13,6 +13,7 @@ var prodMode = (process.argv[2] == 'prod');
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
+var clientSession = require('client-sessions');
 
 // api
 var api = require('../api/api');
@@ -37,29 +38,49 @@ app.use(multipart()); // for resumable.js uploads
 // app.use(morgan('dev')); 
 
 // required for passport
-var secret = api.utils.getRandom(40);
-console.log('secret:', secret);
+// var secret = api.utils.getRandom(40);
+// console.log('secret:', secret);
 // app.use(express.session({
 // 	secret: secret,  // random
 //         saveUninitialized: true,
 //         resave: true,
 // }));
-var session = require('client-sessions');
-app.use(session({
-  cookieName: 'session',
-  secret: 'eg[isfd-8yF9-7w233315df{}+Ijsli;;to8',
-  duration: 30 * 60 * 1000,
-  activeDuration: 5 * 60 * 1000,
-  cookie: {
-	path: '/', // cookie will only be sent to requests under '/api'
-	// maxAge: 60000, // duration of the cookie in milliseconds, defaults to duration above
-	ephemeral: false, // when true, cookie expires when the browser closes
-	httpOnly: true, // when true, cookie is not accessible from javascript
-	secureProxy : true,
-  }
-}));
 
-app.use(function(req, res, next) {
+
+// cookie session options
+var sessionOptions = {
+	cookieName: 'session',
+	secret: 'eg[isfd-8yF9-7w233315df{}+Ijsli;;to8',
+	duration: 30 * 60 * 1000,
+	activeDuration: 5 * 60 * 1000,
+	cookie: {
+		path: '/', // cookie will only be sent to requests under '/api'
+		ephemeral: false, // when true, cookie expires when the browser closes
+		httpOnly: true, // when true, cookie is not accessible from javascript
+		secureProxy : true,
+	}
+}
+
+// use cookie session
+app.use(clientSession(sessionOptions));
+
+// socket auth middleware
+app.io.use(function(socket, next){
+	if (!socket || !socket.headers || !socket.headers.cookie) return next('invalid');
+	var a = socket.headers.cookie.split('=');
+	var decoded_cookie = clientSession.util.decode(sessionOptions, a[a.length-1]);
+	var tokens = decoded_cookie.content ? decoded_cookie.content.tokens : false;
+	if (!tokens || !tokens.access_token) return next(new Error('Invalid access token.'));
+	api.token.authenticate_socket(tokens.access_token, function (err, user) {
+		if (err) return next(err);
+		socket.session = socket.session || {};
+		socket.session.user_id = user._id;
+		next();
+	});
+});
+
+
+// app.use(function(req, res, next) {
 
 	// ok 	- so user goes to / (for first time). 
 	// 	- is then logged in as public user, and access_token is stored in session
@@ -107,7 +128,7 @@ app.use(function(req, res, next) {
 
 
 	// console.log('middleware: req.session: ', req.session, req.connection)
-	next();
+	// next();
 	// if (req.session && req.session.user) {
 	// 	User.findOne({ email: req.session.user.email }, function(err, user) {
 	// 		if (user) {
@@ -123,7 +144,7 @@ app.use(function(req, res, next) {
 	// 	req.
 	// 	next();
 	// }
-});
+// });
 
 // enable passport
 // app.use(passport.initialize());
