@@ -13,5 +13,11 @@
     },
     "layer_already_exist": {
     	"error": "layer with such uuid already exist"
+    },
+    "bad_file_uuid": {
+        "error": "bad file uuid"
+    },
+    "bad_user_uuid": {
+        "error": "bad user uuid"
     }
 }
