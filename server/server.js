@@ -47,12 +47,12 @@ console.log('secret:', secret);
 var session = require('client-sessions');
 app.use(session({
   cookieName: 'session',
-  secret: 'eg[isfd-8yF9-7w23315df{}+Ijsli;;to8',
+  secret: 'eg[isfd-8yF9-7w233315df{}+Ijsli;;to8',
   duration: 30 * 60 * 1000,
   activeDuration: 5 * 60 * 1000,
   cookie: {
 	path: '/', // cookie will only be sent to requests under '/api'
-	maxAge: 60000, // duration of the cookie in milliseconds, defaults to duration above
+	// maxAge: 60000, // duration of the cookie in milliseconds, defaults to duration above
 	ephemeral: false, // when true, cookie expires when the browser closes
 	httpOnly: true, // when true, cookie is not accessible from javascript
 	secureProxy : true,
