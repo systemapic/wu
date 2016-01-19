@@ -25,6 +25,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var clientSession = require('client-sessions');
 
 // api
 var api = require('../api/api');
@@ -32,17 +33,21 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app, passport) {
 
-	app.io.route('ready', function (req) {
 
-		if (!isLoggedIn(req)) return;
+
+
+	app.io.route('ready', function (req) {
+		// checkAccess(req, function (err) {
+		// 	if (err) return;
+		// 	// console.log('ready: ', req);
+		// });
+
 
 		// req.session.name = req.data
 		// req.session.save(function() {
-		// 	req.io.emit('get-feelings')
+		// 	req.io.emit('hola')
 		// });
 
-		// send cpu monitor
-		// api.socket._sendStatisticsContinuously(req);
 	});
 
 	// Send back the session data.
@@ -56,38 +61,51 @@ module.exports = function(app, passport) {
 
 	// get stats
 	app.io.route('get_server_stats', function (req) {
-		if (!isLoggedIn(req)) return;
 		
 		api.socket.getServerStats(req);
 	});
 
 	// get stats
 	app.io.route('user_event', function (req) {
-		if (!isLoggedIn(req)) return;
 		
 		api.socket.userEvent(req);
 	});
 
 	// get stats
 	app.io.route('tileset_meta', function (req) {
-		if (!isLoggedIn(req)) return;
 		
 		api.geo.getTilesetMeta(req);
 	});
 
 	// get stats
 	app.io.route('generate_tiles', function (req) {
-		if (!isLoggedIn(req)) return;
 		
 		api.geo.generateTiles(req);
 	});
 
+	// helper function : if is logged in
+	function checkAccess(req, done) {
+		// console.log('isLogged In req.dta:', req);
+		// console.log('api.app.io.sockets', api.app.io.sockets.sockets);
+
+
+		api.token.authenticate_socket(req, done);
+		// return true;
+		// if (req.session.passport) return true;
+		// return false;
+	}
+
 
 	// helper function : if is logged in
-	function isLoggedIn(req, res, next) {
-		return true;
+	function isLoggedIn(req, done) {
+		// console.log('isLogged In req.dta:', req.data);
+		// console.log('api.app.io.sockets', api.app.io.sockets.sockets);
+
+
+		api.token.authenticate_socket(req, done);
+		// return true;
 		// if (req.session.passport) return true;
-		return false;
+		// return false;
 	}
 
 

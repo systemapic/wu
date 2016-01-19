@@ -212,7 +212,7 @@ module.exports = function(grunt) {
 					'public/js/src/core/api.js',
 
 					// socket.io
-					'public/js/src/core/socket.js',
+					'public/js/src/core/api.socket.js',
 
 					// controller
 					'public/js/src/core/controller.js',
