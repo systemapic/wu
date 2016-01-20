@@ -14,6 +14,207 @@ var second_test_user = {
 };
 var testFile;
 var format = require('util').format;
+var newFileWithPostgisType = {
+    uuid : 'newFileWithPostgisType',
+    family : 'newFile_family',
+    createdBy : 'newFile_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    absfolder : 'newFile_absfolder',
+    name : 'newFile_name',
+    absfolder : 'newFile_absfolder',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    keywords : 'newFile_keywords',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    keywords : 'newFile_keywords',
+    type : 'postgis',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            database_name : 'new database_name',
+            table_name : 'newFileWithPostgisType',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata',
+        },
+        raster : {
+            file_id : 'new file_id',
+            metadata : 'new metadata'
+        }
+    }
+};
+var newFileWithPostgisTypeWithoutDatabaseName = {
+    uuid : 'newFileWithPostgisTypeWithoutDatabaseName',
+    family : 'newFile_family',
+    createdBy : 'newFile_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    absfolder : 'newFile_absfolder',
+    name : 'newFile_name',
+    absfolder : 'newFile_absfolder',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    keywords : 'newFile_keywords',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    keywords : 'newFile_keywords',
+    type : 'postgis',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            table_name : 'newFileWithPostgisTypeWithoutDatabaseName',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata',
+        },
+        raster : {
+            file_id : 'newFileWithPostgisTypeWithoutDatabaseName',
+            metadata : 'new metadata'
+        }
+    }
+};
+var newFileWithPostgisTypeWithoutTableName = {
+    uuid : 'newFileWithPostgisTypeWithoutTableName',
+    family : 'newFile_family',
+    createdBy : 'newFile_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    absfolder : 'newFile_absfolder',
+    name : 'newFile_name',
+    absfolder : 'newFile_absfolder',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    keywords : 'newFile_keywords',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    keywords : 'newFile_keywords',
+    type : 'postgis',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            database_name : 'newFileWithPostgisTypeWithoutTableName',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata',
+        },
+        raster : {
+            file_id : 'newFileWithPostgisTypeWithoutTableName',
+            metadata : 'new metadata'
+        }
+    }
+};
+var newFileWithRasterTypeWithoutFileId = {
+    uuid : 'newFileWithRasterTypeWithoutFileId',
+    family : 'newFile_family',
+    createdBy : 'newFile_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    absfolder : 'newFile_absfolder',
+    name : 'newFile_name',
+    absfolder : 'newFile_absfolder',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    keywords : 'newFile_keywords',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    keywords : 'newFile_keywords',
+    type : 'raster',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            database_name : 'new database_name',
+            table_name : 'newFileWithRasterTypeWithoutFileId',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata',
+        },
+        raster : {
+            metadata : 'new metadata'
+        }
+    }
+};
+var newFileWithRasterType = {
+    uuid : 'newFileWithRasterType',
+    family : 'newFile_family',
+    createdBy : 'newFile_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    absfolder : 'newFile_absfolder',
+    name : 'newFile_name',
+    absfolder : 'newFile_absfolder',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    keywords : 'newFile_keywords',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    keywords : 'newFile_keywords',
+    type : 'raster',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            database_name : 'new database_name',
+            table_name : 'newFileWithRasterType',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata',
+        },
+        raster : {
+            file_id : 'newFileWithRasterType',
+            metadata : 'new metadata'
+        }
+    }
+};
+var newFileNotRasterAndPostgis = {
+    uuid : 'newFileNotRasterAndPostgis',
+    family : 'newFile_family',
+    createdBy : 'newFile_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    absfolder : 'newFile_absfolder',
+    name : 'newFile_name',
+    absfolder : 'newFile_absfolder',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    keywords : 'newFile_keywords',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    keywords : 'newFile_keywords',
+    type : 'test',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            database_name : 'new database_name',
+            table_name : 'newFileNotRasterAndPostgis',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata',
+        },
+        raster : {
+            file_id : 'newFileNotRasterAndPostgis',
+            metadata : 'new metadata'
+        }
+    }
+};
 
 describe('File', function () {
     before(function(done) { helpers.create_user(done); });
@@ -22,9 +223,9 @@ describe('File', function () {
 
     before(function(done) {
         helpers.create_file(function (err, result) {
-                testFile = result;
-                done(err);
-            });
+            testFile = result;
+            done(err);
+        });
     });
 
     after(function(done) {
@@ -36,7 +237,7 @@ describe('File', function () {
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/file/update')
                 .send({})
-                .expect(401)
+                .expect(401, expected.invalid_token)
                 .end(done);
         });
 
@@ -310,5 +511,220 @@ describe('File', function () {
                 });
             });
         });
+    });
+
+    describe('/api/file/delete', function () {
+        var createdFileWithPostgisType = {};
+        var createdFileWithRasterType = {};
+        var createdFileNotRasterAndPostgis = {};
+        var createdFileWithPostgisTypeWithoutDatabaseName = {};
+        var createdFileWithPostgisTypeWithoutTableName = {};
+        var createdFileWithRasterTypeWithoutFileId = {};
+
+        before(function (done) {
+            helpers.create_file_by_parameters(newFileWithPostgisType, function (err, res) {
+                if (err) {
+                    done(err);
+                }
+
+                createdFileWithPostgisType = res;
+                done();
+            });
+        });
+
+        before(function (done) {
+            helpers.create_file_by_parameters(newFileWithRasterType, function (err, res) {
+                if (err) {
+                    done(err);
+                }
+
+                createdFileWithRasterType = res;
+                done();
+            });
+        });
+
+        before(function (done) {
+            helpers.create_file_by_parameters(newFileNotRasterAndPostgis, function (err, res) {
+                if (err) {
+                    done(err);
+                }
+
+                createdFileNotRasterAndPostgis = res;
+                done();
+            });
+        });
+
+        before(function (done) {
+            helpers.create_file_by_parameters(newFileWithPostgisTypeWithoutDatabaseName, function (err, res) {
+                if (err) {
+                    done(err);
+                }
+
+                createdFileWithPostgisTypeWithoutDatabaseName = res;
+                done();
+            });
+        });
+
+        before(function (done) {
+            helpers.create_file_by_parameters(newFileWithPostgisTypeWithoutTableName, function (err, res) {
+                if (err) {
+                    done(err);
+                }
+
+                createdFileWithPostgisTypeWithoutTableName = res;
+                done();
+            });
+        });
+
+        before(function (done) {
+            helpers.create_file_by_parameters(newFileWithRasterTypeWithoutFileId, function (err, res) {
+                if (err) {
+                    done(err);
+                }
+
+                createdFileWithRasterTypeWithoutFileId = res;
+                done();
+            });
+        });
+
+        after(function (done) {
+            helpers.delete_file_by_id(createdFileWithPostgisType.uuid, done);
+        });
+
+        after(function (done) {
+            helpers.delete_file_by_id(createdFileWithRasterType.uuid, done);
+        });
+
+        after(function (done) {
+            helpers.delete_file_by_id(createdFileNotRasterAndPostgis.uuid, done);
+        });
+
+        after(function (done) {
+            helpers.delete_file_by_id(createdFileWithPostgisTypeWithoutDatabaseName.uuid, done);
+        });
+
+        after(function (done) {
+            helpers.delete_file_by_id(createdFileWithPostgisTypeWithoutTableName.uuid, done);
+        });
+
+        after(function (done) {
+            helpers.delete_file_by_id(createdFileWithRasterTypeWithoutFileId.uuid, done);
+        });
+        
+        it('should respond with status code 401 when not authenticated', function (done) {
+            api.post('/api/file/delete')
+                .send({})
+                .expect(401)
+                .end(done);
+        });
+
+        it('should respond with status code 422 when file_id doesn\'t exist in request body', function (done) {
+            token(function (err, access_token) {
+                api.post('/api/file/delete')
+                    .send({
+                        access_token : access_token
+                    })
+                    .expect(422, expected.no_such_file)
+                    .end(done);
+            });
+        });
+
+        it('should respond with status code 200 and success: false if file type is postgis and database_name doesn\'t exist', function (done) {
+           token(function (err, access_token) {
+                api.post('/api/file/delete')
+                    .send({
+                        file_id : createdFileWithPostgisTypeWithoutDatabaseName.uuid,
+                        access_token : access_token
+                    })
+                    .expect(200)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var status = helpers.parse(res.text);
+                        expect(status.success).to.be.false;
+                        done();
+                    });
+            });
+        });
+
+        it('should respond with status code 200 and success: false if file type is postgis and table_name doesn\'t exist', function (done) {
+           token(function (err, access_token) {
+                api.post('/api/file/delete')
+                    .send({
+                        file_id : createdFileWithPostgisTypeWithoutTableName.uuid,
+                        access_token : access_token
+                    })
+                    .expect(200)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var status = helpers.parse(res.text);
+                        expect(status.success).to.be.false;
+                        done();
+                    });
+            });
+        });
+
+        it('should respond with status code 422 and success: false if file type is raster and file_id doesn\'t exist in data', function (done) {
+           token(function (err, access_token) {
+                api.post('/api/file/delete')
+                    .send({
+                        file_id : createdFileWithRasterTypeWithoutFileId.uuid,
+                        access_token : access_token
+                    })
+                    .expect(422, expected.missing_information)
+                    .end(done);
+            });
+        });
+
+        it('should respond with status code 200 if file type isn\'t postgis and raster', function (done) {
+            token(function (err, access_token) {
+                api.post('/api/file/delete')
+                .send({
+                    file_id : createdFileNotRasterAndPostgis.uuid,
+                    access_token : access_token
+                })
+                .expect(200)
+                .end(function (err, res) {
+                    if (err) {
+                        done(err);
+                    }
+                    var status = helpers.parse(res.text);
+                    
+                    expect(status.err).to.be.undefined;
+                    expect(status.success).to.be.true;
+                    done();
+                });
+            });
+        });
+
+        it('should respond with status code 200 if file type is postgis', function (done) {
+            token(function (err, access_token) {
+                api.post('/api/file/delete')
+                    .send({
+                        file_id : createdFileWithPostgisType.uuid,
+                        access_token : access_token
+                    })
+                    .expect(200)
+                    .end(done);
+            });
+        });
+
+        it('should respond with status code 200 if file type is raster', function (done) {
+            token(function (err, access_token) {
+                api.post('/api/file/delete')
+                    .send({
+                        file_id : createdFileWithRasterType.uuid,
+                        access_token : access_token
+                    })
+                    .expect(200)
+                    .end(done);
+            });
+        });
+
     });
 });

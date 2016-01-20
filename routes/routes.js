@@ -547,6 +547,68 @@ module.exports = function(app, passport) {
 		api.postgis.downloadDatasetFromLayer(req, res);
 	});
 	
+	/**
+	* @api {post} /api/file/update Update a file
+	* @apiName update
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} uuid Uuid of file
+	*
+	* @apiSuccess {Array} updated Array of updated fields
+	* @apiSuccess {Object} file Updated file
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "updated": ['name', 'description'],
+	*   "file": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+    *       created: '2016-01-19T12:49:48.943Z',
+    *       type: 'postgis',
+    *       status: 'new status',
+    *       version: 1,
+    *       category: 'new category',
+    *       copyright: 'new copyright',
+    *       description: 'new description',
+    *       originalName: 'test_file_originalName',
+    *       name: 'new name',
+    *       absfolder: 'test_file_absfolder',
+    *       folder: 'test_file_folder',
+    *       createdByName: 'test_file_createdByName',
+    *       createdBy: 'test-user-uuid',
+    *       family: 'test_file_family',
+    *       uuid: 'test_file_uuid',
+    *       __v: 1,
+    *       access: {
+	*           users   : ['new user'],
+	*           projects: ['new project'],
+	*            clients : ['new clients']
+    *       },
+    *       data: {
+    *           postgis : {
+	*               database_name : 'new database name',
+	*               table_name : 'new table name',
+	*               data_type : 'new data type',
+	*               original_format : 'new original format',
+	*               metadata : 'new metadata'
+	*           }
+	*       },
+    *       format: ['new format'],
+    *       keywords: ['new keywords'],
+    *       files: ['new files']
+	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError File with uuid <code>uuid</code> doesn't exist. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: File doesn't exist
+	* {
+	*    "error": "bad file uuid"
+	* }
+	*/
 	// =====================================
 	// UPDATE FILE =========================
 	// =====================================
@@ -555,6 +617,86 @@ module.exports = function(app, passport) {
 		api.file.update(req, res);
 	});
 
+	/**
+	* @api {post} /api/file/getLayers Get layers
+	* @apiName getLayers
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} type Type of file(raster or postgis)
+	* @apiParam {Object} data Object with file_id field for raster files or database_name and table_name for postgis files
+	* @apiSuccess {Array} array of layers
+	* @apiSuccessExample {json} Success-Response:
+	* [
+	*   {
+	*	  uuid: 'layer uuid',
+	*	  title: 'layer title',
+	*	  description: 'layer description',
+	*	  satellite_position: 'layer satellite_position',
+	*	  copyright: 'layer copyright',
+	*	  legend: 'layer legend',
+	*	  maxZoom: 'layer maxZoom',
+	*	  minZoom: 'layer minZoom',
+	*	  zIndex: 4,	// number
+	*	  bounds: 'layer bounds',
+	*	  tms: true,
+	*	  attribution: 'layer attribution',
+	*	  accessToken: 'layer accessToken',
+	*	  opacity: 'layer opacity', 	
+	*	  data : {
+	*	  	geojson: 'geojson',
+	*		topojson: 'topojson',
+	*		cartoid: 'cartoid',
+	*		raster: 'raster',
+	*		rastertile: 'rastertile',
+	*		vectortile: 'vectortile',
+	*		mapbox: 'mapbox',
+	*		cartodb: 'cartodb',
+	*		osm: 'osm',
+	*		norkart: 'norkart',
+	*		google: 'google',
+	*		postgis: {
+	*		  sql: 'sql',
+	*		  cartocss: 'cartocss',
+	*		  cartocss_version: 'cartocss_version',
+	*		  geom_column: 'geom_column',
+	*		  file_id: 'file_id',
+	*		  database_name: 'database_name',
+	*		  table_name: 'table_name',
+	*		  data_type: 'data_type',
+	*		  geom_type: 'geom_type',
+	*		  raster_band: 5,
+	*		  layer_id: 'layer_id',
+	*		  metadata: 'metadata',
+	*		}
+	*	  },
+	*	  metadata : 'metadata',
+	*	  tooltip: 'tooltip',
+	*	  legends: 'legends',
+	*	  file: 'file',
+	*	  style: 'style',
+	*	  filter: 'filter',
+	*	  tileType: 'tileType'
+	*   }
+	* ]
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Missing required fields. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: Missing type parameter or database_name and table_name for postgis type
+	* {
+	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+	* }
+	* @apiError Missing required fields. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: Missing file_id for rater type
+	* {
+	*    "error": "request body should contains data.file_id"
+	* }
+	*/
 	// =====================================
 	// GET LAYERS OF FILE ==================
 	// =====================================
@@ -572,16 +714,26 @@ module.exports = function(app, passport) {
 	});
 	
 	/**
-	* @api {post} /api/data/delete Delete data
-	* @apiName delete_data
-	* @apiGroup Data
+	* @api {post} /api/file/delete Delete data
+	* @apiName delete
+	* @apiGroup File
 	* @apiUse token
 	* @apiParam {String} file_id File id
-	*
 	* @apiSuccess {json} status Upload Status JSON
 	* @apiSuccessExample {json} Success-Response:
 	* {
-	*  "success": true
+	*   "success": true,
+	*   "err": {}
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* Error 422: Missing file_id doesn't exist in request body or in file data.raster field for raster type
+	* {
+	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
 	* }
 	*/
 	// =====================================
@@ -616,6 +768,37 @@ module.exports = function(app, passport) {
 		api.layer.get(req, res);
 	});
 
+	/**
+	* @api {post} /api/layers/new Create layer
+	* @apiName create
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} title Title of new layer
+	* @apiParam {String} description Description of new layer
+	* @apiParam {String} legend Legend of new legend
+	* @apiParam {String} file File of new layer
+	* @apiParam {String} metadata Metadata of new layer
+	* @apiParam {String} data Data of new layer
+	* @apiParam {String} style Style of new layer
+	* @apiSuccess {JSON} Layer New Layer object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*    __v: 0,
+	*    lastUpdated: '2016-01-20T10:55:30.983Z',
+	*    created: '2016-01-20T10:55:30.983Z',
+	*    legend: '',
+	*    description: 'new layer description',
+	*    title: 'new layer title',
+	*    uuid: 'layer-ae4fc38c-58f0-4468-81e7-7330d226dc24',
+	*    _id: '569f67a2ebb7233b667d8a02'
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	*/
 	// =====================================
 	// CREATE NEW LAYER ====================
 	// =====================================
@@ -632,6 +815,39 @@ module.exports = function(app, passport) {
 		api.layer.createOSM(req, res);  	// todo: api.layer.osm.create()
 	});
 
+	/**
+	* @api {post} /api/layer/update Update layer
+	* @apiName update
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} layer uuid of updated layer
+	* @apiParam {String} title New title of updated layer
+	* @apiParam {String} description New description of updated layer
+	* @apiParam {String} satellite_position New satellite_position of updated layer
+	* @apiParam {String} copyright New copyright of updated layer
+	* @apiParam {String} tooltip New tooltip of updated layer
+	* @apiParam {String} style New style of updated layer
+	* @apiParam {String} filter New filter of updated layer
+	* @apiParam {String} legends New legends of updated layer
+	* @apiParam {String} opacity New opacity of updated layer
+	* @apiParam {Number} zIndex New zIndex of updated layer
+	* @apiParam {Object} data New data of updated layer
+	* @apiSuccess {String} response Update info 
+	* @apiSuccessExample {String} Success-Response:
+	* 'save done'
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Missing required fields. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: Missing layer parameter or layer with such id doesn't exist
+	* {
+	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+	* }
+	*/
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================

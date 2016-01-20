@@ -22,5 +22,8 @@
     },
     "bad_user_uuid": {
         "error": "bad user uuid"
+    },
+    "no_such_file": {
+        "error": "No such file."
     }
 }
