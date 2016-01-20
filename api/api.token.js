@@ -263,7 +263,9 @@ module.exports = api.token = {
 		api.token.set({
 			user : user,
 			token : token
-		}, done);
+		}, function (err, user) {
+			done(err, user);
+		});
 	},
 
 	// reset access token
@@ -314,7 +316,9 @@ module.exports = api.token = {
 		public_user.invitedBy 		= 'self';
 
 		// save the user
-		public_user.save(done);
+		public_user.save(function (err, user) {
+			done(err, user);
+		});
 	},
 
 
