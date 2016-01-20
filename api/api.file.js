@@ -410,36 +410,35 @@ module.exports = api.file = {
 		File
 		.findOne({uuid : file_id})
 		.exec(function (err, file) {
-			if (err || !file) return api.error.general(req, res, err || 'No such file.');
+			if (err || !file) {
+				return api.error.general(req, res, err || new Error(errors.no_such_file.error));
+			}
 
 			var type = file.type;
 
-			if (type == 'postgis') {
+			if (type === 'postgis') {
 				ops.push(function (callback) {
-					console.log('postot');
 					api.file.deletePostGISFile({
 						user : req.user,
 						file : file
-					}, callback);
+					}, callback, req, res);
 				});
 			}
 
-			if (type == 'raster') {
+			if (type === 'raster') {
 				ops.push(function (callback) {
-					console.log('postot');
 					api.file.deleteRasterFile({
 						user : req.user,
 						file : file
-					}, callback);
+					}, callback, req, res);
 				});
 			}
 
-			async.series(ops, function (err, result) {
-				console.log('err, result', err, result);
-				
+			async.series(ops, function (error, result) {
+				console.log('err, result', error, result);
 				res.json({
-					err : err,
-					success : !err
+					err : error,
+					success : !error
 				});
 			});
 		});
@@ -448,7 +447,7 @@ module.exports = api.file = {
 	},
 
 
-	deleteRasterFile : function (options, done) {
+	deleteRasterFile : function (options, done, req, res) {
 		
 		var file = options.file;
 		var user = options.user;
@@ -462,13 +461,13 @@ module.exports = api.file = {
 		// get file model
 		ops.push(function (callback) {
 			File
-			.findOne({uuid : file_id})
-			.exec(callback)
+				.findOne({uuid : file_id})
+				.exec(callback);
 		});
 
 		// check permissions
 		ops.push(function (file, callback) {
-			console.log('TODO! permission to delete file!')
+			console.log('TODO! permission to delete file!');
 
 			// api.access.to.delete_file({
 			// 	file : file,
@@ -490,7 +489,7 @@ module.exports = api.file = {
 
 					removedObjects.user = {
 						file_id : file._id
-					}
+					};
 
 					callback(null);
 				});
@@ -561,20 +560,20 @@ module.exports = api.file = {
 		var ops = [];
 		var removedObjects = {};
 
-		if (!database_name || !table_name) return api.error.missingInformation(req, res);
-
+		if (!database_name || !table_name) {
+			return done(new Error(errors.missing_information.error));
+		}
 
 		// get file model
 		ops.push(function (callback) {
 			File
 			.findOne({uuid : fileUuid})
-			.exec(callback)
+			.exec(callback);
 		});
 
 		// check permissions
 		ops.push(function (file, callback) {
 			console.log('TODO! permission to delete file!')
-
 			// api.access.to.delete_file({
 			// 	file : file,
 			// 	user : account
@@ -631,7 +630,7 @@ module.exports = api.file = {
 			Layer
 			.find({'data.postgis.table_name' : table_name})
 			.exec(function (err, layers) {
-				if (err) return api.error.general(req, res, err);
+				if (err) return err;
 
 				// todo: remove layers from projects
 				api.file.deleteLayersFromProjects({
@@ -661,8 +660,6 @@ module.exports = api.file = {
 				removed : removedObjects
 			})
 		});
-
-
 
 	},
 
@@ -1456,35 +1453,4 @@ module.exports = api.file = {
 
 
 	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

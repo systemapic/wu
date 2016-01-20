@@ -209,6 +209,39 @@ module.exports = util = {
             .exec(callback);
     },
 
+    create_file_by_parameters : function (newFile, callback) {
+        var file = new File();
+
+        file.uuid = newFile.uuid;
+        file.family = newFile.family;
+        file.createdBy = newFile.createdBy;
+        file.createdByName = newFile.createdByName;
+        file.files = newFile.files;
+        file.folder = newFile.folder;
+        file.absfolder = newFile.absfolder;
+        file.name = newFile.name;
+        file.absfolder = newFile.absfolder;
+        file.originalName = newFile.originalName;
+        file.description = newFile.description;
+        file.copyright = newFile.copyright;
+        file.keywords = newFile.keywords;
+        file.category = newFile.category;
+        file.version = newFile.version;
+        file.status = newFile.status;
+        file.keywords = newFile.keywords;
+        file.type = newFile.type;
+        file.format = newFile.format;
+        file.data = newFile.data;
+
+        file.save(callback);
+    },
+
+    delete_file_by_id : function (fileId, callback) {
+        File.findOne({uuid : fileId})
+            .remove()
+            .exec(callback);
+    },
+
     createLayer: function (callback) {
         var layer = new Layer();
 
