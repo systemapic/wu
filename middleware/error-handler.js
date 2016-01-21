@@ -18,10 +18,10 @@ module.exports = function () {
    * @param {Object} req express request object
    * @param {Object} res express response object
    * @param {Object} next next middleware in line in the
-   *    request-response cycle of an Express application
+   * request-response cycle of an Express application
    */
   return function (err, req, res, next) {
-    var type = req.accepts(['html', 'json', 'text']);
+    var type = err.type;
 
     //pick required fields
     err = _.pick(err, fields);
@@ -31,16 +31,18 @@ module.exports = function () {
 
     console.log('Error: ', err);
 
-    switch (type) {
-    case 'html':
+    if (type === 'html') {
+       console.log(type, type, type, type, err);
+
       res.render('error', {
         error: err
       });
-      return;
-    case 'json':
-      res.json(err);
-      return;
-    default:
+    } else if (type === 'json') {
+      console.log(type, type, type, type, err);
+      res.json({
+        error: err
+      });
+    } else {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.end(err.message);
     }

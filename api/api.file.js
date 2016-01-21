@@ -35,6 +35,7 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -401,17 +402,38 @@ module.exports = api.file = {
 	},
 
 
-	deleteFile : function (req, res) {
-
+	deleteFile : function (req, res, next) {
 		var file_id = req.body.file_id;
 		var ops = [];
+		var validateError;
 
+		if (!file_id) {
+			validateError = {
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: ['file_id']
+				}
+			};
+
+			return next(validateError);
+		}
 
 		File
 		.findOne({uuid : file_id})
 		.exec(function (err, file) {
-			if (err || !file) {
-				return api.error.general(req, res, err || new Error(errors.no_such_file.errorMessage));
+			if (err) {
+				return next(err);
+			}
+
+			if (!file) {
+				err = {
+					message: errors.no_such_file.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json',
+				}
+				return next(err);
 			}
 
 			var type = file.type;
@@ -442,7 +464,6 @@ module.exports = api.file = {
 				});
 			});
 		});
-
 
 	},
 
@@ -483,7 +504,11 @@ module.exports = api.file = {
 			User
 			.findOne({uuid : user.uuid})
 			.exec(function (err, u) {
+				console.log('I am here I am here I am here I am here I am here I am here I am here I am here I am here I am here ');
+				console.log(u.files);
 				u.files.pull(file._id);
+				console.log(u.files);
+				
 				u.markModified('files');
 				u.save(function (err) {
 
