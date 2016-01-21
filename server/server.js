@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
 var path     = require('path');
-var compress = require('compression')
+var compress = require('compression');
 var favicon  = require('serve-favicon');
 var cors     = require('cors');
 var morgan   = require('morgan');
@@ -21,7 +21,7 @@ var config = api.config;
 var port = config.port;
 
 // socket enabled server
-app = express().http().io()
+app = express().http().io();
 
 // connect to our database
 var sessionStore = mongoose.connect(config.mongo.url); 
@@ -59,7 +59,7 @@ var sessionOptions = {
 		httpOnly: true, // when true, cookie is not accessible from javascript
 		secureProxy : true,
 	}
-}
+};
 
 // use cookie session
 app.use(clientSession(sessionOptions));

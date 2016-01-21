@@ -23,7 +23,6 @@ var newFileWithPostgisType = {
     folder : 'newFile_folder',
     absfolder : 'newFile_absfolder',
     name : 'newFile_name',
-    absfolder : 'newFile_absfolder',
     originalName : 'newFile_originalName',
     description : 'newFile_description',
     copyright : 'newFile_copyright',
@@ -31,7 +30,6 @@ var newFileWithPostgisType = {
     category : 'newFile_category',
     version : 1,
     status : 'newFile_status',
-    keywords : 'newFile_keywords',
     type : 'postgis',
     format : ['newFile_format'],
     data: {
@@ -40,7 +38,7 @@ var newFileWithPostgisType = {
             table_name : 'newFileWithPostgisType',
             data_type : 'new data_type',         // raster or vector
             original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata : 'new metadata',
+            metadata : 'new metadata'
         },
         raster : {
             file_id : 'new file_id',
@@ -57,7 +55,6 @@ var newFileWithPostgisTypeWithoutDatabaseName = {
     folder : 'newFile_folder',
     absfolder : 'newFile_absfolder',
     name : 'newFile_name',
-    absfolder : 'newFile_absfolder',
     originalName : 'newFile_originalName',
     description : 'newFile_description',
     copyright : 'newFile_copyright',
@@ -65,7 +62,6 @@ var newFileWithPostgisTypeWithoutDatabaseName = {
     category : 'newFile_category',
     version : 1,
     status : 'newFile_status',
-    keywords : 'newFile_keywords',
     type : 'postgis',
     format : ['newFile_format'],
     data: {
@@ -73,7 +69,7 @@ var newFileWithPostgisTypeWithoutDatabaseName = {
             table_name : 'newFileWithPostgisTypeWithoutDatabaseName',
             data_type : 'new data_type',         // raster or vector
             original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata : 'new metadata',
+            metadata : 'new metadata'
         },
         raster : {
             file_id : 'newFileWithPostgisTypeWithoutDatabaseName',
@@ -90,11 +86,9 @@ var newFileWithPostgisTypeWithoutTableName = {
     folder : 'newFile_folder',
     absfolder : 'newFile_absfolder',
     name : 'newFile_name',
-    absfolder : 'newFile_absfolder',
     originalName : 'newFile_originalName',
     description : 'newFile_description',
     copyright : 'newFile_copyright',
-    keywords : 'newFile_keywords',
     category : 'newFile_category',
     version : 1,
     status : 'newFile_status',
@@ -121,13 +115,11 @@ var newFileWithRasterTypeWithoutFileId = {
     createdByName : 'newFile_createdByName',
     files : ['newFile_files'],
     folder : 'newFile_folder',
-    absfolder : 'newFile_absfolder',
     name : 'newFile_name',
     absfolder : 'newFile_absfolder',
     originalName : 'newFile_originalName',
     description : 'newFile_description',
     copyright : 'newFile_copyright',
-    keywords : 'newFile_keywords',
     category : 'newFile_category',
     version : 1,
     status : 'newFile_status',
@@ -154,13 +146,11 @@ var newFileWithRasterType = {
     createdByName : 'newFile_createdByName',
     files : ['newFile_files'],
     folder : 'newFile_folder',
-    absfolder : 'newFile_absfolder',
     name : 'newFile_name',
     absfolder : 'newFile_absfolder',
     originalName : 'newFile_originalName',
     description : 'newFile_description',
     copyright : 'newFile_copyright',
-    keywords : 'newFile_keywords',
     category : 'newFile_category',
     version : 1,
     status : 'newFile_status',
@@ -188,13 +178,11 @@ var newFileNotRasterAndPostgis = {
     createdByName : 'newFile_createdByName',
     files : ['newFile_files'],
     folder : 'newFile_folder',
-    absfolder : 'newFile_absfolder',
     name : 'newFile_name',
     absfolder : 'newFile_absfolder',
     originalName : 'newFile_originalName',
     description : 'newFile_description',
     copyright : 'newFile_copyright',
-    keywords : 'newFile_keywords',
     category : 'newFile_category',
     version : 1,
     status : 'newFile_status',
@@ -224,7 +212,7 @@ describe('File', function () {
     before(function(done) {
         helpers.create_file(function (err, result) {
             testFile = result;
-            done(err);
+            return done(err);
         });
     });
 
@@ -237,7 +225,7 @@ describe('File', function () {
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/file/update')
                 .send({})
-                .expect(401, expected.invalid_token)
+                .expect(401, helpers.createExpectedError(expected.invalid_token.errorMessage))
                 .end(done);
         });
 
@@ -245,7 +233,7 @@ describe('File', function () {
             token(function (err, access_token) {
                 api.post('/api/file/update')
                     .send({access_token : access_token})
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -257,7 +245,7 @@ describe('File', function () {
                     	uuid: "invalid file id",
                         access_token : access_token
                     })
-                    .expect(422, expected.bad_file_uuid)
+                    .expect(422, helpers.createExpectedError(expected.bad_file_uuid.errorMessage))
                     .end(done);
             });
         });
@@ -277,7 +265,7 @@ describe('File', function () {
                         uuid: testFile.uuid,
                         access_token : access_token
                     })
-                    .expect(401, expected.invalid_token)
+                    .expect(401, helpers.createExpectedError(expected.invalid_token.errorMessage))
                     .end(done);
             });
         });
@@ -370,7 +358,7 @@ describe('File', function () {
                         type: 'not postgis or raster',
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -383,7 +371,7 @@ describe('File', function () {
                             type: 'raster',
                             access_token : access_token
                         })
-                        .expect(422, {"error": format(expected.missing_request_parameters, 'data.file_id')})
+                        .expect(422, {"error": format(expected.missing_request_parameters.errorMessage, 'data.file_id')})
                         .end(done);
                 });
             });
@@ -445,7 +433,7 @@ describe('File', function () {
                             data: {database_name: 'some database_name'},
                             access_token : access_token
                         })
-                        .expect(422, expected.missing_information)
+                        .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                         .end(done);
                 });
             });
@@ -458,7 +446,7 @@ describe('File', function () {
                             data: {table_name: 'some table_name'},
                             access_token : access_token
                         })
-                        .expect(422, expected.missing_information)
+                        .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                         .end(done);
                 });
             });
@@ -524,7 +512,7 @@ describe('File', function () {
         before(function (done) {
             helpers.create_file_by_parameters(newFileWithPostgisType, function (err, res) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 createdFileWithPostgisType = res;
@@ -535,7 +523,7 @@ describe('File', function () {
         before(function (done) {
             helpers.create_file_by_parameters(newFileWithRasterType, function (err, res) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 createdFileWithRasterType = res;
@@ -546,7 +534,7 @@ describe('File', function () {
         before(function (done) {
             helpers.create_file_by_parameters(newFileNotRasterAndPostgis, function (err, res) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 createdFileNotRasterAndPostgis = res;
@@ -557,7 +545,7 @@ describe('File', function () {
         before(function (done) {
             helpers.create_file_by_parameters(newFileWithPostgisTypeWithoutDatabaseName, function (err, res) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 createdFileWithPostgisTypeWithoutDatabaseName = res;
@@ -568,7 +556,7 @@ describe('File', function () {
         before(function (done) {
             helpers.create_file_by_parameters(newFileWithPostgisTypeWithoutTableName, function (err, res) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 createdFileWithPostgisTypeWithoutTableName = res;
@@ -579,7 +567,7 @@ describe('File', function () {
         before(function (done) {
             helpers.create_file_by_parameters(newFileWithRasterTypeWithoutFileId, function (err, res) {
                 if (err) {
-                    done(err);
+                    return done(err);
                 }
 
                 createdFileWithRasterTypeWithoutFileId = res;
@@ -624,7 +612,7 @@ describe('File', function () {
                     .send({
                         access_token : access_token
                     })
-                    .expect(422, expected.no_such_file)
+                    .expect(422, helpers.createExpectedError(expected.no_such_file.errorMessage))
                     .end(done);
             });
         });
@@ -676,7 +664,7 @@ describe('File', function () {
                         file_id : createdFileWithRasterTypeWithoutFileId.uuid,
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -691,7 +679,7 @@ describe('File', function () {
                 .expect(200)
                 .end(function (err, res) {
                     if (err) {
-                        done(err);
+                        return done(err);
                     }
                     var status = helpers.parse(res.text);
                     

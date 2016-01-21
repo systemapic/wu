@@ -151,7 +151,7 @@ describe('Layer', function () {
 
                 api.post('/api/layer/update')
                     .send({access_token : access_token})
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);                
             });
         });
@@ -167,7 +167,7 @@ describe('Layer', function () {
                         layer: 'bad layer',
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });

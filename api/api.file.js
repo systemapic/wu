@@ -34,7 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
-var errors = require('../shared/errors')
+var errors = require('../shared/errors');
 
 // api
 var api = module.parent.exports;
@@ -411,7 +411,7 @@ module.exports = api.file = {
 		.findOne({uuid : file_id})
 		.exec(function (err, file) {
 			if (err || !file) {
-				return api.error.general(req, res, err || new Error(errors.no_such_file.error));
+				return api.error.general(req, res, err || new Error(errors.no_such_file.errorMessage));
 			}
 
 			var type = file.type;
@@ -421,7 +421,7 @@ module.exports = api.file = {
 					api.file.deletePostGISFile({
 						user : req.user,
 						file : file
-					}, callback, req, res);
+					}, callback);
 				});
 			}
 
@@ -430,7 +430,7 @@ module.exports = api.file = {
 					api.file.deleteRasterFile({
 						user : req.user,
 						file : file
-					}, callback, req, res);
+					}, callback);
 				});
 			}
 
@@ -447,7 +447,7 @@ module.exports = api.file = {
 	},
 
 
-	deleteRasterFile : function (options, done, req, res) {
+	deleteRasterFile : function (options, done) {
 		
 		var file = options.file;
 		var user = options.user;
@@ -456,7 +456,7 @@ module.exports = api.file = {
 		var removedObjects = {};
 		var ops = [];
 
-		if (!file_id) return api.error.missingInformation(req, res);
+		if (!file_id) return new Error(errors.missing_information.errorMessage);
 
 		// get file model
 		ops.push(function (callback) {
@@ -504,7 +504,7 @@ module.exports = api.file = {
 			.remove(function (err, rmf) {
 				removedObjects.file = {
 					file_id : file_id
-				}
+				};
 				callback(null);
 			});
 		});
@@ -515,7 +515,7 @@ module.exports = api.file = {
 			Layer
 			.find({'file' : file_id})
 			.exec(function (err, layers) {
-				if (err) return api.error.general(req, res, err);
+				if (err) return callback(err);
 
 				// todo: remove layers from projects
 				api.file.deleteLayersFromProjects({
@@ -561,7 +561,7 @@ module.exports = api.file = {
 		var removedObjects = {};
 
 		if (!database_name || !table_name) {
-			return done(new Error(errors.missing_information.error));
+			return done(new Error(errors.missing_information.errorMessage));
 		}
 
 		// get file model
@@ -594,7 +594,7 @@ module.exports = api.file = {
 
 					removedObjects.user = {
 						file_id : file._id
-					}
+					};
 
 					callback(null);
 				});
@@ -609,7 +609,7 @@ module.exports = api.file = {
 			.remove(function (err, rmf) {
 				removedObjects.file = {
 					file_id : fileUuid
-				}
+				};
 				callback(null);
 			});
 		});
@@ -630,7 +630,7 @@ module.exports = api.file = {
 			Layer
 			.find({'data.postgis.table_name' : table_name})
 			.exec(function (err, layers) {
-				if (err) return err;
+				if (err) return callback(err);
 
 				// todo: remove layers from projects
 				api.file.deleteLayersFromProjects({
@@ -720,7 +720,7 @@ module.exports = api.file = {
 		var file_id = data.file_id;
 		
 		if (!file_id) {
-			return api.error.general(req, res, new Error(util.format(errors.missing_request_parameters, 'data.file_id')));
+			return api.error.general(req, res, new Error(util.format(errors.missing_request_parameters.errorMessage, 'data.file_id')));
 		}
 		
 		Layer
