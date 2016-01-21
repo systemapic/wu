@@ -657,15 +657,23 @@ describe('File', function () {
             });
         });
 
-        it('should respond with status code 422 and success: false if file type is raster and file_id doesn\'t exist in data', function (done) {
+        it('should respond with status code 200 and success: false if file type is raster and file_id doesn\'t exist in data', function (done) {
            token(function (err, access_token) {
                 api.post('/api/file/delete')
                     .send({
                         file_id : createdFileWithRasterTypeWithoutFileId.uuid,
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
-                    .end(done);
+                    .expect(200)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+                        var status = helpers.parse(res.text);
+
+                        expect(status.success).to.be.false;
+                        done();
+                    });
             });
         });
 

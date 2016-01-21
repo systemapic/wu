@@ -456,7 +456,7 @@ module.exports = api.file = {
 		var removedObjects = {};
 		var ops = [];
 
-		if (!file_id) return new Error(errors.missing_information.errorMessage);
+		if (!file_id) return done(new Error(errors.missing_information.errorMessage));
 
 		// get file model
 		ops.push(function (callback) {
