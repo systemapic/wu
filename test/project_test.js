@@ -143,7 +143,7 @@ describe('Project', function () {
             helpers.delete_user_by_id(second_test_user.uuid, done);
         });
 
-        it('should respond with status code 401 and specific error message when not authorized', function (done) {
+        it('should respond with status code 422 and specific error message when not authorized', function (done) {
             helpers.users_token(second_test_user, function (err, access_token) {
                 api.post('/api/project/update')
                     .send({
@@ -151,7 +151,7 @@ describe('Project', function () {
                         project_id: tmp.project.uuid,
                         access_token : access_token
                     })
-                    .expect(401, helpers.createExpectedError(expected.invalid_token.errorMessage))
+                    .expect(422, helpers.createExpectedError(expected.no_access.errorMessage))
                     .end(done);
             });
         });

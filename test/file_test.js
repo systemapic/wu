@@ -1,10 +1,13 @@
+var async = require('async');
 var supertest = require('supertest');
 var chai = require('chai');
 var expect = chai.expect;
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var helpers = require('./helpers');
+var httpStatus = require('http-status');
 var token = helpers.token;
 var expected = require('../shared/errors');
+var User = require('../models/user');
 var second_test_user = {
     email : 'second_mocha_test_user@systemapic.com',
     firstName : 'Igor',
@@ -203,6 +206,38 @@ var newFileNotRasterAndPostgis = {
         }
     }
 };
+var newRasterFileWithRealtedUser = {
+    uuid : 'newRasterFileWithRealtedUser',
+    family : 'newFile_family',
+    createdBy : 'second_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    name : 'newFile_name',
+    absfolder : 'newFile_absfolder',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    keywords : 'newFile_keywords',
+    type : 'raster',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            database_name : 'new database_name',
+            table_name : 'newRasterFileWithRealtedUser',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata',
+        },
+        raster : {
+            file_id : 'newRasterFileWithRealtedUser',
+            metadata : 'new metadata'
+        }
+    }
+};
 
 describe('File', function () {
     before(function(done) { helpers.create_user(done); });
@@ -258,14 +293,14 @@ describe('File', function () {
             helpers.delete_user_by_id(second_test_user.uuid, done);
         });
 
-        it('should respond with status code 401 and error if not authenticated', function (done) {
+        it('should respond with status code 422 and error if not authenticated', function (done) {
             helpers.users_token(second_test_user, function (err, access_token) {
                 api.post('/api/file/update')
                     .send({
                         uuid: testFile.uuid,
                         access_token : access_token
                     })
-                    .expect(401, helpers.createExpectedError(expected.invalid_token.errorMessage))
+                    .expect(422, helpers.createExpectedError(expected.no_access.errorMessage))
                     .end(done);
             });
         });
@@ -508,6 +543,8 @@ describe('File', function () {
         var createdFileWithPostgisTypeWithoutDatabaseName = {};
         var createdFileWithPostgisTypeWithoutTableName = {};
         var createdFileWithRasterTypeWithoutFileId = {};
+        var createdRasterFileWithRealtedUser = {};
+        var userWithRasterFile = {}
 
         before(function (done) {
             helpers.create_file_by_parameters(newFileWithPostgisType, function (err, res) {
@@ -575,6 +612,34 @@ describe('File', function () {
             });
         });
 
+        before(function (done) {
+            var ops = [];
+
+            ops.push(function (callback) {
+                helpers.create_file_by_parameters(newRasterFileWithRealtedUser, function (err, res) {
+                    if (err) {
+                        callback(err);
+                    }
+                    createdRasterFileWithRealtedUser = res;
+                    callback(null, createdRasterFileWithRealtedUser);
+                });
+            });
+
+            ops.push(function (options, callback) {
+                second_test_user.files = [options];
+                helpers.create_user_by_parameters(second_test_user, function (err, createdUser) {
+                    if (err) {
+                        callback(err);
+                    }
+
+                    userWithRasterFile = createdUser;
+                    callback(null, userWithRasterFile);
+                });
+            });
+
+            async.waterfall(ops, done);
+        });
+
         after(function (done) {
             helpers.delete_file_by_id(createdFileWithPostgisType.uuid, done);
         });
@@ -598,6 +663,19 @@ describe('File', function () {
         after(function (done) {
             helpers.delete_file_by_id(createdFileWithRasterTypeWithoutFileId.uuid, done);
         });
+
+        after(function (done) {
+            var ops = [];
+
+            ops.push(function (callback) {
+                helpers.delete_file_by_id(createdRasterFileWithRealtedUser.uuid, callback);
+            });
+
+            ops.push(function (options, callback) {
+                helpers.delete_user_by_id(userWithRasterFile.uuid, callback);
+            });
+            async.waterfall(ops, done);     
+        });
         
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/file/delete')
@@ -606,14 +684,22 @@ describe('File', function () {
                 .end(done);
         });
 
-        it('should respond with status code 422 when file_id doesn\'t exist in request body', function (done) {
+        it('should respond with status code 400 when file_id doesn\'t exist in request body', function (done) {
             token(function (err, access_token) {
                 api.post('/api/file/delete')
                     .send({
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.no_such_file.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        var result = helpers.parse(res.text);
+
+                        expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        expect(result.error.errors.missingRequiredFields).to.include('file_id');
+
+                        done();
+                    });
             });
         });
 
@@ -719,6 +805,36 @@ describe('File', function () {
                     })
                     .expect(200)
                     .end(done);
+            });
+        });
+
+        it('should respond with status code 200 and upsate related user\'s files if file type is raster', function (done) {
+            var ops = [];
+
+            ops.push(function (callback) {
+                helpers.users_token(second_test_user, function (err, access_token) {
+                    api.post('/api/file/delete')
+                        .send({
+                            file_id : createdRasterFileWithRealtedUser.uuid,
+                            access_token : access_token
+                        })
+                        .expect(200)
+                        .end(callback);
+                });
+            });
+
+            ops.push(function (options, callback) {
+                User.findOne({uuid: userWithRasterFile.uuid})
+                    .exec(callback);
+            });
+
+            async.waterfall(ops, function (err, res) {
+                if (err) {
+                    return done(err)
+                }
+
+                expect(res.files).to.be.empty;
+                done();
             });
         });
 

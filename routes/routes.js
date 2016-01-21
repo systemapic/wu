@@ -39,7 +39,6 @@ module.exports = function(app, passport) {
 	// authenticate shorthand
 	var checkAccess = api.token.authenticate;
 
-
 	/**
 	* @apiDefine token
 	* @apiParam {String} access_token A valid access token
@@ -50,17 +49,12 @@ module.exports = function(app, passport) {
 	*    "error": "Invalid access token."
 	* }
 	*/
-
-
-
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
 	app.get('/', function(req, res) {
 		api.portal.getBase(req, res);
 	});
-	
-	
 	
 	/**
 	* @api {post} /api/portal Get portal store
@@ -76,9 +70,6 @@ module.exports = function(app, passport) {
 	// GET PORTAL  =========================
 	// =====================================
 	app.post('/api/portal', checkAccess, api.portal.getPortal);
-
-
-
 	
 	/**
 	* @api {post} /api/project/create Create a project
@@ -94,9 +85,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/create', checkAccess, api.project.create);
 
-
-
-	
 	/**
 	* @api {post} /api/project/delete Delete a project
 	* @apiName delete
@@ -117,9 +105,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/delete', checkAccess, api.project.deleteProject);
 
-
-
-	
 	/**
 	* @api {get} /api/status Get portal status
 	* @apiName status
@@ -145,15 +130,9 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.get('/api/status', checkAccess, api.portal.status);
 
-	
-
-
-
 	// deprecated
 	app.post('/oauth/token', api.oauth2.getToken);
-	
-
-	
+		
 	/**
 	* @api {post} /api/token Get access token
 	* @apiName access_token
@@ -181,8 +160,6 @@ module.exports = function(app, passport) {
 	// ================================
 	app.post('/api/token', api.token.getTokenFromPassword);
 
-
-
 	/**
 	* @api {post} /api/token/refresh Refresh access token
 	* @apiName refresh_access_token
@@ -201,8 +178,6 @@ module.exports = function(app, passport) {
 	// REFRESH TOKEN ==================
 	// ================================
 	app.post('/api/token/refresh', checkAccess, api.token.refresh);
-
-	
 	
 	/**
 	* @api {post} /api/token/check Check access token
@@ -237,7 +212,6 @@ module.exports = function(app, passport) {
 	app.get('/api/token/check', checkAccess, function (req, res) {
 		res.send({valid : true});
 	});
-
 	
 	/**
 	* @api {post} /api/user/session Check if already logged in (browser-only)
@@ -250,22 +224,6 @@ module.exports = function(app, passport) {
 	// CHECK SESSION ==================
 	// ================================
 	app.post('/api/user/session', api.token.checkSession);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	// =====================================
 	// ERROR LOGGING =======================
@@ -741,9 +699,9 @@ module.exports = function(app, passport) {
 	// DELETE DATA =========================
 	// =====================================
 	// change to /api/data/delete
-	app.post('/api/file/delete', checkAccess, function (req,res) {
-		api.file.deleteFile(req, res);
-	}, errorHandler);
+	app.post('/api/file/delete', checkAccess, function (req, res, next) {
+		api.file.deleteFile(req, res, next);
+	}, errorHandler());
 
 	// =====================================
 	// ADD/LINK FILE TO NEW PROJECT ========
@@ -1156,9 +1114,7 @@ module.exports = function(app, passport) {
 	// 	successRedirect : '/', // redirect to the secure profile section
 	// 	failureRedirect : '/invite', // redirect back to the signup page if there is an error
 	// 	failureFlash : true // allow flash messages
-	// }));
-
-	
+	// }));	
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
@@ -1166,14 +1122,10 @@ module.exports = function(app, passport) {
 		api.portal.wildcard(req, res);
 	});
 
-
-
-
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {
 		if (req.isAuthenticated()) return next();
 		res.redirect('/');
 	}
-
 	
-}
+};

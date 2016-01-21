@@ -10,7 +10,11 @@ var helpers = require('./helpers');
 var token = helpers.token;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var httpStatus = require('http-status');
 var tmp = {};
+var chai = require('chai');
+var expect = chai.expect;
+var expected = require('../shared/errors');
 
 
 
@@ -127,12 +131,12 @@ describe('Import', function () {
         context('Processing', function () {
     
 
-            it('should be processed in < 10s', function (done) {
-                // wait to finish processing (around ten seconds for shapefile.zip)
-                this.timeout(11000);
-                this.slow(20000);
-                setTimeout(done, 10000)
-            });
+             it('should be processed in < 10s', function (done) {
+                 // wait to finish processing (around ten seconds for shapefile.zip)
+                 this.timeout(21000); // must be higher than setTimeout
+                 this.slow(20000);
+                 setTimeout(done, 20000)
+             });
 
             it('should be processed without errors', function (done) {
                 token(function (err, access_token) {
@@ -156,16 +160,20 @@ describe('Import', function () {
                 })
             });
 
-            it('should be able to delete file', function (done) {
+            it('should be able to delete file but respond with status 400 becouse file with this id doesn\'t exist', function (done) {
                 token(function (err, access_token) {
                     api.post('/api/file/delete')
                     .send({file_id : tmp.file_id, access_token : access_token})
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
-                        assert.ifError(err);
-                        var status = helpers.parse(res.text);
-                        assert.ifError(status.error);
-                        assert.ok(status);
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+                        console.log(result);
+                        expect(result.success).to.be.true;
+
                         done();
                     });
                 });

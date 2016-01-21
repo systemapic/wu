@@ -21,7 +21,7 @@ module.exports = util = {
         lastName : 'Doe',
         uuid : 'test-user-uuid',
         password : 'test-user-password',
-        username : 'test-user'
+        username : 'test-user',
     },
 
     test_file : {
@@ -86,7 +86,7 @@ module.exports = util = {
     },
 
     get_users_access_token : function (_user, callback) {
-      api.post('/oauth/token')
+      api.post('/api/token')
         .send({
             grant_type : 'password',
             username : _user.email,
@@ -139,6 +139,7 @@ module.exports = util = {
         user.uuid = _user.uuid;
         user.firstName = _user.firstName;
         user.lastName = _user.lastName;
+        user.files = _user.files;
         user.save(callback);
     },
 
