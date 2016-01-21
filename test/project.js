@@ -105,7 +105,7 @@ describe('Project', function () {
             token(function (err, access_token) {
                 api.post('/api/project/update')
                     .send({access_token : access_token})
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -117,7 +117,7 @@ describe('Project', function () {
                         name : 'mocha-test-updated-name',
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -129,7 +129,7 @@ describe('Project', function () {
                         project_id : tmp.project.uuid,
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -151,10 +151,10 @@ describe('Project', function () {
                         project_id: tmp.project.uuid,
                         access_token : access_token
                     })
-                    .expect(401, expected.invalid_token)
+                    .expect(401, helpers.createExpectedError(expected.invalid_token.errorMessage))
                     .end(done);
             });
-        }); 
+        });
 
 
         it('should respond with status code 200 and shouldn\'t update nonexistent fields', function (done) {
@@ -337,7 +337,7 @@ describe('Project', function () {
             token(function (err, access_token) {
                 api.post('/api/project/delete')
                     .send({access_token : access_token})
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -349,7 +349,7 @@ describe('Project', function () {
                         foo : 'mocha-test-updated-name',
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
