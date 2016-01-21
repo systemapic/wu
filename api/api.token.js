@@ -112,7 +112,12 @@ module.exports = api.token = {
 		api.token.check(tokens.access_token, function (err, user) {
 
 			// return err
-			if (err) res.status(422).send({error : err.message});
+			// if (err) res.status(422).send({error : err.message});
+
+			// no session, return public user
+			if (err) return api.token.getPublicToken(function (err, public_token) {
+				res.send(public_token);
+			});
 
 			// return user
 			res.send(tokens);
