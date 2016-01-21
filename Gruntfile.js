@@ -11,6 +11,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-env');		// Set environment for conditional HTML 
 	grunt.loadNpmTasks('grunt-contrib-htmlmin');	// HTML minifyer
 	grunt.loadNpmTasks('grunt-contrib-jshint');	// Checks JS
+	grunt.loadNpmTasks('grunt-mocha-test'); // Mocha test
 					
 	grunt.initConfig(    {  
 		
@@ -107,7 +108,7 @@ module.exports = function(grunt) {
 			fonts : {
 					src : 'public/css/fonts.css',
 					dest : 'public/dist/fonts.css'
-			},			
+			}
 
 			// mobilestyle : {
 				 
@@ -193,14 +194,14 @@ module.exports = function(grunt) {
 					'public/js/lib/moment.js/moment.min.js',
 					'public/js/lib/sniffer/sniffer.module.js',
 					'public/js/lib/cryptojs/sha3.js',
-					'public/js/lib/nouislider/nouislider.js',
+					'public/js/lib/nouislider/nouislider.js'
 		
 
 
 
 				],
 				
-				dest : 'public/dist/tmp/systemapic.dependencies.combined.js',
+				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
 
 			},
 
@@ -319,7 +320,7 @@ module.exports = function(grunt) {
 
 				],
 				
-				dest : 'public/dist/tmp/systemapic.combined.js',
+				dest : 'public/dist/tmp/systemapic.combined.js'
 
 			},
 
@@ -421,23 +422,22 @@ module.exports = function(grunt) {
 			
 			jsPortal:{  
 				files:{  
-					'public/dist/js.portal.min.js' : 'public/dist/tmp/systemapic.combined.js',
-
+					'public/dist/js.portal.min.js' : 'public/dist/tmp/systemapic.combined.js'
 				}
 			},
 
 			jsDependencies : {  
 				files : {  
-					'public/dist/js.dependencies.min.js' : 'public/dist/tmp/systemapic.dependencies.combined.js',
+					'public/dist/js.dependencies.min.js' : 'public/dist/tmp/systemapic.dependencies.combined.js'
 				}
 			},
 
 
 			jsLogin : {  
 				files : {  
-					'public/dist/login.min.js' : 'public/dist/tmp/login.combined.js',	
+					'public/dist/login.min.js' : 'public/dist/tmp/login.combined.js'
 				}
-			},
+			}
 
 		},
 
@@ -508,7 +508,19 @@ module.exports = function(grunt) {
 		// 		},
 		// 		src: ['dist/tmp/systemapic.combined.js'],
 		// 	},
-		// },		
+		// },
+		mochaTest: {
+			options: {
+				reporter: 'spec',
+				timeout: 10000
+			},
+
+			unit: {
+				src: [
+					'test/server/unit/**/*_test.js'
+				]
+			}
+		}
 
 	}});
   
@@ -528,8 +540,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('waiter',
 		function() {  
 			grunt.task.run([  
-				'watch',
-
+				'watch'
 			]);
 		}    
 	); 
@@ -594,7 +605,11 @@ module.exports = function(grunt) {
 			'preprocess:dev',
 			'login',
 			'preprocess:login'
-	])});	
+	])});
+
+	grunt.registerTask('test', [
+		'mochaTest'
+	]);
 
 	grunt.registerTask('default', ['waiter']);
-}
+};
