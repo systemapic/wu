@@ -1,29 +1,38 @@
 {
     "missing_information": {
-        "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+        "errorMessage": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+        "code": ""
     },
     "no_such_project": {
-        "error": "No such project."
+        "errorMessage": "No such project.",
+        "code": ""
     },
     "no_access": {
-        "error": "No access."
+        "errorMessage": "No access.",
+        "code": ""
     },
     "invalid_token" : {
-        "error" : "Invalid access token."
+        "errorMessage" : "Invalid access token.",
+        "code": ""
     },
     "missing_request_parameters": {
-    	"error": "request body should contains %s"
+    	"errorMessage": "request body should contains %s",
+        "code": ""
     },
     "layer_already_exist": {
-    	"error": "layer with such uuid already exist"
+    	"errorMessage": "layer with such uuid already exist",
+        "code": ""
     },
     "bad_file_uuid": {
-        "error": "bad file uuid"
+        "errorMessage": "bad file uuid",
+        "code": ""
     },
     "bad_user_uuid": {
-        "error": "bad user uuid"
+        "errorMessage": "bad user uuid",
+        "code": ""
     },
     "no_such_file": {
-        "error": "No such file."
+        "errorMessage": "No such file.",
+        "code": ""
     }
 }

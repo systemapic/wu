@@ -346,7 +346,7 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
-			if (!project) return callback(new Error(error_messages.missing_information.error));
+			if (!project) return callback(new Error(error_messages.missing_information.errorMessage));
 
 			// check access to delete
 			var gotAccess = (project.createdBy == user.getUuid() || user.isSuper());
@@ -404,7 +404,7 @@ module.exports = api.project = {
 			var hashedUser = user.getUuid(); // todo: use actual hash
 
 			if (!project || !project.access) {
-				return callback(new Error(error_messages.missing_information));
+				return callback(new Error(error_messages.missing_information.errorMessage));
 			}
 
 			// can edit if on edit list or created project

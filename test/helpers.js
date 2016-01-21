@@ -58,6 +58,12 @@ module.exports = util = {
         }
     },
 
+    createExpectedError : function (errorMessage) {
+        return {
+            error: errorMessage
+        };
+    },
+
     get_access_token : function (done) {
         api.post('/api/token')
         .send({ 

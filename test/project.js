@@ -42,7 +42,9 @@ describe('Project', function () {
                 })
                 .expect(200)
                 .end(function (err, res) {
-                    if (err) return done(err);
+                    if (err) {
+                        return done(err);
+                    }
 
                     var project = helpers.parse(res.text).project;
                     assert.ok(project);
@@ -67,7 +69,7 @@ describe('Project', function () {
             token(function (err, access_token) {
                 api.post('/api/project/create')
                     .send({access_token : access_token})
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -79,7 +81,7 @@ describe('Project', function () {
                         foo : 'mocha-test-updated-name',
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -240,7 +242,9 @@ describe('Project', function () {
                 })
                 .expect(200)
                 .end(function (err, res) {
-                    if (err) return done(err);
+                    if (err) {
+                        return done(err);
+                    }
 
                     var result = helpers.parse(res.text);
 
@@ -310,7 +314,9 @@ describe('Project', function () {
                     })
                     .expect(200)
                     .end(function (err, res) {
-                        if (err) return done(err);
+                        if (err) {
+                            return done(err);
+                        }
 
                         var result = helpers.parse(res.text);
                         assert.ok(result.deleted);
@@ -364,7 +370,9 @@ describe('Project', function () {
                     .send({access_token : access_token})
                     .expect(200)
                     .end(function (err, res) {
-                        if (err) return done(err);
+                        if (err) {
+                            return done(err);
+                        }
 
                         var result = helpers.parse(res.text);
 
