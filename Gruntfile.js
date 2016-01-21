@@ -13,13 +13,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');	// Checks JS
 	grunt.loadNpmTasks('grunt-mocha-test'); // Mocha test
 					
-	grunt.initConfig(    {  
-		
-
+	grunt.initConfig({
 		// Look for filechanges,
 		// run tasks,
-		watch:{  
-
+		watch:{
 			// If change to any of the SASS files,
 			// compile new CSS file
 			cssLogin : {
@@ -55,7 +52,7 @@ module.exports = function(grunt) {
 		// TASKS
 
 		// TASK: Compile CSS from SCSS 
-		sass:{  
+		sass:{
 			// task 
 			dev:{  
 				// another target 
@@ -71,7 +68,7 @@ module.exports = function(grunt) {
 		},
 
 		// TASK: Minify CSS 
-		cssmin:{  
+		cssmin:{
 			css:{  
 				src:'public/css/style.css',
 				dest:'public/css/style.min.css'
@@ -128,10 +125,8 @@ module.exports = function(grunt) {
 			// },	
 		},
 
-
-
 		// TASK: Merge JS files
-		concat:{  
+		concat:{
 
 			options : {  
 				// separator:';',
@@ -195,10 +190,6 @@ module.exports = function(grunt) {
 					'public/js/lib/sniffer/sniffer.module.js',
 					'public/js/lib/cryptojs/sha3.js',
 					'public/js/lib/nouislider/nouislider.js'
-		
-
-
-
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
@@ -411,9 +402,8 @@ module.exports = function(grunt) {
 
 		},
 
-
 		// TASK: MINIFY JS
-		uglify:{  
+		uglify:{
 			options:{  
 				compress:{  
 					drop_console:true
@@ -492,14 +482,14 @@ module.exports = function(grunt) {
 
 		htmlmin: {
 			dist: {
-			options: {
-			removeComments: true,
-			collapseWhitespace: true
+				options: {
+				removeComments: true,
+				collapseWhitespace: true
+				},
+				files: {
+					'views/app.serve.ejs': 'views/tmp/app.temp.ejs',     // 'destination': 'source'
+				}
 			},
-			files: {
-				'views/app.serve.ejs': 'views/tmp/app.temp.ejs',     // 'destination': 'source'
-			}
-		},
 
 		// jshint: {
 		// 	ignore_warning: {
@@ -509,6 +499,8 @@ module.exports = function(grunt) {
 		// 		src: ['dist/tmp/systemapic.combined.js'],
 		// 	},
 		// },
+		},
+
 		mochaTest: {
 			options: {
 				reporter: 'spec',
@@ -517,12 +509,11 @@ module.exports = function(grunt) {
 
 			unit: {
 				src: [
-					'test/server/unit/**/*_test.js'
+					'test/**/*_test.js'
 				]
 			}
 		}
-
-	}});
+	});
   
   
 
@@ -607,9 +598,9 @@ module.exports = function(grunt) {
 			'preprocess:login'
 	])});
 
-	grunt.registerTask('test', [
+	grunt.registerTask('test', function () { grunt.task.run([
 		'mochaTest'
-	]);
+	])});
 
 	grunt.registerTask('default', ['waiter']);
 };
