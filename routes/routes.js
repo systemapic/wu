@@ -25,6 +25,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errorHandler = require('../middleware/error-handler');
 
 // api
 var api = require('../api/api');
@@ -742,7 +743,7 @@ module.exports = function(app, passport) {
 	// change to /api/data/delete
 	app.post('/api/file/delete', checkAccess, function (req,res) {
 		api.file.deleteFile(req, res);
-	});
+	}, errorHandler);
 
 	// =====================================
 	// ADD/LINK FILE TO NEW PROJECT ========
