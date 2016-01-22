@@ -872,7 +872,7 @@ describe('File', function () {
 
         context('when file type is raster', function () {
 
-            it('should respond with status code 404 and success: false if file_id doesn\'t exist in data', function (done) {
+            it('should respond with status code 404 and error if file_id doesn\'t exist in data', function (done) {
                token(function (err, access_token) {
                     api.post('/api/file/delete')
                         .send({
@@ -907,7 +907,7 @@ describe('File', function () {
                 });
             });
 
-            it('should respond with status code 200 and upsate related user\'s files', function (done) {
+            it('should respond with status code 200 and update related user\'s files', function (done) {
                 var ops = [];
 
                 ops.push(function (callback) {
