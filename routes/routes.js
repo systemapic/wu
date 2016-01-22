@@ -521,38 +521,7 @@ module.exports = function(app, passport) {
 	*   "file": {
 	*       lastUpdated: '2016-01-19T12:49:49.076Z',
     *       created: '2016-01-19T12:49:48.943Z',
-    *       type: 'postgis',
-    *       status: 'new status',
-    *       version: 1,
-    *       category: 'new category',
-    *       copyright: 'new copyright',
-    *       description: 'new description',
-    *       originalName: 'test_file_originalName',
-    *       name: 'new name',
-    *       absfolder: 'test_file_absfolder',
-    *       folder: 'test_file_folder',
-    *       createdByName: 'test_file_createdByName',
-    *       createdBy: 'test-user-uuid',
-    *       family: 'test_file_family',
-    *       uuid: 'test_file_uuid',
-    *       __v: 1,
-    *       access: {
-	*           users   : ['new user'],
-	*           projects: ['new project'],
-	*            clients : ['new clients']
-    *       },
-    *       data: {
-    *           postgis : {
-	*               database_name : 'new database name',
-	*               table_name : 'new table name',
-	*               data_type : 'new data type',
-	*               original_format : 'new original format',
-	*               metadata : 'new metadata'
-	*           }
-	*       },
-    *       format: ['new format'],
-    *       keywords: ['new keywords'],
-    *       files: ['new files']
+    *       ... etc
 	*   }
 	* }
 	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
@@ -590,51 +559,7 @@ module.exports = function(app, passport) {
 	*	  uuid: 'layer uuid',
 	*	  title: 'layer title',
 	*	  description: 'layer description',
-	*	  satellite_position: 'layer satellite_position',
-	*	  copyright: 'layer copyright',
-	*	  legend: 'layer legend',
-	*	  maxZoom: 'layer maxZoom',
-	*	  minZoom: 'layer minZoom',
-	*	  zIndex: 4,	// number
-	*	  bounds: 'layer bounds',
-	*	  tms: true,
-	*	  attribution: 'layer attribution',
-	*	  accessToken: 'layer accessToken',
-	*	  opacity: 'layer opacity', 	
-	*	  data : {
-	*	  	geojson: 'geojson',
-	*		topojson: 'topojson',
-	*		cartoid: 'cartoid',
-	*		raster: 'raster',
-	*		rastertile: 'rastertile',
-	*		vectortile: 'vectortile',
-	*		mapbox: 'mapbox',
-	*		cartodb: 'cartodb',
-	*		osm: 'osm',
-	*		norkart: 'norkart',
-	*		google: 'google',
-	*		postgis: {
-	*		  sql: 'sql',
-	*		  cartocss: 'cartocss',
-	*		  cartocss_version: 'cartocss_version',
-	*		  geom_column: 'geom_column',
-	*		  file_id: 'file_id',
-	*		  database_name: 'database_name',
-	*		  table_name: 'table_name',
-	*		  data_type: 'data_type',
-	*		  geom_type: 'geom_type',
-	*		  raster_band: 5,
-	*		  layer_id: 'layer_id',
-	*		  metadata: 'metadata',
-	*		}
-	*	  },
-	*	  metadata : 'metadata',
-	*	  tooltip: 'tooltip',
-	*	  legends: 'legends',
-	*	  file: 'file',
-	*	  style: 'style',
-	*	  filter: 'filter',
-	*	  tileType: 'tileType'
+	*	  ... etc
 	*   }
 	* ]
 	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
@@ -690,9 +615,44 @@ module.exports = function(app, passport) {
 	* {
 	*    "error": "Invalid access token."
 	* }
-	* Error 422: Missing file_id doesn't exist in request body or in file data.raster field for raster type
+	* @apiError Bad_request file_id does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
 	* {
-	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['file_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found database_name or table_name does not exist in file.data.postgis or file_id doesn't exist in file.data.raster (404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Internal_server_error Problems with drop table (500)
+	* @apiErrorExample {json} Error-Response:
+	* Error 500: Internal server error
+	* {
+	*    "error": {
+	*		"message": "Can't drop table tableName",
+	*		"code": "500"
+	*	}
+	* }
+	* @apiError Not_found If file type is postgis and file with file.data.posgis.table_name id doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such file.",
+	*		"code": "404"
+	*	}
 	* }
 	*/
 	// =====================================
