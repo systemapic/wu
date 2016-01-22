@@ -49,6 +49,38 @@ var newFileWithPostgisType = {
         }
     }
 };
+var newFileWithPostgisTypeAndBadTableName = {
+    uuid : 'newFileWithPostgisTypeAndBadTableName',
+    family : 'newFile_family',
+    createdBy : 'newFile_test-user-uuid',
+    createdByName : 'newFile_createdByName',
+    files : ['newFile_files'],
+    folder : 'newFile_folder',
+    absfolder : 'newFile_absfolder',
+    name : 'newFile_name',
+    originalName : 'newFile_originalName',
+    description : 'newFile_description',
+    copyright : 'newFile_copyright',
+    keywords : 'newFile_keywords',
+    category : 'newFile_category',
+    version : 1,
+    status : 'newFile_status',
+    type : 'postgis',
+    format : ['newFile_format'],
+    data: {
+        postgis : {                 // postgis data
+            database_name : 'newFileWithPostgisTypeAndBadTableName',
+            table_name : 'Bad_name',
+            data_type : 'new data_type',         // raster or vector
+            original_format : 'new original_format',   // GeoTIFF, etc.
+            metadata : 'new metadata'
+        },
+        raster : {
+            file_id : 'new file_id',
+            metadata : 'new metadata'
+        }
+    }
+};
 var newFileWithPostgisTypeWithoutDatabaseName = {
     uuid : 'newFileWithPostgisTypeWithoutDatabaseName',
     family : 'newFile_family',
@@ -544,6 +576,7 @@ describe('File', function () {
         var createdFileWithPostgisTypeWithoutTableName = {};
         var createdFileWithRasterTypeWithoutFileId = {};
         var createdRasterFileWithRealtedUser = {};
+        var createdFileWithPostgisTypeAndBadTableName = {};
         var userWithRasterFile = {}
 
         before(function (done) {
@@ -640,6 +673,17 @@ describe('File', function () {
             async.waterfall(ops, done);
         });
 
+        before(function (done) {
+            helpers.create_file_by_parameters(newFileWithPostgisTypeAndBadTableName, function (err, res) {
+                if (err) {
+                    return done(err);
+                }
+
+                createdFileWithPostgisTypeAndBadTableName = res;
+                done();
+            });
+        });
+
         after(function (done) {
             helpers.delete_file_by_id(createdFileWithPostgisType.uuid, done);
         });
@@ -675,6 +719,10 @@ describe('File', function () {
                 helpers.delete_user_by_id(userWithRasterFile.uuid, callback);
             });
             async.waterfall(ops, done);     
+        });
+
+        after(function (done) {
+            helpers.delete_file_by_id(createdFileWithPostgisTypeAndBadTableName.uuid, done);
         });
         
         it('should respond with status code 401 when not authenticated', function (done) {
@@ -794,6 +842,30 @@ describe('File', function () {
                         });
                 });
             });
+
+            it('should respond with status code 404 if file with table_name id doesn\'t exist', function (done) {
+               token(function (err, access_token) {
+                    api.post('/api/file/delete')
+                        .send({
+                            file_id : createdFileWithPostgisTypeAndBadTableName.uuid,
+                            access_token : access_token
+                        })
+                        .expect(httpStatus.NOT_FOUND)
+                        .end(function (err, res) {
+                            if (err) {
+                                return done(err);
+                            }
+
+                            var result = helpers.parse(res.text);
+
+                            expect(result.error.message).to.be.equal(expected.no_such_file.errorMessage);
+                            expect(result.error.code).to.be.equal(httpStatus.NOT_FOUND);
+                            done();
+                        });
+                }); 
+            });
+
+
 
         });
 
