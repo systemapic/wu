@@ -32,13 +32,10 @@ module.exports = function () {
     console.log('Error: ', err);
 
     if (type === 'html') {
-       console.log(type, type, type, type, err);
-
       res.render('error', {
         error: err
       });
     } else if (type === 'json') {
-      console.log(type, type, type, type, err);
       res.json({
         error: err
       });

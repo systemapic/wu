@@ -591,7 +591,11 @@ module.exports = api.file = {
 		var removedObjects = {};
 
 		if (!database_name || !table_name) {
-			return done(new Error(errors.missing_information.errorMessage));
+			return done({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.NOT_FOUND,
+				type: 'json'
+			});
 		}
 
 		// get file model
@@ -684,6 +688,7 @@ module.exports = api.file = {
 			// 	error : err,
 			// 	removed : removedObjects
 			// });
+
 			done(err, {
 				success : true,
 				error : err,
