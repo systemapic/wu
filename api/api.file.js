@@ -618,6 +618,13 @@ module.exports = api.file = {
 
 		// remove file from user
 		ops.push(function (file, callback) {
+			if (!file) {
+				return callback({
+					message: errors.no_such_file.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				});
+			}
 
 			User
 			.findOne({uuid : user.uuid})
