@@ -8,6 +8,7 @@ var _ = require('lodash');
 var User = require('../models/user');
 var File = require('../models/file');
 var Layer = require('../models/layer');
+var Project = require('../models/project');
 var config = require('../config/server-config.js').serverConfig;
 mongoose.connect(config.mongo.url); 
 var supertest = require('supertest');
@@ -182,6 +183,30 @@ module.exports = util = {
             .expect(200)
             .end(done);
         });
+    },
+
+    create_project_by_info : function (info, callback) {
+        var project = new Project();
+
+        project.uuid = info.uuid;
+        project.createdBy = info.createdBy;
+        project.createdByName = info.createdByName;
+        project.createdByUsername = info.createdByUsername;
+        project.name = info.name;
+        project.slug = info.slug;
+        project.description = info.description;
+        project.keywords = info.keywords;
+        project.categories = info.categories;
+        project.layers = info.layers;
+
+        project.save(callback);
+
+    },
+
+    delete_project_by_id : function (id, callback) {
+        Project.findOne({uuid : id})
+            .remove()
+            .exec(callback);
     },
 
     create_file : function (callback) {

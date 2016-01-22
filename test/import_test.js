@@ -5,6 +5,9 @@ var fs = require('fs');
 var crypto = require('crypto');
 var request = require('supertest');
 var User = require('../models/user');
+var Project = require('../models/project');
+var Layer = require('../models/layer');
+var File = require('../models/file');
 var config = require('../config/server-config.js').serverConfig;
 var helpers = require('./helpers');
 var token = helpers.token;
@@ -15,8 +18,6 @@ var tmp = {};
 var chai = require('chai');
 var expect = chai.expect;
 var expected = require('../shared/errors');
-
-
 
 describe('Import', function () {
 
@@ -127,16 +128,14 @@ describe('Import', function () {
             });
         });
 
-
         context('Processing', function () {
-    
 
-             it('should be processed in < 10s', function (done) {
-                 // wait to finish processing (around ten seconds for shapefile.zip)
-                 this.timeout(21000); // must be higher than setTimeout
-                 this.slow(20000);
-                 setTimeout(done, 20000)
-             });
+            it('should be processed in < 10s', function (done) {
+                // wait to finish processing (around ten seconds for shapefile.zip)
+                this.timeout(21000); // must be higher than setTimeout
+                this.slow(20000);
+                setTimeout(done, 20000)
+            });
 
             it('should be processed without errors', function (done) {
                 token(function (err, access_token) {
@@ -160,22 +159,128 @@ describe('Import', function () {
                 })
             });
 
-            it('should be able to delete file but respond with status 400 becouse file with this id doesn\'t exist', function (done) {
-                token(function (err, access_token) {
-                    api.post('/api/file/delete')
-                    .send({file_id : tmp.file_id, access_token : access_token})
-                    .expect(httpStatus.OK)
-                    .end(function (err, res) {
-                        if (err) {
-                            return done(err);
-                        }
+            context('when delete file after upload', function () {
+                var relatedLayer = {
+                    uuid: 'relatedLayerUuid',
+                    title: 'relatedLayerTitle',
+                    description: 'relatedLayerDescription',
+                    file: 'relatedLayerFile',
+                };
+                var relatedProject = {
+                    uuid: 'relatedProjectUuid',
+                    createdBy: 'relatedProjectCreatedBy',
+                    createdByName: 'relatedProjectCreatedByName',
+                    createdByUsername: 'relatedProjectCreatedByUsername',
+                    name: 'relatedProjectName'
+                };
 
-                        var result = helpers.parse(res.text);
-                        expect(result.success).to.be.true;
+                before(function (done) {
+                    var ops = [];
 
-                        done();
+                    ops.push(function (callback) {
+                
+                        relatedLayer.data = {
+                            postgis: {
+                                table_name: tmp.file_id
+                            }
+                        };
+
+                        helpers.create_layer_by_parameters(relatedLayer, function (err, res) {
+                            if (err) {
+                                callback(err);
+                            }
+                            relatedLayer = res;
+                            callback(null, relatedLayer);
+                        });
                     });
+
+                    ops.push(function (options, callback) {
+                        relatedProject.layers = [options];
+
+                        helpers.create_project_by_info(relatedProject, function (err, res) {
+                            if (err) {
+                                callback(err);
+                            }
+
+                            relatedProject = res;
+                            callback(null, relatedProject);
+                        });
+                    });
+
+                    async.waterfall(ops, done);
                 });
+
+                after(function (done) {
+                    var ops = [];
+
+                    ops.push(function (callback) {
+                        helpers.delete_project_by_id(relatedProject.uuid, callback);
+                    });
+
+                    ops.push(function (options, callback) {
+                        helpers.delete_layer_by_id(relatedLayer.uuid, callback);
+                    });
+
+                    async.waterfall(ops, done);     
+                });
+
+                it('should be able to delete file correctly', function (done) {
+                    var ops = [];
+
+                    ops.push(function (callback) {
+                        token(function (err, access_token) {
+                            api.post('/api/file/delete')
+                            .send({file_id : tmp.file_id, access_token : access_token})
+                            .expect(httpStatus.OK)
+                            .end(function (err, res) {
+                                if (err) {
+                                    return callback(err);
+                                }
+
+                                var result = helpers.parse(res.text);
+                                expect(result.success).to.be.true;
+
+                                callback(null, result);
+                            });
+                        });
+                    });
+
+                    ops.push(function (options, callback) {
+                        Project.findOne({uuid: relatedProject.uuid})
+                            .exec(function (err, updatedProject) {
+                                if (err) {
+                                    return callback(err);
+                                }
+                                expect(updatedProject.layers).to.be.empty;
+                                callback(null, updatedProject);
+                            });
+                    });
+
+                    ops.push(function (options, callback) {
+                        Layer.find({uuid: relatedLayer.uuid})
+                            .exec(function (err, updatedLayer) {
+                                if (err) {
+                                    return callback(err);
+                                }
+                                expect(updatedLayer).to.be.empty;
+                                callback(null, updatedLayer);
+                            });
+                    });
+
+                    ops.push(function (options, callback) {
+                        File.find({uuid: tmp.file_id})
+                            .exec(function (err, result) {
+                                if (err) {
+                                    return callback(err);
+                                }
+                                expect(result).to.be.empty;
+                                callback(null, result);
+                            });
+                    });
+
+                    async.waterfall(ops, done); 
+                });
+
             });
 
         });
