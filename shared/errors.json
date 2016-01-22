@@ -1,38 +1,50 @@
 {
     "missing_information": {
         "errorMessage": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
-        "code": ""
+        "code": "400"
     },
     "no_such_project": {
         "errorMessage": "No such project.",
-        "code": ""
+        "code": "404"
     },
     "no_access": {
         "errorMessage": "No access.",
-        "code": ""
+        "code": "401"
     },
     "invalid_token" : {
         "errorMessage" : "Invalid access token.",
-        "code": ""
+        "code": "401"
     },
     "missing_request_parameters": {
     	"errorMessage": "request body should contains %s",
-        "code": ""
+        "code": "400"
     },
     "layer_already_exist": {
     	"errorMessage": "layer with such uuid already exist",
-        "code": ""
+        "code": "400"
     },
     "bad_file_uuid": {
         "errorMessage": "bad file uuid",
-        "code": ""
+        "code": "400"
     },
     "bad_user_uuid": {
         "errorMessage": "bad user uuid",
-        "code": ""
+        "code": "400"
     },
     "no_such_file": {
         "errorMessage": "No such file.",
-        "code": ""
+        "code": "404"
+    },
+    "database_name_or_table_name_does_not_exist": {
+        "errorMessage": "database_name or table_name does not exist in postgis file.",
+        "code": "404"
+    },
+    "invalid_table_name": {
+        "errorMessage": "Invalid table name!%s",
+        "code": "400"
+    },
+    "dropTable_error": {
+        "errorMessage": "Can't drop table %s",
+        "code": "500"
     }
 }

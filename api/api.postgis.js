@@ -37,6 +37,8 @@ var nodemailer  = require('nodemailer');
 var geojsonArea = require('geojson-area');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var httpStatus = require('http-status');
+var errors = require('../shared/errors');
 
 // resumable.js
 var r = require('../tools/resumable-node')('/data/tmp/');
@@ -55,10 +57,21 @@ module.exports = api.postgis = {
 		    DROP_TABLE_SCRIPT = '../scripts/postgis/drop_table.sh';
 
 		// missing information
-		if (!database_name || !table_name) return api.error.missingInformation(req, res);
-
+		if (!database_name || !table_name) {
+			return done({
+				message: errors.database_name_or_table_name_does_not_exist.errorMessage,
+				code: httpStatus.NOT_FOUND,
+				type: 'json'
+			});
+		}
 		// validation, todo: improve
-		if (!table_name.length == 25) return api.error.general(req, res, 'Invalid table name!' + table_name);
+		if (!table_name.length == 25) {
+			return done({
+				message: util.format(errors.invalid_table_name.errorMessage, table_name),
+				code: httpStatus.BAD_REQUEST,
+				type: 'json'
+			});
+		}
 
 		// cmd
 		var command = [
@@ -69,7 +82,16 @@ module.exports = api.postgis = {
 
 		// run
 		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
-			if (err) return done(err);
+			if (err) {
+				return done({
+					message: util.format(errors.dropTable_error.errorMessage, table_name),
+					code: httpStatus.INTERNAL_SERVER_ERROR,
+					type: 'json',
+					errors: {
+						error: err
+					}
+				});
+			}
 			done(null);
 		});
 	},

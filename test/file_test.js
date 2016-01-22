@@ -37,7 +37,7 @@ var newFileWithPostgisType = {
     format : ['newFile_format'],
     data: {
         postgis : {                 // postgis data
-            database_name : 'new database_name',
+            database_name : 'newFileWithPostgisType',
             table_name : 'newFileWithPostgisType',
             data_type : 'new data_type',         // raster or vector
             original_format : 'new original_format',   // GeoTIFF, etc.
@@ -703,66 +703,6 @@ describe('File', function () {
             });
         });
 
-        it('should respond with status code 200 and success: false if file type is postgis and database_name doesn\'t exist', function (done) {
-           token(function (err, access_token) {
-                api.post('/api/file/delete')
-                    .send({
-                        file_id : createdFileWithPostgisTypeWithoutDatabaseName.uuid,
-                        access_token : access_token
-                    })
-                    .expect(200)
-                    .end(function (err, res) {
-                        if (err) {
-                            return done(err);
-                        }
-
-                        var status = helpers.parse(res.text);
-                        expect(status.success).to.be.false;
-                        done();
-                    });
-            });
-        });
-
-        it('should respond with status code 200 and success: false if file type is postgis and table_name doesn\'t exist', function (done) {
-           token(function (err, access_token) {
-                api.post('/api/file/delete')
-                    .send({
-                        file_id : createdFileWithPostgisTypeWithoutTableName.uuid,
-                        access_token : access_token
-                    })
-                    .expect(200)
-                    .end(function (err, res) {
-                        if (err) {
-                            return done(err);
-                        }
-
-                        var status = helpers.parse(res.text);
-                        expect(status.success).to.be.false;
-                        done();
-                    });
-            });
-        });
-
-        it('should respond with status code 200 and success: false if file type is raster and file_id doesn\'t exist in data', function (done) {
-           token(function (err, access_token) {
-                api.post('/api/file/delete')
-                    .send({
-                        file_id : createdFileWithRasterTypeWithoutFileId.uuid,
-                        access_token : access_token
-                    })
-                    .expect(200)
-                    .end(function (err, res) {
-                        if (err) {
-                            return done(err);
-                        }
-                        var status = helpers.parse(res.text);
-
-                        expect(status.success).to.be.false;
-                        done();
-                    });
-            });
-        });
-
         it('should respond with status code 200 if file type isn\'t postgis and raster', function (done) {
             token(function (err, access_token) {
                 api.post('/api/file/delete')
@@ -784,58 +724,146 @@ describe('File', function () {
             });
         });
 
-        it('should respond with status code 200 if file type is postgis', function (done) {
-            token(function (err, access_token) {
-                api.post('/api/file/delete')
-                    .send({
-                        file_id : createdFileWithPostgisType.uuid,
-                        access_token : access_token
-                    })
-                    .expect(200)
-                    .end(done);
-            });
-        });
+        context('when file type is postgis', function () {
 
-        it('should respond with status code 200 if file type is raster', function (done) {
-            token(function (err, access_token) {
-                api.post('/api/file/delete')
-                    .send({
-                        file_id : createdFileWithRasterType.uuid,
-                        access_token : access_token
-                    })
-                    .expect(200)
-                    .end(done);
-            });
-        });
-
-        it('should respond with status code 200 and upsate related user\'s files if file type is raster', function (done) {
-            var ops = [];
-
-            ops.push(function (callback) {
-                helpers.users_token(second_test_user, function (err, access_token) {
+            it('should respond with status code 404 and error if database_name doesn\'t exist', function (done) {
+               token(function (err, access_token) {
                     api.post('/api/file/delete')
                         .send({
-                            file_id : createdRasterFileWithRealtedUser.uuid,
+                            file_id : createdFileWithPostgisTypeWithoutDatabaseName.uuid,
                             access_token : access_token
                         })
-                        .expect(200)
-                        .end(callback);
+                        .expect(httpStatus.NOT_FOUND)
+                        .end(function (err, res) {
+                            if (err) {
+                                return done(err);
+                            }
+
+                            var result = helpers.parse(res.text);
+
+                            expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                            expect(result.error.code).to.be.equal(httpStatus.NOT_FOUND);
+
+                            done();
+                        });
+
                 });
             });
 
-            ops.push(function (options, callback) {
-                User.findOne({uuid: userWithRasterFile.uuid})
-                    .exec(callback);
+            it('should respond with status code 404 and error if table_name doesn\'t exist', function (done) {
+               token(function (err, access_token) {
+                    api.post('/api/file/delete')
+                        .send({
+                            file_id : createdFileWithPostgisTypeWithoutTableName.uuid,
+                            access_token : access_token
+                        })
+                        .expect(404)
+                        .end(function (err, res) {
+                            if (err) {
+                                return done(err);
+                            }
+
+                            var result = helpers.parse(res.text);
+
+                            expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                            expect(result.error.code).to.be.equal(httpStatus.NOT_FOUND);
+
+                            done();
+                        });
+                });
             });
 
-            async.waterfall(ops, function (err, res) {
-                if (err) {
-                    return done(err)
-                }
+            it('should respond with status code 500 if can\'t drop related table', function (done) {
+                token(function (err, access_token) {
+                    api.post('/api/file/delete')
+                        .send({
+                            file_id : createdFileWithPostgisType.uuid,
+                            access_token : access_token
+                        })
+                        .expect(httpStatus.INTERNAL_SERVER_ERROR)
+                        .end(function (err, res) {
+                            if (err) {
+                                return done(err);
+                            }
 
-                expect(res.files).to.be.empty;
-                done();
+                            var result = helpers.parse(res.text);
+
+                            expect(result.error.message).to.be.equal(format(expected.dropTable_error.errorMessage, createdFileWithPostgisType.data.postgis.table_name));
+                            expect(result.error.code).to.be.equal(httpStatus.INTERNAL_SERVER_ERROR);
+                            done();
+                        });
+                });
             });
+
+        });
+
+        context('when file type is raster', function () {
+
+            it('should respond with status code 404 and success: false if file_id doesn\'t exist in data', function (done) {
+               token(function (err, access_token) {
+                    api.post('/api/file/delete')
+                        .send({
+                            file_id : createdFileWithRasterTypeWithoutFileId.uuid,
+                            access_token : access_token
+                        })
+                        .expect(404)
+                        .end(function (err, res) {
+                            if (err) {
+                                return done(err);
+                            }
+
+                            var result = helpers.parse(res.text);
+
+                            expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                            expect(result.error.code).to.be.equal(httpStatus.NOT_FOUND);
+
+                            done();
+                        });
+                });
+            });
+
+            it('should respond with status code 200', function (done) {
+                token(function (err, access_token) {
+                    api.post('/api/file/delete')
+                        .send({
+                            file_id : createdFileWithRasterType.uuid,
+                            access_token : access_token
+                        })
+                        .expect(200)
+                        .end(done);
+                });
+            });
+
+            it('should respond with status code 200 and upsate related user\'s files', function (done) {
+                var ops = [];
+
+                ops.push(function (callback) {
+                    helpers.users_token(second_test_user, function (err, access_token) {
+                        api.post('/api/file/delete')
+                            .send({
+                                file_id : createdRasterFileWithRealtedUser.uuid,
+                                access_token : access_token
+                            })
+                            .expect(200)
+                            .end(callback);
+                    });
+                });
+
+                ops.push(function (options, callback) {
+                    User.findOne({uuid: userWithRasterFile.uuid})
+                        .exec(callback);
+                });
+
+                async.waterfall(ops, function (err, res) {
+                    if (err) {
+                        return done(err)
+                    }
+
+                    expect(res.files).to.be.empty;
+                    done();
+                });
+            });
+
         });
 
     });
