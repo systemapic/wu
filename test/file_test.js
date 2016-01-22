@@ -8,6 +8,8 @@ var httpStatus = require('http-status');
 var token = helpers.token;
 var expected = require('../shared/errors');
 var User = require('../models/user');
+var Project = require('../models/project');
+var Layer = require('../models/layer');
 var second_test_user = {
     email : 'second_mocha_test_user@systemapic.com',
     firstName : 'Igor',
@@ -287,7 +289,7 @@ describe('File', function () {
         helpers.delete_file(done);
     });
 
-	describe('/api/file/update', function () {
+    describe('/api/file/update', function () {
 
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/file/update')
@@ -309,7 +311,7 @@ describe('File', function () {
             token(function (err, access_token) {
                 api.post('/api/file/update')
                     .send({
-                    	uuid: "invalid file id",
+                        uuid: "invalid file id",
                         access_token : access_token
                     })
                     .expect(422, helpers.createExpectedError(expected.bad_file_uuid.errorMessage))
@@ -399,7 +401,7 @@ describe('File', function () {
                     });
             });
         });
-	});
+    });
 
     describe('/api/file/getLayers', function () {
 
@@ -577,7 +579,7 @@ describe('File', function () {
         var createdFileWithRasterTypeWithoutFileId = {};
         var createdRasterFileWithRealtedUser = {};
         var createdFileWithPostgisTypeAndBadTableName = {};
-        var userWithRasterFile = {}
+        var userWithRasterFile = {};
 
         before(function (done) {
             helpers.create_file_by_parameters(newFileWithPostgisType, function (err, res) {
@@ -718,6 +720,7 @@ describe('File', function () {
             ops.push(function (options, callback) {
                 helpers.delete_user_by_id(userWithRasterFile.uuid, callback);
             });
+
             async.waterfall(ops, done);     
         });
 
@@ -864,8 +867,6 @@ describe('File', function () {
                         });
                 }); 
             });
-
-
 
         });
 

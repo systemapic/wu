@@ -625,7 +625,7 @@ module.exports = api.file = {
 					type: 'json'
 				});
 			}
-
+			
 			User
 			.findOne({uuid : user.uuid})
 			.exec(function (err, u) {
