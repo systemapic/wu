@@ -504,11 +504,7 @@ module.exports = api.file = {
 			User
 			.findOne({uuid : user.uuid})
 			.exec(function (err, u) {
-				console.log('I am here I am here I am here I am here I am here I am here I am here I am here I am here I am here ');
-				console.log(u.files);
-				u.files.pull(file._id);
-				console.log(u.files);
-				
+				u.files.pull(file._id);				
 				u.markModified('files');
 				u.save(function (err) {
 
