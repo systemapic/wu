@@ -428,12 +428,11 @@ module.exports = api.file = {
 			}
 
 			if (!file) {
-				err = {
+				return next({
 					message: errors.no_such_file.errorMessage,
 					code: httpStatus.NOT_FOUND,
-					type: 'json',
-				}
-				return next(err);
+					type: 'json'
+				});
 			}
 
 			var type = file.type;
@@ -458,6 +457,10 @@ module.exports = api.file = {
 
 			async.series(ops, function (error, result) {
 				console.log('err, result', error, result);
+				if (error) {
+					return next(error);
+				}
+
 				res.json({
 					err : error,
 					success : !error
@@ -477,7 +480,13 @@ module.exports = api.file = {
 		var removedObjects = {};
 		var ops = [];
 
-		if (!file_id) return done(new Error(errors.missing_information.errorMessage));
+		if (!file_id) {
+			return done({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.NOT_FOUND,
+				type: 'json'
+			});
+		}
 
 		// get file model
 		ops.push(function (callback) {
