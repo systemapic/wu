@@ -171,7 +171,6 @@ describe('Import', function () {
                         }
 
                         var result = helpers.parse(res.text);
-                        console.log(result);
                         expect(result.success).to.be.true;
 
                         done();
