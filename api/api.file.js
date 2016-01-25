@@ -34,7 +34,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
-var errors = require('../shared/errors')
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -401,22 +402,43 @@ module.exports = api.file = {
 	},
 
 
-	deleteFile : function (req, res) {
-
+	deleteFile : function (req, res, next) {
 		var file_id = req.body.file_id;
 		var ops = [];
+		var validateError;
 
+		if (!file_id) {
+			validateError = {
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: ['file_id']
+				}
+			};
+
+			return next(validateError);
+		}
 
 		File
 		.findOne({uuid : file_id})
 		.exec(function (err, file) {
-			if (err || !file) return api.error.general(req, res, err || 'No such file.');
+			if (err) {
+				return next(err);
+			}
+
+			if (!file) {
+				return next({
+					message: errors.no_such_file.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				});
+			}
 
 			var type = file.type;
 
-			if (type == 'postgis') {
+			if (type === 'postgis') {
 				ops.push(function (callback) {
-					console.log('postot');
 					api.file.deletePostGISFile({
 						user : req.user,
 						file : file
@@ -424,9 +446,8 @@ module.exports = api.file = {
 				});
 			}
 
-			if (type == 'raster') {
+			if (type === 'raster') {
 				ops.push(function (callback) {
-					console.log('postot');
 					api.file.deleteRasterFile({
 						user : req.user,
 						file : file
@@ -434,16 +455,18 @@ module.exports = api.file = {
 				});
 			}
 
-			async.series(ops, function (err, result) {
-				console.log('err, result', err, result);
-				
+			async.series(ops, function (error, result) {
+				console.log('err, result', error, result);
+				if (error) {
+					return next(error);
+				}
+
 				res.json({
-					err : err,
-					success : !err
+					err : error,
+					success : !error
 				});
 			});
 		});
-
 
 	},
 
@@ -457,18 +480,24 @@ module.exports = api.file = {
 		var removedObjects = {};
 		var ops = [];
 
-		if (!file_id) return api.error.missingInformation(req, res);
+		if (!file_id) {
+			return done({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.NOT_FOUND,
+				type: 'json'
+			});
+		}
 
 		// get file model
 		ops.push(function (callback) {
 			File
-			.findOne({uuid : file_id})
-			.exec(callback)
+				.findOne({uuid : file_id})
+				.exec(callback);
 		});
 
 		// check permissions
 		ops.push(function (file, callback) {
-			console.log('TODO! permission to delete file!')
+			console.log('TODO! permission to delete file!');
 
 			// api.access.to.delete_file({
 			// 	file : file,
@@ -484,13 +513,13 @@ module.exports = api.file = {
 			User
 			.findOne({uuid : user.uuid})
 			.exec(function (err, u) {
-				u.files.pull(file._id);
+				u.files.pull(file._id);				
 				u.markModified('files');
 				u.save(function (err) {
 
 					removedObjects.user = {
 						file_id : file._id
-					}
+					};
 
 					callback(null);
 				});
@@ -505,7 +534,7 @@ module.exports = api.file = {
 			.remove(function (err, rmf) {
 				removedObjects.file = {
 					file_id : file_id
-				}
+				};
 				callback(null);
 			});
 		});
@@ -516,7 +545,7 @@ module.exports = api.file = {
 			Layer
 			.find({'file' : file_id})
 			.exec(function (err, layers) {
-				if (err) return api.error.general(req, res, err);
+				if (err) return callback(err);
 
 				// todo: remove layers from projects
 				api.file.deleteLayersFromProjects({
@@ -561,20 +590,24 @@ module.exports = api.file = {
 		var ops = [];
 		var removedObjects = {};
 
-		if (!database_name || !table_name) return api.error.missingInformation(req, res);
-
+		if (!database_name || !table_name) {
+			return done({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.NOT_FOUND,
+				type: 'json'
+			});
+		}
 
 		// get file model
 		ops.push(function (callback) {
 			File
 			.findOne({uuid : fileUuid})
-			.exec(callback)
+			.exec(callback);
 		});
 
 		// check permissions
 		ops.push(function (file, callback) {
 			console.log('TODO! permission to delete file!')
-
 			// api.access.to.delete_file({
 			// 	file : file,
 			// 	user : account
@@ -585,7 +618,14 @@ module.exports = api.file = {
 
 		// remove file from user
 		ops.push(function (file, callback) {
-
+			if (!file) {
+				return callback({
+					message: errors.no_such_file.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				});
+			}
+			
 			User
 			.findOne({uuid : user.uuid})
 			.exec(function (err, u) {
@@ -595,7 +635,7 @@ module.exports = api.file = {
 
 					removedObjects.user = {
 						file_id : file._id
-					}
+					};
 
 					callback(null);
 				});
@@ -610,7 +650,7 @@ module.exports = api.file = {
 			.remove(function (err, rmf) {
 				removedObjects.file = {
 					file_id : fileUuid
-				}
+				};
 				callback(null);
 			});
 		});
@@ -631,7 +671,7 @@ module.exports = api.file = {
 			Layer
 			.find({'data.postgis.table_name' : table_name})
 			.exec(function (err, layers) {
-				if (err) return api.error.general(req, res, err);
+				if (err) return callback(err);
 
 				// todo: remove layers from projects
 				api.file.deleteLayersFromProjects({
@@ -655,14 +695,13 @@ module.exports = api.file = {
 			// 	error : err,
 			// 	removed : removedObjects
 			// });
+
 			done(err, {
 				success : true,
 				error : err,
 				removed : removedObjects
 			})
 		});
-
-
 
 	},
 
@@ -723,7 +762,7 @@ module.exports = api.file = {
 		var file_id = data.file_id;
 		
 		if (!file_id) {
-			return api.error.general(req, res, new Error(util.format(errors.missing_request_parameters, 'data.file_id')));
+			return api.error.general(req, res, new Error(util.format(errors.missing_request_parameters.errorMessage, 'data.file_id')));
 		}
 		
 		Layer
@@ -1456,35 +1495,4 @@ module.exports = api.file = {
 
 
 	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

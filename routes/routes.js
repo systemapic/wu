@@ -25,6 +25,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errorHandler = require('../middleware/error-handler')();
 
 // api
 var api = require('../api/api');
@@ -38,7 +39,6 @@ module.exports = function(app, passport) {
 	// authenticate shorthand
 	var checkAccess = api.token.authenticate;
 
-
 	/**
 	* @apiDefine token
 	* @apiParam {String} access_token A valid access token
@@ -49,17 +49,12 @@ module.exports = function(app, passport) {
 	*    "error": "Invalid access token."
 	* }
 	*/
-
-
-
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
 	app.get('/', function(req, res) {
 		api.portal.getBase(req, res);
 	});
-	
-	
 	
 	/**
 	* @api {post} /api/portal Get portal store
@@ -75,9 +70,6 @@ module.exports = function(app, passport) {
 	// GET PORTAL  =========================
 	// =====================================
 	app.post('/api/portal', checkAccess, api.portal.getPortal);
-
-
-
 	
 	/**
 	* @api {post} /api/project/create Create a project
@@ -93,9 +85,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/create', checkAccess, api.project.create);
 
-
-
-	
 	/**
 	* @api {post} /api/project/delete Delete a project
 	* @apiName delete
@@ -116,9 +105,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/delete', checkAccess, api.project.deleteProject);
 
-
-
-	
 	/**
 	* @api {get} /api/status Get portal status
 	* @apiName status
@@ -144,15 +130,9 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.get('/api/status', checkAccess, api.portal.status);
 
-	
-
-
-
 	// deprecated
 	app.post('/oauth/token', api.oauth2.getToken);
-	
-
-	
+		
 	/**
 	* @api {post} /api/token Get access token
 	* @apiName access_token
@@ -180,8 +160,6 @@ module.exports = function(app, passport) {
 	// ================================
 	app.post('/api/token', api.token.getTokenFromPassword);
 
-
-
 	/**
 	* @api {post} /api/token/refresh Refresh access token
 	* @apiName refresh_access_token
@@ -200,8 +178,6 @@ module.exports = function(app, passport) {
 	// REFRESH TOKEN ==================
 	// ================================
 	app.post('/api/token/refresh', checkAccess, api.token.refresh);
-
-	
 	
 	/**
 	* @api {post} /api/token/check Check access token
@@ -236,7 +212,6 @@ module.exports = function(app, passport) {
 	app.get('/api/token/check', checkAccess, function (req, res) {
 		res.send({valid : true});
 	});
-
 	
 	/**
 	* @api {post} /api/user/session Check if already logged in (browser-only)
@@ -249,22 +224,6 @@ module.exports = function(app, passport) {
 	// CHECK SESSION ==================
 	// ================================
 	app.post('/api/user/session', api.token.checkSession);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	// =====================================
 	// ERROR LOGGING =======================
@@ -547,6 +506,37 @@ module.exports = function(app, passport) {
 		api.postgis.downloadDatasetFromLayer(req, res);
 	});
 	
+	/**
+	* @api {post} /api/file/update Update a file
+	* @apiName update
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} uuid Uuid of file
+	*
+	* @apiSuccess {Array} updated Array of updated fields
+	* @apiSuccess {Object} file Updated file
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "updated": ['name', 'description'],
+	*   "file": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+    *       created: '2016-01-19T12:49:48.943Z',
+    *       ... etc
+	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError File with uuid <code>uuid</code> doesn't exist. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: File doesn't exist
+	* {
+	*    "error": "bad file uuid"
+	* }
+	*/
 	// =====================================
 	// UPDATE FILE =========================
 	// =====================================
@@ -555,6 +545,42 @@ module.exports = function(app, passport) {
 		api.file.update(req, res);
 	});
 
+	/**
+	* @api {post} /api/file/getLayers Get layers
+	* @apiName getLayers
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} type Type of file(raster or postgis)
+	* @apiParam {Object} data Object with file_id field for raster files or database_name and table_name for postgis files
+	* @apiSuccess {Array} array of layers
+	* @apiSuccessExample {json} Success-Response:
+	* [
+	*   {
+	*	  uuid: 'layer uuid',
+	*	  title: 'layer title',
+	*	  description: 'layer description',
+	*	  ... etc
+	*   }
+	* ]
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Missing required fields. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: Missing type parameter or database_name and table_name for postgis type
+	* {
+	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+	* }
+	* @apiError Missing required fields. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: Missing file_id for rater type
+	* {
+	*    "error": "request body should contains data.file_id"
+	* }
+	*/
 	// =====================================
 	// GET LAYERS OF FILE ==================
 	// =====================================
@@ -572,25 +598,70 @@ module.exports = function(app, passport) {
 	});
 	
 	/**
-	* @api {post} /api/data/delete Delete data
-	* @apiName delete_data
-	* @apiGroup Data
+	* @api {post} /api/file/delete Delete data
+	* @apiName delete
+	* @apiGroup File
 	* @apiUse token
 	* @apiParam {String} file_id File id
-	*
 	* @apiSuccess {json} status Upload Status JSON
 	* @apiSuccessExample {json} Success-Response:
 	* {
-	*  "success": true
+	*   "success": true,
+	*   "err": {}
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request file_id does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['file_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found database_name or table_name does not exist in file.data.postgis or file_id doesn't exist in file.data.raster (404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Internal_server_error Problems with drop table (500)
+	* @apiErrorExample {json} Error-Response:
+	* Error 500: Internal server error
+	* {
+	*    "error": {
+	*		"message": "Can't drop table tableName",
+	*		"code": "500"
+	*	}
+	* }
+	* @apiError Not_found If file type is postgis and file with file.data.posgis.table_name id doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such file.",
+	*		"code": "404"
+	*	}
 	* }
 	*/
 	// =====================================
 	// DELETE DATA =========================
 	// =====================================
 	// change to /api/data/delete
-	app.post('/api/file/delete', checkAccess, function (req,res) {
-		api.file.deleteFile(req, res);
-	});
+	app.post('/api/file/delete', checkAccess, function (req, res, next) {
+		api.file.deleteFile(req, res, next);
+	}, errorHandler);
 
 	// =====================================
 	// ADD/LINK FILE TO NEW PROJECT ========
@@ -616,6 +687,37 @@ module.exports = function(app, passport) {
 		api.layer.get(req, res);
 	});
 
+	/**
+	* @api {post} /api/layers/new Create layer
+	* @apiName create
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} title Title of new layer
+	* @apiParam {String} description Description of new layer
+	* @apiParam {String} legend Legend of new legend
+	* @apiParam {String} file File of new layer
+	* @apiParam {String} metadata Metadata of new layer
+	* @apiParam {String} data Data of new layer
+	* @apiParam {String} style Style of new layer
+	* @apiSuccess {JSON} Layer New Layer object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*    __v: 0,
+	*    lastUpdated: '2016-01-20T10:55:30.983Z',
+	*    created: '2016-01-20T10:55:30.983Z',
+	*    legend: '',
+	*    description: 'new layer description',
+	*    title: 'new layer title',
+	*    uuid: 'layer-ae4fc38c-58f0-4468-81e7-7330d226dc24',
+	*    _id: '569f67a2ebb7233b667d8a02'
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	*/
 	// =====================================
 	// CREATE NEW LAYER ====================
 	// =====================================
@@ -632,6 +734,39 @@ module.exports = function(app, passport) {
 		api.layer.createOSM(req, res);  	// todo: api.layer.osm.create()
 	});
 
+	/**
+	* @api {post} /api/layer/update Update layer
+	* @apiName update
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} layer uuid of updated layer
+	* @apiParam {String} title New title of updated layer
+	* @apiParam {String} description New description of updated layer
+	* @apiParam {String} satellite_position New satellite_position of updated layer
+	* @apiParam {String} copyright New copyright of updated layer
+	* @apiParam {String} tooltip New tooltip of updated layer
+	* @apiParam {String} style New style of updated layer
+	* @apiParam {String} filter New filter of updated layer
+	* @apiParam {String} legends New legends of updated layer
+	* @apiParam {String} opacity New opacity of updated layer
+	* @apiParam {Number} zIndex New zIndex of updated layer
+	* @apiParam {Object} data New data of updated layer
+	* @apiSuccess {String} response Update info 
+	* @apiSuccessExample {String} Success-Response:
+	* 'save done'
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Missing required fields. (422)
+	* @apiErrorExample {json} Error-Response:
+	* Error 422: Missing layer parameter or layer with such id doesn't exist
+	* {
+	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+	* }
+	*/
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
@@ -939,9 +1074,7 @@ module.exports = function(app, passport) {
 	// 	successRedirect : '/', // redirect to the secure profile section
 	// 	failureRedirect : '/invite', // redirect back to the signup page if there is an error
 	// 	failureFlash : true // allow flash messages
-	// }));
-
-	
+	// }));	
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
@@ -949,14 +1082,10 @@ module.exports = function(app, passport) {
 		api.portal.wildcard(req, res);
 	});
 
-
-
-
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {
 		if (req.isAuthenticated()) return next();
 		res.redirect('/');
 	}
-
 	
-}
+};

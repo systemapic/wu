@@ -8,6 +8,7 @@ var _ = require('lodash');
 var User = require('../models/user');
 var File = require('../models/file');
 var Layer = require('../models/layer');
+var Project = require('../models/project');
 var config = require('../config/server-config.js').serverConfig;
 mongoose.connect(config.mongo.url); 
 var supertest = require('supertest');
@@ -21,7 +22,7 @@ module.exports = util = {
         lastName : 'Doe',
         uuid : 'test-user-uuid',
         password : 'test-user-password',
-        username : 'test-user'
+        username : 'test-user',
     },
 
     test_file : {
@@ -58,6 +59,12 @@ module.exports = util = {
         }
     },
 
+    createExpectedError : function (errorMessage) {
+        return {
+            error: errorMessage
+        };
+    },
+
     get_access_token : function (done) {
         api.post('/api/token')
         .send({ 
@@ -80,7 +87,7 @@ module.exports = util = {
     },
 
     get_users_access_token : function (_user, callback) {
-      api.post('/oauth/token')
+      api.post('/api/token')
         .send({
             grant_type : 'password',
             username : _user.email,
@@ -133,6 +140,7 @@ module.exports = util = {
         user.uuid = _user.uuid;
         user.firstName = _user.firstName;
         user.lastName = _user.lastName;
+        user.files = _user.files;
         user.save(callback);
     },
 
@@ -177,6 +185,30 @@ module.exports = util = {
         });
     },
 
+    create_project_by_info : function (info, callback) {
+        var project = new Project();
+
+        project.uuid = info.uuid;
+        project.createdBy = info.createdBy;
+        project.createdByName = info.createdByName;
+        project.createdByUsername = info.createdByUsername;
+        project.name = info.name;
+        project.slug = info.slug;
+        project.description = info.description;
+        project.keywords = info.keywords;
+        project.categories = info.categories;
+        project.layers = info.layers;
+
+        project.save(callback);
+
+    },
+
+    delete_project_by_id : function (id, callback) {
+        Project.findOne({uuid : id})
+            .remove()
+            .exec(callback);
+    },
+
     create_file : function (callback) {
         var file = new File();
 
@@ -205,6 +237,39 @@ module.exports = util = {
 
     delete_file: function (callback) {
         File.findOne({uuid : util.test_file.uuid})
+            .remove()
+            .exec(callback);
+    },
+
+    create_file_by_parameters : function (newFile, callback) {
+        var file = new File();
+
+        file.uuid = newFile.uuid;
+        file.family = newFile.family;
+        file.createdBy = newFile.createdBy;
+        file.createdByName = newFile.createdByName;
+        file.files = newFile.files;
+        file.folder = newFile.folder;
+        file.absfolder = newFile.absfolder;
+        file.name = newFile.name;
+        file.absfolder = newFile.absfolder;
+        file.originalName = newFile.originalName;
+        file.description = newFile.description;
+        file.copyright = newFile.copyright;
+        file.keywords = newFile.keywords;
+        file.category = newFile.category;
+        file.version = newFile.version;
+        file.status = newFile.status;
+        file.keywords = newFile.keywords;
+        file.type = newFile.type;
+        file.format = newFile.format;
+        file.data = newFile.data;
+
+        file.save(callback);
+    },
+
+    delete_file_by_id : function (fileId, callback) {
+        File.findOne({uuid : fileId})
             .remove()
             .exec(callback);
     },
