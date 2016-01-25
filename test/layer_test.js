@@ -288,7 +288,7 @@ describe('Layer', function () {
             });
 
             ops.push(function (params, moreParams, callback) {
-                projectWithLayers.layers = [params];
+                projectWithLayers.layers = [params._id];
                 helpers.create_project_by_info(projectWithLayers, function (err, _projectWithLayers) {
                     if (err) {
                         return callback(err);
@@ -479,7 +479,6 @@ describe('Layer', function () {
                             }
 
                             var result = helpers.parse(res.text);
-
                             expect(result).to.be.an.array;
                             expect(result).to.be.not.empty;
                             done();
