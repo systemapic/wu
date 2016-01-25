@@ -34,7 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
-var errors = require('../shared/errors')
+var errors = require('../shared/errors');
 
 
 // api
@@ -596,7 +596,7 @@ module.exports = api.layer = {
 						return callback(null, options);
 					}
 
-					return callback(new Error(errors.layer_already_exist.error));
+					return callback(new Error(errors.layer_already_exist.errorMessage));
 				});
 		} else {
 			return callback(null, options);

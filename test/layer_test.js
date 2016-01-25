@@ -151,7 +151,7 @@ describe('Layer', function () {
 
                 api.post('/api/layer/update')
                     .send({access_token : access_token})
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);                
             });
         });
@@ -167,7 +167,7 @@ describe('Layer', function () {
                         layer: 'bad layer',
                         access_token : access_token
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -205,42 +205,41 @@ describe('Layer', function () {
                             if (err) {
                                 return callback(err);
                             }
-
-                            // expect(options.text).to.be.equal('save done');
-                            // expect(res.uuid).to.be.equal(layerUpdates.layer);
+                            expect(options.text).to.be.equal('save done');
+                            expect(res.uuid).to.be.equal(layerUpdates.layer);
                             expect(res.title).to.be.equal(layerUpdates.title);
-                            // expect(res.description).to.be.equal(layerUpdates.description);
-                            // expect(res.satellite_position).to.be.equal(layerUpdates.satellite_position);
-                            // expect(res.copyright).to.be.equal(layerUpdates.copyright);
-                            // expect(res.tooltip).to.be.equal(layerUpdates.tooltip);
-                            // expect(res.style).to.be.equal(layerUpdates.style);
-                            // expect(res.filter).to.be.equal(layerUpdates.filter);
-                            // expect(res.legends).to.be.equal(layerUpdates.legends);
-                            // expect(res.opacity).to.be.equal(layerUpdates.opacity);
+                            expect(res.description).to.be.equal(layerUpdates.description);
+                            expect(res.satellite_position).to.be.equal(layerUpdates.satellite_position);
+                            expect(res.copyright).to.be.equal(layerUpdates.copyright);
+                            expect(res.tooltip).to.be.equal(layerUpdates.tooltip);
+                            expect(res.style).to.be.equal(layerUpdates.style);
+                            expect(res.filter).to.be.equal(layerUpdates.filter);
+                            expect(res.legends).to.be.equal(layerUpdates.legends);
+                            expect(res.opacity).to.be.equal(layerUpdates.opacity);
                             expect(res.zIndex).to.be.equal(layerUpdates.zIndex);
-                            // expect(res.data.geojson).to.be.equal(layerUpdates.data.geojson);
-                            // expect(res.data.topojson).to.be.equal(layerUpdates.data.topojson);
-                            // expect(res.data.cartoid).to.be.equal(layerUpdates.data.cartoid);
-                            // expect(res.data.raster).to.be.equal(layerUpdates.data.raster);
-                            // expect(res.data.rastertile).to.be.equal(layerUpdates.data.rastertile);
-                            // expect(res.data.vectortile).to.be.equal(layerUpdates.data.vectortile);
-                            // expect(res.data.mapbox).to.be.equal(layerUpdates.data.mapbox);
-                            // expect(res.data.cartodb).to.be.equal(layerUpdates.data.cartodb);
-                            // expect(res.data.osm).to.be.equal(layerUpdates.data.osm);
-                            // expect(res.data.norkart).to.be.equal(layerUpdates.data.norkart);
-                            // expect(res.data.google).to.be.equal(layerUpdates.data.google);
-                            // expect(res.data.postgis.sql).to.be.equal(layerUpdates.data.postgis.sql);
-                            // expect(res.data.postgis.cartocss).to.be.equal(layerUpdates.data.postgis.cartocss);
-                            // expect(res.data.postgis.cartocss_version).to.be.equal(layerUpdates.data.postgis.cartocss_version);
-                            // expect(res.data.postgis.geom_column).to.be.equal(layerUpdates.data.postgis.geom_column);
-                            // expect(res.data.postgis.file_id).to.be.equal(layerUpdates.data.postgis.file_id);
-                            // expect(res.data.postgis.database_name).to.be.equal(layerUpdates.data.postgis.database_name);
-                            // expect(res.data.postgis.table_name).to.be.equal(layerUpdates.data.postgis.table_name);
-                            // expect(res.data.postgis.data_type).to.be.equal(layerUpdates.data.postgis.data_type);
-                            // expect(res.data.postgis.geom_type).to.be.equal(layerUpdates.data.postgis.geom_type);
-                            // expect(res.data.postgis.raster_band).to.be.equal(layerUpdates.data.postgis.raster_band);
-                            // expect(res.data.postgis.layer_id).to.be.equal(layerUpdates.data.postgis.layer_id);
-                            // expect(res.data.postgis.metadata).to.be.equal(layerUpdates.data.postgis.metadata);
+                            expect(res.data.geojson).to.be.equal(layerUpdates.data.geojson);
+                            expect(res.data.topojson).to.be.equal(layerUpdates.data.topojson);
+                            expect(res.data.cartoid).to.be.equal(layerUpdates.data.cartoid);
+                            expect(res.data.raster).to.be.equal(layerUpdates.data.raster);
+                            expect(res.data.rastertile).to.be.equal(layerUpdates.data.rastertile);
+                            expect(res.data.vectortile).to.be.equal(layerUpdates.data.vectortile);
+                            expect(res.data.mapbox).to.be.equal(layerUpdates.data.mapbox);
+                            expect(res.data.cartodb).to.be.equal(layerUpdates.data.cartodb);
+                            expect(res.data.osm).to.be.equal(layerUpdates.data.osm);
+                            expect(res.data.norkart).to.be.equal(layerUpdates.data.norkart);
+                            expect(res.data.google).to.be.equal(layerUpdates.data.google);
+                            expect(res.data.postgis.sql).to.be.equal(layerUpdates.data.postgis.sql);
+                            expect(res.data.postgis.cartocss).to.be.equal(layerUpdates.data.postgis.cartocss);
+                            expect(res.data.postgis.cartocss_version).to.be.equal(layerUpdates.data.postgis.cartocss_version);
+                            expect(res.data.postgis.geom_column).to.be.equal(layerUpdates.data.postgis.geom_column);
+                            expect(res.data.postgis.file_id).to.be.equal(layerUpdates.data.postgis.file_id);
+                            expect(res.data.postgis.database_name).to.be.equal(layerUpdates.data.postgis.database_name);
+                            expect(res.data.postgis.table_name).to.be.equal(layerUpdates.data.postgis.table_name);
+                            expect(res.data.postgis.data_type).to.be.equal(layerUpdates.data.postgis.data_type);
+                            expect(res.data.postgis.geom_type).to.be.equal(layerUpdates.data.postgis.geom_type);
+                            expect(res.data.postgis.raster_band).to.be.equal(layerUpdates.data.postgis.raster_band);
+                            expect(res.data.postgis.layer_id).to.be.equal(layerUpdates.data.postgis.layer_id);
+                            expect(res.data.postgis.metadata).to.be.equal(layerUpdates.data.postgis.metadata);
                             callback();
                         });
                 });

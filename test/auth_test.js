@@ -33,4 +33,8 @@ describe('Authentication', function () {
         });
     });
 
+    after(function (done) {
+        helpers.delete_user(done);
+    });
+
 });
