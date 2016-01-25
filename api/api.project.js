@@ -136,6 +136,70 @@ module.exports = api.project = {
 
 	},
 
+	get : function (req, res) {
+
+		console.log('api.project.get', req.body);
+
+		var username = req.body.username;
+		var project_slug = req.body.project_slug;
+		var project_id = req.body.project_id;
+
+		api.project.checkPublic({
+			username : username,
+			project_slug : project_slug
+		}, function (err, public_project) {
+			console.log('checked for public', arguments);
+			if (err) {
+				// not public
+				return res.status(400).send({
+					error : 'Not public project'
+				});
+			}
+
+			// public project
+			res.send(public_project);
+		})
+
+
+	},
+
+	checkPublic : function (options, done) {
+		var username = options.username;
+		var project_slug = options.project_slug;
+
+		console.log('username/slug', username + '/' + project_slug);
+
+		var errMsg = 'Not a public project.';
+		
+		User
+		.findOne({username : username})
+		.exec(function (err, user) {
+			console.log('found user: ', err, user.username, user.uuid);
+			if (err || !user) return done(err || errMsg)
+
+			// find project, check if public
+			Project
+			.findOne({
+				createdBy : user.uuid,
+				slug : project_slug
+			})
+			.populate('files')
+			.populate('layers')
+			.exec(function (err, project) {
+				console.log('found project', err, project);
+
+				if (err || !project) return done(err || errMsg);
+
+				// check if public
+				if (project.access.options.isPublic) {
+					return done(null, project);
+				} else {
+					return done(errMsg);
+				}
+			});
+		});
+	},
+
 
 	defaultStoreAccess : function (access) {
 		var access = access || {};
