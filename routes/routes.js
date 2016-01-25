@@ -699,13 +699,50 @@ module.exports = function(app, passport) {
 		api.layer.deleteLayer(req, res);
 	});
 
+	/**
+	* @api {post} /api/layers Get layers related with project
+	* @apiName get layers by project id
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} project Project uuid
+	* @apiSuccess {Array} layers Array of layers related with project
+	* @apiSuccessExample {json} Success-Response:
+	*[{
+	*    data: [Object],
+	*    __v: 0,
+	*    uuid: 'relatedLayerUuid',
+	*    title: 'relatedLayerTitle',
+	*    description: 'relatedLayerDescription',
+	*    created: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
+	*    lastUpdated: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
+	*    _id: 56 a60908fdce40a15eca6773
+	*}, and etc]
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }	
+	* @apiError Bad_request project does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// LAYERS ==============================
 	// =====================================
 	// change to /api/layer/get 
-	app.post('/api/layers', checkAccess, function (req, res) { 	// todo: layer/layers !! make all same...
-		api.layer.get(req, res);
-	});
+	app.post('/api/layers', checkAccess, function (req, res, next) { 	// todo: layer/layers !! make all same...
+		api.layer.get(req, res, next);
+	}, errorHandler);
 
 	/**
 	* @api {post} /api/layers/new Create layer

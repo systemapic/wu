@@ -43,7 +43,6 @@ var api = module.parent.exports;
 // exports
 module.exports = api.file = {
 
-
 	// zip a file and send to client
 	zipAndSend : function (req, res) {
 
@@ -108,7 +107,6 @@ module.exports = api.file = {
 
 	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
-
 		var userUuid = options.user.uuid,
 		    file_id = options.file._id;
 

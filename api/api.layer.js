@@ -35,14 +35,13 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errors = require('../shared/errors');
-
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
 
 // exports
-module.exports = api.layer = { 
-
+module.exports = api.layer = {
 
 	// create layer
 	create : function (req, res) {
@@ -146,23 +145,44 @@ module.exports = api.layer = {
 
 
 	// get layers and send to client
-	get : function (req, res) {
-		var project = req.body.project,
-		    user = req.user.uuid;
+	get : function (req, res, next) {
+		var project = req.body.project;
+		var user = req.user.uuid;
 
 		// error if no project or user
-		if (!project || !user) return api.error.missingInformation(req, res);
-
+		if (!project || !user) {
+			return next({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: ['project']
+				}
+			});
+		}
 		// get project
-		Project.find({ 'access.read' : user, 'uuid' : project }, function(err, result) { 
-			if (err || !result) api.error.general(req, res, err);
-
+		Project.findOne({ 'access.read' : user, 'uuid' : project }).exec(function(err, result) {
+			var layerIds = []
+			if (err || !result){
+				err = err || {
+					message: errors.no_such_project.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				};
+				return next(err);
+			};
 			// got project
-			Layer.find({ 'uuid': { $in: result.layers }}, function(err, docs){
-				if (err || !docs) api.error.general(req, res, err);
-				
+			Layer.find({ '_id': { $in: result.layers }}, function(err, docs){
+				if (err || !docs) {
+					err = err || {
+						message: errors.no_such_layers.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json'
+					};
+					return next(err);
+				}
 				// return layers
-				res.end(JSON.stringify(docs));
+				res.send(docs);
 			});
 		});
 	},
@@ -665,4 +685,3 @@ carto.Renderer.prototype.getRules = function render(data) {
 
 	return parser;
 }
-
