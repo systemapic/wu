@@ -1,11 +1,13 @@
 var winston = require('winston');
 var _ = require('lodash');
+var fs = require('fs-extra');
 
 // api
 var api = module.parent.exports;
 
 
 var logPath = api.config.path.log || '/data/logs/';
+fs.ensureDirSync(logPath);
 
 // logger
 var winston_logger = new (winston.Logger)({
