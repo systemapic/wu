@@ -118,6 +118,24 @@ module.exports = function(app, passport) {
 
 
 
+	/**
+	* @api {post} /api/project/get Get a project
+	* @apiName create
+	* @apiGroup Project
+	* @apiUse token
+	* @apiDescription Can get project _either_ by `project_id` OR `username, project_slug` 
+	* @apiParam {String} [project_id] Id project
+	* @apiParam {String} [username] Username
+	* @apiParam {String} [project_slug] Project slug (shortname in url)
+	*
+	* @apiSuccess {JSON} Project JSON object of the newly created project
+	*/
+	// =====================================
+	// CREATE NEW PROJECT  =================
+	// =====================================
+	app.post('/api/project/get', checkAccess, api.project.get);
+
+
 	
 	/**
 	* @api {get} /api/status Get portal status

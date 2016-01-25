@@ -250,14 +250,21 @@ module.exports = api.portal = {
 		var username = path[1];
 		var project_slug = path[2];
 		var hotlink = {
-			client : username,
+			username : username,
 			project : project_slug
 		};
+
+		// - no point checking public project here
+		// - this will only give out main page (which will ask for access token)
+		// - to get a public project - must be handled otherwise... 
+
+
 
 		req.session.hotlink = hotlink;
 		res.render('../../views/app.serve.ejs', {
 			hotlink : hotlink || {},
 		});
+	
 
 		return;
 
