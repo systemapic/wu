@@ -161,9 +161,9 @@ module.exports = api.layer = {
 			});
 		}
 		// get project
-		Project.find({ 'access.read' : user, 'uuid' : project }).populate('layers').exec(function(err, result) {
+		Project.findOne({ 'access.read' : user, 'uuid' : project }).exec(function(err, result) {
 			var layerIds = []
-			if (err || !result || _.isEmpty(result)){
+			if (err || !result){
 				err = err || {
 					message: errors.no_such_project.errorMessage,
 					code: httpStatus.NOT_FOUND,
@@ -171,18 +171,18 @@ module.exports = api.layer = {
 				};
 				return next(err);
 			};
-			_.forEach(result, function (project) {
-				_.forEach(project.layers, function (layer) {
-					layerIds.push(layer.uuid);
-				});
-			});
 			// got project
-			Layer.find({ 'uuid': { $in: layerIds }}, function(err, docs){
-				console.log(docs);
-				if (err || !docs) api.error.general(req, res, err);
-				
+			Layer.find({ '_id': { $in: result.layers }}, function(err, docs){
+				if (err || !docs) {
+					err = err || {
+						message: errors.no_such_layers.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json'
+					};
+					return next(err);
+				}
 				// return layers
-				res.end(JSON.stringify(docs));
+				res.send(docs);
 			});
 		});
 	},

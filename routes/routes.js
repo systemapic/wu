@@ -700,34 +700,40 @@ module.exports = function(app, passport) {
 	});
 
 	/**
-	* @api {post} /api/layers/new Create layer
-	* @apiName create
+	* @api {post} /api/layers Get layers related with project
+	* @apiName get layers by project id
 	* @apiGroup Layer
 	* @apiUse token
-	* @apiParam {String} title Title of new layer
-	* @apiParam {String} description Description of new layer
-	* @apiParam {String} legend Legend of new legend
-	* @apiParam {String} file File of new layer
-	* @apiParam {String} metadata Metadata of new layer
-	* @apiParam {String} data Data of new layer
-	* @apiParam {String} style Style of new layer
-	* @apiSuccess {JSON} Layer New Layer object
+	* @apiParam {String} project Project uuid
+	* @apiSuccess {Array} layers Array of layers related with project
 	* @apiSuccessExample {json} Success-Response:
-	* {
+	*[{
+	*    data: [Object],
 	*    __v: 0,
-	*    lastUpdated: '2016-01-20T10:55:30.983Z',
-	*    created: '2016-01-20T10:55:30.983Z',
-	*    legend: '',
-	*    description: 'new layer description',
-	*    title: 'new layer title',
-	*    uuid: 'layer-ae4fc38c-58f0-4468-81e7-7330d226dc24',
-	*    _id: '569f67a2ebb7233b667d8a02'
-	* }
+	*    uuid: 'relatedLayerUuid',
+	*    title: 'relatedLayerTitle',
+	*    description: 'relatedLayerDescription',
+	*    created: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
+	*    lastUpdated: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
+	*    _id: 56 a60908fdce40a15eca6773
+	*}, and etc]
 	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
 	* @apiErrorExample {json} Error-Response:
 	* Error 401: Unauthorized
 	* {
 	*    "error": "Invalid access token."
+	* }	
+	* @apiError Bad_request project does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project']
+	*		}
+	*	}
 	* }
 	*/
 	// =====================================
