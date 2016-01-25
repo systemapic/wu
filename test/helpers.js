@@ -198,6 +198,7 @@ module.exports = util = {
         project.keywords = info.keywords;
         project.categories = info.categories;
         project.layers = info.layers;
+        project.access = info.access;
 
         project.save(callback);
 
