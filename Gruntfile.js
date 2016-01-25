@@ -367,7 +367,7 @@ module.exports = function(grunt) {
 					'public/css/knut.css',
 					'public/css/experiments.css',
 					'public/css/jevil.css',
-					'public/css/globesar-public.css',
+					'public/css/guide-stylesheet.css',
 				],
 
 				dest : 'public/dist/tmp/css.portal.css'
