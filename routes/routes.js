@@ -699,13 +699,44 @@ module.exports = function(app, passport) {
 		api.layer.deleteLayer(req, res);
 	});
 
+	/**
+	* @api {post} /api/layers/new Create layer
+	* @apiName create
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} title Title of new layer
+	* @apiParam {String} description Description of new layer
+	* @apiParam {String} legend Legend of new legend
+	* @apiParam {String} file File of new layer
+	* @apiParam {String} metadata Metadata of new layer
+	* @apiParam {String} data Data of new layer
+	* @apiParam {String} style Style of new layer
+	* @apiSuccess {JSON} Layer New Layer object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*    __v: 0,
+	*    lastUpdated: '2016-01-20T10:55:30.983Z',
+	*    created: '2016-01-20T10:55:30.983Z',
+	*    legend: '',
+	*    description: 'new layer description',
+	*    title: 'new layer title',
+	*    uuid: 'layer-ae4fc38c-58f0-4468-81e7-7330d226dc24',
+	*    _id: '569f67a2ebb7233b667d8a02'
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	*/
 	// =====================================
 	// LAYERS ==============================
 	// =====================================
 	// change to /api/layer/get 
-	app.post('/api/layers', checkAccess, function (req, res) { 	// todo: layer/layers !! make all same...
-		api.layer.get(req, res);
-	});
+	app.post('/api/layers', checkAccess, function (req, res, next) { 	// todo: layer/layers !! make all same...
+		api.layer.get(req, res, next);
+	}, errorHandler);
 
 	/**
 	* @api {post} /api/layers/new Create layer
