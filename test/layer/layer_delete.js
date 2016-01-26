@@ -2,25 +2,22 @@ var supertest = require('supertest');
 var chai = require('chai');
 var expect = chai.expect;
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
-var helpers = require('./helpers');
+var helpers = require('./../helpers');
 var _ = require('lodash');
 var token = helpers.token;
-var expected = require('../shared/errors');
-var Layer   = require('../models/layer');
-var Project = require('../models/project');
+var expected = require('../../shared/errors');
+var Layer   = require('../../models/layer');
+var Project = require('../../models/project');
 var async = require('async');
 var httpStatus = require('http-status');
 
-describe('Layer', function () {
 
-    before(function(done) { helpers.create_user(done); });
-    after(function(done) { helpers.delete_user(done); });
-
+module.exports.layer = function () {
     describe('/api/layers/new', function () {
-        
+
         var newLayer = {
             title: 'new mocha test layer title',
-            description: 'new mocha test layer description',   // html
+            description: 'new mocha test layer description'   // html
         };
 
         it('should respond with status code 401 when not authenticated', function (done) {
@@ -57,7 +54,7 @@ describe('Layer', function () {
         });
 
         after(function (done) {
-            Layer.findOne({uuid : newLayer.uuid})
+            Layer.findOne({uuid: newLayer.uuid})
                 .remove()
                 .exec(done);
         });
@@ -85,40 +82,40 @@ describe('Layer', function () {
             opacity: 'update mocha test layer opacity',
             zIndex: 4,
             data: {
-                    geojson     : 'update mocha test layer geojson',       // file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
-                    topojson    : 'update mocha test layer topojson',       // file uuid ... // simply request, check auth, serve file.
-                    
-                    cartoid     : 'update mocha test layer cartoid',
-                    raster      : 'update mocha test layer raster',
+                geojson: 'update mocha test layer geojson',       // file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
+                topojson: 'update mocha test layer topojson',       // file uuid ... // simply request, check auth, serve file.
 
-                    rastertile  : 'update mocha test layer rastertile',       // server raster path: raster/hubble2/hubble
-                    vectortile  : 'update mocha test layer vectortile',       // server vector tile: vector/bigassvector/bigvector
-                    mapbox      : 'update mocha test layer mapbox',       // mapbox id: rawger.geography-class
-                    cartodb     : 'update mocha test layer cartodb',       // cartodb id: 
-                    osm         : 'update mocha test layer osm',       // osm id?
-                    norkart     : 'update mocha test layer norkart',
-                    google      : 'update mocha test layer google',
+                cartoid: 'update mocha test layer cartoid',
+                raster: 'update mocha test layer raster',
 
-                    postgis : {
+                rastertile: 'update mocha test layer rastertile',       // server raster path: raster/hubble2/hubble
+                vectortile: 'update mocha test layer vectortile',       // server vector tile: vector/bigassvector/bigvector
+                mapbox: 'update mocha test layer mapbox',       // mapbox id: rawger.geography-class
+                cartodb: 'update mocha test layer cartodb',       // cartodb id:
+                osm: 'update mocha test layer osm',       // osm id?
+                norkart: 'update mocha test layer norkart',
+                google: 'update mocha test layer google',
 
-                        sql : 'update mocha test layer sql',
-                        cartocss : 'update mocha test layer cartocss',
-                        cartocss_version : 'update mocha test layer cartocss_version',
-                        geom_column : 'update mocha test layer geom_column',
-                        file_id : 'update mocha test layer file_id',
-                        database_name : 'update mocha test layer database_name',
-                        table_name : 'update mocha test layer table_name',
-                        data_type : 'update mocha test layer data_type',
-                        geom_type : 'update mocha test layer geom_type',
-                        raster_band : 4,
-                        layer_id : 'update mocha test layer layer_id',
-                        metadata : 'update mocha test layer metadata',
-                    }
+                postgis: {
+
+                    sql: 'update mocha test layer sql',
+                    cartocss: 'update mocha test layer cartocss',
+                    cartocss_version: 'update mocha test layer cartocss_version',
+                    geom_column: 'update mocha test layer geom_column',
+                    file_id: 'update mocha test layer file_id',
+                    database_name: 'update mocha test layer database_name',
+                    table_name: 'update mocha test layer table_name',
+                    data_type: 'update mocha test layer data_type',
+                    geom_type: 'update mocha test layer geom_type',
+                    raster_band: 4,
+                    layer_id: 'update mocha test layer layer_id',
+                    metadata: 'update mocha test layer metadata'
                 }
+            }
         };
         var tmpLayer;
 
-        before(function(done) {
+        before(function (done) {
             helpers.create_layer_by_parameters(newLayerParameters, function (err, result) {
                 if (err) {
                     return done(err);
@@ -129,14 +126,14 @@ describe('Layer', function () {
             });
         });
 
-        after(function(done) {
-            helpers.delete_layer_by_id(tmpLayer.uuid, function (err, result) {
+        after(function (done) {
+            helpers.delete_layer_by_id(tmpLayer.uuid, function (err) {
                 if (err) {
                     return done(err);
                 }
                 done();
             })
-        })
+        });
 
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/layer/update')
@@ -152,9 +149,9 @@ describe('Layer', function () {
                 }
 
                 api.post('/api/layer/update')
-                    .send({access_token : access_token})
+                    .send({access_token: access_token})
                     .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
-                    .end(done);                
+                    .end(done);
             });
         });
 
@@ -167,14 +164,14 @@ describe('Layer', function () {
                 api.post('/api/layer/update')
                     .send({
                         layer: 'bad layer',
-                        access_token : access_token
+                        access_token: access_token
                     })
                     .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
 
-      
+
         it('should respond with status code 200 and update layer correctly', function (done) {
             token(function (err, access_token) {
                 if (err) {
@@ -200,7 +197,7 @@ describe('Layer', function () {
                 });
 
                 ops.push(function (options, callback) {
-                    Layer.findOne({uuid : layerUpdates.layer})
+                    Layer.findOne({uuid: layerUpdates.layer})
                         .exec(function (err, res) {
                             if (err) {
                                 return callback(err);
@@ -243,7 +240,7 @@ describe('Layer', function () {
                             callback();
                         });
                 });
-                async.waterfall(ops, function (err, result) {
+                async.waterfall(ops, function (err) {
                     if (err) {
                         return done(err);
                     }
@@ -327,7 +324,7 @@ describe('Layer', function () {
             ops.push(function (params, callback) {
                 helpers.delete_project_by_id(projectWithLayers.uuid, callback);
             });
-            
+
             async.waterfall(ops, done)
         });
 
@@ -346,7 +343,7 @@ describe('Layer', function () {
 
                 api.post('/api/layers')
                     .send({
-                        access_token : access_token
+                        access_token: access_token
                     })
                     .expect(400)
                     .end(function (err, res) {
@@ -373,7 +370,7 @@ describe('Layer', function () {
                 api.post('/api/layers')
                     .send({
                         project: 'Bad project uuid',
-                        access_token : access_token
+                        access_token: access_token
                     })
                     .expect(404)
                     .end(function (err, res) {
@@ -400,7 +397,7 @@ describe('Layer', function () {
                     api.post('/api/layers')
                         .send({
                             project: projectWithoutLayers.uuid,
-                            access_token : access_token
+                            access_token: access_token
                         })
                         .expect(404)
                         .end(function (err, res) {
@@ -414,12 +411,12 @@ describe('Layer', function () {
                             expect(result.error.code).to.be.equal(httpStatus.NOT_FOUND);
                             done();
                         });
-                });     
+                });
             });
         });
-        
+
         context('when user have access', function () {
-            
+
             before(function (done) {
                 Project.findOne({uuid: projectWithoutLayers.uuid})
                     .exec(function (err, result) {
@@ -444,7 +441,7 @@ describe('Layer', function () {
                     api.post('/api/layers')
                         .send({
                             project: projectWithoutLayers.uuid,
-                            access_token : access_token
+                            access_token: access_token
                         })
                         .expect(200)
                         .end(function (err, res) {
@@ -470,7 +467,7 @@ describe('Layer', function () {
                     api.post('/api/layers')
                         .send({
                             project: projectWithLayers.uuid,
-                            access_token : access_token
+                            access_token: access_token
                         })
                         .expect(200)
                         .end(function (err, res) {
@@ -518,7 +515,7 @@ describe('Layer', function () {
             ops.push(function (callback) {
                 helpers.create_layer_by_parameters(layerInfoRelatedWithProjet, callback);
             });
-            
+
             ops.push(function (params, moreParams, callback) {
                 projectInfo.layers = [params._id];
                 helpers.create_project_by_info(projectInfo, callback);
@@ -558,78 +555,78 @@ describe('Layer', function () {
         });
 
         it('should respond with status code 400 if layer_id and project_id doesn\'t exist in request body', function (done) {
-                token(function (err, access_token) {
-                    if (err) {
-                        return done(err);
-                    }
+            token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
 
-                    api.post('/api/layers/delete')
-                        .send({
-                            access_token : access_token
-                        })
-                        .expect(400)
-                        .end(function (err, res) {
-                            if (err) {
-                                return done(err);
-                            }
+                api.post('/api/layers/delete')
+                    .send({
+                        access_token: access_token
+                    })
+                    .expect(400)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
 
-                            var result = helpers.parse(res.text);
-                            expect(result.error.errors.missingRequiredFields).to.be.an.array;
-                            expect(result.error.errors.missingRequiredFields).to.include('layer_id');
-                            expect(result.error.errors.missingRequiredFields).to.include('project_id');
-                            done();
-                        });
-                });
+                        var result = helpers.parse(res.text);
+                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
+                        expect(result.error.errors.missingRequiredFields).to.include('layer_id');
+                        expect(result.error.errors.missingRequiredFields).to.include('project_id');
+                        done();
+                    });
+            });
         });
 
         it('should respond with status code 400 if layer_id doesn\'t exist in request body', function (done) {
-                token(function (err, access_token) {
-                    if (err) {
-                        return done(err);
-                    }
+            token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
 
-                    api.post('/api/layers/delete')
-                        .send({
-                            access_token : access_token,
-                            project_id : 'some_id'
-                        })
-                        .expect(400)
-                        .end(function (err, res) {
-                            if (err) {
-                                return done(err);
-                            }
+                api.post('/api/layers/delete')
+                    .send({
+                        access_token: access_token,
+                        project_id: 'some_id'
+                    })
+                    .expect(400)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
 
-                            var result = helpers.parse(res.text);
-                            expect(result.error.errors.missingRequiredFields).to.be.an.array;
-                            expect(result.error.errors.missingRequiredFields).to.include('layer_id');
-                            done();
-                        });
-                });
+                        var result = helpers.parse(res.text);
+                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
+                        expect(result.error.errors.missingRequiredFields).to.include('layer_id');
+                        done();
+                    });
+            });
         });
 
         it('should respond with status code 400 if project_id doesn\'t exist in request body', function (done) {
-                token(function (err, access_token) {
-                    if (err) {
-                        return done(err);
-                    }
+            token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
 
-                    api.post('/api/layers/delete')
-                        .send({
-                            layer_id: 'some id',
-                            access_token : access_token
-                        })
-                        .expect(400)
-                        .end(function (err, res) {
-                            if (err) {
-                                return done(err);
-                            }
+                api.post('/api/layers/delete')
+                    .send({
+                        layer_id: 'some id',
+                        access_token: access_token
+                    })
+                    .expect(400)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
 
-                            var result = helpers.parse(res.text);
-                            expect(result.error.errors.missingRequiredFields).to.be.an.array;
-                            expect(result.error.errors.missingRequiredFields).to.include('project_id');
-                            done();
-                        });
-                });
+                        var result = helpers.parse(res.text);
+                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
+                        expect(result.error.errors.missingRequiredFields).to.include('project_id');
+                        done();
+                    });
+            });
         });
 
         it('should respond with status 404 if layer doesn\'t exist', function (done) {
@@ -750,4 +747,4 @@ describe('Layer', function () {
         });
 
     });
-});
+};
