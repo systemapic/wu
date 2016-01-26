@@ -6,6 +6,7 @@ var helpers = require('../helpers');
 var token = helpers.token;
 var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
+var format = require('util').format;
 
 module.exports = function () {
     describe('/api/file/getLayers', function () {
