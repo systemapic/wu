@@ -691,6 +691,56 @@ module.exports = function(app, passport) {
 		api.file.addFileToProject(req, res);
 	});
 
+	/**
+	* @api {post} /api/layers/delete Delete data
+	* @apiName delete
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} layer_id Layer id
+	* @apiParam {String}  project__id Project id 
+	* @apiSuccess {json} status Upload Status JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "success": true,
+	*   "err": {}
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request layer_id or project_id does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['layer_id', 'project_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found Layer with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such layers",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Not_found Project with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// DELETE LAYER(S) =====================
 	// =====================================
