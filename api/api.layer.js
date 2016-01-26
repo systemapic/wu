@@ -343,7 +343,10 @@ module.exports = api.layer = {
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-				console.log('removed Project: ', err, project);
+				if (err) {
+					return callback(err);
+				}
+				
 				if (!project || !project._id) {
 					return callback({
 						message: errors.no_such_project.errorMessage,
