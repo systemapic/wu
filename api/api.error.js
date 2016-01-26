@@ -78,8 +78,12 @@ module.exports = api.error = {
 			error : api.error.pretty(err)
 		});
 		
+		// hotfix: todo: fix sessions
+		var user_id = req.user ? req.user._id : false;
+		if (!user_id) return;
+
 		// send to socket
-		api.socket.sendError(req.user._id, err.message || err);
+		api.socket.sendError(user._id, err.message || err);
 
 		api.error.log(err);
 	},
