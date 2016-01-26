@@ -228,9 +228,6 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.account.js',
 					'public/js/src/panes/pane.guide.js',
 
-					'public/js/src/panes/pane.guide.js',
-
-
 					// chrome
 					'public/js/src/chrome/chrome.js',	
 					'public/js/src/chrome/chrome.top.js',	
