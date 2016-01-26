@@ -19,5 +19,6 @@ dist/css/mobilestyle.css
 dist/css/padstyle.css
 dist/css/phantomJS.css
 dist/css/phantomJSthumb.css
+server.sh
 public/dist/*
 public/local/*

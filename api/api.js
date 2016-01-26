@@ -2,7 +2,8 @@
 
 // api
 var api = {};
-api.version = require('fs').readFileSync('../public/js/src/core/app.js').toString().split("'")[1];
+// api.version = require('fs').readFileSync('../public/js/src/core/app.js').toString().split("'")[1];
+api.verson = '1.3.6';
 
 // config
 var config = require('../config/server-config.js');
