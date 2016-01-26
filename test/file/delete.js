@@ -271,7 +271,7 @@ var newRasterFileWithRealtedUser = {
         }
     }
 };
-module.exports.fileTests = function () {
+module.exports = function () {
 
     describe('/api/file/delete', function () {
         var createdFileWithPostgisType = {};
