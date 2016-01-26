@@ -128,65 +128,99 @@ module.exports = api.file = {
 
 	},
 
-	addFileToProject : function (req, res) {
+	addFileToProject : function (req, res, next) {
 		var options = req.body,
-		    fileUuid = options.fileUuid,
-		    projectUuid = options.projectUuid,
+		    fileUuid = options.file_id,
+		    projectUuid = options.project_id,
 		    ops = [],
-		    thefile,
 		    theproject,
-		    thelayers = [];
+		    missingRequiredFields = [];
 
+		if (!fileUuid) {
+			missingRequiredFields.push('file_id');
+		}
+
+		if (!projectUuid) {
+			missingRequiredFields.push('project_id');
+		}
+
+		if (!_.isEmpty(missingRequiredFields)) {
+			return next({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: missingRequiredFields
+				}
+			});
+		}
 
 		ops.push(function (callback) {
 
 			File
 			.findOne({uuid : fileUuid})
 			.exec(function (err, file) {
-				thefile = file;
-				callback(err);
+				if (!file) {
+					return callback({
+						message: errors.no_such_file.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json',
+					});
+				}
+
+				callback(err, file);
 			});
 
 		});
 
 		// get all layers connected to file
-		ops.push(function (callback) {
-			
+		ops.push(function (file, callback) {
 			Layer
-			.find({file : thefile.uuid})
+			.find({file : file.uuid})
 			.exec(function (err, layers) {
-				thelayers = layers;
-				callback(err);
+				callback(err, {
+					layers: layers || [],
+					file: file
+				});
 			});
-
 		});
 
 		// get and save project
-		ops.push(function (callback) {
+		ops.push(function (params, callback) {
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-				theproject = project;
-				callback(err);
+				if (!project) {
+					return callback({
+						message: errors.no_such_project.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json',
+					});
+				}
+				params.project = project
+				callback(err, params);
 			});
 		});
-		ops.push(function (callback) {
-			theproject.files.push(thefile._id);
-			thelayers.forEach(function (layer) {
-				theproject.layers.push(layer._id);
-			});
-			theproject.markModified('files');
-			theproject.markModified('layers');
-			theproject.save(function (err, project) {
-				theproject = project;
-				callback(err);
-			});
 
+		ops.push(function (params, callback) {
+			params.project.files.push(params.file._id);
+			params.layers.forEach(function (layer) {
+				params.project.layers.push(layer._id);
+			});
+			params.project.markModified('files');
+			params.project.markModified('layers');
+			params.project.save(function (err, project) {
+				params.project = project;
+				callback(err, params.project);
+			});
 		});
 
-		async.series(ops, function (err, results) {
-			if (err) return api.error.general(res, err);
-			res.json(theproject);
+		async.waterfall(ops, function (err, results) {
+			if (err) {
+				return next(err);
+			}
+
+			res.send(results);
 		});
 
 	},
@@ -228,8 +262,6 @@ module.exports = api.file = {
 					if (ext == 'pdf') {
 						pdf = f;
 					}
-				
-					
 				});
 
 				var path = folder + '/' + pdf;
@@ -238,8 +270,6 @@ module.exports = api.file = {
 				callback(null, path);
 
 			});
-
-			
 
 		});
 
@@ -255,7 +285,6 @@ module.exports = api.file = {
 		});
 		
 	},
-
 
 	// handle file downloads
 	downloadFile : function (req, res) {

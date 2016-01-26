@@ -123,8 +123,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/get', checkAccess, api.project.get);
 
-
-	
 	/**
 	* @api {get} /api/status Get portal status
 	* @apiName status
@@ -302,8 +300,6 @@ module.exports = function(app, passport) {
 	app.get('/api/upload/get', checkAccess, function (req, res) {
 		api.upload.getUpload(req, res);
 	});
-
-
 
 	/**
 	* @api {post} /api/import Import data
@@ -683,21 +679,144 @@ module.exports = function(app, passport) {
 		api.file.deleteFile(req, res, next);
 	}, errorHandler);
 
+	/**
+	* @api {post} /api/file/addtoproject Add file to the project
+	* @apiName addToTheProject
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} file_id File id
+	* @apiParam {String} project_id Project id
+	* @apiSuccess {json} status Upload Status JSON
+	* @apiSuccessExample {json} Success-Response:
+	*{
+	*  _id: '56a76e07b6aa58e535c88d22',
+	*  lastUpdated: '2016-01-26T13:00:55.159Z',
+	*  created: '2016-01-26T13:00:55.018Z',
+	*  createdByUsername: 'relatedProjectCreatedByUsername',
+	*  createdByName: 'relatedProjectCreatedByName',
+	*  createdBy: 'relatedProjectCreatedBy',
+	*  uuid: 'relatedProjectInfo',
+	*  layers: ['56a76e07b6aa58e535c88d23'],
+	*  files: ['56a76e07b6aa58e535c88d21'],
+	*  roles: [],
+	*  access: {
+	*    options: {
+	*      isPublic: false,
+	*      download: false,
+	*      share: true
+	*    },
+	*    edit: [],
+	*    read: ['test-user-uuid']
+	*  },
+	*  categories: [],
+	*  keywords: [],
+	*  description: 'Description',
+	*  slug: 'projectslug',
+	*  name: 'relatedProjectName'
+	* etc...
+	*}
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request file_id or project_id does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['file_id', 'project_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found File with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such file",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Not_found Project with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	// change to /api/project/addData
-	app.post('/api/file/addtoproject', checkAccess, function (req,res) {
-		api.file.addFileToProject(req, res);
-	});
+	app.post('/api/file/addtoproject', checkAccess, function (req, res, next) {
+		api.file.addFileToProject(req, res, next);
+	}, errorHandler);
 
+	/**
+	* @api {post} /api/layers/delete Delete data
+	* @apiName delete
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} layer_id Layer id
+	* @apiParam {String}  project__id Project id 
+	* @apiSuccess {json} status Upload Status JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "success": true,
+	*   "err": {}
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request layer_id or project_id does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['layer_id', 'project_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found Layer with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such layers",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Not_found Project with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// DELETE LAYER(S) =====================
 	// =====================================
 	// change to /api/layer/delete (layer, not layers)
-	app.post('/api/layers/delete', checkAccess, function (req,res) {
-		api.layer.deleteLayer(req, res);
-	});
+	app.post('/api/layers/delete', checkAccess, function (req,res, next) {
+		api.layer.deleteLayer(req, res, next);
+	}, errorHandler);
 
 	/**
 	* @api {post} /api/layers Get layers related with project
