@@ -1,6 +1,7 @@
 var helpers = require('../helpers');
 var layersDelete = require('./delete');
 var layerNew = require('./new');
+var layerUpdate = require('./update');
 
 describe('Layer', function () {
     before(function(done) { helpers.create_user(done); });
@@ -8,4 +9,5 @@ describe('Layer', function () {
 
     layersDelete();
     layerNew();
+    layerUpdate();
 });
