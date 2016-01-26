@@ -348,16 +348,12 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/api/project/update', checkAccess, function (req,res) {
-		api.project.update(req, res);
-	});
+	app.post('/api/project/update', checkAccess, api.project.update);
 
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/api/project/unique', checkAccess, function (req,res) {
-		api.project.checkUniqueSlug(req, res);
-	});
+	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug);
 
 	// =====================================
 	// SET PROJECT HASH ====================
@@ -557,9 +553,7 @@ module.exports = function(app, passport) {
 	// UPDATE FILE =========================
 	// =====================================
 	// change to /api/data/update
-	app.post('/api/file/update', checkAccess, function (req,res) {
-		api.file.update(req, res);
-	});
+	app.post('/api/file/update', checkAccess, api.file.update);
 
 	/**
 	* @api {post} /api/file/getLayers Get layers
@@ -601,9 +595,7 @@ module.exports = function(app, passport) {
 	// GET LAYERS OF FILE ==================
 	// =====================================
 	// change to /api/data/getLayers
-	app.post('/api/file/getLayers', checkAccess, function (req,res) {
-		api.file.getLayers(req, res);
-	});
+	app.post('/api/file/getLayers', checkAccess, api.file.getLayers);
 
 	// =====================================
 	// SHARE DATASET =======================
@@ -675,9 +667,7 @@ module.exports = function(app, passport) {
 	// DELETE DATA =========================
 	// =====================================
 	// change to /api/data/delete
-	app.post('/api/file/delete', checkAccess, function (req, res, next) {
-		api.file.deleteFile(req, res, next);
-	}, errorHandler);
+	app.post('/api/file/delete', checkAccess, api.file.deleteFile, errorHandler);
 
 	/**
 	* @api {post} /api/file/addtoproject Add file to the project
@@ -756,9 +746,7 @@ module.exports = function(app, passport) {
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	// change to /api/project/addData
-	app.post('/api/file/addtoproject', checkAccess, function (req, res, next) {
-		api.file.addFileToProject(req, res, next);
-	}, errorHandler);
+	app.post('/api/file/addtoproject', checkAccess, api.file.addFileToProject, errorHandler);
 
 	/**
 	* @api {post} /api/layers/delete Delete data
@@ -814,9 +802,7 @@ module.exports = function(app, passport) {
 	// DELETE LAYER(S) =====================
 	// =====================================
 	// change to /api/layer/delete (layer, not layers)
-	app.post('/api/layers/delete', checkAccess, function (req,res, next) {
-		api.layer.deleteLayer(req, res, next);
-	}, errorHandler);
+	app.post('/api/layers/delete', checkAccess, api.layer.deleteLayer, errorHandler);
 
 	/**
 	* @api {post} /api/layers Get layers related with project
@@ -859,9 +845,7 @@ module.exports = function(app, passport) {
 	// LAYERS ==============================
 	// =====================================
 	// change to /api/layer/get 
-	app.post('/api/layers', checkAccess, function (req, res, next) { 	// todo: layer/layers !! make all same...
-		api.layer.get(req, res, next);
-	}, errorHandler);
+	app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
 
 	/**
 	* @api {post} /api/layers/new Create layer
@@ -898,9 +882,7 @@ module.exports = function(app, passport) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	// change to /api/layer/create 
-	app.post('/api/layers/new', checkAccess, function (req, res) {
-		api.layer.create(req, res);
-	});
+	app.post('/api/layers/new', checkAccess, api.layer.create);
 
 	// =====================================
 	// NEW OSM LAYERS ======================
@@ -946,9 +928,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
-	app.post('/api/layer/update', checkAccess, function (req, res) {
-		api.layer.update(req, res);
-	});
+	app.post('/api/layer/update', checkAccess, api.layer.update);
 
 	// =====================================
 	// RELOAD LAYER METADATA ===============
