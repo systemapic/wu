@@ -228,6 +228,8 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.account.js',
 					'public/js/src/panes/pane.guide.js',
 
+					'public/js/src/panes/pane.guide.js',
+
 
 					// chrome
 					'public/js/src/chrome/chrome.js',	
@@ -364,7 +366,8 @@ module.exports = function(grunt) {
 					'public/css/chrome.css',
 					'public/css/knut.css',
 					'public/css/experiments.css',
-					'public/css/jevil.css'					
+					'public/css/jevil.css',
+					'public/css/guide-stylesheet.css',
 				],
 
 				dest : 'public/dist/tmp/css.portal.css'
