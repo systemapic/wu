@@ -6,6 +6,8 @@ var helpers = require('../helpers');
 var token = helpers.token;
 var httpStatus = require('http-status');
 var async = require('async');
+var expected = require('../../shared/errors');
+var Project =  require('../../models/project');
 
 module.exports = function () {
     // skipping for now, because we need to make HUGE changes on the layer specs.. @igor: interested?
