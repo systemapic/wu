@@ -123,8 +123,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/get', checkAccess, api.project.get);
 
-
-	
 	/**
 	* @api {get} /api/status Get portal status
 	* @apiName status
@@ -303,8 +301,6 @@ module.exports = function(app, passport) {
 		api.upload.getUpload(req, res);
 	});
 
-
-
 	/**
 	* @api {post} /api/import Import data
 	* @apiName import
@@ -352,16 +348,12 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/api/project/update', checkAccess, function (req,res) {
-		api.project.update(req, res);
-	});
+	app.post('/api/project/update', checkAccess, api.project.update);
 
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/api/project/unique', checkAccess, function (req,res) {
-		api.project.checkUniqueSlug(req, res);
-	});
+	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug);
 
 	// =====================================
 	// SET PROJECT HASH ====================
@@ -561,9 +553,7 @@ module.exports = function(app, passport) {
 	// UPDATE FILE =========================
 	// =====================================
 	// change to /api/data/update
-	app.post('/api/file/update', checkAccess, function (req,res) {
-		api.file.update(req, res);
-	});
+	app.post('/api/file/update', checkAccess, api.file.update);
 
 	/**
 	* @api {post} /api/file/getLayers Get layers
@@ -605,9 +595,7 @@ module.exports = function(app, passport) {
 	// GET LAYERS OF FILE ==================
 	// =====================================
 	// change to /api/data/getLayers
-	app.post('/api/file/getLayers', checkAccess, function (req,res) {
-		api.file.getLayers(req, res);
-	});
+	app.post('/api/file/getLayers', checkAccess, api.file.getLayers);
 
 	// =====================================
 	// SHARE DATASET =======================
@@ -679,33 +667,185 @@ module.exports = function(app, passport) {
 	// DELETE DATA =========================
 	// =====================================
 	// change to /api/data/delete
-	app.post('/api/file/delete', checkAccess, function (req, res, next) {
-		api.file.deleteFile(req, res, next);
-	}, errorHandler);
+	app.post('/api/file/delete', checkAccess, api.file.deleteFile, errorHandler);
 
+	/**
+	* @api {post} /api/file/addtoproject Add file to the project
+	* @apiName addToTheProject
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} file_id File id
+	* @apiParam {String} project_id Project id
+	* @apiSuccess {json} status Upload Status JSON
+	* @apiSuccessExample {json} Success-Response:
+	*{
+	*  _id: '56a76e07b6aa58e535c88d22',
+	*  lastUpdated: '2016-01-26T13:00:55.159Z',
+	*  created: '2016-01-26T13:00:55.018Z',
+	*  createdByUsername: 'relatedProjectCreatedByUsername',
+	*  createdByName: 'relatedProjectCreatedByName',
+	*  createdBy: 'relatedProjectCreatedBy',
+	*  uuid: 'relatedProjectInfo',
+	*  layers: ['56a76e07b6aa58e535c88d23'],
+	*  files: ['56a76e07b6aa58e535c88d21'],
+	*  roles: [],
+	*  access: {
+	*    options: {
+	*      isPublic: false,
+	*      download: false,
+	*      share: true
+	*    },
+	*    edit: [],
+	*    read: ['test-user-uuid']
+	*  },
+	*  categories: [],
+	*  keywords: [],
+	*  description: 'Description',
+	*  slug: 'projectslug',
+	*  name: 'relatedProjectName'
+	* etc...
+	*}
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request file_id or project_id does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['file_id', 'project_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found File with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such file",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Not_found Project with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	// change to /api/project/addData
-	app.post('/api/file/addtoproject', checkAccess, function (req,res) {
-		api.file.addFileToProject(req, res);
-	});
+	app.post('/api/file/addtoproject', checkAccess, api.file.addFileToProject, errorHandler);
 
+	/**
+	* @api {post} /api/layers/delete Delete data
+	* @apiName delete
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} layer_id Layer id
+	* @apiParam {String}  project__id Project id 
+	* @apiSuccess {json} status Upload Status JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "success": true,
+	*   "err": {}
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request layer_id or project_id does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['layer_id', 'project_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found Layer with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such layers",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Not_found Project with specific id not found(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// DELETE LAYER(S) =====================
 	// =====================================
 	// change to /api/layer/delete (layer, not layers)
-	app.post('/api/layers/delete', checkAccess, function (req,res) {
-		api.layer.deleteLayer(req, res);
-	});
+	app.post('/api/layers/delete', checkAccess, api.layer.deleteLayer, errorHandler);
 
+	/**
+	* @api {post} /api/layers Get layers related with project
+	* @apiName get layers by project id
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} project Project uuid
+	* @apiSuccess {Array} layers Array of layers related with project
+	* @apiSuccessExample {json} Success-Response:
+	*[{
+	*    data: [Object],
+	*    __v: 0,
+	*    uuid: 'relatedLayerUuid',
+	*    title: 'relatedLayerTitle',
+	*    description: 'relatedLayerDescription',
+	*    created: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
+	*    lastUpdated: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
+	*    _id: 56 a60908fdce40a15eca6773
+	*}, and etc]
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }	
+	* @apiError Bad_request project does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// LAYERS ==============================
 	// =====================================
 	// change to /api/layer/get 
-	app.post('/api/layers', checkAccess, function (req, res) { 	// todo: layer/layers !! make all same...
-		api.layer.get(req, res);
-	});
+	app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
 
 	/**
 	* @api {post} /api/layers/new Create layer
@@ -742,9 +882,7 @@ module.exports = function(app, passport) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	// change to /api/layer/create 
-	app.post('/api/layers/new', checkAccess, function (req, res) {
-		api.layer.create(req, res);
-	});
+	app.post('/api/layers/new', checkAccess, api.layer.create);
 
 	// =====================================
 	// NEW OSM LAYERS ======================
@@ -790,9 +928,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
-	app.post('/api/layer/update', checkAccess, function (req, res) {
-		api.layer.update(req, res);
-	});
+	app.post('/api/layer/update', checkAccess, api.layer.update);
 
 	// =====================================
 	// RELOAD LAYER METADATA ===============

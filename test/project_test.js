@@ -13,6 +13,7 @@ var config = require('../config/server-config.js').serverConfig;
 var helpers = require('./helpers');
 var token = helpers.token;
 var expected = require('../shared/errors');
+var httpStatus = require('http-status');
 var second_test_user = {
     email : 'second_mocha_test_user@systemapic.com',
     firstName : 'Igor',
@@ -65,23 +66,23 @@ describe('Project', function () {
                 .end(done);
         });
 
-        it('should respond with status code 422 and specific error message if empty body', function (done) {
+        it('should respond with status code 400 and specific error message if empty body', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/create')
                     .send({access_token : access_token})
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
 
-        it('should respond with status code 422 and specific error message if no project name', function (done) {
+        it('should respond with status code 400 and specific error message if no project name', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/create')
                     .send({
                         foo : 'mocha-test-updated-name',
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -101,35 +102,35 @@ describe('Project', function () {
                 .end(done);
         });
 
-        it('should respond with status code 422 and specific error message if empty body', function (done) {
+        it('should respond with status code 400 and specific error message if empty body', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/update')
                     .send({access_token : access_token})
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
 
-        it('should respond with status code 422 and specific error message if no project_id', function (done) {
+        it('should respond with status code 400 and specific error message if no project_id', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/update')
                     .send({
                         name : 'mocha-test-updated-name',
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
 
-        it('should respond with status code 422 and specific error message if no field to update', function (done) {
+        it('should respond with status code 400 and specific error message if no field to update', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/update')
                     .send({
                         project_id : tmp.project.uuid,
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
@@ -143,7 +144,7 @@ describe('Project', function () {
             helpers.delete_user_by_id(second_test_user.uuid, done);
         });
 
-        it('should respond with status code 422 and specific error message when not authorized', function (done) {
+        it('should respond with status code 400 and specific error message when not authorized', function (done) {
             helpers.users_token(second_test_user, function (err, access_token) {
                 api.post('/api/project/update')
                     .send({
@@ -151,7 +152,7 @@ describe('Project', function () {
                         project_id: tmp.project.uuid,
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.no_access.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.no_access.errorMessage))
                     .end(done);
             });
         });
@@ -333,23 +334,23 @@ describe('Project', function () {
                 .end(done);
         });
 
-        it('should respond with status code 422 and specific error message if empty body', function (done) {
+        it('should respond with status code 400 and specific error message if empty body', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/delete')
                     .send({access_token : access_token})
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
 
-        it('should respond with status code 422 and specific error message if no project_id', function (done) {
+        it('should respond with status code 400 and specific error message if no project_id', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/delete')
                     .send({
                         foo : 'mocha-test-updated-name',
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
