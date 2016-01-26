@@ -262,8 +262,6 @@ module.exports = api.file = {
 					if (ext == 'pdf') {
 						pdf = f;
 					}
-				
-					
 				});
 
 				var path = folder + '/' + pdf;
@@ -272,8 +270,6 @@ module.exports = api.file = {
 				callback(null, path);
 
 			});
-
-			
 
 		});
 
@@ -289,7 +285,6 @@ module.exports = api.file = {
 		});
 		
 	},
-
 
 	// handle file downloads
 	downloadFile : function (req, res) {
