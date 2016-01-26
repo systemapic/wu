@@ -3,6 +3,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var helpers = require('../helpers');
+var token = helpers.token;
 var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
 var second_test_user = {
@@ -14,7 +15,7 @@ var second_test_user = {
 };
 var testFile = helpers.test_file;
 
-module.export = function () {
+module.exports = function () {
     describe('/api/file/update', function () {
 
         it('should respond with status code 401 when not authenticated', function (done) {
