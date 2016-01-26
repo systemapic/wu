@@ -1,4 +1,5 @@
 var fileTests = require('./file_old').fileTests;
+var helpers = require('../helpers');
 
 describe('File', function () {
     before(function(done) { helpers.create_user(done); });
