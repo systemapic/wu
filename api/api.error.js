@@ -83,7 +83,7 @@ module.exports = api.error = {
 		if (!user_id) return;
 
 		// send to socket
-		api.socket.sendError(user._id, err.message || err);
+		api.socket.sendError(user_id, err.message || err);
 
 		api.error.log(err);
 	},
