@@ -358,6 +358,8 @@ module.exports = api.email = {
 		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
 		var bgcolor = api.config.mail.portal.color;
 
+		var bg_logo = api.config.mail.portal.backgroundLogo;
+
 		// email body
 		var body  = '<script type="application/ld+json">';
 			body  += '{';
@@ -366,7 +368,7 @@ module.exports = api.email = {
 			body  += '"description":    "Welcome to Systemapic",';
 			body  += '"potentialAction": {';
 			body  += '"@type": "ViewAction",';
-			body  += '"target":   "http://systemapic.com/",';
+			body  += '"target":   "https://systemapic.com/",';
 			body  += '"name": "Your access details for Systemapic"';
 			body  += '},';
 			body  += '"publisher": ';
@@ -386,7 +388,8 @@ module.exports = api.email = {
 			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
 			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
 			body += '<tr>';
-			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			// body += '<td width="100" align="center"><a href="https://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '<td width="100" align="center"><a href="https://systemapic.com/" target="_blank"><div alt="Logo" style="background-image:' + bg_logo + ';display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
 			body += '</tr>';
 			body += '</table>';
 			body += '</td>';
@@ -451,7 +454,7 @@ module.exports = api.email = {
 			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a><br>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="https://systemapic.com">Powered by Systemapic.com</a><br>';
 			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
@@ -503,7 +506,8 @@ module.exports = api.email = {
 
 		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
 		var bgcolor = api.config.mail.portal.color;
-
+		var bg_logo = api.config.mail.portal.backgroundLogo;
+		
 		// email body
 		var body  = '<script type="application/ld+json">';
 			body  += '{';
@@ -512,14 +516,14 @@ module.exports = api.email = {
 			body  += '"description":    "Welcome to Systemapic",';
 			body  += '"potentialAction": {';
 			body  += '"@type": "ViewAction",';
-			body  += '"target":   "http://systemapic.com/",';
+			body  += '"target":   "https://systemapic.com/",';
 			body  += '"name": "Your access details for Systemapic"';
 			body  += '},';
 			body  += '"publisher": ';
 			body  += '{';
 			body  += '"@type": "Organization",';
 			body  += '"name": "Systemapic",';
-			body  += '"url": "http://systemapic.com"';
+			body  += '"url": "https://systemapic.com"';
 			body  += '}';
 			body  += '}';
 			body  += '</script>';
@@ -532,7 +536,8 @@ module.exports = api.email = {
 			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
 			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
 			body += '<tr>';
-			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			// body += '<td width="100" align="center"><a href="https://systemapic.com/" target="_blank"><div alt="Logo" style="background-image:' + bg_logo + ';display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '<td width="100" align="center"><a href="https://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
 			body += '</tr>';
 			body += '</table>';
 			body += '</td>';
@@ -597,7 +602,7 @@ module.exports = api.email = {
 			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a><br>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="https://systemapic.com">Powered by Systemapic.com</a><br>';
 			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
@@ -625,7 +630,7 @@ module.exports = api.email = {
 		var title          = 'Thank you!';
 		var subject        = 'Systemapic Beta: Early Access Mailing List';
 		var subtitle       = 'You have been signed up for the Systemapic Beta: Early Access mailing list. We will contact you as soon as we have available slots!<br><br>In the meantime, feel free to read our blog and follow our progress:';
-		var link           = 'http://systemapic.com/blog';
+		var link           = 'https://systemapic.com/blog';
 		var link_text      = 'Systemapic Blog';
 
 		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
@@ -639,14 +644,14 @@ module.exports = api.email = {
 			body  += '"description":    "Welcome to Systemapic Beta Mailing List",';
 			body  += '"potentialAction": {';
 			body  += '"@type": "ViewAction",';
-			body  += '"target":   "http://systemapic.com/",';
+			body  += '"target":   "https://systemapic.com/",';
 			body  += '"name": "Join Beta Mailing List"';
 			body  += '},';
 			body  += '"publisher": ';
 			body  += '{';
 			body  += '"@type": "Organization",';
 			body  += '"name": "Systemapic",';
-			body  += '"url": "http://systemapic.com"';
+			body  += '"url": "https://systemapic.com"';
 			body  += '}';
 			body  += '}';
 			body  += '</script>';
@@ -659,7 +664,7 @@ module.exports = api.email = {
 			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
 			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
 			body += '<tr>';
-			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '<td width="100" align="center"><a href="https://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
 			body += '</tr>';
 			body += '</table>';
 			body += '</td>';
@@ -725,7 +730,7 @@ module.exports = api.email = {
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
 			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="https://systemapic.com">Powered by Systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
 			body += '</table>';
@@ -785,14 +790,14 @@ module.exports = api.email = {
 			body  += '"description":    "Welcome to Systemapic",';
 			body  += '"potentialAction": {';
 			body  += '"@type": "ViewAction",';
-			body  += '"target":   "http://systemapic.com/",';
+			body  += '"target":   "https://systemapic.com/",';
 			body  += '"name": "Your access details for Systemapic"';
 			body  += '},';
 			body  += '"publisher": ';
 			body  += '{';
 			body  += '"@type": "Organization",';
 			body  += '"name": "Systemapic",';
-			body  += '"url": "http://systemapic.com"';
+			body  += '"url": "https://systemapic.com"';
 			body  += '}';
 			body  += '}';
 			body  += '</script>';
@@ -805,7 +810,7 @@ module.exports = api.email = {
 			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
 			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
 			body += '<tr>';
-			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '<td width="100" align="center"><a href="https://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
 			body += '</tr>';
 			body += '</table>';
 			body += '</td>';
@@ -871,7 +876,7 @@ module.exports = api.email = {
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
 			// body += 'If you think you have received this email in error, no further action is required.<br>';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a><br>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="https://systemapic.com">Powered by Systemapic.com</a><br>';
 			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
