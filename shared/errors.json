@@ -46,5 +46,9 @@
     "dropTable_error": {
         "errorMessage": "Can't drop table %s",
         "code": "500"
+    },
+    "no_such_layers": {
+      "errorMessage": "No such layers",
+      "code": "404"
     }
 }

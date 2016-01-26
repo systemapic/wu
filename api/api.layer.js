@@ -35,14 +35,13 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errors = require('../shared/errors');
-
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
 
 // exports
-module.exports = api.layer = { 
-
+module.exports = api.layer = {
 
 	// create layer
 	create : function (req, res) {
@@ -146,23 +145,44 @@ module.exports = api.layer = {
 
 
 	// get layers and send to client
-	get : function (req, res) {
-		var project = req.body.project,
-		    user = req.user.uuid;
+	get : function (req, res, next) {
+		var project = req.body.project;
+		var user = req.user.uuid;
 
 		// error if no project or user
-		if (!project || !user) return api.error.missingInformation(req, res);
-
+		if (!project || !user) {
+			return next({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: ['project']
+				}
+			});
+		}
 		// get project
-		Project.find({ 'access.read' : user, 'uuid' : project }, function(err, result) { 
-			if (err || !result) api.error.general(req, res, err);
-
+		Project.findOne({ 'access.read' : user, 'uuid' : project }).exec(function(err, result) {
+			var layerIds = []
+			if (err || !result){
+				err = err || {
+					message: errors.no_such_project.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				};
+				return next(err);
+			};
 			// got project
-			Layer.find({ 'uuid': { $in: result.layers }}, function(err, docs){
-				if (err || !docs) api.error.general(req, res, err);
-				
+			Layer.find({ '_id': { $in: result.layers }}, function(err, docs){
+				if (err || !docs) {
+					err = err || {
+						message: errors.no_such_layers.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json'
+					};
+					return next(err);
+				}
 				// return layers
-				res.end(JSON.stringify(docs));
+				res.send(docs);
 			});
 		});
 	},
@@ -272,14 +292,31 @@ module.exports = api.layer = {
 
 	},
 
-	deleteLayer : function (req, res) {
-
-
+	deleteLayer : function (req, res, next) {
 		var options = req.body,
-		    layerUuid = options.layerUuid,
-		    projectUuid = options.projectUuid,
+		    layerUuid = options.layer_id,
+		    projectUuid = options.project_id,
+		    missingRequiredFields = [],
 		    ops = [];
 
+		if (!layerUuid) {
+			missingRequiredFields.push('layer_id');
+		}
+
+		if (!projectUuid) {
+			missingRequiredFields.push('project_id');
+		}
+
+		if (!_.isEmpty(missingRequiredFields)) {
+			return next({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: missingRequiredFields
+				}
+			});
+		}
 
 		// delete layer model
 		// delete from project
@@ -287,30 +324,51 @@ module.exports = api.layer = {
 		ops.push(function (callback) {
 
 			Layer
-			.findOne({uuid : layerUuid})
-			.remove(function (err, layer) {
+			.findOneAndRemove({uuid : layerUuid})
+			.exec(function (err, layer) {
 				console.log('removed layer: ', err, layer);
-
+				if (!layer || !layer._id) {
+					return callback({
+						message: errors.no_such_layers.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json',
+					});
+				}
 				callback(err, layer._id);
-			})
+			});
 
 		});
 
 		ops.push(function (layer_id, callback) {
-
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
+				if (err) {
+					return callback(err);
+				}
+				
+				if (!project || !project._id) {
+					return callback({
+						message: errors.no_such_project.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json',
+					});
+				}
 
-				project.layers.pull(layer_id)
+				project.layers.pull(layer_id);
 				project.markModified('layers');
 				project.save(callback);
-			})
+			});
 		});
 
 		async.waterfall(ops, function (err, results) {
 			console.log('all done? ', err, results);
-			res.json({
+
+			if (err) {
+				return next(err);
+			}
+
+			res.send({
 				success : true,
 				error : err
 			});
@@ -318,9 +376,6 @@ module.exports = api.layer = {
 
 
 	},
-
-
-
 
 	// deleteLayer : function (req, res) {
 
@@ -665,4 +720,3 @@ carto.Renderer.prototype.getRules = function render(data) {
 
 	return parser;
 }
-
