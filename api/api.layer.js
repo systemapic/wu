@@ -292,14 +292,31 @@ module.exports = api.layer = {
 
 	},
 
-	deleteLayer : function (req, res) {
-
-
+	deleteLayer : function (req, res, next) {
 		var options = req.body,
-		    layerUuid = options.layerUuid,
-		    projectUuid = options.projectUuid,
+		    layerUuid = options.layer_id,
+		    projectUuid = options.project_id,
+		    missingRequiredFields = [],
 		    ops = [];
 
+		if (!layerUuid) {
+			missingRequiredFields.push('layer_id');
+		}
+
+		if (!projectUuid) {
+			missingRequiredFields.push('project_id');
+		}
+
+		if (!_.isEmpty(missingRequiredFields)) {
+			return next({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: missingRequiredFields
+				}
+			});
+		}
 
 		// delete layer model
 		// delete from project
@@ -307,30 +324,51 @@ module.exports = api.layer = {
 		ops.push(function (callback) {
 
 			Layer
-			.findOne({uuid : layerUuid})
-			.remove(function (err, layer) {
+			.findOneAndRemove({uuid : layerUuid})
+			.exec(function (err, layer) {
 				console.log('removed layer: ', err, layer);
-
+				if (!layer || !layer._id) {
+					return callback({
+						message: errors.no_such_layers.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json',
+					});
+				}
 				callback(err, layer._id);
-			})
+			});
 
 		});
 
 		ops.push(function (layer_id, callback) {
-
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
+				if (err) {
+					return callback(err);
+				}
+				
+				if (!project || !project._id) {
+					return callback({
+						message: errors.no_such_project.errorMessage,
+						code: httpStatus.NOT_FOUND,
+						type: 'json',
+					});
+				}
 
-				project.layers.pull(layer_id)
+				project.layers.pull(layer_id);
 				project.markModified('layers');
 				project.save(callback);
-			})
+			});
 		});
 
 		async.waterfall(ops, function (err, results) {
 			console.log('all done? ', err, results);
-			res.json({
+
+			if (err) {
+				return next(err);
+			}
+
+			res.send({
 				success : true,
 				error : err
 			});
@@ -338,9 +376,6 @@ module.exports = api.layer = {
 
 
 	},
-
-
-
 
 	// deleteLayer : function (req, res) {
 
