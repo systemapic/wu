@@ -5,6 +5,7 @@ var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var helpers = require('../helpers');
 var token = helpers.token;
 var httpStatus = require('http-status');
+var async = require('async');
 
 module.exports = function () {
     // skipping for now, because we need to make HUGE changes on the layer specs.. @igor: interested?
