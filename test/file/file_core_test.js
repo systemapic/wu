@@ -1,4 +1,5 @@
 var fileTests = require('./file_old').fileTests;
+var fileUpdate = require('./update');
 var helpers = require('../helpers');
 
 describe('File', function () {
@@ -16,4 +17,5 @@ describe('File', function () {
     });
 
     fileTests();
+    fileUpdate();
 });
