@@ -269,6 +269,9 @@ module.exports = api.geo = {
 		// create target
 		targets.forEach(function (t) {
 
+			// default value
+			if (t.opacity == undefined) t.opacity = 1;
+
 			var column = t.column;
 			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
 			var color = t.color;
@@ -306,6 +309,9 @@ module.exports = api.geo = {
 
 		// create target
 		targets.forEach(function (t) {
+
+			// default value
+			if (t.opacity == undefined) t.opacity = 1;
 
 			var column = t.column;
 			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
@@ -358,7 +364,7 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			var staticOpacity = (opacity.staticVal == undefined) ? 1 : opacity.staticVal;
 			css.headers += '@point_opacity: ' + staticOpacity + ';\n';
 		}
 
@@ -393,7 +399,7 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			var staticOpacity = (opacity.staticVal == undefined) ? 1 : opacity.staticVal;
 			css.headers += '@polygon_opacity: ' + staticOpacity + ';\n';
 		}
 
@@ -428,7 +434,7 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			var staticOpacity = (opacity.staticVal == undefined) ? 1 : opacity.staticVal;
 			css.headers += '@line_opacity: ' + staticOpacity + ';\n';
 		}
 
@@ -559,7 +565,7 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			var staticColor = (color.staticVal === undefined) ? 'red' : color.staticVal;
+			var staticColor = (color.staticVal == undefined) ? 'red' : color.staticVal;
 			cartObj.style += '\tmarker-fill: ' + staticColor + ';\n\n';
 		}
 

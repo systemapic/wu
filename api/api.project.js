@@ -167,14 +167,11 @@ module.exports = api.project = {
 		var username = options.username;
 		var project_slug = options.project_slug;
 
-		console.log('username/slug', username + '/' + project_slug);
-
 		var errMsg = 'Not a public project.';
 		
 		User
 		.findOne({username : username})
 		.exec(function (err, user) {
-			console.log('found user: ', err, user.username, user.uuid);
 			if (err || !user) return done(err || errMsg)
 
 			// find project, check if public
@@ -186,7 +183,6 @@ module.exports = api.project = {
 			.populate('files')
 			.populate('layers')
 			.exec(function (err, project) {
-				console.log('found project', err, project);
 
 				if (err || !project) return done(err || errMsg);
 
