@@ -687,9 +687,9 @@ module.exports = function(app, passport) {
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	// change to /api/project/addData
-	app.post('/api/file/addtoproject', checkAccess, function (req,res) {
-		api.file.addFileToProject(req, res);
-	});
+	app.post('/api/file/addtoproject', checkAccess, function (req, res, next) {
+		api.file.addFileToProject(req, res, next);
+	}, errorHandler);
 
 	/**
 	* @api {post} /api/layers/delete Delete data

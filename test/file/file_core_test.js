@@ -1,5 +1,6 @@
 var fileTests = require('./file_old').fileTests;
 var fileUpdate = require('./update');
+var fileAddToProject = require('./addtoproject');
 var helpers = require('../helpers');
 
 describe('File', function () {
@@ -18,4 +19,5 @@ describe('File', function () {
 
     fileTests();
     fileUpdate();
+    fileAddToProject()
 });
