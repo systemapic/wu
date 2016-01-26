@@ -695,9 +695,9 @@ module.exports = function(app, passport) {
 	// DELETE LAYER(S) =====================
 	// =====================================
 	// change to /api/layer/delete (layer, not layers)
-	app.post('/api/layers/delete', checkAccess, function (req,res) {
-		api.layer.deleteLayer(req, res);
-	});
+	app.post('/api/layers/delete', checkAccess, function (req,res, next) {
+		api.layer.deleteLayer(req, res, next);
+	}, errorHandler);
 
 	/**
 	* @api {post} /api/layers Get layers related with project

@@ -298,23 +298,23 @@ describe('File', function () {
                 .end(done);
         });
 
-        it('should respond with status code 422 if fileUuid doesn\'t exist in request body', function (done) {
+        it('should respond with status code 400 if fileUuid doesn\'t exist in request body', function (done) {
             token(function (err, access_token) {
                 api.post('/api/file/update')
                     .send({access_token : access_token})
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
 
-        it('should respond with status code 422 and error if file doesn\'t exist', function (done) {
+        it('should respond with status code 400 and error if file doesn\'t exist', function (done) {
             token(function (err, access_token) {
                 api.post('/api/file/update')
                     .send({
                         uuid: "invalid file id",
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.bad_file_uuid.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.bad_file_uuid.errorMessage))
                     .end(done);
             });
         });
@@ -327,14 +327,14 @@ describe('File', function () {
             helpers.delete_user_by_id(second_test_user.uuid, done);
         });
 
-        it('should respond with status code 422 and error if not authenticated', function (done) {
+        it('should respond with status code 400 and error if not authenticated', function (done) {
             helpers.users_token(second_test_user, function (err, access_token) {
                 api.post('/api/file/update')
                     .send({
                         uuid: testFile.uuid,
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.no_access.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.no_access.errorMessage))
                     .end(done);
             });
         });
@@ -420,27 +420,27 @@ describe('File', function () {
                 .end(done);
         });
         
-        it('should respond with status code 422 and error if type is not postgis or raster', function (done) {
+        it('should respond with status code 400 and error if type is not postgis or raster', function (done) {
             token(function (err, access_token) {
                 api.post('/api/file/getLayers')
                     .send({
                         type: 'not postgis or raster',
                         access_token : access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                     .end(done);
             });
         });
 
         context('when type is raster', function () {
-            it('should respond with status code 422 and error if data.file_id doesn\'t exist in request body', function (done) {
+            it('should respond with status code 400 and error if data.file_id doesn\'t exist in request body', function (done) {
                 token(function (err, access_token) {
                     api.post('/api/file/getLayers')
                         .send({
                             type: 'raster',
                             access_token : access_token
                         })
-                        .expect(422, {"error": format(expected.missing_request_parameters.errorMessage, 'data.file_id')})
+                        .expect(httpStatus.BAD_REQUEST, {"error": format(expected.missing_request_parameters.errorMessage, 'data.file_id')})
                         .end(done);
                 });
             });
@@ -494,7 +494,7 @@ describe('File', function () {
 
         context('when type is postgis', function () {
 
-            it('should respond with status code 422 and error if table_name doesn\'t exist in request parameters', function (done) {
+            it('should respond with status code 400 and error if table_name doesn\'t exist in request parameters', function (done) {
                 token(function (err, access_token) {
                     api.post('/api/file/getLayers')
                         .send({
@@ -502,12 +502,12 @@ describe('File', function () {
                             data: {database_name: 'some database_name'},
                             access_token : access_token
                         })
-                        .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                        .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                         .end(done);
                 });
             });
 
-            it('should respond with status code 422 and error if database_name doesn\'t exist in request parameters', function (done) {
+            it('should respond with status code 400 and error if database_name doesn\'t exist in request parameters', function (done) {
                 token(function (err, access_token) {
                     api.post('/api/file/getLayers')
                         .send({
@@ -515,7 +515,7 @@ describe('File', function () {
                             data: {table_name: 'some table_name'},
                             access_token : access_token
                         })
-                        .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
+                        .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
                         .end(done);
                 });
             });
