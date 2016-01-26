@@ -1,6 +1,7 @@
-var fileTests = require('./file_old').fileTests;
+var fileTests = require('./delete').fileTests;
 var fileUpdate = require('./update');
 var fileAddToProject = require('./addtoproject');
+var fileGetLayers = require('./getLayers');
 var helpers = require('../helpers');
 
 describe('File', function () {
@@ -19,5 +20,6 @@ describe('File', function () {
 
     fileTests();
     fileUpdate();
-    fileAddToProject()
+    fileAddToProject();
+    fileGetLayers();
 });
