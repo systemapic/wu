@@ -7,6 +7,7 @@ var uuid 	 = require('node-uuid');
 var mongoose 	 = require('mongoose');
 var _ 		 = require('lodash');
 var fs 		 = require('fs');
+var Table 	 = require('easy-table');
 
 // database schemas
 var Project 	 = require('../models/project');
@@ -28,10 +29,24 @@ mongoose.connect(config.mongo.url);
 User
 .find()
 .exec(function (err, users) {
+
+	var t = new Table;
+
 	// console.log(err, users)
 	users.forEach(function (u) {
-		console.log(u.local.email, ', ', u.firstName, u.lastName, ', ', u.username);
+		
+		// columns
+		t.cell('Username', u.username);
+		t.cell('First Name', u.firstName);
+		t.cell('Last Name', u.lastName);
+		t.cell('Email', u.local.email);
+		t.newRow();
+
 	});
+
+	t.sort();
+	console.log('\n');
+	console.log(t.toString());
 	process.exit(0);
 
 });
