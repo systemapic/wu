@@ -498,9 +498,7 @@ module.exports = function(app, passport) {
 	// GET GEOJSON FILES ===================
 	// =====================================
 	// change to /api/tools/json2carto
-	app.post('/api/geo/json2carto', checkAccess, function (req,res) {
-		api.geo.json2carto(req, res);
-	});
+	app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
 
 	// =====================================
 	// DOWNLOAD DATASET ====================
