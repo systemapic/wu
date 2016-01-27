@@ -17,7 +17,7 @@ module.exports = function () {
 		    files : [],
 		    name : 'fileInfoName',
 		    originalName : 'fileInfoOriginalName',
-		    description : 'fileInfoDescription',
+		    description : 'fileInfoDescription'
     	};
     	var relatedProjectInfo = {
             uuid: 'relatedProjectInfo',

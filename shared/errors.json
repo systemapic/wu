@@ -50,5 +50,13 @@
     "no_such_layers": {
       "errorMessage": "No such layers",
       "code": "404"
+    },
+    "no_geojson_found": {
+      "errorMessage": "No geojson found",
+      "code": "404"  
+    },
+    "missing_style": {
+        "errorMessage": "Missing style!",
+        "code": "400"
     }
 }

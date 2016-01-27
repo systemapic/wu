@@ -1,4 +1,4 @@
-var fileTests = require('./delete').fileTests;
+var fileDelete = require('./delete');
 var fileUpdate = require('./update');
 var fileAddToProject = require('./addtoproject');
 var fileGetLayers = require('./getLayers');
@@ -18,7 +18,7 @@ describe('File', function () {
         helpers.delete_file(done);
     });
 
-    fileTests();
+    fileDelete();
     fileUpdate();
     fileAddToProject();
     fileGetLayers();
