@@ -18,11 +18,11 @@ module.exports = util = {
 
     test_user : { 
         email : 'mocha_test_user@systemapic.com',
-        firstName : 'John',
-        lastName : 'Doe',
+        firstName : 'mocha',
+        lastName : 'test',
         uuid : 'test-user-uuid',
         password : 'test-user-password',
-        username : 'test-user',
+        username : 'test-user'
     },
 
     test_file : {
