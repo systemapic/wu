@@ -38,6 +38,8 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var pg = require('pg');
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -45,17 +47,28 @@ var api = module.parent.exports;
 // exports
 module.exports = api.geo = { 
 
-	json2carto : function (req, res) {
+	json2carto : function (req, res, next) {
 		var options = req.body;
 
 		// convert json to cartocss
 		api.geo._json2carto(options, function (err, css) {
+			if (err) {
+				return next(err);
+			}
+
 			res.end(css);
 		});
 	},
 
 	_json2carto : function (options, callback) {
-		if (!options.style) return callback('Missing style!');
+		if (!options.style) return callback({
+			message: errors.missing_style.errorMessage,
+			code: httpStatus.BAD_REQUEST,
+			type: 'json',
+			errors: {
+				missingRequiredFields: ['style']
+			}
+		});
 		
 		// find vector types
 		var isPoint 	= (options.style.point && options.style.point.enabled);
@@ -98,11 +111,9 @@ module.exports = api.geo = {
 	},
 
 	_createPointCarto : function (options, style) {
-
 		var allowOverlap = 'true';
 		var markerClip = 'false';
 		var compOp = options.style.point.blend ? options.style.point.blend.mode || 'screen' : 'screen';
-
 
 		// global style
 		style.layer += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
@@ -343,7 +354,7 @@ module.exports = api.geo = {
 	buildCarto_pointOpacity : function (options) {
 
 		var style = options.style.point;
-		var opacity = style.opacity;
+		var opacity = style.opacity || {};
 
 		var css = {
 			headers : '',
@@ -377,7 +388,7 @@ module.exports = api.geo = {
 	buildCarto_polygonOpacity : function (options) {
 
 		var style = options.style.polygon;
-		var opacity = style.opacity;
+		var opacity = style.opacity || {};
 
 
 		var css = {
@@ -412,7 +423,7 @@ module.exports = api.geo = {
 	buildCarto_lineOpacity : function (options) {
 
 		var style = options.style.line;
-		var opacity = style.opacity;
+		var opacity = style.opacity || {};
 
 
 		var css = {
@@ -453,7 +464,7 @@ module.exports = api.geo = {
 	buildCarto_pointColor : function (options) {
 
 		var style = options.style.point;
-		var color = style.color;
+		var color = style.color || {};
 
 		var cartObj = {
 			headers : '',
@@ -576,12 +587,12 @@ module.exports = api.geo = {
 	buildCarto_polygonColor : function (options) {
 
 		var style = options.style.polygon;
-		var color = style.color;
+		var color = style.color || {};
 
 		var cartObj = {
 			headers : '',
 			style   : ''
-		}		
+		};
 
 		if ( color.column ) {
 
@@ -711,12 +722,12 @@ module.exports = api.geo = {
 	buildCarto_lineColor : function (options) {
 
 		var style = options.style.line;
-		var color = style.color;
+		var color = style.color || {};
 
 		var cartObj = {
 			headers : '',
 			style   : ''
-		}		
+		}
 
 		if ( color.column ) {
 
@@ -850,12 +861,12 @@ module.exports = api.geo = {
 	buildCarto_pointSize : function (options) {
 
 		var style = options.style.point;
-		var pointSize = style.pointsize;
+		var pointSize = style.pointsize || {};
 
 		var cartObj = {
 			headers : '',
 			style   : ''
-		}		
+		};
 
 		if ( pointSize.column ) {
 
@@ -897,7 +908,7 @@ module.exports = api.geo = {
 	buildCarto_lineWidth : function (options) {
 
 		var style = options.style.line;
-		var lineWidth = style.width;
+		var lineWidth = style.width || {};
 
 		var cartObj = {
 			headers : '',
@@ -1985,10 +1996,6 @@ module.exports = api.geo = {
 		});
 
 	},
-
-
-
-
 
 	_generateTiles : function (options, done) {
 
