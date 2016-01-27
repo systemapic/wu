@@ -144,6 +144,7 @@ module.exports = api.project = {
 		var project_slug = req.body.project_slug;
 		var project_id = req.body.project_id;
 
+		// check if public
 		api.project.checkPublic({
 			username : username,
 			project_slug : project_slug
@@ -172,17 +173,21 @@ module.exports = api.project = {
 		User
 		.findOne({username : username})
 		.exec(function (err, user) {
+			console.log('err, user', err, user);
 			if (err || !user) return done(err || errMsg)
+
+				console.log('project_slug', project_slug, user.uuid);
 
 			// find project, check if public
 			Project
 			.findOne({
-				createdBy : user.uuid,
+				// createdBy : user.uuid,
 				slug : project_slug
 			})
 			.populate('files')
 			.populate('layers')
 			.exec(function (err, project) {
+				console.log('err, project', err, project);
 
 				if (err || !project) return done(err || errMsg);
 

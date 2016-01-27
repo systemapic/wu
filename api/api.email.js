@@ -56,7 +56,7 @@ module.exports = api.email = {
 		options.from = options.from || api.config.nodemailer.from;
 
 		// overwrite to // debug
-		// options.to = 'knutole@noerd.biz';
+		// options.to = 'knutole@systemapic.com';
 
 		// send email
 		transporter.sendMail(options);
