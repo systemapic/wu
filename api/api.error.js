@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -160,5 +161,18 @@ module.exports = api.error = {
 
 		res && res.end(); // no feedback
 	},
+
+	code : {
+	    missingRequiredRequestFields : function (errorMessage, missingRequiredFields) {
+	     return {
+	            message: errorMessage,
+	            code: httpStatus.BAD_REQUEST,
+	            type: 'json',
+	            errors: {
+	                missingRequiredFields: missingRequiredFields
+	            }
+	        };
+	     }
+	}
 
 }

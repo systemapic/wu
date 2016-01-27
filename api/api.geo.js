@@ -61,14 +61,9 @@ module.exports = api.geo = {
 	},
 
 	_json2carto : function (options, callback) {
-		if (!options.style) return callback({
-			message: errors.missing_style.errorMessage,
-			code: httpStatus.BAD_REQUEST,
-			type: 'json',
-			errors: {
-				missingRequiredFields: ['style']
-			}
-		});
+		if (!options.style) {
+			return callback(api.error.code.missingRequiredRequestFields(errors.missing_style.errorMessage, ['style']));	
+		};
 		
 		// find vector types
 		var isPoint 	= (options.style.point && options.style.point.enabled);

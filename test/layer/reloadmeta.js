@@ -153,6 +153,7 @@ module.exports = function () {
         });
 
         context('when file have geojson info', function () {
+        // TODO more tests when file model will be have geojson
             before(function (done) {
                 File.findOne({uuid: newFileInfo.uuid})
                 .exec(function (err, _file) {
