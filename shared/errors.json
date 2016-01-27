@@ -50,5 +50,9 @@
     "no_such_layers": {
       "errorMessage": "No such layers",
       "code": "404"
+    },
+    "no_geojson_found": {
+      "errorMessage": "No geojson found",
+      "code": "404"  
     }
 }

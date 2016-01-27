@@ -934,9 +934,7 @@ module.exports = function(app, passport) {
 	// RELOAD LAYER METADATA ===============
 	// =====================================
 	// change to /api/layer/reloadMeta (camelcase) 
-	app.post('/api/layer/reloadmeta', checkAccess, function (req, res) {
-		api.layer.reloadMeta(req, res);
-	});
+	app.post('/api/layer/reloadmeta', checkAccess, api.layer.reloadMeta, errorHandler);
 
 	// =====================================
 	// SET CARTOCSS ========================
