@@ -907,7 +907,7 @@ module.exports = api.geo = {
 		var cartObj = {
 			headers : '',
 			style   : ''
-		}		
+		}
 
 		if ( lineWidth.column ) {
 
