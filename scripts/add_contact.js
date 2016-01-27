@@ -1,4 +1,3 @@
-
 // libs
 var async 	 = require('async');
 var colors 	 = require('colors');
@@ -82,30 +81,4 @@ async.series(ops, function (err, results) {
 	// done
 	console.log('Contacts added! ' + users.a.username + ' and ' + users.b.username + ' are now contacts!');
 	process.exit(0);
-});
-
-return;
-
-User
-.find()
-.exec(function (err, users) {
-	
-	User
-	.findOne({'local.email' : cloneUser})
-	.exec(function (err, user) {
-
-		async.each(users, function (u, callback) {
-			user.contact_list.addToSet(u._id);
-			user.save(function (err) {
-				u.contact_list.addToSet(user._id);
-				u.save(callback);
-			});
-
-		}, function (err) {
-			console.log('added contacts!');
-			process.exit(0);
-		});
-
-	});
-
 });
