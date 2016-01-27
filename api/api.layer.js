@@ -331,7 +331,7 @@ module.exports = api.layer = {
 					return callback({
 						message: errors.no_such_layers.errorMessage,
 						code: httpStatus.NOT_FOUND,
-						type: 'json',
+						type: 'json'
 					});
 				}
 				callback(err, layer._id);
@@ -351,7 +351,7 @@ module.exports = api.layer = {
 					return callback({
 						message: errors.no_such_project.errorMessage,
 						code: httpStatus.NOT_FOUND,
-						type: 'json',
+						type: 'json'
 					});
 				}
 
@@ -438,18 +438,42 @@ module.exports = api.layer = {
 
 
 	// reload layer meta
-	reloadMeta : function (req, res) {
-		var fileUuid = req.body.fileUuid;
-		var layerUuid = req.body.layerUuid;
+	reloadMeta : function (req, res, next) {
+		var fileUuid = req.body.file_id;
+		var layerUuid = req.body.layer_id;
+		var missingRequiredFields = [];
 
-		// return on err
-		if (!fileUuid || !layerUuid) return api.error.missingInformation(req, res);
+		if (!fileUuid) {
+			missingRequiredFields.push('file_id');
+		}
+
+		if (!layerUuid) {
+			missingRequiredFields.push('layer_id');
+		}
+
+		if (!_.isEmpty(missingRequiredFields)) {
+			return next({
+				message: errors.missing_information.errorMessage,
+				code: httpStatus.BAD_REQUEST,
+				type: 'json',
+				errors: {
+					missingRequiredFields: missingRequiredFields
+				}
+			});
+		}
+
+		// // return on err
+		// if (!fileUuid || !layerUuid) return api.error.missingInformation(req, res);
 
 		// get meta
 		api.layer.getMeta(fileUuid, function (err, meta) {
 
 			// return on err
-			if (err || !meta) return api.error.general(req, res, err || 'No meta.');
+			if (err) {
+				return next(err);
+			}
+
+			if (!meta) return api.error.general(req, res, err || 'No meta.');
 
 			// save meta to fil
 			api.layer.setMeta(meta, layerUuid, function (err, result) {
@@ -470,10 +494,26 @@ module.exports = api.layer = {
 		File
 		.findOne({uuid : fileUuid})
 		.exec(function (err, file) {
-			if (err || !file) return callback(err || 'No file.');
+			if (err) {
+				return callback(err);
+			}
+
+			if (!file) {
+				return callback({
+					message: errors.no_such_file.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				});
+			}
 
 			// only support for geojson now
-			if (!file.data || !file.data.geojson) return callback({error : 'No geojson found.'});
+			if (!file.data || !file.data.geojson) {
+				return callback({
+					message: errors.no_geojson_found.errorMessage,
+					code: httpStatus.UNPROCESSABLE_ENTITY,
+					type: 'json'
+				});
+			}
 
 			// set path
 			var path = api.config.path.file + fileUuid + '/' + file.data.geojson;
@@ -481,7 +521,7 @@ module.exports = api.layer = {
 			// var omnipath = METAPATH + uuid + '.meta.json';
 			fs.readJson(path, function (err, metadata) { 			// expensive
 				callback(err, metadata);
-			});			
+			});
 		});
 	},
 
