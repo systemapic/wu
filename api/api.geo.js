@@ -365,10 +365,9 @@ module.exports = api.geo = {
 		if (opacity.column) {
 
 			// calc ranges
-			var range = opacity.range;			
+			var range = opacity.range;
 			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
 			var field_calc = parseFloat(range[0]) / field_floor;
-
 			// normalized = (x-min(x))/(max(x)-min(x))
 			css.headers += '@point_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
