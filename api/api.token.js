@@ -45,6 +45,7 @@ module.exports = api.token = {
 	// middleware for routes
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
+		console.log('access_token', access_token);
 		api.token._authenticate(access_token, function (err, user) {
 			if (err || !user) return res.status(401).send({error : err.message});
 			req.user = user;
