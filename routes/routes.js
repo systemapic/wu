@@ -1071,6 +1071,7 @@ module.exports = function(app, passport) {
 	});
 
 	/**
+	* @apiIgnore Not finished Method
 	* @api {post} /api/user/unique Is unique email
 	* @apiName unique email
 	* @apiGroup User
@@ -1106,6 +1107,7 @@ module.exports = function(app, passport) {
 	app.post('/api/user/unique', checkAccess, api.user.checkUniqueEmail, errorHandler);
 
 	/**
+	* @apiIgnore Not finished Method
 	* @api {post} /api/user/uniqueUsername Is unique email
 	* @apiName unique username
 	* @apiGroup User
@@ -1141,6 +1143,7 @@ module.exports = function(app, passport) {
 	app.post('/api/user/uniqueUsername', api.user.checkUniqueUsername, errorHandler);
 
 	/**
+	* @apiIgnore Not finished Method
 	* @api {post} /api/user/uniqueEmail Is unique email
 	* @apiName unique email
 	* @apiGroup User
