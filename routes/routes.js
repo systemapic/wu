@@ -1079,7 +1079,7 @@ module.exports = function(app, passport) {
 	* @apiSuccess {Boolean} unique True if email is unique
 	* @apiSuccessExample {json} Success-Response:
 	* {
-	*   "updated": true
+	*   "unique": true
 	* }
 	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
 	* @apiErrorExample {json} Error-Response:
@@ -1105,6 +1105,36 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/user/unique', checkAccess, api.user.checkUniqueEmail, errorHandler);
 
+	/**
+	* @api {post} /api/user/uniqueUsername Is unique email
+	* @apiName unique username
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} username Username which should be check
+	* @apiSuccess {Boolean} unique True if username is unique
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "unique": true
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request Username does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['username']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
@@ -1119,7 +1149,7 @@ module.exports = function(app, passport) {
 	* @apiSuccess {Boolean} unique True if email is unique
 	* @apiSuccessExample {json} Success-Response:
 	* {
-	*   "updated": true
+	*   "unique": true
 	* }
 	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
 	* @apiErrorExample {json} Error-Response:
