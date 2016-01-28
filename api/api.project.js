@@ -136,9 +136,9 @@ module.exports = api.project = {
 
 	},
 
-	get : function (req, res) {
+	getPublic : function (req, res) {
 
-		console.log('api.project.get', req.body);
+		console.log('api.project.getPublic', req.body);
 
 		var username = req.body.username;
 		var project_slug = req.body.project_slug;
@@ -159,8 +159,27 @@ module.exports = api.project = {
 
 			// public project
 			res.send(public_project);
-		})
+		});
+	},
 
+	getPrivate : function (req, res) {
+		console.log('api.project.getPrivate', req.body);
+
+		var project_id = req.body.project_id;
+		var access_token = req.body.user_access_token;
+
+		// TODO: check access token and access!!!
+		res.end() // debug
+		return;
+
+		Project
+		.findOne({uuid : project_id})
+		.populate('files')
+		.populate('layers')
+		.exec(function (err, project) {
+
+			res.send(project);
+		})
 
 	},
 
@@ -181,7 +200,7 @@ module.exports = api.project = {
 			// find project, check if public
 			Project
 			.findOne({
-				// createdBy : user.uuid,
+				createdBy : user.uuid,
 				slug : project_slug
 			})
 			.populate('files')

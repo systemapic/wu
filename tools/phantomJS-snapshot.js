@@ -16,29 +16,39 @@ var serverUrl   = args.serverUrl;
 var serverData  = args.serverData;
 var outfile 	= path;
 
-console.log('a2rgs: ', args);
+// console.log('a2rgs: ', args);
 
-console.log('SERVER URL :', serverUrl);
-console.log('DATA: ', serverData);
+// console.log('SERVER URL :', serverUrl);
+// console.log('DATA: ', serverData);
 
-console.log('isPdf', isPdf);
-console.log('outfile', outfile);
+// console.log('isPdf', isPdf);
+// console.log('outfile', outfile);
 
 // connect
 var page = require('webpage').create(),
 	server = serverUrl,
 	data = serverData;    // phantomJS account
+
+
+page.onCallback = function(data){
+	console.log("finished: " + data.text);
+	page.viewportSize = { width : 1620, height: 1080 };
+	page.render(outfile);
+	phantom.exit();
+    // phantom.exit();
+};
+
 									// todo: create phantomjs user with changing password..
 // revv phantomjs
 page.viewportSize = { width : 1620, height: 1080 };	// set size...
-page.open(server, 'post', data, function (status, why) {
+page.open(server, 'get', function (status, why) {
 	
-	console.log('phtantomJS open!', status)
+	// console.log('phtantomJS open!', status)
 	
 	// if not success, exit
 	if (status !== 'success') return phantom.exit();
 	
-	console.log('PHTANTOM SUCCESS!!');
+	// console.log('PHTANTOM SUCCESS!!');
 
 
 	// // // interact with page
@@ -51,12 +61,14 @@ page.open(server, 'post', data, function (status, why) {
 
 
 
-	console.log('phantom after evaluate...');
+	// console.log('phantom after evaluate...');
 
-
-	
 	waitFor(function () {
-		console.log('checking...', JSON.stringify(args));
+		// console.log('checking... STRINGIFIED =>', JSON.stringify(args));
+
+		console.log('    SUNGLASSES ---->>>     ')
+		console.log('args.access_token', args.access_token);
+		console.log('args.projectUuid', args.projectUuid);
 
 		// Check in the page if a specific element is now visible
 		var result = page.evaluate(function(args) {
@@ -64,15 +76,26 @@ page.open(server, 'post', data, function (status, why) {
 			console.log('evaluating!');
 
 			if (!app) return 'no app';
-			if (!app.Projects) return 'no projects';
+			// if (!app.Projects) return 'no projects';
 
-			if (!app._isPhantom) {
-				setTimeout(function () {
+			
 
-					app.phantomJS(args);
-				}, 1000);
-			}
-			return app.phantomReady();
+
+			var p = new Wu.PhantomJS();
+
+			p.get({
+				project_id : args.projectUuid,
+				user_access_token : args.access_token
+			});
+
+			// if (!app._isPhantom) {
+			// 	setTimeout(function () {
+
+			// 		app.phantomJS(args);
+			// 	}, 1000);
+			// }
+			// return app.phantomReady();
+			return false; // debug, will timeout
 		}, args);
 
 		console.log('result: ', result);
@@ -94,6 +117,46 @@ page.open(server, 'post', data, function (status, why) {
 		
 
 	});
+	
+	// waitFor(function () {
+	// 	console.log('checking...', JSON.stringify(args));
+
+	// 	// Check in the page if a specific element is now visible
+	// 	var result = page.evaluate(function(args) {
+
+	// 		console.log('evaluating!');
+
+	// 		if (!app) return 'no app';
+	// 		if (!app.Projects) return 'no projects';
+
+	// 		if (!app._isPhantom) {
+	// 			setTimeout(function () {
+
+	// 				app.phantomJS(args);
+	// 			}, 1000);
+	// 		}
+	// 		return app.phantomReady();
+	// 	}, args);
+
+	// 	console.log('result: ', result);
+
+	// 	return result === true;
+	// }, 
+
+	// // callback
+	// function () {
+		
+	// 	console.log('loaded!!1');
+
+	// 	setTimeout(function () {
+	// 		page.viewportSize = { width : 1620, height: 1080 };
+	// 		page.render(outfile);
+	// 		phantom.exit();
+	// 	}, 5000);
+
+		
+
+	// });
 });
 
 
