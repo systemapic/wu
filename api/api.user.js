@@ -767,17 +767,14 @@ module.exports = api.user = {
 	// update user 	
 	update : function (req, res, next) {
 		var error = api.user._validateUserUpdates(req);
-		var userUuid;
-		var account;
-		var ops = [];
 
 		if (error) {
 			return next(error);
 		}
 
-		userUuid = req.body.uuid;
-	    account = req.user;
-	    ops = [];
+		var userUuid = req.body.uuid;
+		var account = req.user;
+		var ops = [];
 
 		ops.push(function (callback) {
 			User
