@@ -66,5 +66,9 @@
     "checkingEmailError": {
         "errorMessage": "Error checking email.",
         "code": "500"
+    },
+    "checking_user_name": {
+        "errorMessage": "Error checking user name.",
+        "code": "500"
     }
 }

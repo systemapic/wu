@@ -1,5 +1,6 @@
 var userUpdate = require('./update');
 var userUnique = require('./unique');
+var userUniqueName = require('./uniqueUsername');
 var helpers = require('../helpers');
 
 describe('User', function () {
@@ -8,4 +9,5 @@ describe('User', function () {
 
     userUpdate();
     userUnique();
+    userUniqueName();
 });

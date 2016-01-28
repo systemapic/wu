@@ -1108,9 +1108,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/uniqueUsername', function (req,res) {
-		api.user.checkUniqueUsername(req, res);
-	});
+	app.post('/api/user/uniqueUsername', api.user.checkUniqueUsername, errorHandler);
 
 	/**
 	* @api {post} /api/user/uniqueEmail Is unique email
