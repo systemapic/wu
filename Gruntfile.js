@@ -212,6 +212,7 @@ module.exports = function(grunt) {
 					'public/js/src/core/data.js',
 					'public/js/src/core/evented.js',
 					'public/js/src/ext/resumable.js',
+					'public/js/src/ext/phantom.js',
 					
 					// Panes
 					'public/js/src/panes/pane.js',
