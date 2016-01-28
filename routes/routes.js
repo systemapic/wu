@@ -494,6 +494,41 @@ module.exports = function(app, passport) {
 		api.geo.getTilecount(req, res);
 	});
 
+	/**
+	* @api {post} /api/geo/json2carto Return carto css
+	* @apiName json2carto
+	* @apiGroup Geo
+	* @apiUse token
+	* @apiParam {Object} style Style object parameter
+	* @apiSuccess {String} cartoCss Carto css
+	* @apiSuccessExample {String} Success-Response:
+	* "@polygon_opacity: 1;
+	*#layer {
+	*
+	*	polygon-opacity: @polygon_opacity;
+	*
+	*	polygon-fill: red;
+	*
+	*}"
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing style!",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['style']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
