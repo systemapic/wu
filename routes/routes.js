@@ -112,7 +112,7 @@ module.exports = function(app, passport) {
 
 
 	/**
-	* @api {post} /api/project/get Get a project
+	* @api {post} /api/project/get/public Get a public project
 	* @apiName create
 	* @apiGroup Project
 	* @apiUse token
@@ -126,7 +126,11 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/api/project/get', checkAccess, api.project.get);
+	app.post('/api/project/get/public', checkAccess, api.project.getPublic);
+	
+
+
+	app.post('/api/project/get/private', checkAccess, api.project.getPrivate);
 
 	/**
 	* @api {get} /api/status Get portal status
