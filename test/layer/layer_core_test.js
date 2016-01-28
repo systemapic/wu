@@ -3,6 +3,7 @@ var layersDelete = require('./delete');
 var layerNew = require('./new');
 var layerUpdate = require('./update');
 var layerGet = require('./get');
+var layerOsm = require('./osm');
 var layerReloadmeta = require('./reloadmeta');
 
 describe('Layer', function () {
@@ -14,4 +15,5 @@ describe('Layer', function () {
     layerUpdate();
     layerGet();
 	layerReloadmeta();
+    layerOsm();
 });
