@@ -60,16 +60,14 @@ module.exports = api.postgis = {
 		if (!database_name || !table_name) {
 			return done({
 				message: errors.database_name_or_table_name_does_not_exist.errorMessage,
-				code: httpStatus.NOT_FOUND,
-				type: 'json'
+				code: httpStatus.NOT_FOUND
 			});
 		}
 		// validation, todo: improve
 		if (!table_name.length == 25) {
 			return done({
 				message: util.format(errors.invalid_table_name.errorMessage, table_name),
-				code: httpStatus.BAD_REQUEST,
-				type: 'json'
+				code: httpStatus.BAD_REQUEST
 			});
 		}
 
@@ -86,7 +84,6 @@ module.exports = api.postgis = {
 				return done({
 					message: util.format(errors.dropTable_error.errorMessage, table_name),
 					code: httpStatus.INTERNAL_SERVER_ERROR,
-					type: 'json',
 					errors: {
 						error: err
 					}

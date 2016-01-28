@@ -745,8 +745,7 @@ module.exports = api.user = {
 
 		if (!req.user) {
 			return {
-				code: httpStatus.UNAUTHORIZED,
-				type: 'json'
+				code: httpStatus.UNAUTHORIZED
 			};
 		}
 
@@ -789,8 +788,7 @@ module.exports = api.user = {
 			if (!user) {
 				return callback({
 					message: errors.no_such_user.errorMessage,
-					code: httpStatus.NOT_FOUND,
-					type: 'json'
+					code: httpStatus.NOT_FOUND
 				});
 			}
 
@@ -808,8 +806,7 @@ module.exports = api.user = {
 			if (!result.user) {
 				return next({
 					message: errors.no_such_user.errorMessage,
-					code: httpStatus.NOT_FOUND,
-					type: 'json'
+					code: httpStatus.NOT_FOUND
 				});
 			}
 
