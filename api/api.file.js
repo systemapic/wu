@@ -148,7 +148,6 @@ module.exports = api.file = {
 			return next({
 				message: errors.missing_information.errorMessage,
 				code: httpStatus.BAD_REQUEST,
-				type: 'json',
 				errors: {
 					missingRequiredFields: missingRequiredFields
 				}
@@ -163,8 +162,7 @@ module.exports = api.file = {
 				if (!file) {
 					return callback({
 						message: errors.no_such_file.errorMessage,
-						code: httpStatus.NOT_FOUND,
-						type: 'json',
+						code: httpStatus.NOT_FOUND
 					});
 				}
 
@@ -193,8 +191,7 @@ module.exports = api.file = {
 				if (!project) {
 					return callback({
 						message: errors.no_such_project.errorMessage,
-						code: httpStatus.NOT_FOUND,
-						type: 'json',
+						code: httpStatus.NOT_FOUND
 					});
 				}
 				params.project = project
@@ -438,7 +435,6 @@ module.exports = api.file = {
 			validateError = {
 				message: errors.missing_information.errorMessage,
 				code: httpStatus.BAD_REQUEST,
-				type: 'json',
 				errors: {
 					missingRequiredFields: ['file_id']
 				}
@@ -457,8 +453,7 @@ module.exports = api.file = {
 			if (!file) {
 				return next({
 					message: errors.no_such_file.errorMessage,
-					code: httpStatus.NOT_FOUND,
-					type: 'json'
+					code: httpStatus.NOT_FOUND
 				});
 			}
 
@@ -510,8 +505,7 @@ module.exports = api.file = {
 		if (!file_id) {
 			return done({
 				message: errors.missing_information.errorMessage,
-				code: httpStatus.NOT_FOUND,
-				type: 'json'
+				code: httpStatus.NOT_FOUND
 			});
 		}
 
@@ -620,8 +614,7 @@ module.exports = api.file = {
 		if (!database_name || !table_name) {
 			return done({
 				message: errors.missing_information.errorMessage,
-				code: httpStatus.NOT_FOUND,
-				type: 'json'
+				code: httpStatus.NOT_FOUND
 			});
 		}
 
@@ -648,8 +641,7 @@ module.exports = api.file = {
 			if (!file) {
 				return callback({
 					message: errors.no_such_file.errorMessage,
-					code: httpStatus.NOT_FOUND,
-					type: 'json'
+					code: httpStatus.NOT_FOUND
 				});
 			}
 			

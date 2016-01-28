@@ -35,6 +35,7 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var httpStatus = require('http-status');
+var errors = require('../shared/errors');
 
 // api
 var api = module.parent.exports;
@@ -167,12 +168,18 @@ module.exports = api.error = {
 	     return {
 	            message: errorMessage,
 	            code: httpStatus.BAD_REQUEST,
-	            type: 'json',
 	            errors: {
 	                missingRequiredFields: missingRequiredFields
 	            }
 	        };
+	     },
+
+	     noAccess : function () {
+	     	return {
+	            message: errors.no_access.errorMessage,
+	            code: httpStatus.BAD_REQUEST
+	        };
 	     }
 	}
 
-}
+};
