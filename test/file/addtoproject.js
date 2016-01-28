@@ -6,7 +6,6 @@ var helpers = require('../helpers');
 var token = helpers.token;
 var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
-var testFile = helpers.test_file;
 var async = require('async');
 var Project = require('../../models/project');
 
@@ -89,7 +88,7 @@ module.exports = function () {
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/file/addtoproject')
                 .send({})
-                .expect(401, helpers.createExpectedError(expected.invalid_token.errorMessage))
+                .expect(httpStatus.UNAUTHORIZED, helpers.createExpectedError(expected.invalid_token.errorMessage))
                 .end(done);
         });
 

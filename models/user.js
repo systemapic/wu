@@ -34,7 +34,7 @@ var userSchema = mongoose.Schema({
         },
 
         state : {
-            lastProject : [String],  // projectUuid of last opened project
+            lastProject : [String]  // projectUuid of last opened project
         },
 
         access : {
@@ -47,7 +47,7 @@ var userSchema = mongoose.Schema({
             remaining_quota : { type: Number, default: '200000000' },
 
             // allowed private projects
-            private_projects : { type: Boolean, default: true },
+            private_projects : { type: Boolean, default: true }
 
         },
 
@@ -57,7 +57,7 @@ var userSchema = mongoose.Schema({
 
         local : {
                 email        : String,      // login name
-                password     : String,
+                password     : String
         },
         facebook : {
                 id           : String,

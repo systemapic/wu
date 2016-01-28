@@ -498,6 +498,41 @@ module.exports = function(app, passport) {
 		api.geo.getTilecount(req, res);
 	});
 
+	/**
+	* @api {post} /api/geo/json2carto Return carto css
+	* @apiName json2carto
+	* @apiGroup Geo
+	* @apiUse token
+	* @apiParam {Object} style Style object parameter
+	* @apiSuccess {String} cartoCss Carto css
+	* @apiSuccessExample {String} Success-Response:
+	* "@polygon_opacity: 1;
+	*#layer {
+	*
+	*	polygon-opacity: @polygon_opacity;
+	*
+	*	polygon-fill: red;
+	*
+	*}"
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing style!",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['style']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
@@ -890,9 +925,7 @@ module.exports = function(app, passport) {
 	// NEW OSM LAYERS ======================
 	// =====================================
 	// change to /api/layer/osm/create 
-	app.post('/api/layers/osm/new', checkAccess, function (req, res) {
-		api.layer.createOSM(req, res);  	// todo: api.layer.osm.create()
-	});
+	app.post('/api/layers/osm/new', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
 
 	/**
 	* @api {post} /api/layer/update Update layer
@@ -954,12 +987,64 @@ module.exports = function(app, passport) {
 		api.layer.getCartoCSS(req, res);
 	});
 
+	/**
+	* @api {post} /api/user/update Update user
+	* @apiName update
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} uuid Uuid of user
+	* @apiSuccess {Array} updated Array of updated fields
+	* @apiSuccess {Object} user Updated user
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "updated": ['phone', 'company'],
+	*   "user": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+    *       created: '2016-01-19T12:49:48.943Z',
+    *       ... etc
+	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['uuid']
+	*		}
+	*	}
+	* }
+	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "No access.",
+	*		"code": "400"
+	*	}
+	* }
+	* @apiError Not_found If user doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such user.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	app.post('/api/user/update', checkAccess, function (req,res) {
-		api.user.update(req, res);
-	});
+	app.post('/api/user/update', checkAccess, api.user.update, errorHandler);
 
 	// =====================================
 	// CREATE NEW USER =====================
@@ -972,6 +1057,7 @@ module.exports = function(app, passport) {
 		api.user.create(req, res);
 	});
 
+	// TODO this endpoint does not exist
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
@@ -986,26 +1072,113 @@ module.exports = function(app, passport) {
 		api.delegateUser(req, res);
 	});
 
+	/**
+	* @apiIgnore
+	* @api {post} /api/user/unique Is unique email
+	* @apiName unique email
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} email Email which should be check
+	* @apiSuccess {Boolean} unique True if email is unique
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "unique": true
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['email']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/unique', checkAccess, function (req,res) {
-		api.user.checkUniqueEmail(req, res);
-	});
+	app.post('/api/user/unique', checkAccess, api.user.checkUniqueEmail, errorHandler);
 
+	/**
+	* @apiIgnore
+	* @api {post} /api/user/uniqueUsername Is unique email
+	* @apiName unique username
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} username Username which should be check
+	* @apiSuccess {Boolean} unique True if username is unique
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "unique": true
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request Username does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['username']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/uniqueUsername', function (req,res) {
-		api.user.checkUniqueUsername(req, res);
-	});
+	app.post('/api/user/uniqueUsername', api.user.checkUniqueUsername, errorHandler);
 
+	/**
+	* @apiIgnore
+	* @api {post} /api/user/uniqueEmail Is unique email
+	* @apiName unique email
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} email Email which should be check
+	* @apiSuccess {Boolean} unique True if email is unique
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "unique": true
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['email']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/uniqueEmail', function (req,res) {
-		api.user.checkUniqueEmail(req, res);
-	});
+	app.post('/api/user/uniqueEmail', api.user.checkUniqueEmail, errorHandler);
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============

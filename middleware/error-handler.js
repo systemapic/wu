@@ -21,7 +21,7 @@ module.exports = function () {
    * request-response cycle of an Express application
    */
   return function (err, req, res, next) {
-    var type = err.type;
+    var type = err.type || 'json';
 
     //pick required fields
     err = _.pick(err, fields);

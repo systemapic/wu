@@ -48,15 +48,31 @@
         "code": "500"
     },
     "no_such_layers": {
-      "errorMessage": "No such layers",
-      "code": "404"
+        "errorMessage": "No such layers",
+        "code": "404"
+    },
+    "no_such_user": {
+        "errorMessage": "No such user",
+        "code": "404"
     },
     "no_geojson_found": {
-      "errorMessage": "No geojson found",
-      "code": "404"  
+        "errorMessage": "No geojson found",
+        "code": "404"  
     },
     "missing_style": {
         "errorMessage": "Missing style!",
         "code": "400"
+    },
+    "checkingEmailError": {
+        "errorMessage": "Error checking email.",
+        "code": "500"
+    },
+    "checking_user_name": {
+        "errorMessage": "Error checking user name.",
+        "code": "500"
+    },
+    "checking_user_name": {
+        "errorMessage": "Couldn't create layer.",
+        "code": "500"
     }
 }
