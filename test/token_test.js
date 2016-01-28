@@ -10,6 +10,7 @@ var helpers = require('./helpers');
 var token = util.token;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var httpStatus = require('http-status');
 
 describe('Access', function () {
     this.slow(200);
@@ -75,7 +76,7 @@ describe('Access', function () {
                 username : helpers.test_user.email,
                 password : 'wrong-password'
             })
-            .expect(401)
+            .expect(httpStatus.UNAUTHORIZED)
             .end(function (err, res) {
                 assert.ifError(err);
                 var response = helpers.parse(res.text);
@@ -92,7 +93,7 @@ describe('Access', function () {
                 username : 'wrong-email',
                 password : 'wrong-password'
             })
-            .expect(401)
+            .expect(httpStatus.UNAUTHORIZED)
             .end(function (err, res) {
                 assert.ifError(err);
                 var response = helpers.parse(res.text);
@@ -106,7 +107,7 @@ describe('Access', function () {
         it('should get 401 if missing information', function (done) {
             api.post('/api/token')
             .send()
-            .expect(401)
+            .expect(httpStatus.UNAUTHORIZED)
             .end(function (err, res) {
                 assert.ifError(err);
                 var response = helpers.parse(res.text);
@@ -144,7 +145,7 @@ describe('Access', function () {
                 .send({ 
                     access_token : 'invalid'
                 })
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(function (err, res) {
                     assert.ifError(err);
                     var response = helpers.parse(res.text);
@@ -159,7 +160,7 @@ describe('Access', function () {
         it('should get 401 if missing information', function (done) {
             api.post('/api/token/refresh')
             .send()
-            .expect(401)
+            .expect(httpStatus.UNAUTHORIZED)
             .end(function (err, res) {
                 assert.ifError(err);
                 var response = helpers.parse(res.text);
@@ -195,7 +196,7 @@ describe('Access', function () {
                 .send({ 
                     access_token : 'invalid'
                 })
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(function (err, res) {
                     assert.ifError(err);
                     var response = helpers.parse(res.text);
@@ -211,7 +212,7 @@ describe('Access', function () {
             token(function (err, access_token) {
                 api.post('/api/token/check')
                 .send()
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(function (err, res) {
                     assert.ifError(err);
                     var response = helpers.parse(res.text);

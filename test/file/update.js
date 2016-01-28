@@ -21,7 +21,7 @@ module.exports = function () {
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/file/update')
                 .send({})
-                .expect(401, helpers.createExpectedError(expected.invalid_token.errorMessage))
+                .expect(httpStatus.UNAUTHORIZED, helpers.createExpectedError(expected.invalid_token.errorMessage))
                 .end(done);
         });
 
