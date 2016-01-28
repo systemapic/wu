@@ -314,14 +314,29 @@ module.exports = api.pixels = {
 
 		var phantomLogin = 'email=' + api.config.phantomJS.user + '&password=' + api.config.phantomJS.auth;
 
+		var user = req.user;
+
+		console.log('###### PHANTOMJS ######')
+		console.log('###### PHANTOMJS ######')
+		console.log('###### PHANTOMJS ######')
+
+		console.log('user: ', user);
+		console.log('session', req.session);
+
+		if (!req.session || !req.session.tokens || !req.session.tokens.access_token) return res.end('nope');
+
+		var access_token = req.session.tokens.access_token;
+
 
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
 			path : path,
 			pdf : false,
-			serverUrl : api.config.portalServer.uri + 'login',
-			serverData : phantomLogin
+			// serverUrl : api.config.portalServer.uri + 'login',
+			serverUrl : api.config.portalServer.uri,
+			serverData : phantomLogin,
+			access_token : access_token
 		}
 
 
