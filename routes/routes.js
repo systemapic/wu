@@ -1112,12 +1112,40 @@ module.exports = function(app, passport) {
 		api.user.checkUniqueUsername(req, res);
 	});
 
+	/**
+	* @api {post} /api/user/uniqueEmail Is unique email
+	* @apiName unique email
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} email Email which should be check
+	* @apiSuccess {Boolean} unique True if email is unique
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "updated": true
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['email']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/uniqueEmail', function (req,res) {
-		api.user.checkUniqueEmail(req, res);
-	});
+	app.post('/api/user/uniqueEmail', api.user.checkUniqueEmail, errorHandler);
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
