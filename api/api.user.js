@@ -813,7 +813,7 @@ module.exports = api.user = {
 				});
 			}
 
-			res.send(JSON.stringify(result));
+			res.send(result);
 		});
 	},
 
@@ -957,16 +957,25 @@ module.exports = api.user = {
 	},
 
 	// check unique username
-	checkUniqueUsername : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+	checkUniqueUsername : function (req, res, next) {
+		if (!req.body) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
+		}
 
 		var username = req.body.username;
 
+		if (!username) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['username']));
+		}
+
 		// check if unique
 		api.user._checkUniqueUsername(username, function (err, unique) {
-			if (err) return api.error.general(req, res, 'Error checking email.');
-			
-			res.json({
+			if (err) {
+				err.message = errors.checking_user_name.errorMessage;
+				return next(err);
+			}
+
+			res.send({
 				unique : unique
 			});
 		});
