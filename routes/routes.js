@@ -921,9 +921,7 @@ module.exports = function(app, passport) {
 	// NEW OSM LAYERS ======================
 	// =====================================
 	// change to /api/layer/osm/create 
-	app.post('/api/layers/osm/new', checkAccess, function (req, res) {
-		api.layer.createOSM(req, res);  	// todo: api.layer.osm.create()
-	});
+	app.post('/api/layers/osm/new', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
 
 	/**
 	* @api {post} /api/layer/update Update layer
