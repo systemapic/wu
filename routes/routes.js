@@ -55,6 +55,11 @@ module.exports = function(app, passport) {
 	app.get('/', function(req, res) {
 		api.portal.getBase(req, res);
 	});
+
+
+	app.get('/debug/gl', function (req, res) {
+		api.debug.serveGL(req, res);
+	});
 	
 	/**
 	* @api {post} /api/portal Get portal store

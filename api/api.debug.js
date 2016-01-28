@@ -51,6 +51,18 @@ module.exports = api.debug = {
 
 	},
 
+
+
+	serveGL : function (req, res) {
+
+		var access_token = req.session ? req.session.access_token : {};
+		// render GL test page
+		res.render('../../views/gltest.ejs', {
+			access_token : access_token
+		});
+
+	},
+
 	// #########################################
 	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###
 	// #########################################

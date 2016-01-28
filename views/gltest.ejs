@@ -1,0 +1,87 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJjaWZ0emwzc2wwMXpzdDBtN2s1dHg4MXBiIn0.5RA5fN9IcK6s8WjJi7z2ww';
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/mapbox/streets-v8', //stylesheet location
+    center: [-74.50, 40], // starting position
+    zoom: 9 // starting zoom
+});
+</script>
+
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>test2</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJjaWZ0emwzc2wwMXpzdDBtN2s1dHg4MXBiIn0.5RA5fN9IcK6s8WjJi7z2ww';
+var simple = {
+    "version": 8,
+    "sources": {
+        "sysa": {
+            "type": "vector",
+            "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
+        }
+    },
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "paint": {
+                "background-color": "#41afa5"
+            }
+        }, {
+            "id": "water",
+            "type": "fill",
+            "source": "sysa",
+            "source-layer": "water",
+            "filter": ["==", "$type", "Polygon"],
+            "paint": {
+                "fill-color": "#3C4759"
+            }
+        }
+    ]
+};
+
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: simple,
+    zoom: 1,
+    center: [-14, 35]
+});
+
+map.addControl(new mapboxgl.Navigation());
+</script>
+
+</body>
+</html>
