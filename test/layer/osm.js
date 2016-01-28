@@ -18,5 +18,31 @@ module.exports = function () {
                 .end(done);
         });
 
+        it('should respond with status code 400 if projectUuid or title do not exist in reqest body', function (done) {
+            token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
+
+                api.post('/api/layers/osm/new')
+                    .send({
+                        access_token: access_token
+                    })
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+
+                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
+                        expect(result.error.errors.missingRequiredFields).to.include('projectUuid');
+                        expect(result.error.errors.missingRequiredFields).to.include('title');
+                        done();
+                    });
+            });
+        });
+
     });
 };

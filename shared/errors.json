@@ -70,5 +70,9 @@
     "checking_user_name": {
         "errorMessage": "Error checking user name.",
         "code": "500"
+    },
+    "checking_user_name": {
+        "errorMessage": "Couldn't create layer.",
+        "code": "500"
     }
 }
