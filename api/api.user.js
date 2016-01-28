@@ -767,7 +767,7 @@ module.exports = api.user = {
 	// update user 	
 	update : function (req, res, next) {
 		var error = api.user._validateUserUpdates(req);
-		var	userUuid;
+		var userUuid;
 		var account;
 		var ops = [];
 
