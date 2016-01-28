@@ -60,9 +60,9 @@ describe('Project', function () {
         it("should respond with status code 401 when not authenticated", function (done) {
             api.post('/api/project/create')
                 .send({
-                    name : 'mocha-test-project',
+                    name : 'mocha-test-project'
                 })
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
         });
 
@@ -98,7 +98,7 @@ describe('Project', function () {
                     name : 'mocha-test-updated-name',
                     project_id : 'some project id'
                 })
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
         });
 
@@ -233,7 +233,7 @@ describe('Project', function () {
                         tooltips    : true,
                         mediaLibrary    : true,
                         mapboxGL    : true,
-                        d3popup     : true,
+                        d3popup     : true
                     },
                     categories: ['test_categories'],
                     thumbCreated: true,
@@ -330,7 +330,7 @@ describe('Project', function () {
         it("should respond with status code 401 when not authenticated", function (done) {
             api.post('/api/project/delete')
                 .send({project_id : tmp.project.uuid})
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
         });
 
@@ -361,7 +361,7 @@ describe('Project', function () {
         it("should respond with status code 401 when not authenticated", function (done) {
             api.post('/api/project/unique')
                 .send({})
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
         });
 

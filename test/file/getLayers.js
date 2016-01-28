@@ -22,7 +22,7 @@ module.exports = function () {
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/file/getLayers')
                 .send({})
-                .expect(401)
+                .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
         });
 
