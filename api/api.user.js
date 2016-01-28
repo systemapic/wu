@@ -740,7 +740,7 @@ module.exports = api.user = {
 		var missingRequiredRequestFields = [];
 
 		if (!req.body) {
-			return api.error.code.missingRequiredRequestFields(errors.missing_style.errorMessage, ['body']);
+			return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']);
 		}
 
 		if (!req.user) {
@@ -820,7 +820,7 @@ module.exports = api.user = {
 
 	_update : function (options, callback) {
 		if (!options) {
-			return callback(api.error.code.missingRequiredRequestFields(errors.missing_style.errorMessage, ['options']));
+			return callback(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['options']));
 		}
 
 		var user = options.user,
@@ -887,24 +887,31 @@ module.exports = api.user = {
 		return queries;
 	},
 
-	
-
-
 	// check unique email
-	checkUniqueEmail : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+	checkUniqueEmail : function (req, res, next) {
+		if (!req.body) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
+		}
 
 		var user = req.user,
 		    email = req.body.email,
 		    unique = false;
 
-		    console.log('check unique EMAIL', email);
+		if (!email) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['email']));
+		}
+	
+	    console.log('check unique EMAIL', email);
 
 		User.findOne({'local.email' : email}, function (err, result) {
-			if (err) return api.error.general(req, res, 'Error checking email.');
+			if (err) {
+				err.message = errors.checkingEmailError.errorMessage;
+				return next(err);
+			}
+
 			if (!result) unique = true; 
 
-			res.json({
+			res.send({
 				unique : unique
 			});
 		});

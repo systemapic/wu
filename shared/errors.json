@@ -62,5 +62,9 @@
     "missing_style": {
         "errorMessage": "Missing style!",
         "code": "400"
+    },
+    "checkingEmailError": {
+        "errorMessage": "Error checking email.",
+        "code": "500"
     }
 }
