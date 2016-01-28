@@ -168,7 +168,6 @@ module.exports = api.error = {
 	     return {
 	            message: errorMessage,
 	            code: httpStatus.BAD_REQUEST,
-	            type: 'json',
 	            errors: {
 	                missingRequiredFields: missingRequiredFields
 	            }
@@ -178,10 +177,9 @@ module.exports = api.error = {
 	     noAccess : function () {
 	     	return {
 	            message: errors.no_access.errorMessage,
-	            code: httpStatus.BAD_REQUEST,
-	            type: 'json'
+	            code: httpStatus.BAD_REQUEST
 	        };
 	     }
 	}
 
-}
+};

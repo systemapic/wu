@@ -154,7 +154,6 @@ module.exports = api.layer = {
 			return next({
 				message: errors.missing_information.errorMessage,
 				code: httpStatus.BAD_REQUEST,
-				type: 'json',
 				errors: {
 					missingRequiredFields: ['project']
 				}
@@ -166,8 +165,7 @@ module.exports = api.layer = {
 			if (err || !result){
 				err = err || {
 					message: errors.no_such_project.errorMessage,
-					code: httpStatus.NOT_FOUND,
-					type: 'json'
+					code: httpStatus.NOT_FOUND
 				};
 				return next(err);
 			};
@@ -176,8 +174,7 @@ module.exports = api.layer = {
 				if (err || !docs) {
 					err = err || {
 						message: errors.no_such_layers.errorMessage,
-						code: httpStatus.NOT_FOUND,
-						type: 'json'
+						code: httpStatus.NOT_FOUND
 					};
 					return next(err);
 				}
@@ -311,7 +308,6 @@ module.exports = api.layer = {
 			return next({
 				message: errors.missing_information.errorMessage,
 				code: httpStatus.BAD_REQUEST,
-				type: 'json',
 				errors: {
 					missingRequiredFields: missingRequiredFields
 				}
@@ -330,8 +326,7 @@ module.exports = api.layer = {
 				if (!layer || !layer._id) {
 					return callback({
 						message: errors.no_such_layers.errorMessage,
-						code: httpStatus.NOT_FOUND,
-						type: 'json'
+						code: httpStatus.NOT_FOUND
 					});
 				}
 				callback(err, layer._id);
@@ -350,8 +345,7 @@ module.exports = api.layer = {
 				if (!project || !project._id) {
 					return callback({
 						message: errors.no_such_project.errorMessage,
-						code: httpStatus.NOT_FOUND,
-						type: 'json'
+						code: httpStatus.NOT_FOUND
 					});
 				}
 
@@ -455,7 +449,6 @@ module.exports = api.layer = {
 			return next({
 				message: errors.missing_information.errorMessage,
 				code: httpStatus.BAD_REQUEST,
-				type: 'json',
 				errors: {
 					missingRequiredFields: missingRequiredFields
 				}
@@ -502,7 +495,6 @@ module.exports = api.layer = {
 				return callback({
 					message: errors.no_such_file.errorMessage,
 					code: httpStatus.NOT_FOUND,
-					type: 'json'
 				});
 			}
 
@@ -510,8 +502,7 @@ module.exports = api.layer = {
 			if (!file.data || !file.data.geojson) {
 				return callback({
 					message: errors.no_geojson_found.errorMessage,
-					code: httpStatus.UNPROCESSABLE_ENTITY,
-					type: 'json'
+					code: httpStatus.UNPROCESSABLE_ENTITY
 				});
 			}
 
