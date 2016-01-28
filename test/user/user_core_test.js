@@ -1,4 +1,5 @@
 var userUpdate = require('./update');
+var userUnique = require('./unique');
 var helpers = require('../helpers');
 
 describe('User', function () {
@@ -6,4 +7,5 @@ describe('User', function () {
     after(function(done) { helpers.delete_user(done); });
 
     userUpdate();
+    userUnique();
 });
