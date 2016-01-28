@@ -1,21 +1,9 @@
-var supertest = require('supertest');
-var chai = require('chai');
-var expect = chai.expect;
-var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var userUpdate = require('./update');
 var helpers = require('../helpers');
-var token = helpers.token;
-var httpStatus = require('http-status');
-var Layer = require('../../models/layer');
 
-module.exports = function () {
+describe('User', function () {
+    before(function(done) { helpers.create_user(done); });
+    after(function(done) { helpers.delete_user(done); });
 
-    describe('/api/user/update', function () {
-        it('should respond with status code 401 when not authenticated', function (done) {
-            api.post('/api/user/update')
-                .send({})
-                .expect(401)
-                .end(done);
-        });
-    });
-
-};
+    userUpdate();
+});

@@ -953,9 +953,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	app.post('/api/user/update', checkAccess, function (req,res) {
-		api.user.update(req, res);
-	});
+	app.post('/api/user/update', checkAccess, api.user.update, errorHandler);
 
 	// =====================================
 	// CREATE NEW USER =====================

@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors');
 
 
 // api
@@ -734,21 +735,49 @@ module.exports = api.user = {
 		});
 	},
 
+	// validate request parameters for update user
+	_validateUserUpdates : function (req) {
+		var missingRequiredRequestFields = [];
+
+		if (!req.body) {
+			return api.error.code.missingRequiredRequestFields(errors.missing_style.errorMessage, ['body']);
+		}
+
+		if (!req.user) {
+			return {
+				code: httpStatus.UNAUTHORIZED,
+				type: 'json'
+			};
+		}
+
+		if (!req.body.uuid) {
+			missingRequiredRequestFields.push('uuid');
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields);
+		}
+
+		if (req.body.uuid !== req.user.uuid) {
+			return api.error.code.noAccess();
+		}
+
+		return false;
+	},
 
 	// update user 	
-	update : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+	update : function (req, res, next) {
+		var error = api.user._validateUserUpdates(req),
+			userUuid, account,
+			ops = [];
 
-		var userUuid = req.body.uuid,
-		    account = req.user,
-		    projectUuid = req.body.project,
-		    ops = [];
+		if (error) {
+			return next(error);
+		}
 
-		if (!userUuid || !account || !projectUuid) return api.error.missingInformation(req, res);
-
-
-		// can only edit yourself
-		if (userUuid != req.user.uuid) return api.error.general(req, res, 'No access.');
+		userUuid = req.body.uuid;
+	    account = req.user;
+	    ops = [];
 
 		ops.push(function (callback) {
 			User
@@ -757,25 +786,47 @@ module.exports = api.user = {
 		});
 
 		ops.push(function (user, callback) {
+			if (!user) {
+				return callback({
+					message: errors.no_such_user.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				});
+			}
+
 			api.user._update({
 				options : req.body,
 				user : user
 			}, callback);
 		});
 
-		async.waterfall(ops, function (err, user) {
-			if (err || !user) api.error.general(req, res, err || 'No user.');
+		async.waterfall(ops, function (err, result) {
+			if (err) {
+				return next(err);
+			}
 
-			res.end(JSON.stringify(user));
+			if (!result.user) {
+				return next({
+					message: errors.no_such_user.errorMessage,
+					code: httpStatus.NOT_FOUND,
+					type: 'json'
+				});
+			}
+
+			res.send(JSON.stringify(result));
 		});
 	},
 
 
 	_update : function (options, callback) {
-		if (!options) return callback('Missing information.6');
+		if (!options) {
+			return callback(api.error.code.missingRequiredRequestFields(errors.missing_style.errorMessage, ['options']));
+		}
 
 		var user = options.user,
 		    options = options.options,
+		    ops = [],
+		    updates = {},
 		    queries = {};
 
 		// valid fields
@@ -787,20 +838,35 @@ module.exports = api.user = {
 			'lastName', 
 		];
 
+		updates = _.pick(options, valid);
 		// enqueue updates for valid fields
-		valid.forEach(function (field) {
-			if (options[field]) {
-				queries = api.user._enqueueUpdate({
-					queries : queries,
-					field : field,
-					options : options,
-					user : user
+		ops.push(function (callback) {
+			user.update({ $set: updates })
+				.exec(function (err, result) {
+					if (err) {
+						callback(err);
+					}
+
+					callback(null, {
+						updated: _.keys(updates)
+					});
 				});
-			}
+		});
+
+		ops.push(function (params, callback) {
+			User.findOne({uuid: user.uuid})
+				.exec(function (err, res) {
+					if (err) {
+						return callback(err);
+					}
+
+					params.user = res;
+					callback(null, params);
+				});
 		});
 
 		// do updates
-		async.parallel(queries, callback);
+		async.waterfall(ops, callback);
 
 	},
 
