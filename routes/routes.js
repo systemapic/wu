@@ -345,9 +345,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET UPLOAD ==========================
 	// =====================================
-	app.get('/api/upload/get', checkAccess, function (req, res) {
-		api.upload.getUpload(req, res);
-	});
+	app.get('/api/upload/get', checkAccess, api.upload.getUpload, errorHandler);
 
 	/**
 	* @api {post} /api/import Import data
