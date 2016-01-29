@@ -10,7 +10,7 @@ module.exports = function () {
     describe('/api/upload/get', function () {
 
         it("should respond with status code 401 when not authenticated", function (done) {
-            api.post('/api/upload/get')
+            api.get('/api/upload/get')
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
