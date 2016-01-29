@@ -1,3 +1,4 @@
+var assert = require('assert');
 var supertest = require('supertest');
 var chai = require('chai');
 var expect = chai.expect;
@@ -11,12 +12,11 @@ module.exports = function () {
     describe('/api/project/create', function () {
 
         it('should be able to create empty project and get valid project in response', function (done) {
-            this.slow(1500);
             token(function (err, access_token) {
                 api.post('/api/project/create')
                     .send({
                         access_token: access_token,
-                        name: 'mocha-test-project'
+                        name: 'mocha-test-project'             
                     })
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
