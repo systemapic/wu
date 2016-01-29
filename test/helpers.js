@@ -20,7 +20,7 @@ module.exports = util = {
         email : 'mocha_test_user@systemapic.com',
         firstName : 'mocha',
         lastName : 'test',
-        uuid : 'test-user-uuid',
+        uuid : 'uuid-mocha-test-project',
         password : 'test-user-password',
         username : 'test-user'
     },
@@ -28,7 +28,7 @@ module.exports = util = {
     test_file : {
         uuid : 'test_file_uuid',
         family : 'test_file_family',
-        createdBy : 'test-user-uuid',
+        createdBy : 'uuid-mocha-test-project',
         createdByName : 'test_file_createdByName',
         files : ['test_file_files'],
         folder : 'test_file_folder',

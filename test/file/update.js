@@ -91,6 +91,7 @@ module.exports = function () {
                         }
                     }
                 };
+
                 options.access_token = access_token;
                 api.post('/api/file/update')
                     .send(options)

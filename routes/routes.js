@@ -103,7 +103,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
-	app.post('/api/project/delete', checkAccess, api.project.deleteProject);
+	app.post('/api/project/delete', checkAccess, api.project.deleteProject, errorHandler);
 
 
 	/**
@@ -290,13 +290,57 @@ module.exports = function(app, passport) {
 		api.project.setAccess(req, res);
 	});
 
+	/**
+	* @api {post} /api/project/addInvites Add invites
+	* @apiName add invites
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project Uuid of project
+	* @apiParam {Object} access Access object
+	* @apiSuccess {json} access Project access object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+  	*  read: ['test'],
+  	*  edit: ['uuid-mocha-test-project'],
+	*  options: {
+	*    share: true,
+	*    download: false,
+	*    isPublic: false
+	*  }
+	*}
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request access or project do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['access', project]
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If project doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	// change route to /api/project/invite
-	app.post('/api/project/addInvites', checkAccess, function (req,res) {
-		api.project.addInvites(req, res);
-	});
+	app.post('/api/project/addInvites', checkAccess, api.project.addInvites, errorHandler);
 
 	// =====================================
 	// GET UPLOAD ==========================
@@ -352,12 +396,12 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/api/project/update', checkAccess, api.project.update);
+	app.post('/api/project/update', checkAccess, api.project.update, errorHandler);
 
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug);
+	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
 
 	// =====================================
 	// SET PROJECT HASH ====================
@@ -590,7 +634,7 @@ module.exports = function(app, passport) {
 	// UPDATE FILE =========================
 	// =====================================
 	// change to /api/data/update
-	app.post('/api/file/update', checkAccess, api.file.update);
+	app.post('/api/file/update', checkAccess, api.file.update, errorHandler);
 
 	/**
 	* @api {post} /api/file/getLayers Get layers

@@ -35,6 +35,8 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var error_messages = require('../shared/errors.json');
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -42,9 +44,6 @@ var api = module.parent.exports;
 
 // exports
 module.exports = api.project = {
-
-
-
 
 	setAccess : function (req, res) {
 
@@ -98,39 +97,57 @@ module.exports = api.project = {
 	},
 
 
-	addInvites : function (req, res) {
-		var options = req.body;
+	addInvites : function (req, res, next) {
+		var options = req.body || {};
 		var access = options.access;
 		var projectUuid = options.project;
+		var missingRequiredRequestFields = [];
+
+		if (!access) {
+			missingRequiredRequestFields.push('access');
+		}
+
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project');
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-				if (err || !project) return res.json({
-					error : err || 'No such project.'
-				});
+				if (err) {
+					return next(err);
+				}
 
+				if (!project) {
+					return next({
+						message: errors.no_such_project.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
+
+				if (!access.read || !_.isArray(access.read)) {
+					return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access.read']));			
+				}
 
 				access.read.forEach(function (u) {
-
 					// add read (if not in edit)
 					if (!_.contains(project.access.edit, u)) {
-
 						project.access.read.addToSet(u);
-					} else {
 					}
-
 				});
 
-
 				project.save(function (err, updatedProject) {
-					if (err) return res.json({
-						error : err
-					});
+					if (err) {
+						return next(err);
+					}
 
 					// return updated access
-					res.json(updatedProject.access);
-				})
+					res.send(updatedProject.access);
+				});
 
 			});
 
@@ -414,13 +431,18 @@ module.exports = api.project = {
 	// #########################################
 	// ###  API: Delete Project              ###
 	// #########################################
-	deleteProject : function (req, res) {
-		if (_.isEmpty(req.body)) return api.error.missingInformation(req, res);
+	deleteProject : function (req, res, next) {
+		if (_.isEmpty(req.body)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
+		}
 
 		var user = req.user;
 		var projectUuid = req.body.projectUuid || req.body.project_id;
-
 		var ops = [];
+
+		if (!projectUuid) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['project_id']))
+		}
 
 		ops.push(function (callback) {
 			Project
@@ -430,22 +452,37 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
-			if (!project) return callback(new Error(error_messages.missing_information.errorMessage));
+			if (!project) {
+				return callback({
+					message: errors.no_such_project.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
 
 			// check access to delete
 			var gotAccess = (project.createdBy == user.getUuid() || user.isSuper());
-			gotAccess ? callback(null, project) : callback('No access.');
+			gotAccess ? callback(null, project) : callback({
+				message: errors.no_access.errorMessage,
+				code: httpStatus.BAD_REQUEST
+			});
 		});
 
 		ops.push(function (project, callback) {
-			if (!project) return callback('No project.');
+			if (!project) {
+				return callback({
+					message: errors.no_such_project.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
 
 			// delete
 			project.remove(callback);
 		});
 
 		async.waterfall(ops, function (err, project) {
-			if (err || !project) return api.error.general(req, res, err);
+			if (err) {
+				return next(err);
+			}
 
 			// slack
 			api.slack.deletedProject({
@@ -454,7 +491,7 @@ module.exports = api.project = {
 			});
 
 			// done
-			res.json({
+			res.send({
 				project : project.uuid,
 				deleted : true
 			});
@@ -464,18 +501,24 @@ module.exports = api.project = {
 	// #########################################
 	// ###  API: Update Project              ###
 	// #########################################
-	update : function (req, res) {
-		if (_.isEmpty(req.body)) return api.error.missingInformation(req, res);
+	update : function (req, res, next) {
+		if (_.isEmpty(req.body)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
+		}
 
 		var user = req.user,
 			projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
 			ops = [];
 
-		// return on missing
-		if (!projectUuid) return api.error.missingInformation(req, res);
+		// return on missing;
+		if (!projectUuid) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['project_id']));
+		}
 
 		// no fields except project_id and access_token
-		if (_.size(req.body) < 3) api.error.missingInformation(req, res);
+		if (_.size(req.body) < 3) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage));
+		}
 
 		ops.push(function (callback) {
 			Project
@@ -497,7 +540,6 @@ module.exports = api.project = {
 			// continue only if canEdit
 			canEdit ? callback(null, project) : callback(new Error('No access.'));
 		});
-
 		ops.push(function (project, callback) {
 			api.project._update({
 				project : project,
@@ -585,14 +627,16 @@ module.exports = api.project = {
 	// #########################################
 	// ###  API: Check Unique Slug           ###
 	// #########################################
-	checkUniqueSlug : function (req, res) {
-		if (!req.body) return api.error.general(req, res, new Error('request body is empty'));
+	checkUniqueSlug : function (req, res, next) {
+		if (!req.body) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
+		}
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
-		return res.end(JSON.stringify({
+		return res.send({
 			unique : true
-		}));
+		});
 
 		// var value = req.body.value,
 		//     clientUuid = req.body.client,
