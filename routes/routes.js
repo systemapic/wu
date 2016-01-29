@@ -294,9 +294,7 @@ module.exports = function(app, passport) {
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	// change route to /api/project/invite
-	app.post('/api/project/addInvites', checkAccess, function (req,res) {
-		api.project.addInvites(req, res);
-	});
+	app.post('/api/project/addInvites', checkAccess, api.project.addInvites, errorHandler);
 
 	// =====================================
 	// GET UPLOAD ==========================
