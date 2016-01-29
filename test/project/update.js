@@ -1,4 +1,3 @@
-var assert = require('assert');
 var mongoose = require('mongoose');
 var async = require('async');
 var fs = require('fs');

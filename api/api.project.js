@@ -627,14 +627,16 @@ module.exports = api.project = {
 	// #########################################
 	// ###  API: Check Unique Slug           ###
 	// #########################################
-	checkUniqueSlug : function (req, res) {
-		if (!req.body) return api.error.general(req, res, new Error('request body is empty'));
+	checkUniqueSlug : function (req, res, next) {
+		if (!req.body) {
+			return next api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']);
+		}
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
-		return res.end(JSON.stringify({
+		return res.send({
 			unique : true
-		}));
+		});
 
 		// var value = req.body.value,
 		//     clientUuid = req.body.client,

@@ -1,4 +1,3 @@
-var assert = require('assert');
 var supertest = require('supertest');
 var chai = require('chai');
 var expect = chai.expect;

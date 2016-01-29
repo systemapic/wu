@@ -401,7 +401,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug);
+	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
 
 	// =====================================
 	// SET PROJECT HASH ====================
