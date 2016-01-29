@@ -629,7 +629,7 @@ module.exports = api.project = {
 	// #########################################
 	checkUniqueSlug : function (req, res, next) {
 		if (!req.body) {
-			return next api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']);
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
 		}
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
