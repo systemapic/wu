@@ -36,6 +36,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 var ZipInfo = require('infozip');
 
@@ -394,14 +396,15 @@ module.exports = api.upload = {
 
 
 	// after upload, calling this to get results
-	getUpload : function (req, res) {
-
-		var file_id = req.query.fileUuid || req.query.file_id,
-		    ops = [];
+	getUpload : function (req, res, next) {
+		var query = req.query || {};
+		var file_id = query.fileUuid || query.file_id;
+		var ops = [];
 
 		// check for missing info
-		if (!file_id) return api.error.missingInformation(req, res);
-
+		if (!file_id) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['file_id']));
+		}
 
 		var key = 'uploadStatus:' + file_id;
 		api.redis.layers.get(key, function (err, uploadStatus) {
@@ -443,7 +446,7 @@ module.exports = api.upload = {
 			};
 
 			async.parallel(ops, function (err, result) {
-				res.end(JSON.stringify(result));
+				res.send(result);
 			});
 
 		});
