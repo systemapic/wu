@@ -177,7 +177,7 @@ module.exports = function () {
                         if (err) {
                             return done(err);
                         }
-
+                        
                         Project.findOne({uuid: tmpProject.uuid})
                         	.exec(function (err, result) {
                         		if (err) {
