@@ -45,9 +45,6 @@ var api = module.parent.exports;
 // exports
 module.exports = api.project = {
 
-
-
-
 	setAccess : function (req, res) {
 
 		var user = req.user;
@@ -100,39 +97,57 @@ module.exports = api.project = {
 	},
 
 
-	addInvites : function (req, res) {
-		var options = req.body;
+	addInvites : function (req, res, next) {
+		var options = req.body || {};
 		var access = options.access;
 		var projectUuid = options.project;
+		var missingRequiredRequestFields = [];
+
+		if (!access) {
+			missingRequiredRequestFields.push('access');
+		}
+
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project');
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-				if (err || !project) return res.json({
-					error : err || 'No such project.'
-				});
+				if (err) {
+					return next(err);
+				}
 
+				if (!project) {
+					return next({
+						message: errors.no_such_project.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
+
+				if (!access.read || !_.isArray(access.read)) {
+					return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access.read']));			
+				}
 
 				access.read.forEach(function (u) {
-
 					// add read (if not in edit)
 					if (!_.contains(project.access.edit, u)) {
-
 						project.access.read.addToSet(u);
-					} else {
 					}
-
 				});
 
-
 				project.save(function (err, updatedProject) {
-					if (err) return res.json({
-						error : err
-					});
+					if (err) {
+						return next(err);
+					}
 
 					// return updated access
-					res.json(updatedProject.access);
-				})
+					res.send(updatedProject.access);
+				});
 
 			});
 

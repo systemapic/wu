@@ -127,7 +127,6 @@ module.exports = function () {
 
 
         it('should respond with status code 200 and shouldn\'t update nonexistent fields', function (done) {
-            console.log(tmpProject.uuid);
             token(function (err, access_token) {
                 api.post('/api/project/update')
                     .send({
