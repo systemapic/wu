@@ -88,7 +88,7 @@ module.exports = api.upload = {
 			size : files.data.size,
 			upload_success : true,
 			error_code : null,
-			error_text : null,
+			error_text : null
 			// processing_success : null,
 			// rows_count : null,
 			// import_took_ms : null,
@@ -97,7 +97,7 @@ module.exports = api.upload = {
 			// table_name : null, 
 			// database_name : null,
 
-		}
+		};
 
 		
 		// save upload id to redis
@@ -113,7 +113,7 @@ module.exports = api.upload = {
 			user : req.user,
 			uploadStatus : uploadStatus,
 			body : req.body
-		}
+		};
 
 		api.import.import(options, function (err, results) {
 			console.log('api.upload.upload done: ', err, results);
@@ -169,7 +169,7 @@ module.exports = api.upload = {
 		    				file_id = stored_file_id;
 		    				callback(null);
 		    			});
-		    		};
+		    		}
 		    	});
 	    	});
 
@@ -306,8 +306,8 @@ module.exports = api.upload = {
 				uniqueIdentifier : uniqueIdentifier,
 
 				default_layer : null,
-				default_layer_model : null,
-			}
+				default_layer_model : null
+			};
 
 			console.log('uploadStatus', globalUploadStatus);
 
@@ -329,13 +329,13 @@ module.exports = api.upload = {
 						path : outputPath,
 						size : uploadStatus.size,
 						originalFilename : original_filename
-					},
+					}
 				},
 				user : user,
 				uploadStatus : uploadStatus,
 				body : body,
 				access_token : access_token
-			}
+			};
 
 			// import file
 			api.import.import(options, function (err, results) {
@@ -424,7 +424,7 @@ module.exports = api.upload = {
 					callback(null, file);
 				});
 
-			}
+			};
 
 			ops.layer = function (callback) {
 
@@ -436,11 +436,11 @@ module.exports = api.upload = {
 
 					callback(null, layer);
 				});
-			}
+			};
 
 			ops.project = function (callback) {
 				callback(null, status.added_to_project);
-			}
+			};
 
 			async.parallel(ops, function (err, result) {
 				res.end(JSON.stringify(result));
@@ -523,7 +523,7 @@ module.exports = api.upload = {
 			var uploadStatus = JSON.parse(uploadStatusJSON);
 			for (var s in status) {
 				if (s != 'expire') uploadStatus[s] = status[s]; // set status (except ttl)
-			};
+			}
 
 			// save upload status
 			api.redis.layers.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
@@ -690,7 +690,7 @@ module.exports = api.upload = {
 		var form = new formidable.IncomingForm({
 			hash : 'sha1',
 			multiples : true,
-			keepExtensions : true,
+			keepExtensions : true
 		});
 
 		form.parse(req, function(err, fields, files) {	
