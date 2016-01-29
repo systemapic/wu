@@ -1,3 +1,4 @@
+var assert = require('assert');
 var mongoose = require('mongoose');
 var async = require('async');
 var fs = require('fs');
@@ -25,7 +26,14 @@ module.exports = function () {
     var tmpProject ={};
 
     before(function (done) {
-        helpers.create_project_by_info({name: 'mocha-test-project'}, function (err, project) {
+        helpers.create_project_by_info({
+            name: 'mocha-test-project',
+            uuid: 'uuid-mocha-test-project',
+            access: {
+                edit: [helpers.test_user.uuid]
+            },
+            createdBy: helpers.test_user.uuid
+        }, function (err, project) {
             if (err) {
                 return done(err);
             }
@@ -51,15 +59,6 @@ module.exports = function () {
                 .end(done);
         });
 
-        it('should respond with status code 400 and specific error message if empty body', function (done) {
-            token(function (err, access_token) {
-                api.post('/api/project/update')
-                    .send({access_token: access_token})
-                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
-                    .end(done);
-            });
-        });
-
         it('should respond with status code 400 and specific error message if no project_id', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/update')
@@ -67,8 +66,19 @@ module.exports = function () {
                         name: 'mocha-test-updated-name',
                         access_token: access_token
                     })
-                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
+                        expect(result.error.errors.missingRequiredFields).to.include('project_id');
+                        done();
+                    });
             });
         });
 
@@ -79,8 +89,17 @@ module.exports = function () {
                         project_id: tmpProject.uuid,
                         access_token: access_token
                     })
-                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.missing_information.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        done();
+                    });
             });
         });
 
@@ -108,6 +127,7 @@ module.exports = function () {
 
 
         it('should respond with status code 200 and shouldn\'t update nonexistent fields', function (done) {
+            console.log(tmpProject.uuid);
             token(function (err, access_token) {
                 api.post('/api/project/update')
                     .send({

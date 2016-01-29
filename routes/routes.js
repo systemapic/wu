@@ -103,7 +103,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
-	app.post('/api/project/delete', checkAccess, api.project.deleteProject);
+	app.post('/api/project/delete', checkAccess, api.project.deleteProject, errorHandler);
 
 
 	/**
@@ -352,7 +352,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/api/project/update', checkAccess, api.project.update);
+	app.post('/api/project/update', checkAccess, api.project.update, errorHandler);
 
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
@@ -590,7 +590,7 @@ module.exports = function(app, passport) {
 	// UPDATE FILE =========================
 	// =====================================
 	// change to /api/data/update
-	app.post('/api/file/update', checkAccess, api.file.update);
+	app.post('/api/file/update', checkAccess, api.file.update, errorHandler);
 
 	/**
 	* @api {post} /api/file/getLayers Get layers
