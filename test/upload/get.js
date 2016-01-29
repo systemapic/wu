@@ -16,5 +16,21 @@ module.exports = function () {
                 .end(done);
         });
 
+        it("should respond with status code 400 when file_id doesn\'t exist in request query parameters", function (done) {
+            token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
+
+                api.get('/api/upload/get')
+                    .query({})
+                    .send({
+                        access_token: access_token
+                    })
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(done);
+            });
+        });
+
     });
 };
