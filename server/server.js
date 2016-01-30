@@ -151,7 +151,7 @@ app.io.use(function(socket, next){
 // app.use(passport.initialize());
 // app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
-app.use(favicon(__dirname + '/../public/local/favicon.ico'));
+app.use(favicon(__dirname + '/../public/images/favicon.ico'));
 
 // enable compression
 app.use(compress());
