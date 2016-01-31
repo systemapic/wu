@@ -1,6 +1,6 @@
 npm-debug.log
 node_modules/*
-config/wu-config.js
+config/*
 log/*
 tests/*
 dist/tmp/*
