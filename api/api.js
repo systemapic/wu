@@ -6,7 +6,7 @@ var api = {};
 api.version = '1.3.7';
 
 // config
-var config = require('../config/server-config.js');
+var config = require('../config/wu-config.js');
 api.config = config.serverConfig;
 api.clientConfig = config.clientConfig;
 api.loginConfig = config.loginConfig;

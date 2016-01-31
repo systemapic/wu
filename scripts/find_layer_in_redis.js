@@ -21,7 +21,7 @@ var RASTERPATH   = '/data/raster_tiles/';
 var GRIDPATH     = '/data/grid_tiles/';
 
 // config
-var config = require('../config/server-config');
+var config = require('../config/wu-config');
 
 
 var redis = require('redis');
