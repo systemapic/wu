@@ -2,7 +2,7 @@
 var api = module.parent.exports;
 
 // config
-var config = require('../config/server-config.js');
+var config = require('../config/wu-config.js');
 
 // redis store for layers
 var redisLayers = require('redis').createClient(config.serverConfig.redis.layers.port, config.serverConfig.redis.layers.host);
