@@ -3,6 +3,7 @@ var projectUpdate = require('./update');
 var projectCreate = require('./create');
 var projectUnique = require('./unique');
 var projectDelete = require('./delete');
+var getPublic = require('./getPublic');
 var projectAddInvites = require('./addInvites');
 
 describe('Project', function () {
@@ -15,4 +16,5 @@ describe('Project', function () {
     projectDelete();
     projectUnique();
 	projectAddInvites();
+	getPublic();
 });

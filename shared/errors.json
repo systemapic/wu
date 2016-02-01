@@ -78,5 +78,9 @@
     "no_such_upload_status_id": {
         "errorMessage": "no such upload status id",
         "code": "404"  
+    },
+    "not_a_public_project": {
+        "errorMessage": "Not a public project.",
+        "code": "400"  
     }
 }
