@@ -534,6 +534,29 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/update', checkAccess, api.project.update, errorHandler);
 
+	/**
+	* @api {post} /api/project/unique Unique project
+	* @apiName unique
+	* @apiGroup Project
+	* @apiUse token
+	* @apiSuccess {Boolean} unique Project access object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+  	*   updated: ['logo', 'header', etc...],
+  	*   project: {
+	*    _id: '56af0e566f8ca08221ee2ca7',
+	*    lastUpdated: '2016-02-01T07:50:46.730Z',
+	*    created: '2016-02-01T07:50:46.726Z',
+	*	 etc...
+  	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	*/
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================

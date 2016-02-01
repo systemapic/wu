@@ -506,9 +506,9 @@ module.exports = api.project = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
 		}
 
-		var user = req.user,
-			projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
-			ops = [];
+		var user = req.user;
+		var projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id;
+		var ops = [];
 
 		// return on missing;
 		if (!projectUuid) {

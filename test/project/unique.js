@@ -19,7 +19,7 @@ module.exports = function () {
             token(function (err, access_token) {
                 api.post('/api/project/unique')
                     .send({access_token: access_token})
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) {
                             return done(err);
