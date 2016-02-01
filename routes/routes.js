@@ -90,15 +90,41 @@ module.exports = function(app, passport) {
 	* @apiName delete
 	* @apiGroup Project
 	* @apiUse token
-	* @apiParam {String} projectUuid Uuid of project
-	*
+	* @apiParam {String} project_id Uuid of project
 	* @apiSuccess {String} project ID of deleted project
 	* @apiSuccess {Boolean} deleted True if successful
 	* @apiSuccessExample {json} Success-Response:
-	*     {
-	*       "project": "project-o121l2m-12d12dlk-addasml",
-	*       "deleted": true
-	*     }
+	*  {
+	*    "project": "project-o121l2m-12d12dlk-addasml",
+	*    "deleted": true
+	*  }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request project_id doesn't exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If project doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
 	*/
 	// =====================================
 	// DELETE PROJECT   ====================

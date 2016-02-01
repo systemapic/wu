@@ -441,7 +441,7 @@ module.exports = api.project = {
 		var ops = [];
 
 		if (!projectUuid) {
-			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['project_id']))
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['project_id']));
 		}
 
 		ops.push(function (callback) {
