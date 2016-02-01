@@ -52,7 +52,9 @@ module.exports = function(app, passport) {
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
-	app.get('/', api.portal.getBase);
+	app.get('/', function(req, res) {
+		api.portal.getBase(req, res);
+	});
 	
 	/**
 	* @api {post} /api/portal Get portal store
@@ -146,25 +148,73 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/delete', checkAccess, api.project.deleteProject, errorHandler);
 
-
 	/**
 	* @api {post} /api/project/get/public Get a public project
-	* @apiName create
+	* @apiName get public project
 	* @apiGroup Project
 	* @apiUse token
-	* @apiDescription Can get project _either_ by `project_id` OR `username, project_slug` 
-	* @apiParam {String} [project_id] Id project
-	* @apiParam {String} [username] Username
-	* @apiParam {String} [project_slug] Project slug (shortname in url)
-	*
+	* @apiParam {String} username Username
+	* @apiParam {String} project_slug Project slug
 	* @apiSuccess {JSON} Project JSON object of the newly created project
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  _id: '56af8403c608bbce6616d291',
+	*  lastUpdated: '2016-02-01T16:12:51.390Z',
+	*  created: '2016-02-01T16:12:51.390Z',
+	*  createdBy: 'uuid-mocha-test-project',
+	*  uuid: 'uuid-mocha-test-project_public',
+	*  etc..
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request username or project_slug don't exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['username', 'project_slug']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If user with specific username doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such user.",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Not_found If project with specific slug doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Bad_request If project isn't public(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Not a public project.",
+	*		"code": "400"
+	*	}
+	* }
 	*/
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/api/project/get/public', checkAccess, api.project.getPublic);
-	
-
+	app.post('/api/project/get/public', checkAccess, api.project.getPublic, errorHandler);
 
 	app.post('/api/project/get/private', checkAccess, api.project.getPrivate);
 
@@ -306,12 +356,16 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/api/data/upload/chunked', checkAccess, api.upload.chunkedCheck);
+	app.get('/api/data/upload/chunked', checkAccess, function (req, res) {
+		api.upload.chunkedCheck(req, res);
+	});
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/download/:identifier', checkAccess, api.upload.chunkedIdent);
+	app.get('/download/:identifier', checkAccess, function (req, res) {
+		api.upload.chunkedIdent(req, res);
+	});
 
 	// todo: this route is now DEAD; still alive in wu.js (?? still true?)
 	// =====================================
@@ -323,7 +377,9 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SET ACCESS / deprecated =============
 	// =====================================
-	app.post('/api/project/setAccess', checkAccess, api.project.setAccess);
+	app.post('/api/project/setAccess', checkAccess, function (req,res) {
+		api.project.setAccess(req, res);
+	});
 
 	/**
 	* @api {post} /api/project/addInvites Add invites
@@ -472,18 +528,24 @@ module.exports = function(app, passport) {
 	// IMPORT DATA to POSTGIS ==============
 	// =====================================
 	// change to /api/data/import
-	app.post('/api/import', checkAccess, api.upload.upload);
+	app.post('/api/import', checkAccess, function (req, res) {
+		api.upload.upload(req, res);
+	});
 
 	// =====================================
 	// GET UPLOAD STATUS ===================
 	// =====================================
 	// change to /api/import/status
-	app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
+	app.get('/api/import/status', checkAccess, function (req, res) {
+		api.upload.getUploadStatus(req, res);
+	});
 
 	// =====================================
 	// JOIN BETA MAIL ======================
 	// =====================================
-	app.get('/api/joinbeta', api.portal.joinBeta);
+	app.get('/api/joinbeta', function (req, res) {
+		api.portal.joinBeta(req, res);
+	});
 
 	/**
 	* @api {post} /api/project/update Update project
@@ -595,106 +657,140 @@ module.exports = function(app, passport) {
 	// SET PROJECT HASH ====================
 	// =====================================
 	// change to /api/project/setHash
-	app.post('/api/project/hash/set', checkAccess, api.project.setHash);
+	app.post('/api/project/hash/set', checkAccess, function (req,res) {
+		api.project.setHash(req, res);
+	});
 
 	// =====================================
 	// GET PROJECT HASH ====================
 	// =====================================
 	// change to /api/project/getHash
-	app.post('/api/project/hash/get', checkAccess, api.project.getHash);
+	app.post('/api/project/hash/get', checkAccess, function (req,res) {
+		api.project.getHash(req, res);
+	});
 
 	// =====================================
 	// UPLOAD PROJECT LOGO  ================
 	// =====================================
 	// change to /api/project/setLogo
-	app.post('/api/project/uploadlogo', checkAccess, api.upload.projectLogo);
+	app.post('/api/project/uploadlogo', checkAccess, function (req,res) {
+		api.upload.projectLogo(req, res);
+	});
 
 	// =====================================
 	// UPLOAD IMAGE ========================
 	// =====================================
 	// change to /api/import/image
-	app.post('/api/upload/image', checkAccess, api.upload.image);
+	app.post('/api/upload/image', checkAccess, function (req,res) {
+		api.upload.image(req, res);
+	});
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// special route, don't touch for now
-	app.get('/images/*', checkAccess, api.file.sendImage);
+	app.get('/images/*', checkAccess, function (req,res) {
+		api.file.sendImage(req, res);
+	});
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
 	// special route, don't touch for now
-	app.get('/pixels/fit/*',checkAccess, api.pixels.serveFitPixelPerfection);
+	app.get('/pixels/fit/*',checkAccess, function (req,res) {
+		api.pixels.serveFitPixelPerfection(req, res);
+	});
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/image/*', checkAccess, api.pixels.serveImagePixelPerfection);
+	app.get('/pixels/image/*', checkAccess, function (req,res) {
+		api.pixels.serveImagePixelPerfection(req, res);
+	});
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/screenshot/*', api.pixels.serveScreenshot);
+	app.get('/pixels/screenshot/*', function (req,res) {
+		api.pixels.serveScreenshot(req, res);
+	});
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/*', checkAccess, api.pixels.servePixelPerfection);
+	app.get('/pixels/*', checkAccess, function (req,res) {
+		api.pixels.servePixelPerfection(req, res);
+	});
 
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
 	// =====================================
 	// change to /api/tools/mapbox/get
-	app.post('/api/util/getmapboxaccount', checkAccess, api.provider.mapbox.getAccount);
+	app.post('/api/util/getmapboxaccount', checkAccess, function (req, res) {
+		api.provider.mapbox.getAccount(req, res);
+	});
 	
 	// =====================================
 	// CREATE SNAPSHOT =====================
 	// =====================================
 	// create snapshot of current map
 	// change to /api/tools/snap/create
-	app.post('/api/util/snapshot', checkAccess, api.pixels.createSnapshot);
+	app.post('/api/util/snapshot', checkAccess, function (req, res) {
+		api.pixels.createSnapshot(req, res);
+	});
 
 	// =====================================
 	// CREATE THUMBNAIL ====================
 	// =====================================
 	// change to /api/tools/thumb/create
-	app.post('/api/util/createThumb', checkAccess, api.pixels.createThumb);
+	app.post('/api/util/createThumb', checkAccess, function (req, res) {
+		api.pixels.createThumb(req, res);
+	});
 
 	// =====================================
 	// CREATE PDF SNAPSHOT =================
 	// =====================================
 	// change to /api/tools/pdf/create
-	app.post('/api/util/pdfsnapshot', checkAccess, api.pixels.createPDFSnapshot);
+	app.post('/api/util/pdfsnapshot', checkAccess, function (req, res) {
+		api.pixels.createPDFSnapshot(req, res);
+	});
 
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
 	// change to /api/layer/legends/create
-	app.post('/api/layer/createlegends', checkAccess, api.legend.create);
+	app.post('/api/layer/createlegends', checkAccess, function (req, res) {
+		api.legend.create(req, res);
+	});
 
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
 	// change to /api/data/get ... 
 	// todo: perhaps improve this, put all downloads together, with type/format in query/form.. todo later
-	app.post('/api/geojson', checkAccess, api.file.getGeojsonFile);
+	app.post('/api/geojson', checkAccess, function (req,res) {
+		api.file.getGeojsonFile(req, res);
+	});
 	
 	// =====================================
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/data/download
-	app.get('/api/file/download', checkAccess, api.file.download);
+	app.get('/api/file/download', checkAccess, function (req, res) {
+		api.file.download(req, res);
+	});
 
 	// =====================================
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/tools/tilecount
-	app.get('/api/util/getTilecount', checkAccess, api.geo.getTilecount);
+	app.get('/api/util/getTilecount', checkAccess, function (req, res) {
+		api.geo.getTilecount(req, res);
+	});
 
 	/**
 	* @api {post} /api/geo/json2carto Return carto css
@@ -741,13 +837,17 @@ module.exports = function(app, passport) {
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/data/download (POST/GET routes with same name no problem)
-	app.post('/api/file/downloadDataset', checkAccess, api.postgis.downloadDatasetFromFile);
+	app.post('/api/file/downloadDataset', checkAccess, function (req,res) {
+		api.postgis.downloadDatasetFromFile(req, res);
+	});
 
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/layer/download
-	app.post('/api/layer/downloadDataset', checkAccess, api.postgis.downloadDatasetFromLayer);
+	app.post('/api/layer/downloadDataset', checkAccess, function (req,res) {
+		api.postgis.downloadDatasetFromLayer(req, res);
+	});
 	
 	/**
 	* @api {post} /api/file/update Update a file
@@ -832,7 +932,9 @@ module.exports = function(app, passport) {
 	// SHARE DATASET =======================
 	// =====================================
 	// change to /api/data/share
-	app.post('/api/dataset/share', checkAccess, api.file.shareDataset);
+	app.post('/api/dataset/share', checkAccess, function (req,res) {
+		api.file.shareDataset(req, res);
+	});
 	
 	/**
 	* @api {post} /api/file/delete Delete data
@@ -1167,13 +1269,17 @@ module.exports = function(app, passport) {
 	// SET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/set 
-	app.post('/api/layers/cartocss/set', checkAccess, api.layer.setCartoCSS);
+	app.post('/api/layers/cartocss/set', checkAccess, function (req, res) {
+		api.layer.setCartoCSS(req, res);
+	});
 
 	// =====================================
 	// GET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/get 
-	app.post('/api/layers/cartocss/get', checkAccess, api.layer.getCartoCSS);
+	app.post('/api/layers/cartocss/get', checkAccess, function (req, res) {
+		api.layer.getCartoCSS(req, res);
+	});
 
 	/**
 	* @api {post} /api/user/update Update user
@@ -1237,20 +1343,28 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE NEW USER =====================
 	// =====================================
-	app.post('/api/user/new', checkAccess, api.user.create); // todo: remove /new route
+	app.post('/api/user/new', checkAccess, function (req,res) { // todo: remove /new route
+		api.user.create(req, res);
+	});
 	// keep only this route, not /api/user/new
-	app.post('/api/user/create', checkAccess, api.user.create);
+	app.post('/api/user/create', checkAccess, function (req,res) {
+		api.user.create(req, res);
+	});
 
 	// TODO this endpoint does not exist
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
-	app.post('/api/user/delete', checkAccess, api.user.deleteUser);
+	app.post('/api/user/delete', checkAccess, function (req,res) {
+		api.user.deleteUser(req, res);
+	});
 
 	// =====================================
 	// DELETGATE USER ======================
 	// =====================================
-	app.post('/api/user/delegate', checkAccess, api.delegateUser);
+	app.post('/api/user/delegate', checkAccess, function (req,res) {
+		api.delegateUser(req, res);
+	});
 
 	/**
 	* @apiIgnore
@@ -1363,82 +1477,112 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/invite', checkAccess, api.user.invite);
+	app.post('/api/user/invite', checkAccess, function (req,res) {
+		api.user.invite(req, res);
+	});
 
 	// =====================================
 	// REQUEST CONTACT =============
 	// =====================================
-	app.post('/api/user/requestContact', checkAccess, api.user.requestContact);
+	app.post('/api/user/requestContact', checkAccess, function (req,res) {
+		api.user.requestContact(req, res);
+	});
 
 	// =====================================
 	// REQUEST CONTACT =============
 	// =====================================
 	// change to /api/user/acceptContact/*
-	app.get('/api/user/acceptContactRequest/*', api.user.acceptContactRequest);
+	app.get('/api/user/acceptContactRequest/*', function (req,res) {
+		api.user.acceptContactRequest(req, res);
+	});
 
 	// =====================================
 	// INVITE TO PROJECTS ==================
 	// =====================================
 	// todo: see if this can be removed (replaced by /api/user/invite?)
-	app.post('/api/user/inviteToProjects', checkAccess, api.user.inviteToProjects);
+	app.post('/api/user/inviteToProjects', checkAccess, function (req,res) {
+		api.user.inviteToProjects(req, res);
+	});
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/invite/link', checkAccess, api.user.getInviteLink);
+	app.post('/api/invite/link', checkAccess, function (req,res) {
+		api.user.getInviteLink(req, res);
+	});
 
 	// =====================================
 	// access: SET PROJECT ACCESS  =========
 	// =====================================
-	app.post('/api/access/set/project', checkAccess, api.access.setProject);
+	app.post('/api/access/set/project', checkAccess, function (req,res) {
+		api.access.setProject(req, res);
+	});
 
 	// =====================================
 	// access: GET ROLE  ===============
 	// =====================================
-	app.post('/api/access/getrole', checkAccess, api.access.getRole);
+	app.post('/api/access/getrole', checkAccess, function (req,res) {
+		api.access.getRole(req, res);
+	});
 
 	// =====================================
 	// access: SET ROLE  ===============
 	// =====================================
-	app.post('/api/access/setrolemember', checkAccess, api.access.setRoleMember);
+	app.post('/api/access/setrolemember', checkAccess, function (req,res) {
+		api.access.setRoleMember(req, res);
+	});
 
 	// =====================================
 	// access: SET ROLE SUPERADMIN =========
 	// =====================================
-	app.post('/api/access/super/setrolemember', checkAccess, api.access.setSuperRoleMember);
+	app.post('/api/access/super/setrolemember', checkAccess, function (req,res) {
+		api.access.setSuperRoleMember(req, res);
+	});
 
 	// =====================================
 	// access: SET ROLE  ===============
 	// =====================================
-	app.post('/api/access/portal/setrolemember', checkAccess, api.access.setPortalRoleMember);
+	app.post('/api/access/portal/setrolemember', checkAccess, function (req,res) {
+		api.access.setPortalRoleMember(req, res);
+	});
 
 	// =====================================
 	// access: SET NO ROLE  ================
 	// =====================================
-	app.post('/api/access/setnorole', checkAccess, api.access.setNoRole);
+	app.post('/api/access/setnorole', checkAccess, function (req,res) {
+		api.access.setNoRole(req, res);
+	});
 
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========
 	// =====================================
-	app.post('/reset/checktoken', api.auth.checkResetToken);
+	app.post('/reset/checktoken', function (req, res) {
+		api.auth.checkResetToken(req, res);
+	});
 
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
 	// change to /api/... 
-	app.post('/reset', api.auth.requestPasswordReset);
+	app.post('/reset', function (req, res) {
+		api.auth.requestPasswordReset(req, res);
+	});
 
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
 	// change to /api/... 
-	app.get('/reset', api.auth.serveResetPage);
+	app.get('/reset', function (req, res) {
+		api.auth.serveResetPage(req, res);
+	});
 
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
 	// change to /api/... 
-	app.post('/reset/password', api.auth.createPassword);
+	app.post('/reset/password', function (req, res) {
+		api.auth.createPassword(req, res);
+	});
 
 	// =====================================
 	// ZXCVBN DICTIONARY =================
@@ -1480,7 +1624,10 @@ module.exports = function(app, passport) {
 	// =====================================
 	// LOGIN ===============================
 	// =====================================
-	app.get('/login', api.portal.login);
+	app.get('/login', function(req, res) {
+		console.log('get login');
+		api.portal.login(req, res);
+	});
 
 	// =====================================
 	// PRIVACY POLICY ======================
@@ -1501,12 +1648,16 @@ module.exports = function(app, passport) {
 	// =====================================
 	// LOGOUT ==============================
 	// =====================================
-	app.get('/logout', api.portal.logout);
+	app.get('/logout', function(req, res) {
+		api.portal.logout(req, res);
+	});
 
 	// =====================================
 	// INVITE ==============================
 	// =====================================
-	app.get('/invite/*', api.portal.invite);
+	app.get('/invite/*', function(req, res) {
+		api.portal.invite(req, res);
+	});
 
 	// // =====================================
 	// // INVITE ==============================
@@ -1527,7 +1678,9 @@ module.exports = function(app, passport) {
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
-	app.post('/api/forgot', api.auth.forgotPassword);
+	app.post('/api/forgot', function (req, res) {
+		api.auth.forgotPassword(req, res);
+	});
 
 	// =====================================
 	// FORGOT PASSWORD =====================
@@ -1548,7 +1701,9 @@ module.exports = function(app, passport) {
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
-	app.get('*', api.portal.wildcard);
+	app.get('*', function (req, res) {
+		api.portal.wildcard(req, res);
+	});
 
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {

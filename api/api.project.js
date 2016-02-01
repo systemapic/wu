@@ -153,25 +153,31 @@ module.exports = api.project = {
 
 	},
 
-	getPublic : function (req, res) {
+	getPublic : function (req, res, next) {
+		var params = req.body || {};
+		var username = params.username;
+		var project_slug = params.project_slug;
+		var missingRequiredRequestFields = [];
 
-		console.log('api.project.getPublic', req.body);
+		if (!username) {
+			missingRequiredRequestFields.push('username');	
+		}
 
-		var username = req.body.username;
-		var project_slug = req.body.project_slug;
-		var project_id = req.body.project_id;
+		if (!project_slug) {
+			missingRequiredRequestFields.push('project_slug');	
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		// check if public
 		api.project.checkPublic({
 			username : username,
 			project_slug : project_slug
 		}, function (err, public_project) {
-			console.log('checked for public', arguments);
 			if (err) {
-				// not public
-				return res.status(400).send({
-					error : 'Not public project'
-				});
+				next(err);
 			}
 
 			// public project
@@ -210,9 +216,19 @@ module.exports = api.project = {
 		.findOne({username : username})
 		.exec(function (err, user) {
 			console.log('err, user', err, user);
-			if (err || !user) return done(err || errMsg)
+			
+			if (err) {
+				return done(err);
+			} 
 
-				console.log('project_slug', project_slug, user.uuid);
+			if(!user) {
+				return done({
+					message: errors.no_such_user.errorMessage,
+					code:httpStatus.NOT_FOUND
+				});
+			}
+
+			console.log('project_slug', project_slug, user.uuid);
 
 			// find project, check if public
 			Project
@@ -224,14 +240,25 @@ module.exports = api.project = {
 			.populate('layers')
 			.exec(function (err, project) {
 				console.log('err, project', err, project);
+				if (err) {
+					return done(err);
+				}
 
-				if (err || !project) return done(err || errMsg);
+				if (!project) {
+					return done({
+						message: errors.no_such_project.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
 
 				// check if public
 				if (project.access.options.isPublic) {
 					return done(null, project);
 				} else {
-					return done(errMsg);
+					return done({
+						message: errors.not_a_public_project.errorMessage,
+						code: httpStatus.BAD_REQUEST
+					});
 				}
 			});
 		});
@@ -264,7 +291,7 @@ module.exports = api.project = {
 		if (!store.name) {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['name']));
 		}
-		
+
 		// get access
 		var storeAccess = api.project.defaultStoreAccess(store.access);
 		var isPublic = storeAccess.options.isPublic;

@@ -9,7 +9,7 @@ var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 
 module.exports = function () {
-    var tmpProject ={};
+    var tmpProject = {};
 
     before(function (done) {
         helpers.create_project_by_info({
@@ -50,7 +50,7 @@ module.exports = function () {
                         }
 
                         var result = helpers.parse(res.text);
-                        
+
                         expect(result.deleted).to.be.true;
                         expect(result.project).to.be.equal(tmpProject.uuid);
                         done();

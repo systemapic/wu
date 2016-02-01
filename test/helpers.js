@@ -16,7 +16,7 @@ var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 
 module.exports = util = {
 
-    test_user : { 
+    test_user : {
         email : 'mocha_test_user@systemapic.com',
         firstName : 'mocha',
         lastName : 'test',
