@@ -255,14 +255,16 @@ module.exports = api.project = {
 	// ###  API: Create Project              ###
 	// #########################################
 	// createProject : function (req, res) {
-	create : function (req, res) {
-		var store = req.body;
+	create : function (req, res, next) {
+		var store = req.body || {};
 		var user = req.user;
 		var ops = [];
 
 		// return if missing info
-		if (!store || !store.name) return api.error.missingInformation(req, res, 'Please provide a project `name`.');
-
+		if (!store.name) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['name']));
+		}
+		
 		// get access
 		var storeAccess = api.project.defaultStoreAccess(store.access);
 		var isPublic = storeAccess.options.isPublic;
@@ -274,7 +276,10 @@ module.exports = api.project = {
 			if (isPublic) return callback(null);
 
 			// check if user can create private project
-			user.canCreatePrivateProject() ? callback(null) : callback(new Error('No access.'));
+			user.canCreatePrivateProject() ? callback(null) : callback({
+				message: errors.no_access.errorMessage,
+				code: httpStatus.BAD_REQUEST
+			});
 		});
 
 		// create project
@@ -321,7 +326,9 @@ module.exports = api.project = {
 
 		// run ops
 		async.waterfall(ops, function (err, project) {
-			if (err) return api.error.general(req, res, err);
+			if (err) {
+				return next(err);
+			}
 
 			// slack
 			api.slack.createdProject({

@@ -77,13 +77,30 @@ module.exports = function(app, passport) {
 	* @apiGroup Project
 	* @apiUse token
 	* @apiParam {String} name Name of project
-	*
 	* @apiSuccess {JSON} Project JSON object of the newly created project
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request name doesn't exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['name']
+	*		}
+	*	}
+	* }
 	*/
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/api/project/create', checkAccess, api.project.create);
+	app.post('/api/project/create', checkAccess, api.project.create, errorHandler);
 
 	/**
 	* @api {post} /api/project/delete Delete a project

@@ -50,7 +50,7 @@ module.exports = function () {
                         }
 
                         var result = helpers.parse(res.text);
-                        console.log(result);
+                        
                         expect(result.deleted).to.be.true;
                         expect(result.project).to.be.equal(tmpProject.uuid);
                         done();
