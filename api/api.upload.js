@@ -48,13 +48,7 @@ var r = require('../tools/resumable-node')('/data/tmp/');
 var api = module.parent.exports;
 
 // exports
-module.exports = api.upload = { 
-
-
-
-
-
-
+module.exports = api.upload = {
 	/**
 	 * Upload data to PostGIS with cUrl (API)
 	 *
@@ -77,6 +71,7 @@ module.exports = api.upload = {
 
 		var files = req.files;
 		var user = req.user;
+		var response = {};
 
 		console.log('upload', files);
 
@@ -98,29 +93,41 @@ module.exports = api.upload = {
 			// original_format : null,
 			// table_name : null, 
 			// database_name : null,
-
 		};
-
+		var ops = [];
 		
-		// save upload id to redis
-		var key = 'uploadStatus:' + uploadStatus.file_id;
-		api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
+		ops.push(function (callback) {
+			var key = 'uploadStatus:' + uploadStatus.file_id;
 
-			// return upload status to client
-			res.end(JSON.stringify(uploadStatus));
+			api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
+				if (err) {
+					console.log('api.upload.upload done: ', err);
+				}
+				callback(err);
+			});
 		});
 
-		var options = {
-			files : req.files,
-			user : req.user,
-			uploadStatus : uploadStatus,
-			body : req.body
-		};
+		ops.push(function (callback) {
+			var options = {
+				files : req.files,
+				user : req.user,
+				uploadStatus : uploadStatus,
+				body : req.body
+			};
 
-		api.import.import(options, function (err, results) {
-			console.log('api.upload.upload done: ', err, results);
+			api.import.import(options, function (err, results) {
+				console.log('api.import.import done: ', err, results);
+				callback(err);
+			});
 		});
+	
+		async.parallel(ops, function (err) {
+			if (err) {
+				console.log('api.upload.upload done: ', err);
+			}
 
+			res.send(uploadStatus);
+		});
 
 	},
 
@@ -408,10 +415,18 @@ module.exports = api.upload = {
 
 		var key = 'uploadStatus:' + file_id;
 		api.redis.layers.get(key, function (err, uploadStatus) {
+			if (err) {
+				return next(err);
+			}
 
 			var status = JSON.parse(uploadStatus);
 
-			if (!status) return api.error.genera(req, res, 'no such upload status id');
+			if (!status) {
+				return next({
+					message: errors.no_such_upload_status_id.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
 
 			var layer_id = status.default_layer_model;
 			
@@ -422,20 +437,24 @@ module.exports = api.upload = {
 				File
 				.findOne({uuid : file_id})
 				.exec(function (err, file) {
-					if (err) return api.error.general(req, res, err);
-
+					if (err) {
+						err.message = 'find file error'
+						return callback(err);
+					}
+					
 					callback(null, file);
 				});
 
 			};
 
 			ops.layer = function (callback) {
-
-
 				Layer
 				.findOne({uuid : layer_id})
 				.exec(function (err, layer) {
-					if (err) return api.error.general(req, res, err);
+					if (err) {
+						err.message = 'find layer error'
+						return callback(err);
+					}
 
 					callback(null, layer);
 				});
@@ -446,6 +465,10 @@ module.exports = api.upload = {
 			};
 
 			async.parallel(ops, function (err, result) {
+				if (err) {
+					next(err);
+				}
+
 				res.send(result);
 			});
 
