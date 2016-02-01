@@ -969,6 +969,9 @@ module.exports = api.postgis = {
 						exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
 							if (err) return done(null);
 
+
+							console.log('GETMETA -->', stdout);
+							
 							var json = stdout.split('\n')[2];
 							var data = JSON.parse(json);
 							
@@ -1270,7 +1273,7 @@ module.exports = api.postgis = {
 		    query = options.query;
 
 		// count rows and add to uploadStatus
-		var conString = 'postgres://docker:docker@postgis/' + postgis_db; // todo: put in config
+		var conString = 'postgres://systemapic:docker@postgis/' + postgis_db; // todo: put in config
 		pg.connect(conString, function(err, client, pgcb) {
 			if (err) return callback(err);
 			

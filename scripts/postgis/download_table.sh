@@ -20,8 +20,15 @@ if [ "$3" == "" ]; then
 fi
 
 
-PGPASSWORD=docker
-PGUSERNAME=docker
+# get config
+source /systemapic/config/env.sh
+# echo $SYSTEMAPIC_PGSQL_USERNAME
+# echo $SYSTEMAPIC_PGSQL_PASSWORD
+# echo $SYSTEMAPIC_PGSQL_DBNAME
+
+
+PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
+PGUSERNAME=$SYSTEMAPIC_PGSQL_USERNAME
 PGHOST=postgis
 
 pgsql2shp -f "$2" -h $PGHOST -u $PGUSERNAME -P $PGPASSWORD "$1" "$3"

@@ -25,12 +25,18 @@ else
 	BUCKETS=$4
 fi
 
+# get config
+source /systemapic/config/env.sh
+# echo $SYSTEMAPIC_PGSQL_USERNAME
+# echo $SYSTEMAPIC_PGSQL_PASSWORD
+# echo $SYSTEMAPIC_PGSQL_DBNAME
+
 
 # set -f
 if [ "$5" == "bar" ]; then
 
 	# with bars (for terminal fun)
-	PGPASSWORD=docker psql -U docker -d $1 -h postgis -c 'with column_stats as (
+	PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c 'with column_stats as (
 	    select min("'$3'") as min,
 	           max("'$3'") as max
 	      from '$2'
@@ -49,7 +55,7 @@ if [ "$5" == "bar" ]; then
 
 else 
 
-	PGPASSWORD=docker psql -U docker -d $1 -h postgis -c 'select row_to_json(t) from (with column_stats as (
+	PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c 'select row_to_json(t) from (with column_stats as (
 	    select min("'$3'") as min,
 	           max("'$3'") as max
 	      from '$2'
