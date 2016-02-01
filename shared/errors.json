@@ -74,5 +74,9 @@
     "checking_user_name": {
         "errorMessage": "Couldn't create layer.",
         "code": "500"
+    },
+    "no_such_upload_status_id": {
+        "errorMessage": "no such upload status id",
+        "code": "404"  
     }
 }
