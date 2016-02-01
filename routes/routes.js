@@ -456,6 +456,79 @@ module.exports = function(app, passport) {
 		api.portal.joinBeta(req, res);
 	});
 
+	/**
+	* @api {post} /api/project/update Update project
+	* @apiName update
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project_id Uuid of project which should be update
+	* @apiParam {String} logo New logo of project
+	* @apiParam {String} header New header of project
+	* @apiParam {Array} baseLayers New baseLayers of project
+	* @apiParam {Object} position New position of project
+	* @apiParam {Object} bounds New bounds of project
+	* @apiParam {Array} layermenu New layermenu of project
+	* @apiParam {Array} folders New folders of project
+	* @apiParam {Object} controls New controls of project
+	* @apiParam {String} description New description of project
+	* @apiParam {Array} keywords New keywords of project
+	* @apiParam {String} colorTheme New colorTheme of project
+	* @apiParam {String} title New title of project
+	* @apiParam {String} slug New slug of project
+	* @apiParam {Object} connectedAccounts New connectedAccounts of project
+	* @apiParam {Object} settings New settings of project
+	* @apiParam {Array} categories New categories of project
+	* @apiParam {Boolean} thumbCreated New thumbCreated of project
+	* @apiParam {String} state New state of project
+	* @apiParam {Array} pending New pending of project
+	* @apiSuccess {json} access Project access object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+  	*   updated: ['logo', 'header', etc...],
+  	*   project: {
+	*    _id: '56af0e566f8ca08221ee2ca7',
+	*    lastUpdated: '2016-02-01T07:50:46.730Z',
+	*    created: '2016-02-01T07:50:46.726Z',
+	*	 etc...
+  	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request project_id doesn't not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If project doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	* @apiError Bad_request User haven't access to the project (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "No access.",
+	*		"code": "400"
+	*	}
+	* }
+	*/
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================

@@ -530,15 +530,28 @@ module.exports = api.project = {
 
 			var hashedUser = user.getUuid(); // todo: use actual hash
 
-			if (!project || !project.access) {
-				return callback(new Error(error_messages.missing_information.errorMessage));
+			if (!project) {
+				return callback({
+					message: errors.no_such_project,
+					code: httpStatus.NOT_FOUND
+				});
+			}
+
+			if (!project.access) {
+				return callback({
+					message: errors.no_access,
+					code: httpStatus.NOT_FOUND
+				});
 			}
 
 			// can edit if on edit list or created project
 			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
 
 			// continue only if canEdit
-			canEdit ? callback(null, project) : callback(new Error('No access.'));
+			canEdit ? callback(null, project) : callback({
+				message: errors.no_access.errorMessage,
+				code: httpStatus.BAD_REQUEST
+			});
 		});
 		ops.push(function (project, callback) {
 			api.project._update({
@@ -547,11 +560,12 @@ module.exports = api.project = {
 			}, callback);
 		});
 
-		async.waterfall(ops, function (err, project) {
-			if (err) return api.error.general(req, res, err);
-
+		async.waterfall(ops, function (err, result) {
+			if (err) {
+				return next(err);
+			}
 			// done
-			res.json(project);
+			res.send(result);
 		});
 	},
 
@@ -559,9 +573,11 @@ module.exports = api.project = {
 	_update : function (job, callback) {
 		if (!job) return callback('Missing job.');
 
-		var project = job.project,
-				options = job.options,
-				queries = {};
+		var project = job.project;
+		var options = job.options;
+    	var updates = {};
+		var queries = {};
+		var ops = [];
 
 		// valid fields
 		var valid = [
@@ -587,18 +603,49 @@ module.exports = api.project = {
 			'pending'
 		];
 
-		// enqueue queries for valid fields
-		valid.forEach(function (field) {
-			if (options[field]) queries = api.project._enqueueUpdate({
-				queries : queries,
-				field : field,
-				project : project,
-				options : options
-			});
+		updates = _.pick(options, valid);
+		// enqueue updates for valid fields
+		ops.push(function (callback) {
+			project.update({ $set: updates })
+				.exec(function (err, result) {
+					if (err) {
+						callback(err);
+					}
+
+					callback(null, {
+						updated: _.keys(updates)
+					});
+				});
 		});
 
-		// run queries to database
-		async.parallel(queries, callback);
+		ops.push(function (params, callback) {
+			console.log(project)
+			Project.findOne({uuid: options.project_id})
+				.exec(function (err, res) {
+					if (err) {
+						return callback(err);
+					}
+
+					params.project = res;
+					callback(null, params);
+				});
+		});
+
+		// do updates
+		async.waterfall(ops, callback);
+
+		// // enqueue queries for valid fields
+		// valid.forEach(function (field) {
+		// 	if (options[field]) queries = api.project._enqueueUpdate({
+		// 		queries : queries,
+		// 		field : field,
+		// 		project : project,
+		// 		options : options
+		// 	});
+		// });
+
+		// // run queries to database
+		// async.parallel(queries, callback);
 	},
 
 
