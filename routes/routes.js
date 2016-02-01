@@ -322,7 +322,7 @@ module.exports = function(app, passport) {
 	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
 	*		"code": "400",
 	*		"errors": {
-	*			"missingRequiredFields": ['access', project]
+	*			"missingRequiredFields": ['access', 'project']
 	*		}
 	*	}
 	* }
@@ -342,6 +342,71 @@ module.exports = function(app, passport) {
 	// change route to /api/project/invite
 	app.post('/api/project/addInvites', checkAccess, api.project.addInvites, errorHandler);
 
+	/**
+	* @api {post} /api/upload/get Get upload
+	* @apiName get upload
+	* @apiGroup Upload
+	* @apiUse token
+	* @apiParam {String} file_id
+	* @apiSuccess {Object} file Upload file
+	* @apiSuccess {Object} layer Related layer
+	* @apiSuccess {Object} project Related project
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  file: {
+	*    _id: '56af0e566f8ca08221ee2ca7',
+	*    lastUpdated: '2016-02-01T07:50:46.730Z',
+	*    created: '2016-02-01T07:50:46.726Z',
+	*    dataSize: '109770',
+	*    type: 'postgis',
+	*    originalName: 'shapefile.zip',
+	*    name: 'shapefile',
+	*    createdBy: 'uuid-mocha-test-project',
+	*    uuid: 'file_tzcqhdaecyhmqraulgby',
+	*    __v: 0,
+	*    access: {
+	*      clients: [],
+	*      projects: [],
+	*      users: []
+	*    },
+	*    data: {
+	*      image: [Object],
+	*      postgis: [Object]
+	*    },
+	*    format: [],
+	*    keywords: [],
+	*    files: []
+	*  },
+	*  layer: null
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request file_id do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['file_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If file doesn't upload(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "no such upload status id",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// GET UPLOAD ==========================
 	// =====================================
