@@ -32,7 +32,7 @@ function check_errors() {
 	# ERROR: encoding
 	if grep -q 'LATIN' ./shp2pgsql.error ; then
 	    	
-	    	# import with LATIN encoding
+	    	# import with LATIN1 encoding
 	    	import_latin_encoding
 
 	# ERROR: Geometry has Z dimension but column does not"
@@ -43,6 +43,9 @@ function check_errors() {
 }
 
 function import_latin_encoding() {
+
+	# import with LATIN1 encoding
+	echo "Importing with LATIN1 encoding..."
 	ENCODING="-W 'LATIN1"
 	shp2pgsql -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./shp2pgsql.error | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
 

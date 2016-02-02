@@ -39,7 +39,7 @@ describe('Import', function () {
                     api.post('/api/import')
                     .type('form')
                     .field('access_token', access_token)
-                    .field('data', fs.createReadStream(__dirname + '/data/shapefile.zip'))
+                    .field('data', fs.createReadStream(__dirname + '/data/shapefile.polygon.zip'))
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
@@ -47,7 +47,7 @@ describe('Import', function () {
                         assert.ok(result.file_id);
                         assert.ok(result.user_id);
                         assert.ok(result.upload_success);
-                        assert.equal(result.filename, 'shapefile.zip');
+                        assert.equal(result.filename, 'shapefile.polygon.zip');
                         assert.equal(result.status, 'Processing');
                         assert.ifError(result.error_code);
                         assert.ifError(result.error_text);
@@ -69,7 +69,7 @@ describe('Import', function () {
                         assert.ok(result.file_id);
                         assert.ok(result.user_id);
                         assert.ok(result.upload_success);
-                        assert.equal(result.filename, 'shapefile.zip');
+                        assert.equal(result.filename, 'shapefile.polygon.zip');
                         assert.equal(result.status, 'Processing');
                         assert.ifError(result.error_code);
                         assert.ifError(result.error_text);
