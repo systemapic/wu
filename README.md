@@ -1,5 +1,5 @@
-![alt tag](dist/docs/logo/Sideways/719x200/black-systemapic-logo-sideways-719x200.png)
+![alt tag](https://systemapic.com/wp-content/uploads/2013/08/bbox.png)
 
-Check out [wiki](https://github.com/noerdbiz/systemapic.js/wiki) for details.
+Check out [wiki](https://github.com/systemapic/systemapic.js/wiki) for details.
 
 
