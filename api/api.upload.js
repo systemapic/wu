@@ -93,40 +93,26 @@ module.exports = api.upload = {
 			// original_format : null,
 			// table_name : null, 
 			// database_name : null,
-		};
-		var ops = [];
-		
-		ops.push(function (callback) {
-			var key = 'uploadStatus:' + uploadStatus.file_id;
+		};	
+		var key = 'uploadStatus:' + uploadStatus.file_id;
 
-			api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
-				if (err) {
-					console.log('api.upload.upload done: ', err);
-				}
-				callback(err);
-			});
-		});
-
-		ops.push(function (callback) {
-			var options = {
-				files : req.files,
-				user : req.user,
-				uploadStatus : uploadStatus,
-				body : req.body
-			};
-
-			api.import.import(options, function (err, results) {
-				console.log('api.import.import done: ', err, results);
-				callback(err);
-			});
-		});
-	
-		async.parallel(ops, function (err) {
+		api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
 			if (err) {
 				console.log('api.upload.upload done: ', err);
 			}
-
+			
 			res.send(uploadStatus);
+		});
+		
+		var options = {
+			files : req.files,
+			user : req.user,
+			uploadStatus : uploadStatus,
+			body : req.body
+		};
+
+		api.import.import(options, function (err, results) {
+			console.log('api.import.import done: ', err, results);
 		});
 
 	},
