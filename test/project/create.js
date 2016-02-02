@@ -24,8 +24,8 @@ module.exports = function () {
                         }
 
                         var project = helpers.parse(res.text).project;
-                        expect(project).to.be.define;
-                        expect(project.uuid).to.be.define;
+                        expect(project).to.exist;
+                        expect(project.uuid).to.exist;
                         expect(project.name).to.be.equal('mocha-test-project');
                         done();
                     });

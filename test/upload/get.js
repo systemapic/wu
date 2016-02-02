@@ -28,9 +28,9 @@ module.exports = function () {
                     }
 
                     var result = helpers.parse(res.text);
-                    expect(result.file_id).to.be.define;
-                    expect(result.user_id).to.be.define;
-                    expect(result.upload_success).to.be.define;
+                    expect(result.file_id).to.exist;
+                    expect(result.user_id).to.exist;
+                    expect(result.upload_success).to.exist;
                     expect(result.filename).to.be.equal('shapefile.zip');
                     expect(result.status).to.be.equal('Processing');
                     
