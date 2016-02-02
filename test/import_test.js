@@ -70,7 +70,7 @@ describe('Import', function () {
                         assert.ok(result.user_id);
                         assert.ok(result.upload_success);
                         assert.equal(result.filename, 'shapefile.zip');
-                        assert.equal(result.status, 'Done');
+                        assert.equal(result.status, 'Processing');
                         assert.ifError(result.error_code);
                         assert.ifError(result.error_text);
                         done();
@@ -129,6 +129,13 @@ describe('Import', function () {
         });
 
         context('Processing', function () {
+
+            it('should be processed in < 20s', function (done) {       
+                // wait to finish processing (around ten seconds for shapefile.zip)       
+                this.timeout(21000); // must be higher than setTimeout        
+                this.slow(20000);     
+                setTimeout(done, 20000)       
+            });
 
             it('should be processed without errors', function (done) {
                 token(function (err, access_token) {

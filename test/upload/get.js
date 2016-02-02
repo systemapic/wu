@@ -13,8 +13,9 @@ module.exports = function () {
     describe('/api/upload/get', function () {
         var tmp = {};
 
-        before(function (done) {
-            this.timeout(21000);
+        before(function (done) {   
+            this.timeout(21000);     
+            this.slow(20000);     
             token(function (err, access_token) {
                 api.post('/api/import')
                 .type('form')
@@ -34,7 +35,7 @@ module.exports = function () {
                     expect(result.status).to.be.equal('Processing');
                     
                     tmp.file_id = result.file_id;
-                    done();
+                    setTimeout(done, 20000)    
                 });
             });
         });

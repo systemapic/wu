@@ -178,7 +178,7 @@ module.exports = function () {
 		                        }
 
 		                        var result = helpers.parse(res.text);
-		                        console.log(result);
+		                        
 		                        expect(result.uuid).to.be.equal(tmpPublicProject.uuid)
 		                        done();
 		                    });
