@@ -18,9 +18,9 @@ var tmp = {};
 var chai = require('chai');
 var expect = chai.expect;
 var expected = require('../shared/errors');
+var httpStatus = require('http-status');
 
 describe('Import', function () {
-
     // prepare
     before(function(callback) {
         async.series([helpers.create_user, helpers.create_project], callback);
@@ -33,14 +33,14 @@ describe('Import', function () {
         this.slow(500);
 
         context('zipped', function () {
-
+            this.timeout(21000);
             it('should upload', function (done) {
                 token(function (err, access_token) {
                     api.post('/api/import')
                     .type('form')
                     .field('access_token', access_token)
                     .field('data', fs.createReadStream(__dirname + '/data/shapefile.zip'))
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
                         var result = helpers.parse(res.text);
@@ -62,7 +62,7 @@ describe('Import', function () {
                 token(function (err, access_token) {
                     api.get('/api/import/status')
                     .query({file_id : tmp.file_id, access_token : access_token})
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
                         var result = helpers.parse(res.text);
@@ -89,7 +89,7 @@ describe('Import', function () {
                     .field('userUuid', util.test_user.uuid)
                     .field('access_token', access_token)
                     .field('data', fs.createReadStream(__dirname + '/data/shapefile.missing-prj.zip'))
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
                         var result = helpers.parse(res.text);
@@ -111,7 +111,7 @@ describe('Import', function () {
                 token(function (err, access_token) {
                     api.get('/api/import/status')
                     .query({ file_id : tmp.file_id, access_token : access_token})
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
                         var result = helpers.parse(res.text);
@@ -130,18 +130,18 @@ describe('Import', function () {
 
         context('Processing', function () {
 
-            it('should be processed in < 10s', function (done) {
-                // wait to finish processing (around ten seconds for shapefile.zip)
-                this.timeout(21000); // must be higher than setTimeout
-                this.slow(20000);
-                setTimeout(done, 20000)
+            it('should be processed in < 20s', function (done) {       
+                // wait to finish processing (around ten seconds for shapefile.zip)       
+                this.timeout(21000); // must be higher than setTimeout        
+                this.slow(20000);     
+                setTimeout(done, 20000)       
             });
 
             it('should be processed without errors', function (done) {
                 token(function (err, access_token) {
                     api.get('/api/import/status')
                     .query({file_id : tmp.file_id, access_token : access_token})
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
                         var status = helpers.parse(res.text);
