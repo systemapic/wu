@@ -20,16 +20,21 @@ var expect = chai.expect;
 var expected = require('../shared/errors');
 var httpStatus = require('http-status');
 
-describe('Import', function () {
-    // prepare
+describe('Import shapefile', function () {
+   
+    // prepare test
     before(function(callback) {
+        // create tmp user, project
         async.series([helpers.create_user, helpers.create_project], callback);
     });
     after(function(callback) {
+        // delete tmp user, project
         async.series([helpers.delete_project, helpers.delete_user], callback);
     });
 
-    describe('shapefile', function () {
+
+    
+    describe('shapefile with POLYGON geom', function () {
         this.slow(500);
 
         context('zipped', function () {
