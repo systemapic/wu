@@ -36,6 +36,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 var ZipInfo = require('infozip');
 
@@ -46,13 +48,7 @@ var r = require('../tools/resumable-node')('/data/tmp/');
 var api = module.parent.exports;
 
 // exports
-module.exports = api.upload = { 
-
-
-
-
-
-
+module.exports = api.upload = {
 	/**
 	 * Upload data to PostGIS with cUrl (API)
 	 *
@@ -75,6 +71,7 @@ module.exports = api.upload = {
 
 		var files = req.files;
 		var user = req.user;
+		var response = {};
 
 		console.log('upload', files);
 
@@ -88,7 +85,7 @@ module.exports = api.upload = {
 			size : files.data.size,
 			upload_success : true,
 			error_code : null,
-			error_text : null,
+			error_text : null
 			// processing_success : null,
 			// rows_count : null,
 			// import_took_ms : null,
@@ -96,29 +93,27 @@ module.exports = api.upload = {
 			// original_format : null,
 			// table_name : null, 
 			// database_name : null,
-
-		}
-
-		
-		// save upload id to redis
+		};	
 		var key = 'uploadStatus:' + uploadStatus.file_id;
+
 		api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
-
-			// return upload status to client
-			res.end(JSON.stringify(uploadStatus));
+			if (err) {
+				console.log('api.upload.upload done: ', err);
+			}
+			
+			res.send(uploadStatus);
 		});
-
+		
 		var options = {
 			files : req.files,
 			user : req.user,
 			uploadStatus : uploadStatus,
 			body : req.body
-		}
+		};
 
 		api.import.import(options, function (err, results) {
-			console.log('api.upload.upload done: ', err, results);
+			console.log('api.import.import done: ', err, results);
 		});
-
 
 	},
 
@@ -169,7 +164,7 @@ module.exports = api.upload = {
 		    				file_id = stored_file_id;
 		    				callback(null);
 		    			});
-		    		};
+		    		}
 		    	});
 	    	});
 
@@ -306,8 +301,8 @@ module.exports = api.upload = {
 				uniqueIdentifier : uniqueIdentifier,
 
 				default_layer : null,
-				default_layer_model : null,
-			}
+				default_layer_model : null
+			};
 
 			console.log('uploadStatus', globalUploadStatus);
 
@@ -329,13 +324,13 @@ module.exports = api.upload = {
 						path : outputPath,
 						size : uploadStatus.size,
 						originalFilename : original_filename
-					},
+					}
 				},
 				user : user,
 				uploadStatus : uploadStatus,
 				body : body,
 				access_token : access_token
-			}
+			};
 
 			// import file
 			api.import.import(options, function (err, results) {
@@ -394,21 +389,30 @@ module.exports = api.upload = {
 
 
 	// after upload, calling this to get results
-	getUpload : function (req, res) {
-
-		var file_id = req.query.fileUuid || req.query.file_id,
-		    ops = [];
+	getUpload : function (req, res, next) {
+		var query = req.query || {};
+		var file_id = query.fileUuid || query.file_id;
+		var ops = [];
 
 		// check for missing info
-		if (!file_id) return api.error.missingInformation(req, res);
-
+		if (!file_id) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['file_id']));
+		}
 
 		var key = 'uploadStatus:' + file_id;
 		api.redis.layers.get(key, function (err, uploadStatus) {
+			if (err) {
+				return next(err);
+			}
 
 			var status = JSON.parse(uploadStatus);
 
-			if (!status) return api.error.genera(req, res, 'no such upload status id');
+			if (!status) {
+				return next({
+					message: errors.no_such_upload_status_id.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
 
 			var layer_id = status.default_layer_model;
 			
@@ -419,31 +423,39 @@ module.exports = api.upload = {
 				File
 				.findOne({uuid : file_id})
 				.exec(function (err, file) {
-					if (err) return api.error.general(req, res, err);
-
+					if (err) {
+						err.message = 'find file error'
+						return callback(err);
+					}
+					
 					callback(null, file);
 				});
 
-			}
+			};
 
 			ops.layer = function (callback) {
-
-
 				Layer
 				.findOne({uuid : layer_id})
 				.exec(function (err, layer) {
-					if (err) return api.error.general(req, res, err);
+					if (err) {
+						err.message = 'find layer error'
+						return callback(err);
+					}
 
 					callback(null, layer);
 				});
-			}
+			};
 
 			ops.project = function (callback) {
 				callback(null, status.added_to_project);
-			}
+			};
 
 			async.parallel(ops, function (err, result) {
-				res.end(JSON.stringify(result));
+				if (err) {
+					next(err);
+				}
+
+				res.send(result);
 			});
 
 		});
@@ -523,7 +535,7 @@ module.exports = api.upload = {
 			var uploadStatus = JSON.parse(uploadStatusJSON);
 			for (var s in status) {
 				if (s != 'expire') uploadStatus[s] = status[s]; // set status (except ttl)
-			};
+			}
 
 			// save upload status
 			api.redis.layers.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
@@ -690,7 +702,7 @@ module.exports = api.upload = {
 		var form = new formidable.IncomingForm({
 			hash : 'sha1',
 			multiples : true,
-			keepExtensions : true,
+			keepExtensions : true
 		});
 
 		form.parse(req, function(err, fields, files) {	

@@ -27,7 +27,7 @@ module.exports = function () {
     before(function (done) {
         helpers.create_project_by_info({
             name: 'mocha-test-project',
-            uuid: 'uuid-mocha-test-project',
+            uuid: 'mocha-test-project-uuid',
             access: {
                 edit: [helpers.test_user.uuid]
             },
@@ -119,8 +119,18 @@ module.exports = function () {
                         project_id: tmpProject.uuid,
                         access_token: access_token
                     })
-                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.no_access.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+
+                        expect(result.error.message).to.be.equal(expected.no_access.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        done();
+                    });
             });
         });
 
@@ -133,8 +143,18 @@ module.exports = function () {
                         project_id: tmpProject.uuid,
                         access_token: access_token
                     })
-                    .expect(200, {})
-                    .end(done);
+                    .expect(httpStatus.OK)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+
+                        expect(result.updated).to.be.an.array;
+                        expect(result.project).to.exist;
+                        done();
+                    });
             });
         });
 
@@ -208,7 +228,7 @@ module.exports = function () {
                         pending: ['test_pending'],
                         project_id: tmpProject.uuid
                     })
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) {
                             return done(err);
@@ -216,54 +236,56 @@ module.exports = function () {
 
                         var result = helpers.parse(res.text);
 
-                        expect(result.name.name).to.be.equal('mocha-test-updated-name');
-                        expect(result.slug.slug).to.be.equal('mocha-test-updated-slug');
-                        expect(result.logo.logo).to.be.equal('mocha-test-updated-logo');
-                        expect(result.position.position.lat).to.be.equal('44');
-                        expect(result.position.position.lng).to.be.equal('44');
-                        expect(result.position.position.zoom).to.be.equal('4');
-                        expect(result.bounds.bounds.northEast.lat).to.be.equal('44');
-                        expect(result.bounds.bounds.northEast.lng).to.be.equal('33');
-                        expect(result.bounds.bounds.southWest.lat).to.be.equal('55');
-                        expect(result.bounds.bounds.southWest.lng).to.be.equal('44');
-                        expect(result.bounds.bounds.minZoom).to.be.equal('3');
-                        expect(result.bounds.bounds.maxZoom).to.be.equal('5');
-                        expect(result.folders.folders[0].uuid).to.be.equal('test_folder_uuid');
-                        expect(result.folders.folders[0].title).to.be.equal('test_folder_title');
-                        expect(result.folders.folders[0].content).to.be.equal('test_folder_content');
-                        expect(result.controls.controls.zoom).to.be.false;
-                        expect(result.controls.controls.measure).to.be.false;
-                        expect(result.controls.controls.mouseposition).to.be.false;
-                        expect(result.controls.controls.layermenu).to.be.false;
-                        expect(result.controls.controls.draw).to.be.false;
-                        expect(result.controls.controls.legends).to.be.true;
-                        expect(result.controls.controls.inspect).to.be.true;
-                        expect(result.controls.controls.geolocation).to.be.true;
-                        expect(result.controls.controls.vectorstyle).to.be.true;
-                        expect(result.controls.controls.baselayertoggle).to.be.true;
-                        expect(result.controls.controls.cartocss).to.be.true;
-                        expect(result.description.description).to.be.equal('mocha-test-updated-description');
-                        expect(result.keywords.keywords[0]).to.be.equal('mocha-test-updated-keywords');
-                        expect(result.categories.categories[0]).to.be.equal('test_categories');
-                        expect(result.colorTheme.colorTheme).to.be.equal('mocha-test-updated-colorTheme');
-                        expect(result.connectedAccounts.connectedAccounts.mapbox[0].username).to.be.equal('test_user_name');
-                        expect(result.connectedAccounts.connectedAccounts.mapbox[0].accessToken).to.be.equal('test_access_token');
-                        expect(result.connectedAccounts.connectedAccounts.cartodb[0]).to.be.equal('test_cartodb');
-                        expect(result.settings.settings.screenshot).to.be.false;
-                        expect(result.settings.settings.socialSharing).to.be.false;
-                        expect(result.settings.settings.documentsPane).to.be.false;
-                        expect(result.settings.settings.dataLibrary).to.be.false;
-                        expect(result.settings.settings.saveState).to.be.true;
-                        expect(result.settings.settings.autoHelp).to.be.true;
-                        expect(result.settings.settings.autoAbout).to.be.true;
-                        expect(result.settings.settings.darkTheme).to.be.true;
-                        expect(result.settings.settings.tooltips).to.be.true;
-                        expect(result.settings.settings.mediaLibrary).to.be.true;
-                        expect(result.settings.settings.mapboxGL).to.be.true;
-                        expect(result.settings.settings.d3popup).to.be.true;
-                        expect(result.thumbCreated.thumbCreated).to.be.true;
-                        expect(result.state.state).to.be.equal('test_state');
-                        expect(result.pending.pending[0]).to.be.equal('test_pending');
+                        expect(result.project.name).to.be.equal('mocha-test-updated-name');
+                        expect(result.project.slug).to.be.equal('mocha-test-updated-slug');
+                        expect(result.project.logo).to.be.equal('mocha-test-updated-logo');
+                        expect(result.project.position.lat).to.be.equal('44');
+                        expect(result.project.position.lng).to.be.equal('44');
+                        expect(result.project.position.zoom).to.be.equal('4');
+                        expect(result.project.bounds.northEast.lat).to.be.equal('44');
+                        expect(result.project.bounds.northEast.lng).to.be.equal('33');
+                        expect(result.project.bounds.southWest.lat).to.be.equal('55');
+                        expect(result.project.bounds.southWest.lng).to.be.equal('44');
+                        expect(result.project.bounds.minZoom).to.be.equal('3');
+                        expect(result.project.bounds.maxZoom).to.be.equal('5');
+                        expect(result.project.folders[0].uuid).to.be.equal('test_folder_uuid');
+                        expect(result.project.folders[0].title).to.be.equal('test_folder_title');
+                        expect(result.project.folders[0].content).to.be.equal('test_folder_content');
+                        expect(result.project.controls.zoom).to.be.false;
+                        expect(result.project.controls.measure).to.be.false;
+                        expect(result.project.controls.mouseposition).to.be.false;
+                        expect(result.project.controls.layermenu).to.be.false;
+                        expect(result.project.controls.draw).to.be.false;
+                        expect(result.project.controls.legends).to.be.true;
+                        expect(result.project.controls.inspect).to.be.true;
+                        expect(result.project.controls.geolocation).to.be.true;
+                        expect(result.project.controls.vectorstyle).to.be.true;
+                        expect(result.project.controls.baselayertoggle).to.be.true;
+                        expect(result.project.controls.cartocss).to.be.true;
+                        expect(result.project.description).to.be.equal('mocha-test-updated-description');
+                        expect(result.project.keywords[0]).to.be.equal('mocha-test-updated-keywords');
+                        expect(result.project.categories[0]).to.be.equal('test_categories');
+                        expect(result.project.colorTheme).to.be.equal('mocha-test-updated-colorTheme');
+                        expect(result.project.connectedAccounts.mapbox[0].username).to.be.equal('test_user_name');
+                        expect(result.project.connectedAccounts.mapbox[0].accessToken).to.be.equal('test_access_token');
+                        expect(result.project.connectedAccounts.cartodb[0]).to.be.equal('test_cartodb');
+                        expect(result.project.settings.screenshot).to.be.false;
+                        expect(result.project.settings.socialSharing).to.be.false;
+                        expect(result.project.settings.documentsPane).to.be.false;
+                        expect(result.project.settings.dataLibrary).to.be.false;
+                        expect(result.project.settings.saveState).to.be.true;
+                        expect(result.project.settings.autoHelp).to.be.true;
+                        expect(result.project.settings.autoAbout).to.be.true;
+                        expect(result.project.settings.darkTheme).to.be.true;
+                        expect(result.project.settings.tooltips).to.be.true;
+                        expect(result.project.settings.mediaLibrary).to.be.true;
+                        expect(result.project.settings.mapboxGL).to.be.true;
+                        expect(result.project.settings.d3popup).to.be.true;
+                        expect(result.project.thumbCreated).to.be.true;
+                        expect(result.project.state).to.be.equal('test_state');
+                        expect(result.project.pending[0]).to.be.equal('test_pending');
+                        expect(result.updated).to.be.an.array;
+                        expect(result.updated).to.be.not.empty;
                         done();
                     });
             });

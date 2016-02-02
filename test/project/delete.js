@@ -9,7 +9,7 @@ var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 
 module.exports = function () {
-    var tmpProject ={};
+    var tmpProject = {};
 
     before(function (done) {
         helpers.create_project_by_info({
@@ -43,15 +43,16 @@ module.exports = function () {
                         project_id: tmpProject.uuid,
                         access_token: access_token
                     })
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) {
                             return done(err);
                         }
 
                         var result = helpers.parse(res.text);
-                        assert.ok(result.deleted);
-                        assert.equal(result.project, tmpProject.uuid);
+
+                        expect(result.deleted).to.be.true;
+                        expect(result.project).to.be.equal(tmpProject.uuid);
                         done();
                     });
             });

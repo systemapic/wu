@@ -153,25 +153,31 @@ module.exports = api.project = {
 
 	},
 
-	getPublic : function (req, res) {
+	getPublic : function (req, res, next) {
+		var params = req.body || {};
+		var username = params.username;
+		var project_slug = params.project_slug;
+		var missingRequiredRequestFields = [];
 
-		console.log('api.project.getPublic', req.body);
+		if (!username) {
+			missingRequiredRequestFields.push('username');	
+		}
 
-		var username = req.body.username;
-		var project_slug = req.body.project_slug;
-		var project_id = req.body.project_id;
+		if (!project_slug) {
+			missingRequiredRequestFields.push('project_slug');	
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		// check if public
 		api.project.checkPublic({
 			username : username,
 			project_slug : project_slug
 		}, function (err, public_project) {
-			console.log('checked for public', arguments);
 			if (err) {
-				// not public
-				return res.status(400).send({
-					error : 'Not public project'
-				});
+				next(err);
 			}
 
 			// public project
@@ -179,24 +185,36 @@ module.exports = api.project = {
 		});
 	},
 
-	getPrivate : function (req, res) {
+	getPrivate : function (req, res, next) {
 		console.log('api.project.getPrivate', req.body);
+		var params = req.body || {};
+		var project_id = params.project_id;
+		var access_token = params.user_access_token;		
+		var missingRequiredRequestFields = [];
 
-		var project_id = req.body.project_id;
-		var access_token = req.body.user_access_token;
+		if (!project_id) {
+			missingRequiredRequestFields.push('project_id');	
+		}
+
+		if (!access_token) {
+			missingRequiredRequestFields.push('user_access_token');	
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		// TODO: check access token and access!!!
-		res.end() // debug
+		res.send() // debug
 		return;
 
 		Project
-		.findOne({uuid : project_id})
-		.populate('files')
-		.populate('layers')
-		.exec(function (err, project) {
-
-			res.send(project);
-		})
+			.findOne({uuid : project_id})
+			.populate('files')
+			.populate('layers')
+			.exec(function (err, project) {
+				res.send(project);
+			});
 
 	},
 
@@ -210,9 +228,19 @@ module.exports = api.project = {
 		.findOne({username : username})
 		.exec(function (err, user) {
 			console.log('err, user', err, user);
-			if (err || !user) return done(err || errMsg)
+			
+			if (err) {
+				return done(err);
+			} 
 
-				console.log('project_slug', project_slug, user.uuid);
+			if(!user) {
+				return done({
+					message: errors.no_such_user.errorMessage,
+					code:httpStatus.NOT_FOUND
+				});
+			}
+
+			console.log('project_slug', project_slug, user.uuid);
 
 			// find project, check if public
 			Project
@@ -224,14 +252,25 @@ module.exports = api.project = {
 			.populate('layers')
 			.exec(function (err, project) {
 				console.log('err, project', err, project);
+				if (err) {
+					return done(err);
+				}
 
-				if (err || !project) return done(err || errMsg);
+				if (!project) {
+					return done({
+						message: errors.no_such_project.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
 
 				// check if public
 				if (project.access.options.isPublic) {
 					return done(null, project);
 				} else {
-					return done(errMsg);
+					return done({
+						message: errors.not_a_public_project.errorMessage,
+						code: httpStatus.BAD_REQUEST
+					});
 				}
 			});
 		});
@@ -255,13 +294,15 @@ module.exports = api.project = {
 	// ###  API: Create Project              ###
 	// #########################################
 	// createProject : function (req, res) {
-	create : function (req, res) {
-		var store = req.body;
+	create : function (req, res, next) {
+		var store = req.body || {};
 		var user = req.user;
 		var ops = [];
 
 		// return if missing info
-		if (!store || !store.name) return api.error.missingInformation(req, res, 'Please provide a project `name`.');
+		if (!store.name) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['name']));
+		}
 
 		// get access
 		var storeAccess = api.project.defaultStoreAccess(store.access);
@@ -274,7 +315,10 @@ module.exports = api.project = {
 			if (isPublic) return callback(null);
 
 			// check if user can create private project
-			user.canCreatePrivateProject() ? callback(null) : callback(new Error('No access.'));
+			user.canCreatePrivateProject() ? callback(null) : callback({
+				message: errors.no_access.errorMessage,
+				code: httpStatus.BAD_REQUEST
+			});
 		});
 
 		// create project
@@ -321,7 +365,9 @@ module.exports = api.project = {
 
 		// run ops
 		async.waterfall(ops, function (err, project) {
-			if (err) return api.error.general(req, res, err);
+			if (err) {
+				return next(err);
+			}
 
 			// slack
 			api.slack.createdProject({
@@ -441,7 +487,7 @@ module.exports = api.project = {
 		var ops = [];
 
 		if (!projectUuid) {
-			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['project_id']))
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['project_id']));
 		}
 
 		ops.push(function (callback) {
@@ -506,9 +552,9 @@ module.exports = api.project = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
 		}
 
-		var user = req.user,
-			projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
-			ops = [];
+		var user = req.user;
+		var projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id;
+		var ops = [];
 
 		// return on missing;
 		if (!projectUuid) {
@@ -530,15 +576,28 @@ module.exports = api.project = {
 
 			var hashedUser = user.getUuid(); // todo: use actual hash
 
-			if (!project || !project.access) {
-				return callback(new Error(error_messages.missing_information.errorMessage));
+			if (!project) {
+				return callback({
+					message: errors.no_such_project,
+					code: httpStatus.NOT_FOUND
+				});
+			}
+
+			if (!project.access) {
+				return callback({
+					message: errors.no_access,
+					code: httpStatus.NOT_FOUND
+				});
 			}
 
 			// can edit if on edit list or created project
 			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
 
 			// continue only if canEdit
-			canEdit ? callback(null, project) : callback(new Error('No access.'));
+			canEdit ? callback(null, project) : callback({
+				message: errors.no_access.errorMessage,
+				code: httpStatus.BAD_REQUEST
+			});
 		});
 		ops.push(function (project, callback) {
 			api.project._update({
@@ -547,11 +606,12 @@ module.exports = api.project = {
 			}, callback);
 		});
 
-		async.waterfall(ops, function (err, project) {
-			if (err) return api.error.general(req, res, err);
-
+		async.waterfall(ops, function (err, result) {
+			if (err) {
+				return next(err);
+			}
 			// done
-			res.json(project);
+			res.send(result);
 		});
 	},
 
@@ -559,9 +619,11 @@ module.exports = api.project = {
 	_update : function (job, callback) {
 		if (!job) return callback('Missing job.');
 
-		var project = job.project,
-				options = job.options,
-				queries = {};
+		var project = job.project;
+		var options = job.options;
+    	var updates = {};
+		var queries = {};
+		var ops = [];
 
 		// valid fields
 		var valid = [
@@ -587,18 +649,49 @@ module.exports = api.project = {
 			'pending'
 		];
 
-		// enqueue queries for valid fields
-		valid.forEach(function (field) {
-			if (options[field]) queries = api.project._enqueueUpdate({
-				queries : queries,
-				field : field,
-				project : project,
-				options : options
-			});
+		updates = _.pick(options, valid);
+		// enqueue updates for valid fields
+		ops.push(function (callback) {
+			project.update({ $set: updates })
+				.exec(function (err, result) {
+					if (err) {
+						callback(err);
+					}
+
+					callback(null, {
+						updated: _.keys(updates)
+					});
+				});
 		});
 
-		// run queries to database
-		async.parallel(queries, callback);
+		ops.push(function (params, callback) {
+			console.log(project)
+			Project.findOne({uuid: options.project_id})
+				.exec(function (err, res) {
+					if (err) {
+						return callback(err);
+					}
+
+					params.project = res;
+					callback(null, params);
+				});
+		});
+
+		// do updates
+		async.waterfall(ops, callback);
+
+		// // enqueue queries for valid fields
+		// valid.forEach(function (field) {
+		// 	if (options[field]) queries = api.project._enqueueUpdate({
+		// 		queries : queries,
+		// 		field : field,
+		// 		project : project,
+		// 		options : options
+		// 	});
+		// });
+
+		// // run queries to database
+		// async.parallel(queries, callback);
 	},
 
 

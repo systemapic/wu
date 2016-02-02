@@ -48,8 +48,6 @@ var api = module.parent.exports;
 // exports
 module.exports = api.import = { 
 
-
-
 	import : function (options, done) {
 
 		var files = options.files,
@@ -59,10 +57,7 @@ module.exports = api.import = {
 		    access_token = options.access_token,
 		    file_id = uploadStatus.file_id,
 		    import_start_time = new Date().getTime();
-
-
 		var ops = [];
-
 
 		// import data
 		ops.push(function (callback) {
@@ -116,7 +111,6 @@ module.exports = api.import = {
 						api.geo.handleRaster(opts, callback);
 
 					} else {
-						
 						// postgis import
 						api.postgis.import(opts, callback);
 					}
@@ -224,8 +218,6 @@ module.exports = api.import = {
 			done(err);
 		});	
 	},
-
-
 
 	/**
 	 * Prepare upload before organizing (unzip, etc.)
