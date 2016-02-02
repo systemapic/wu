@@ -1,9 +1,19 @@
 #!/bin/bash
 #export PAGER="/usr/bin/less -S"
-export PGUSER=docker 
-export PGPASSWORD=docker 
-export PGDATABASE=template1
+
+# get config
+source /systemapic/config/env.sh
+
+export PGUSER=$SYSTEMAPIC_PGSQL_USERNAME 
+export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD 
+export PGDATABASE=$SYSTEMAPIC_PGSQL_DBNAME
 export PGHOST
+# export PGUSER=docker 
+# export PGPASSWORD=docker 
+# export PGDATABASE=template1
+# export PGHOST
+
+
 
 if test -z "$1"; then
 	echo "Usage: $0 <outdir>" >&2

@@ -18,9 +18,12 @@ if [ "$4" == "" ]; then
 	SRID=""
 fi
 
+# get config
+source /systemapic/config/env.sh
+
 # env vars
-PGPASSWORD=docker
-PGUSERNAME=docker
+PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
+PGUSERNAME=$SYSTEMAPIC_PGSQL_USERNAME
 PGHOST=postgis
 
 # encoding // todo!
