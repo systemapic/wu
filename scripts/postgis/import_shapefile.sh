@@ -26,17 +26,20 @@ ENCODING=$5
 SRID="-s $4"
 if [ "$4" == "" ]; then SRID=""; fi
 
+# error file
+TIMESTAMP=$(date +"%s")
+ERRORFILE="shp2pgsql.$TIMESTAMP.error"
 
 function check_errors() {
 
 	# ERROR: encoding
-	if grep -q 'LATIN' ./shp2pgsql.error ; then
+	if grep -q 'LATIN' ./$ERRORFILE ; then
 	    	
 	    	# import with LATIN1 encoding
 	    	import_latin_encoding
 
 	# ERROR: Geometry has Z dimension but column does not"
-	elif grep -q 'We have a Multipolygon' ./shp2pgsql.error ; then
+	elif grep -q 'We have a Multipolygon' ./$ERRORFILE ; then
 		# See https://github.com/systemapic/wu/issues/342
 		echo "TODO: support this"
 	fi
@@ -47,7 +50,7 @@ function import_latin_encoding() {
 	# import with LATIN1 encoding
 	echo "Importing with LATIN1 encoding..."
 	ENCODING="-W 'LATIN1"
-	shp2pgsql -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./shp2pgsql.error | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
+	shp2pgsql -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./$ERRORFILE | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
 
 	# check for erros
 	check_errors
@@ -57,12 +60,18 @@ function import_latin_encoding() {
 function import() {
 
 	# import shapefile
-	shp2pgsql -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./shp2pgsql.error | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
+	shp2pgsql -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./$ERRORFILE | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
 
 	# check for errors
 	check_errors
 }
 
+
+function clean_up() {
+	echo "Cleaning up"
+	# remove shp2pgsql.error file
+	rm ./$ERRORFILE
+}
 
 
 echo "    Importing SHAPFILE DEBUG!"
@@ -72,3 +81,6 @@ echo "    TABLE: $TABLE"
 
 # import shapefile to postgis
 import
+
+# clean up
+clean_up
