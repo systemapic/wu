@@ -152,7 +152,7 @@ module.exports = function () {
                         var result = helpers.parse(res.text);
 
                         expect(result.updated).to.be.an.array;
-                        expect(result.project).to.be.define;
+                        expect(result.project).to.exist;
                         done();
                     });
             });
