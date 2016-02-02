@@ -675,6 +675,8 @@ module.exports = api.postgis = {
 		var srid_converted = srid;
 		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; 
 
+		console.log('POSTGIS DATABASE:::::', pg_db);
+
 		// create database script
 		var cmd = [
 			IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
