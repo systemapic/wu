@@ -84,7 +84,7 @@ module.exports = api.auth = {
 				api.auth.setPassword(user, password, function (err, doc) {
 					
 					// send to login page
-					res.redirect('/login');
+					res.redirect('/');
 
 					// delete temp token
 					if (token) api.redis.temp.del(token);
