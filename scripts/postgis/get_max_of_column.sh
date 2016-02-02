@@ -20,5 +20,11 @@ if [ "$3" == "" ]; then
 fi
 
 
-PGPASSWORD=docker psql -U docker -d $1 -h postgis -c "select row_to_json(t) from (select MAX($3), MIN($3), AVG($3) from $2) t;"
+# get config
+source /systemapic/config/env.sh
+# echo $SYSTEMAPIC_PGSQL_USERNAME
+# echo $SYSTEMAPIC_PGSQL_PASSWORD
+# echo $SYSTEMAPIC_PGSQL_DBNAME
+
+PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "select row_to_json(t) from (select MAX($3), MIN($3), AVG($3) from $2) t;"
 

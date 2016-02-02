@@ -22,7 +22,7 @@ var Role 	 = require('../models/role');
 var Group 	 = require('../models/group');
 
 // config
-var config  = require('../config/server-config.js').serverConfig;
+var config  = require('../config/wu-config.js').serverConfig;
 
 // connect to our database
 mongoose.connect(config.mongo.url); 
@@ -207,7 +207,7 @@ function create_models() {
 
 		var admins = options.admins;
 
-		var configFile = require('../config/server-config.js');
+		var configFile = require('../config/wu-config.js');
 
 		// console.log('foncif', configFile, typeof(configFile));
 
@@ -222,7 +222,7 @@ function create_models() {
 
 		// console.log('output', output);
 
-		fs.writeFile('../config/server-config.js', output, function (err) {
+		fs.writeFile('../config/wu-config.js', output, function (err) {
 			console.log('wrote config', err);
 			process.exit(0);
 

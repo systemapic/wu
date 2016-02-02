@@ -16,7 +16,7 @@ var mongoose = require('mongoose');
 var request = require('request');
 
 // config
-var config = require('../config/server-config');
+var config = require('../config/wu-config');
 
 // redis store for temp tokens and upload increments
 var redisLayers = require('redis').createClient(config.serverConfig.redis.layers.port, config.serverConfig.redis.layers.host);
