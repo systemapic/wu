@@ -216,7 +216,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/get/public', checkAccess, api.project.getPublic, errorHandler);
 
-	app.post('/api/project/get/private', checkAccess, api.project.getPrivate);
+	app.post('/api/project/get/private', checkAccess, api.project.getPrivate, errorHandler);
 
 	/**
 	* @api {get} /api/status Get portal status
