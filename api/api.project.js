@@ -185,24 +185,36 @@ module.exports = api.project = {
 		});
 	},
 
-	getPrivate : function (req, res) {
+	getPrivate : function (req, res, next) {
 		console.log('api.project.getPrivate', req.body);
+		var params = req.body || {};
+		var project_id = params.project_id;
+		var access_token = params.user_access_token;		
+		var missingRequiredRequestFields = [];
 
-		var project_id = req.body.project_id;
-		var access_token = req.body.user_access_token;
+		if (!project_id) {
+			missingRequiredRequestFields.push('project_id');	
+		}
+
+		if (!access_token) {
+			missingRequiredRequestFields.push('user_access_token');	
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		// TODO: check access token and access!!!
-		res.end() // debug
+		res.send() // debug
 		return;
 
 		Project
-		.findOne({uuid : project_id})
-		.populate('files')
-		.populate('layers')
-		.exec(function (err, project) {
-
-			res.send(project);
-		})
+			.findOne({uuid : project_id})
+			.populate('files')
+			.populate('layers')
+			.exec(function (err, project) {
+				res.send(project);
+			});
 
 	},
 
