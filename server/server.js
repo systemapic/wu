@@ -26,7 +26,7 @@ var port = config.port;
 // convert image from base64
 if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.invitationLogo && api.clientConfig.logos.invitationLogo.backgroundImage && _.isString(api.clientConfig.logos.invitationLogo.backgroundImage)) {
 
-	var base64Data = api.util(api.clientConfig.logos.invitationLogo.backgroundImage);
+	var base64Data = api.utils.encodeBase64ToPng(api.clientConfig.logos.invitationLogo.backgroundImage);
 	fs.writeFile(path.resolve(__dirname, '../public/portal-logo.png'), base64Data, 'base64', function (err) {
 		if (err) {
 			console.log("file with portal-logo.png was not created");
