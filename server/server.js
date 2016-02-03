@@ -27,12 +27,12 @@ var port = config.port;
 if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.invitationLogo && api.clientConfig.logos.invitationLogo.backgroundImage && _.isString(api.clientConfig.logos.invitationLogo.backgroundImage)) {
 
 	var base64Data = api.util(api.clientConfig.logos.invitationLogo.backgroundImage);
-	fs.writeFile(path.resolve(__dirname, '../public/logo.png'), base64Data, 'base64', function (err) {
+	fs.writeFile(path.resolve(__dirname, '../public/portal-logo.png'), base64Data, 'base64', function (err) {
 		if (err) {
-			console.log("file with logo was not created");
+			console.log("file with portal-logo.png was not created");
 		}
 
-		console.log("file with logo was created successfully");
+		console.log("file with portal-logo.png was created successfully");
 	});
 }
 
