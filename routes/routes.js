@@ -928,13 +928,60 @@ module.exports = function(app, passport) {
 	// change to /api/data/getLayers
 	app.post('/api/file/getLayers', checkAccess, api.file.getLayers);
 
+	/**
+	* @api {post} /api/dataset/share Share dataset
+	* @apiName shareDataset
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} dataset File id
+	* @apiParam {Array} users Array of user's ids
+	* @apiSuccess {Object} err Error object
+	* @apiSuccess {Boolean} success
+	* @apiSuccess {Object} file_shared File shared object
+	* @apiSuccess {Array} users_shared_with Shared users
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  err: null
+	*  success: true,
+	*  file_shared: {
+	*	file_name: 'fileName',
+	*	file_uuid: 'fileUuid',
+	*  }
+	*  users_shared_with : ['userId']
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request dataset or users do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['users', 'dataset']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found file does not exist (404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such file.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// SHARE DATASET =======================
 	// =====================================
 	// change to /api/data/share
-	app.post('/api/dataset/share', checkAccess, function (req,res) {
-		api.file.shareDataset(req, res);
-	});
+	app.post('/api/dataset/share', checkAccess, api.file.shareDataset, errorHandler);
 	
 	/**
 	* @api {post} /api/file/delete Delete data
