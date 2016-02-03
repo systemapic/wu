@@ -82,5 +82,9 @@
     "not_a_public_project": {
         "errorMessage": "Not a public project.",
         "code": "400"  
+    },
+    "empty_users_array": {
+        "errorMessage": "Users array is empty",
+        "code": "400"
     }
 }

@@ -470,7 +470,7 @@ module.exports = api.upload = {
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
 
-			var cleanName = u.filename.split('.')[0];
+			var cleanName = fspath.basename(u.filename, fspath.extname(u.filename));
 
 			if (u.data_type == 'vector') {
 				var fileModel = {

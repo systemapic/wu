@@ -135,7 +135,7 @@ module.exports = function () {
 
                         expect(result.file.type).to.be.equal('postgis');
                         expect(result.file.originalName).to.be.equal('shapefile.polygon.zip');
-                        expect(result.file.name).to.be.equal('shapefile');
+                        expect(result.file.name).to.be.equal('shapefile.polygon');
                         done();
                     });
             });

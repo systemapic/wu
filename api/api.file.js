@@ -1445,6 +1445,13 @@ module.exports = api.file = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
 		}
 
+		if (_.isEmpty(users)) {
+			return next({
+				message: errors.empty_users_array.errorMessage,
+				code: httpStatus.BAD_REQUEST
+			});
+		}
+
 		ops.push(function (callback) {
 			File
 			.findOne({uuid : file_id})
