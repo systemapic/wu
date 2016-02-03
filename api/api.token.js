@@ -124,19 +124,6 @@ module.exports = api.token = {
 		});
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 	// get access token from password
 	_get_token_from_password : function (options, done) {
 
@@ -145,7 +132,6 @@ module.exports = api.token = {
 		var refresh = (options.refresh == 'true');
 		var username = options.username || options.email;
 		var password = options.password;
-
 		// throw if no credentials
 		if (_.isEmpty(username) || _.isEmpty(password)) return done(new Error('Invalid credentials.'));
 

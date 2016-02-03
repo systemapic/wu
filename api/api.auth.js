@@ -82,12 +82,27 @@ module.exports = api.auth = {
 				}
 
 				api.auth.setPassword(user, password, function (err, doc) {
-					
-					// send to login page
-					res.redirect('/');
+					var options = {
+						email: user.username,
+						password: password
+					};
 
-					// delete temp token
-					if (token) api.redis.temp.del(token);
+					api.token._get_token_from_password(options, function (err, tokens) {
+						if (err) {
+							return res.status(401).send({error : err.message});
+						}
+
+						// update cookie
+						req.session.tokens = api.utils.parse(tokens);
+
+						// send to login page
+						res.redirect('/');
+
+						// delete temp token
+						if (token) {
+							api.redis.temp.del(token);
+						}						
+					});
 				});
 			});
 		});

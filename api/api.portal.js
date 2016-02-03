@@ -365,12 +365,12 @@ module.exports = api.portal = {
 
 		// });
 
-
-
-		res.render('../../views/app.serve.ejs', {
+		var options = {
 			hotlink : {},
-			// access_token : public_access_token
-		});
+			access_token : req.session.tokens || {}
+		}
+
+		res.render('../../views/app.serve.ejs', options);
 
 		// req.session.access_token = access_token;
 
