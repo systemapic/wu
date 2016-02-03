@@ -22,8 +22,10 @@ var config = api.config;
 var port = config.port;
 
 // convert image from base64
-var base64Data = api.clientConfig.logos.invitationLogo.backgroundImage.replace(/^data:image\/png;base64,/, "");
-fs.writeFileSync(path.resolve(__dirname, '../logo.png'), base64Data, 'base64');
+var base64Data = api.clientConfig.logos.invitationLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "");
+	base64Data = base64Data.replace(/\'\)/, "");
+console.log(base64Data);
+fs.writeFileSync(path.resolve(__dirname, '../public/logo.png'), base64Data, 'base64');
 
 // socket enabled server
 app = express().http().io();
