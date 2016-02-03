@@ -689,5 +689,7 @@ module.exports = api.utils = {
 		}
 	},
 
-
+	encodeBase64ToPng : function (base64String) {
+		return api.clientConfig.logos.invitationLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
+	}
 }

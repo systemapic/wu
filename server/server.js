@@ -15,17 +15,26 @@ var cookieParser = require('cookie-parser');
 var clientSession = require('client-sessions');
 var fs = require('fs');
 var path = require('path');
+var _ = require('lodash')
 
 // api
 var api = require('../api/api');
 var config = api.config;
 var port = config.port;
 
+
 // convert image from base64
-var base64Data = api.clientConfig.logos.invitationLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "");
-	base64Data = base64Data.replace(/\'\)/, "");
-console.log(base64Data);
-fs.writeFileSync(path.resolve(__dirname, '../public/logo.png'), base64Data, 'base64');
+if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.invitationLogo && api.clientConfig.logos.invitationLogo.backgroundImage && _.isString(api.clientConfig.logos.invitationLogo.backgroundImage)) {
+
+	var base64Data = api.util(api.clientConfig.logos.invitationLogo.backgroundImage);
+	fs.writeFile(path.resolve(__dirname, '../public/logo.png'), base64Data, 'base64', function (err) {
+		if (err) {
+			console.log("file with logo was not created");
+		}
+
+		console.log("file with logo was created successfully");
+	});
+}
 
 // socket enabled server
 app = express().http().io();
