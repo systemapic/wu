@@ -6,13 +6,11 @@ var helpers = require('./../helpers');
 var _ = require('lodash');
 var token = helpers.token;
 var expected = require('../../shared/errors');
-var Layer   = require('../../models/layer');
-var Project = require('../../models/project');
+var User   = require('../../models/user');
 var async = require('async');
 var httpStatus = require('http-status');
 
 module.exports = function () {
-    // skipping for now, because we need to make HUGE changes on the layer specs.. @igor: interested?
     describe('/api/dataset/share', function () {
 		var second_test_user = {
 		    email : 'second_mocha_test_user@systemapic.com',
@@ -115,7 +113,7 @@ module.exports = function () {
                 api.post('/api/dataset/share')
                     .send({
                         access_token: access_token,
-                        users: [],
+                        users: ['test'],
                         dataset: 'some dataset'
                     })
                     .expect(httpStatus.NOT_FOUND)
@@ -143,7 +141,7 @@ module.exports = function () {
                 api.post('/api/dataset/share')
                     .send({
                         access_token: access_token,
-                        users: [],
+                        users: ['test'],
                         dataset: fileInfo.uuid
                     })
                     .expect(httpStatus.BAD_REQUEST)
@@ -161,7 +159,7 @@ module.exports = function () {
             });
 		});
 
-		it('should respond with status 200 if file exist and users array is empty', function (done) {
+		it('should respond with status 400 if file exist and users array is empty', function (done) {
  			helpers.users_token(second_test_user, function (err, access_token) {
                 if (err) {
                     return done(err);
@@ -173,7 +171,7 @@ module.exports = function () {
                         users: [],
                         dataset: fileInfo.uuid
                     })
-                    .expect(httpStatus.OK)
+                    .expect(httpStatus.BAD_REQUEST)
                     .end(function (err, res) {
                         if (err) {
                             return done(err);
@@ -181,12 +179,8 @@ module.exports = function () {
 
                         var result = helpers.parse(res.text);
 
-                        expect(result.err).to.be.null;
-                        expect(result.success).to.be.true;
-                        expect(result.file_shared.file_name).to.be.equal(fileInfo.name);
-                        expect(result.file_shared.file_uuid).to.be.equal(fileInfo.uuid);                        
-                        expect(result.users_shared_with).to.be.an.array;
-                        expect(result.users_shared_with).to.empty;
+                        expect(result.error.message).to.be.equal(expected.empty_users_array.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
                         done();
                     });
             });
@@ -217,7 +211,6 @@ module.exports = function () {
                         expect(result.file_shared.file_name).to.be.equal(fileInfo.name);
                         expect(result.file_shared.file_uuid).to.be.equal(fileInfo.uuid);                        
                         expect(result.users_shared_with).to.be.an.array;
-                        expect(result.users_shared_with).to.empty;
                         done();
                     });
             });
@@ -249,7 +242,17 @@ module.exports = function () {
                         expect(result.file_shared.file_uuid).to.be.equal(fileInfo.uuid);                        
                         expect(result.users_shared_with).to.be.an.array;
                         expect(result.users_shared_with).to.include(helpers.test_user.uuid);
-                        done();
+
+                        User.findOne({
+                            uuid: helpers.test_user.uuid
+                        }).exec(function(err, _user) {
+                            if (err) {
+                                return done(err);
+                            }
+
+                            expect(_user.files).to.include(fileInfo._id);
+                            done();
+                        });
                     });
             });
 		});
