@@ -13,11 +13,17 @@ var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
 var clientSession = require('client-sessions');
+var fs = require('fs');
+var path = require('path');
 
 // api
 var api = require('../api/api');
 var config = api.config;
 var port = config.port;
+
+// convert image from base64
+var base64Data = api.clientConfig.logos.invitationLogo.backgroundImage.replace(/^data:image\/png;base64,/, "");
+fs.writeFileSync(path.resolve(__dirname, '../logo.png'), base64Data, 'base64');
 
 // socket enabled server
 app = express().http().io();
