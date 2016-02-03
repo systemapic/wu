@@ -367,7 +367,7 @@ module.exports = api.portal = {
 
 		var options = {
 			hotlink : {},
-			access_token : req.session.access_token || {}
+			access_token : req.session.tokens || {}
 		}
 
 		res.render('../../views/app.serve.ejs', options);

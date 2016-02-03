@@ -93,7 +93,7 @@ module.exports = api.auth = {
 						}
 
 						// update cookie
-						req.session.access_token = api.utils.parse(tokens);
+						req.session.tokens = api.utils.parse(tokens);
 
 						// send to login page
 						res.redirect('/');
