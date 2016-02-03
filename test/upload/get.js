@@ -20,7 +20,7 @@ module.exports = function () {
                 api.post('/api/import')
                 .type('form')
                 .field('access_token', access_token)
-                .field('data', fs.createReadStream(path.resolve(__dirname, '../data/shapefile.zip')))
+                .field('data', fs.createReadStream(path.resolve(__dirname, '../data/shapefile.polygon.zip')))
                 .expect(httpStatus.OK)
                 .end(function (err, res) {
                     if (err) {
@@ -31,7 +31,7 @@ module.exports = function () {
                     expect(result.file_id).to.exist;
                     expect(result.user_id).to.exist;
                     expect(result.upload_success).to.exist;
-                    expect(result.filename).to.be.equal('shapefile.zip');
+                    expect(result.filename).to.be.equal('shapefile.polygon.zip');
                     expect(result.status).to.be.equal('Processing');
                     
                     tmp.file_id = result.file_id;
@@ -134,13 +134,12 @@ module.exports = function () {
                         var result = helpers.parse(res.text);
 
                         expect(result.file.type).to.be.equal('postgis');
-                        expect(result.file.originalName).to.be.equal('shapefile.zip');
+                        expect(result.file.originalName).to.be.equal('shapefile.polygon.zip');
                         expect(result.file.name).to.be.equal('shapefile');
-
                         done();
                     });
             });
-        })
+        });
 
     });
 };

@@ -1422,21 +1422,44 @@ module.exports = api.file = {
 
 
 
-	shareDataset : function (req, res) {
-
+	shareDataset : function (req, res, next) {
 		var ops = [];
+		var params = req.body || {};
 		var user = req.user;
-		var users = req.body.users;
-		var file_id = req.body.dataset;
+		var users = params.users;
+		var file_id = params.dataset;
 		var userModels = [];
 		var foundFile;
 		var file;
+		var missingRequiredFields = [];
 
+		if (!file_id) {
+			missingRequiredFields.push('dataset');
+		}
+
+		if (!users) {
+			missingRequiredFields.push('users');
+		}
+
+		if (!_.isEmpty(missingRequiredFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
+		}
 
 		ops.push(function (callback) {
 			File
 			.findOne({uuid : file_id})
 			.exec(function (err, f) {
+				if (err) {
+					return callback(err);
+				}
+
+				if (!f) {
+					return callback({
+						message: errors.no_such_file.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
+
 				file = f;
 				callback(null);
 			});
@@ -1458,7 +1481,12 @@ module.exports = api.file = {
 			});
 
 			// if no file, no access
-			if (_.isEmpty(foundFile)) return callback('No access.');
+			if (_.isEmpty(foundFile)) {
+				return callback({
+					message: errors.no_access.errorMessage,
+					code: httpStatus.BAD_REQUEST
+				});
+			}
 
 			// next
 			callback(null);
@@ -1472,7 +1500,14 @@ module.exports = api.file = {
 				User
 				.findOne({uuid : user})
 				.exec(function (err, u) {
-					userModels.push(u);
+					if (err) {
+						return done(err);
+					}
+
+					if (u) {
+						userModels.push(u);
+					}
+
 					done(null);
 				});
 			}, callback);
@@ -1495,13 +1530,12 @@ module.exports = api.file = {
 
 
 		async.waterfall(ops, function (err, results) {
-			if (err) return res.json({
-				err : err
-			});
-
+			if (err) {
+				return next(err);
+			}
 
 			// return success
-			res.json({
+			res.send({
 				err : null,
 				success : true,
 				file_shared : {
@@ -1511,7 +1545,6 @@ module.exports = api.file = {
 				users_shared_with : users
 			});
 		});
-
 
 	},
 }
