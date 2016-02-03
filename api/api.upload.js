@@ -506,7 +506,6 @@ module.exports = api.upload = {
 					}
 				}
 			}
-			
 
 			// create file model
 			api.file._createModel(fileModel, done);	
