@@ -1627,9 +1627,7 @@ module.exports = function(app, passport) {
 	// CREATE PASSWORD =====================
 	// ===================================== 
 	// change to /api/... 
-	app.post('/reset/password', function (req, res) {
-		api.auth.createPassword(req, res);
-	});
+	app.post('/reset/password', api.auth.createPassword, errorHandler);
 
 	// =====================================
 	// ZXCVBN DICTIONARY =================
