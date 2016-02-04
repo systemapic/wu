@@ -117,7 +117,7 @@ module.exports = api.email = {
 		    body    +=  '<td style="padding: 10px 0px 10px 0px;" class="logo">';
 		    body    +=  '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
 		    body    +=  '<tr>';
-		    body    +=  '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+		    body    +=  '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + api.config.portalServer.uri + 'images/portal-logo.png' + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
 		    body    +=  '</tr>';
 			body    +=  '</table>';
 			body    +=  '</td>';
