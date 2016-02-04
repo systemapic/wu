@@ -22,4 +22,4 @@ dist/css/phantomJSthumb.css
 server.sh
 public/dist/*
 public/local/*
-public/portal-logo.png
+public/images/portal-logo.png

@@ -34,6 +34,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var path = require('path');
+var _ = require('lodash');
 
 // api
 var api = module.parent.exports;
@@ -689,7 +691,16 @@ module.exports = api.utils = {
 		}
 	},
 
-	encodeBase64ToPng : function (base64String) {
-		return api.clientConfig.logos.invitationLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
+	preRenderLogos : function () {
+		if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.invitationLogo && api.clientConfig.logos.invitationLogo.backgroundImage && _.isString(api.clientConfig.logos.invitationLogo.backgroundImage)) {
+			var base64Data = api.clientConfig.logos.invitationLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
+			fs.writeFile(path.resolve(__dirname, '../public/images/portal-logo.png'), base64Data, 'base64', function (err) {
+				if (err) {
+					console.log("file with portal-logo.png was not created");
+				}
+
+				console.log("file with portal-logo.png was created successfully");
+			});
+		}
 	}
 }
