@@ -321,6 +321,13 @@ module.exports = api.user = {
 	},
 
 
+	info : function (req, res, next) {
+		// return info on logged-in user
+		var user = req.user;
+
+		res.send(user);
+	},
+
 	_createInviteLink : function (options, callback) {
 
 		var user = options.user;

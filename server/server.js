@@ -54,7 +54,7 @@ app.use(multipart()); // for resumable.js uploads
 // cookie session options
 var sessionOptions = {
 	cookieName: 'session',
-	secret: 'eg[isfd-8yF9-7w233315df{}+Ijsli;;to8',
+	secret: 'eg[isfd-8yF9-7w23x3315df{}+Ijsli;;to8',
 	duration: 30 * 60 * 1000,
 	activeDuration: 5 * 60 * 1000,
 	cookie: {

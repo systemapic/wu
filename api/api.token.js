@@ -81,6 +81,9 @@ module.exports = api.token = {
 			// update cookie
 			req.session.tokens = api.utils.parse(tokens);
 
+
+
+
 			// return tokens
 			res.send(tokens);
 		});
@@ -231,7 +234,8 @@ module.exports = api.token = {
 		var token = {
 			access_token : 'pk.' + api.token.generateToken(40),
 			expires : api.token.calculateExpirationDate(36000),
-			token_type : 'multipass'
+			token_type : 'multipass',
+			user_id : user.uuid
 		};
 
 		// save token
