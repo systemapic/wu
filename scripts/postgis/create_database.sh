@@ -2,34 +2,31 @@
 
 echo $1
 
-if [ "$1" == "" ]; then
-	exit 1 # missing args
+if [ -z "$3" ]; then
+	echo "Usage: $0 <database> <owner_name> <owner_uuid>" >&2
+  exit 1
 fi
+DBNAME=$1
+OWNER_NAME=$2
+OWNER_UUID=$3
 
-if [ "$2" == "" ]; then
-	exit 1 # missing args
-fi
+# get config or die
+source /systemapic/config/env.sh || exit 1
 
-if [ "$3" == "" ]; then
-	exit 1 # missing args
-fi
+export PGUSER=${SYSTEMAPIC_PGSQL_USERNAME}
+export PGPASSWORD=${SYSTEMAPIC_PGSQL_PASSWORD}
+export PGHOST=postgis
 
-# get config
-source /systemapic/config/env.sh
 
-# @strk: should template1 be the base? or we're doing systemapic now?
-BASEDB=template1
+PSQL="psql --no-password"
 
 # create database
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $BASEDB -h postgis -c "CREATE DATABASE $1"
+${PSQL} -d template1 -c \
+  "CREATE DATABASE ${DBNAME} TEMPLATE ${SYSTEMAPIC_PGSQL_DBNAME}"
 
-# enable spatial
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "CREATE EXTENSION postgis"
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "CREATE EXTENSION postgis_topology"
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "CREATE EXTENSION fuzzystrmatch"
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "CREATE EXTENSION postgis_tiger_geocoder"
+export PGDATABASE=${DBNAME}
 
 # add owner_info
 TIMESTAMP=$(date +%s)
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "CREATE TABLE owner_info ( name text, uuid text, created_at integer);"
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "INSERT INTO owner_info VALUES ('$2', '$3', $TIMESTAMP);"
+${PSQL} -c "CREATE TABLE owner_info ( name text, uuid text, created_at integer);"
+${PSQL} -c "INSERT INTO owner_info VALUES ('$2', '$3', $TIMESTAMP);"
