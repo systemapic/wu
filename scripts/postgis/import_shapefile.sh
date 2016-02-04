@@ -38,10 +38,6 @@ function check_errors() {
 	    	# import with LATIN1 encoding
 	    	import_latin_encoding
 
-	# ERROR: Geometry has Z dimension but column does not"
-	elif grep -q 'We have a Multipolygon' ./$ERRORFILE ; then
-		# See https://github.com/systemapic/wu/issues/342
-		echo "TODO: support this"
 	fi
 }
 
@@ -50,17 +46,15 @@ function import_latin_encoding() {
 	# import with LATIN1 encoding
 	echo "Importing with LATIN1 encoding..."
 	ENCODING="-W 'LATIN1"
-	shp2pgsql -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./$ERRORFILE | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
 
-	# check for erros
-	check_errors
+	# import again
+	import
 }
-
 
 function import() {
 
 	# import shapefile
-	shp2pgsql -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./$ERRORFILE | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
+	shp2pgsql -t 2D -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./$ERRORFILE | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
 
 	# check for errors
 	check_errors
