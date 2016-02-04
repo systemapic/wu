@@ -133,20 +133,31 @@ module.exports = api.auth = {
 		});
 	},
 
-	requestPasswordReset : function (req, res) {
+	requestPasswordReset : function (req, res, next) {
 		// get email
-		var email = req.body.email;
+		var params = req.body || {}; 
+		var email = params.email;
+
+		if (!email) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['email']));
+		}
 
 		User
 		.findOne({'local.email' : email})
 		.exec(function (err, user) {
+			if (!user) {
+				return next ({
+					message: errors.no_such_user.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
 
 			var text = 'Please check your email for password reset link.';
 
 			// send password reset email
 			if (!err && user) api.email.sendPasswordResetEmail(user);
 			
-			res.end(text);
+			res.send(text);
 		});
 	},
 
