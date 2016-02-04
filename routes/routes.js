@@ -1607,13 +1607,39 @@ module.exports = function(app, passport) {
 		api.auth.checkResetToken(req, res);
 	});
 
+	/**
+	* @api {post} /reset Send reset password mail
+	* @apiName send reset password mail
+	* @apiGroup User
+	* @apiParam {String} email User's email
+	* @apiSuccess {String} text Please check your email for password reset link.
+	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['email']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If user with specific email doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: User not found
+	* {
+	*    "error": {
+	*		"message": "No such user.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
 	// change to /api/... 
-	app.post('/reset', function (req, res) {
-		api.auth.requestPasswordReset(req, res);
-	});
+	app.post('/reset', api.auth.requestPasswordReset, errorHandler);
 
 	// =====================================
 	// RESET PASSWORD ======================
@@ -1623,13 +1649,40 @@ module.exports = function(app, passport) {
 		api.auth.serveResetPage(req, res);
 	});
 
+	/**
+	* @api {post} /reset/password Reset password
+	* @apiName reset password
+	* @apiGroup User
+	* @apiParam {String} password New password
+	* @apiParam {String} token Access token
+	* @apiSuccess {String} text Moved Temporarily. Redirecting to /
+	* @apiError Bad_request password or token do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['token', 'password']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If file doesn't upload(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Invalid token
+	* {
+	*    "error": {
+	*		"message": "Invalid access token.",
+	*		"code": "401"
+	*	}
+	* }
+	*/
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
 	// change to /api/... 
-	app.post('/reset/password', function (req, res) {
-		api.auth.createPassword(req, res);
-	});
+	app.post('/reset/password', api.auth.createPassword, errorHandler);
 
 	// =====================================
 	// ZXCVBN DICTIONARY =================
