@@ -13,11 +13,16 @@ var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
 var clientSession = require('client-sessions');
+var fs = require('fs');
 
 // api
 var api = require('../api/api');
 var config = api.config;
 var port = config.port;
+
+
+// convert logo image from base64
+api.utils.preRenderLogos();
 
 // socket enabled server
 app = express().http().io();
