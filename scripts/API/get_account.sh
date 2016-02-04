@@ -5,7 +5,9 @@ PASSWORD=***REMOVED***
 SERVER=dev.systemapic.com
 
 # get access token
-ACCESS_TOKEN=$(curl -s --header "Authorization: Basic YWJjMTIzOnNzaC1zZWNyZXQ=" --data "grant_type=password&username=$USERNAME&password=$PASSWORD&scope=offline_access" https://$SERVER/oauth/token | jq -r ".access_token")
+ACCESS_TOKEN=$(curl -s --data "grant_type=password&username=$USERNAME&password=$PASSWORD" https://$SERVER/api/token | jq -r ".access_token")
 
 # get account
-curl --header "Authorization: Bearer $ACCESS_TOKEN" https://$SERVER/api/userinfo
+USER=$(curl -s --data "access_token=$ACCESS_TOKEN" https://$SERVER/api/user/info)
+
+echo $USER

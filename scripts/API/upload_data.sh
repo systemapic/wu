@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # enter details
-USERNAME=your_email
-PASSWORD=your_password
-SERVER=maps.globesar.com
-FILEPATH=/home/tsx_huge.tar.gz
+USERNAME=knutole@systemapic.com
+PASSWORD=***REMOVED***
+SERVER=dev.systemapic.com
+FILEPATH=/home/tsx_tiny.tar.gz
 
 # prepare
-ACCESS_TOKEN=$(curl -s --header "Authorization: Basic YWJjMTIzOnNzaC1zZWNyZXQ=" --data "grant_type=password&username=$USERNAME&password=$PASSWORD&scope=offline_access" https://$SERVER/oauth/token | jq -r ".access_token")
-USERUUID=$(curl -s --header "Authorization: Bearer $ACCESS_TOKEN" https://$SERVER/api/userinfo | jq -r ".user.uuid")
+ACCESS_TOKEN=$(curl -s --data "grant_type=password&username=$USERNAME&password=$PASSWORD" https://$SERVER/api/token | jq -r ".access_token")
+USERUUID=$(curl -s --data "access_token=$ACCESS_TOKEN" https://$SERVER/api/user/info | jq -r ".uuid")
 
 # upload
-curl -s --header "Authorization: Bearer $ACCESS_TOKEN" --form "userUuid=$USERUUID" --form "data=@$FILEPATH"  https://$SERVER/api/import
+curl -s --form "userUuid=$USERUUID" --form "data=@$FILEPATH" --form "access_token=$ACCESS_TOKEN" https://$SERVER/api/import
 
 # works! :)
