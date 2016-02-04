@@ -86,5 +86,9 @@
     "empty_users_array": {
         "errorMessage": "Users array is empty",
         "code": "400"
+    },
+    "invalid_credentials": {
+        "errorMessage": "Invalid credentials.",
+        "code": "401"
     }
 }
