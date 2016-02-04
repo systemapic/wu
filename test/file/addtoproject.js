@@ -92,7 +92,7 @@ module.exports = function () {
                 .end(done);
         });
 
-        it('should respond with status code 400 and error if file_id does\'t exist in request body', function (done) {
+        it('should respond with status code 400 and error if file_id doesn\'t exist in request body', function (done) {
             token(function (err, access_token) {
                 if (err) {
                     return done(err);
@@ -117,7 +117,7 @@ module.exports = function () {
             });
         });
 
-        it('should respond with status code 400 and error if project_id does\'t exist in request body', function (done) {
+        it('should respond with status code 400 and error if project_id doesn\'t exist in request body', function (done) {
 			token(function (err, access_token) {
                 if (err) {
                     return done(err);

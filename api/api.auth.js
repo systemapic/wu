@@ -34,6 +34,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -63,22 +65,42 @@ module.exports = api.auth = {
 		res.render('../../views/reset.ejs');
 	},
 
-	createPassword : function (req, res) {
+	createPassword : function (req, res, next) {
 
 		// check token
-		var token = req.body.token;
-		var password = req.body.password;
+		var params = req.body || {};
+		var token = params.token;
+		var password = params.password;
+		var missingRequiredFields = [];
+
+		if (!token) {
+			missingRequiredFields.push('token');
+		}
+
+		if (!password) {
+			missingRequiredFields.push('password');
+		}
+
+		if (!_.isEmpty(missingRequiredFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
+		}
 
 		api.redis.temp.get(token, function (err, userUuid) {
-			if (err || !userUuid) return res.end(JSON.stringify({
-				err : err || 'Invalid token'
-			}));
+			if (err || !userUuid) {
+				return next({
+					message: errors.invalid_token.errorMessage,
+					code: httpStatus.UNAUTHORIZED
+				});
+			}
 
 			User
 			.findOne({uuid : userUuid})
 			.exec(function (err, user) {
 				if (err || !user) {
-					return res.end('no such user');
+					return next({
+						message: errors.no_such_user,
+						code: httpStatus.NOT_FOUND
+					});
 				}
 
 				api.auth.setPassword(user, password, function (err, doc) {
@@ -89,7 +111,10 @@ module.exports = api.auth = {
 
 					api.token._get_token_from_password(options, function (err, tokens) {
 						if (err) {
-							return res.status(401).send({error : err.message});
+							return next({
+								message: err.message,
+								code: httpStatus.UNAUTHORIZED
+							});
 						}
 
 						// update cookie
@@ -108,20 +133,31 @@ module.exports = api.auth = {
 		});
 	},
 
-	requestPasswordReset : function (req, res) {
+	requestPasswordReset : function (req, res, next) {
 		// get email
-		var email = req.body.email;
+		var params = req.body || {}; 
+		var email = params.email;
+
+		if (!email) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['email']));
+		}
 
 		User
 		.findOne({'local.email' : email})
 		.exec(function (err, user) {
+			if (!user) {
+				return next ({
+					message: errors.no_such_user.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
 
 			var text = 'Please check your email for password reset link.';
 
 			// send password reset email
 			if (!err && user) api.email.sendPasswordResetEmail(user);
 			
-			res.end(text);
+			res.send(text);
 		});
 	},
 
