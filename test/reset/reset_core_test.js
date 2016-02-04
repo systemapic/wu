@@ -1,4 +1,5 @@
 var resetPassword = require('./password');
+var resetIndex = require('./index');
 var helpers = require('../helpers');
 
 describe('Reset', function () {
@@ -6,4 +7,5 @@ describe('Reset', function () {
     after(function(done) { helpers.delete_user(done); });
 
     resetPassword();
+    resetIndex();
 });
