@@ -73,6 +73,7 @@ module.exports = util = {
         })
         .expect(200)
         .end(function (err, res) {
+            assert.ifError(err);
             var tokens = util.parse(res.text);
             assert.equal(tokens.token_type, 'multipass');
             assert.equal(_.size(tokens.access_token), 43);
