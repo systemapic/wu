@@ -21,10 +21,17 @@ fi
 
 
 # get config
-source /systemapic/config/env.sh
+source /systemapic/config/env.sh || exit 1
 # echo $SYSTEMAPIC_PGSQL_USERNAME
 # echo $SYSTEMAPIC_PGSQL_PASSWORD
 # echo $SYSTEMAPIC_PGSQL_DBNAME
 
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "select row_to_json(t) from (select MAX($3), MIN($3), AVG($3) from $2) t;"
+export PGDATABASE=$1
+export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
+export PGUSER=$SYSTEMAPIC_PGSQL_USERNAME
+export PGHOST=postgis
+export PSQL="psql --no-password"
+export PGAPPNAME=$PGAPPNAME`basename $0`
+
+$PSQL -c "select row_to_json(t) from (select MAX($3), MIN($3), AVG($3) from $2) t;"
 
