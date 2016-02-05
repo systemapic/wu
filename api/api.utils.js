@@ -692,8 +692,8 @@ module.exports = api.utils = {
 	},
 
 	preRenderLogos : function () {
-		if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.clientLogo && api.clientConfig.logos.clientLogo.image && _.isString(api.clientConfig.logos.clientLogo.image)) {
-			var base64Data = api.clientConfig.logos.clientLogo.image.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
+		if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.clientLogo && api.clientConfig.logos.clientLogo.backgroundImage && _.isString(api.clientConfig.logos.clientLogo.backgroundImage)) {
+			var base64Data = api.clientConfig.logos.clientLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
 			fs.writeFile(path.resolve(__dirname, '../public/images/portal-logo.png'), base64Data, 'base64', function (err) {
 				if (err) {
 					console.log("file with portal-logo.png was not created");
