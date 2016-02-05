@@ -26,7 +26,7 @@ else
 	grunt dev 
 	grunt watch &
 	echo 'Running in development mode...'
-	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
+	nodemon --watch ../api --watch /systemapic/config --watch server.js --watch ../routes server.js
 	
 fi
 
