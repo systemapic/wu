@@ -12,7 +12,7 @@ var Project = require('../models/project');
 var config = require('../config/wu-config.js').serverConfig;
 mongoose.connect(config.mongo.url); 
 var supertest = require('supertest');
-var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var api = supertest('http://localhost:3001');
 
 module.exports = util = {
 
