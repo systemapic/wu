@@ -44,8 +44,11 @@ module.exports = api.token = {
 
 	// middleware for routes
 	authenticate : function (req, res, next) {
+		console.log('#1 authenticate');
 		var access_token = req.body.access_token || req.query.access_token;
+		console.log('api.token.authenticate, access_token:', access_token)
 		api.token._authenticate(access_token, function (err, user) {
+			console.log('api.token.authenticate, err, username:', err, user.username);
 			if (err || !user) return res.status(401).send({error : err.message});
 			req.user = user;
 			next();
@@ -54,6 +57,7 @@ module.exports = api.token = {
 
 	// middleware for socket routes
 	authenticate_socket : function (access_token, done) {
+		console.log('#2 authenticate socket');
 		api.token._authenticate(access_token, function (err, user) {
 			if (err) return done(err);
 			if (!user) return done(new Error('Invalid access token.'));
@@ -62,6 +66,7 @@ module.exports = api.token = {
 	},
 
 	_authenticate : function (access_token, done) {
+		console.log('#3 _authenticate');
 
 		// verify access_token
 		api.token.check(access_token, function (err, user) {
@@ -75,6 +80,7 @@ module.exports = api.token = {
 
 	// route: get access token from password
 	getTokenFromPassword : function (req, res) {
+		console.log('#4 getTokenFromPassword');
 		api.token._get_token_from_password(req.body, function (err, tokens) {
 			if (err) return res.status(401).send({error : err.message});
 
@@ -88,6 +94,7 @@ module.exports = api.token = {
 
 	// route: refresh access token
 	refresh : function (req, res) {
+		console.log('#5 refresh');
 		api.token.reset(req.user, function (err, access_token) {
 			if (err) return res.status(401).send(err.message);
 			res.send(access_token);
@@ -96,12 +103,20 @@ module.exports = api.token = {
 
 	// route: check if existing session, returns tokens only
 	checkSession : function (req, res) {
-		// first request - check if active user in session, if not return public
+		console.log('#6 checkSession');
 
 		var ops = [];
 
 		// check for access_token in session
 		var tokens = _.isObject(req.session) ? req.session.tokens : false;
+
+		// console.log('#6b tokens, req.session: ', tokens, req.session);
+
+		// login handler
+		// check for access_token in req
+		// var access_token_param = req.query.access_token;
+		// console.log('#6c - params:', req.query, access_token_param);
+		// console.log('REQQQQ', req);
 
 		// no session, return public user
 		if (!tokens) return api.token.getPublicToken(function (err, public_token) {
@@ -110,9 +125,6 @@ module.exports = api.token = {
 
 		// got some session, either public or user
 		api.token.check(tokens.access_token, function (err, user) {
-
-			// return err
-			// if (err) res.status(422).send({error : err.message});
 
 			// no session, return public user
 			if (err) return api.token.getPublicToken(function (err, public_token) {
@@ -126,12 +138,14 @@ module.exports = api.token = {
 
 	// get access token from password
 	_get_token_from_password : function (options, done) {
+		console.log('#7 _get_token_from_password');
 
 		// details
 		var ops = [];
 		var refresh = (options.refresh == 'true');
 		var username = options.username || options.email;
 		var password = options.password;
+		
 		// throw if no credentials
 		if (_.isEmpty(username) || _.isEmpty(password)) return done(new Error('Invalid credentials.'));
 
@@ -164,6 +178,8 @@ module.exports = api.token = {
 		async.waterfall(ops, function (err, access_token) {
 			if (err) return done(new Error('Invalid credentials.'));
 
+			console.log('#7b done: err, access_token', err, access_token);
+
 			// all good, return access_token
 			done(null, access_token);
 		});
@@ -172,12 +188,14 @@ module.exports = api.token = {
 
 	// retrieve access token
 	get : function (user, done) {
+		console.log('#8 get');
 		var key = 'access_token:' + user._id + user.uuid;
 		api.redis.tokens.get(key, done);
 	},
 
 	// save access token
 	set : function (options, done) {
+		console.log('#9 set');
 		var ops = [];
 		var user = options.user;
 		var token = options.token;
@@ -201,6 +219,7 @@ module.exports = api.token = {
 
 	// check if access token is valid
 	check : function (access_token, done) {
+		console.log('#10 check');
 		api.redis.tokens.get(access_token, function (err, token) {
 			if (err) return done(new Error('Invalid access token.'));
 			if (!token) return done(new Error('Invalid access token.'));
@@ -215,6 +234,7 @@ module.exports = api.token = {
 
 	// should always return an access_token (get or create)
 	get_create_token : function (user, done) {
+		console.log('#11 get_create_token');
 		api.token.get(user, function (err, access_token) {
 			if (err) return done(err);
 
@@ -228,6 +248,7 @@ module.exports = api.token = {
 
 	// create access token
 	createToken : function (user, done) {
+		console.log('#12 createToken');
 		var token = {
 			access_token : 'pk.' + api.token.generateToken(40),
 			expires : api.token.calculateExpirationDate(36000),
@@ -243,6 +264,7 @@ module.exports = api.token = {
 
 	// create public access token
 	createPublicToken : function (user, done) {
+		console.log('#13 createPublicToken');
 		var token = {
 			access_token : 'public',
 			expires : api.token.calculateExpirationDate(3600000000),
@@ -254,18 +276,18 @@ module.exports = api.token = {
 		api.token.set({
 			user : user,
 			token : token
-		}, function (err, user) {
-			done(err, user);
-		});
+		}, done);
 	},
 
 	// reset access token
 	reset : function (user, done) {
+		console.log('#14 reset');
 		api.token.createToken(user, done);
 	},
 
 
 	getPublicToken : function (done) {
+		console.log('#15 getPublicToken');
 		var ops = [];
 		ops.push(function (callback) {
 			api.token.getPublicUser(callback);
@@ -281,6 +303,7 @@ module.exports = api.token = {
 	},
 
 	getPublicUser : function (done) {
+		console.log('#16 getPublicUser');
 		User
 		.findOne({uuid : 'systemapic-public'})
 		.exec(function (err, public_user) {
@@ -293,6 +316,7 @@ module.exports = api.token = {
 	// only runs once ever, but better to
 	// have init here than in external scripts
 	createPublicUser : function (done) {
+		console.log('#17 createPublicUser');
 
 		// create the user
 		var public_user            	= new User();
