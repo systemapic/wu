@@ -9,7 +9,7 @@ var config = require('../config/wu-config.js').serverConfig;
 var helpers = require('./helpers');
 var token = util.token;
 var supertest = require('supertest');
-var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var api = supertest('http://localhost:3001');
 var httpStatus = require('http-status');
 
 describe('Access', function () {
