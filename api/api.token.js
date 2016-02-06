@@ -53,8 +53,11 @@ module.exports = api.token = {
 	},
 
 	// middleware for socket routes
-	authenticate_socket : function (access_token, done) {
+	authenticate_socket : function (req, done) {
+		console.log('#101 auth socket', req.data, done);
+		var access_token = req.data.access_token;	
 		api.token._authenticate(access_token, function (err, user) {
+			console.log('#102 auth socket:', err, user);
 			if (err) return done(err);
 			if (!user) return done(new Error('Invalid access token.'));
 			done(null, user);
