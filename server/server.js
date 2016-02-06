@@ -25,7 +25,7 @@ var port = config.port;
 api.utils.preRenderLogos();
 
 // socket enabled server
-app = express().http().io();
+var app = express().http().io();
 
 // connect to our database
 var sessionStore = mongoose.connect(config.mongo.url); 
@@ -55,13 +55,13 @@ app.use(clientSession(sessionOptions));
 
 // socket auth middleware
 app.io.use(function(socket, next){
-	if (!socket || !socket.headers || !socket.headers.cookie) return next('invalid');
+	if (!socket || !socket.headers || !socket.headers.cookie) return next(new Error('No socket, fatal.'));
 	var a = socket.headers.cookie.split('=');
 	var decoded_cookie = clientSession.util.decode(sessionOptions, a[a.length-1]);
 	if (!decoded_cookie) return next(new Error('Invalid access token.'));
 	var tokens = decoded_cookie.content ? decoded_cookie.content.tokens : false;
-	if (!tokens || !tokens.access_token) return next(new Error('Invalid access token.'));
-	api.token.authenticate_socket(tokens.access_token, function (err, user) {
+	if (!tokens || !tokens.access_token) return next(new Error('Invalid access token.')); // public will fail here, returns 500...
+	api.token._authenticate(tokens.access_token, function (err, user) {
 		if (err) return next(err);
 		socket.session = socket.session || {};
 		socket.session.user_id = user._id;
@@ -80,16 +80,18 @@ app.use(cors());
 var staticPath = '../public';
 app.use(express.static(path.join(__dirname, staticPath)));
 
-// load our routes and pass in our app and fully configured passport
+// catch route errors
+app.use(function(err, req, res, next){ 
+	err.status === 400 ? res.render('../../views/index.ejs') : next(err);
+});
+
+// load our routes and pass in our app
 require('../routes/routes.js')(app);
 
 // load our socket api
 require('../routes/socket.routes.js')(app);
 
-// catch route errors
-app.use(function(err, req, res, next){ 
-	err.status === 400 ? res.render('../../views/index.ejs') : next(err);
-});
+
 
 // launch 
 var server = app.listen(port);
