@@ -26,9 +26,11 @@ mongoose.connect(config.mongo.url);
 
 
 Layer
-.findOne({uuid : "layer-c8b02859-f573-4ce6-b6c3-67978fb22b2f"})
+.findOne({uuid : "layer-6ceab98c-ee81-4990-b87e-ee34a5c47b72"})
 .exec(function (err, layer) {
-	console.log(layer);
+	console.log('err', err);
+	console.log(typeof layer);
+	console.log(JSON.stringify(layer));
 	process.exit(0);
 
 });
