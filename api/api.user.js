@@ -36,7 +36,6 @@ var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errors = require('../shared/errors');
 
-
 // api
 var api = module.parent.exports;
 
@@ -364,21 +363,45 @@ module.exports = api.user = {
 
 	// invite users
 	// sent from client (invite by email)
-	invite : function (req, res) {
-		var options = req.body;
+	invite : function (req, res, next) {
+		var options = req.body || {};
 
 		var emails = options.emails;
 		var customMessage = options.customMessage;
 		var access = options.access;
-		var numProjects = access.edit.length + access.read.length;
+		var missingRequiredRequestFields = [];
 
-		// checks
-		if (!emails.length) return api.error.missingInformation(req, res);
+		if (!emails || !emails.length) {
+			missingRequiredRequestFields.push('emails');
+		}
+
+		if (!customMessage) {
+			missingRequiredRequestFields.push('customMessage');
+		}
+
+		if (!access) {
+			missingRequiredRequestFields.push('access');
+			missingRequiredRequestFields.push('access.edit');
+			missingRequiredRequestFields.push('access.read');
+		} else {
+			if (!access.edit) {
+				missingRequiredRequestFields.push('access.edit');
+			}
+
+			if (!access.read) {
+				missingRequiredRequestFields.push('access.read');
+			}
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
+
+		var numProjects = access.edit.length + access.read.length;
 
 
 		// send emails
 		emails.forEach(function (email) {
-
 
 			api.user._createInviteLink({
 				user : req.user,
@@ -400,8 +423,7 @@ module.exports = api.user = {
 
 		});
 
-
-		return res.json({
+		return res.send({
 			error : null
 		});
 		
