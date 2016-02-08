@@ -5,7 +5,6 @@ var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var helpers = require('../helpers');
 var token = helpers.token;
 var httpStatus = require('http-status');
-var Layer = require('../../models/layer');
 var expected = require('../../shared/errors');
 var second_test_user = {
     email : 'second_mocha_test_user@systemapic.com',
