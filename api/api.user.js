@@ -35,6 +35,7 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -165,24 +166,19 @@ module.exports = api.user = {
 			});
 			
 		})
-		
-
 
 	},
 
-
-	requestContact : function (req, res) {
-
-		var contact_uuid = req.body.contact;
+	requestContact : function (req, res, next) {
+		var params = req.body || {};
+		var contact_uuid = params.contact;
 		var request_id;
 		var contact_email;
-
 		var ops = [];
 
-		// check
-		if (!contact_uuid) return res.json({
-			error : 'No contact uuid!'
-		})
+		if (!contact_uuid) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['contact']));
+		}
 
 		ops.push(function (callback) {
 
@@ -191,7 +187,7 @@ module.exports = api.user = {
 			var request_options = JSON.stringify({
 				requester : req.user.getUuid(),
 				contact : contact_uuid,
-				timestamp : new Date().getTime(),
+				timestamp : new Date().getTime()
 			});
 
 			// save request
@@ -204,9 +200,12 @@ module.exports = api.user = {
 			User
 			.findOne({uuid : contact_uuid})
 			.exec(function (err, user) {
-				if (err || !user) return res.json({
-					error : err || 'No such user.'
-				});
+				if (err || !user) {
+					return callback({
+						message: errors.no_such_user.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
 
 				contact_email = user.local.email;
 
@@ -237,9 +236,12 @@ module.exports = api.user = {
 		});
 
 		async.series(ops, function (err) {
+			if (err) {
+				return next(err);
+			}
 
-			res.json({
-				error : err
+			res.send({
+				error : err || null
 			});
 		});
 
@@ -426,8 +428,6 @@ module.exports = api.user = {
 		return res.send({
 			error : null
 		});
-		
-
 
 		// return callback(null, 'oko');
 

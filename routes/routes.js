@@ -1558,12 +1558,49 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/user/invite', checkAccess, api.user.invite, errorHandler);
 
+	/**
+	* @api {post} /api/user/requestContact Request contact
+	* @apiName Request contact
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} contact User id
+	* @apiSuccess {Object} error error object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "error": null
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request Contact does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['contact']
+	*		}
+	*	}
+	* }
+	* @apiError Bad_request user does not exist in request body (404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such user.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// REQUEST CONTACT =====================
 	// =====================================
-	app.post('/api/user/requestContact', checkAccess, function (req,res) {
-		api.user.requestContact(req, res);
-	});
+	app.post('/api/user/requestContact', checkAccess, api.user.requestContact, errorHandler);
 
 	// =====================================
 	// REQUEST CONTACT =====================
