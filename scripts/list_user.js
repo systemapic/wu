@@ -31,9 +31,6 @@ User
 .populate('files')
 .populate('contact_list')
 .exec(function (err, user) {
-	console.log(err, user)
-	// console.log(u.local.email, '|', u.firstName, u.lastName);
-
+	console.log(user.toString());
 	process.exit(0);
-
 });
