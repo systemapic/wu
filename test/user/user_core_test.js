@@ -1,6 +1,8 @@
 var userUpdate = require('./update');
 var userUnique = require('./unique');
 var userUniqueName = require('./uniqueUsername');
+var userInvite = require('./invite');
+var userRequestContact = require('./requestContact');
 var helpers = require('../helpers');
 
 describe('User', function () {
@@ -10,4 +12,6 @@ describe('User', function () {
     userUpdate();
     userUnique();
     userUniqueName();
+    userInvite();
+    userRequestContact();
 });
