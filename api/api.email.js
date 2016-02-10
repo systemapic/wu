@@ -203,6 +203,10 @@ module.exports = api.email = {
 
 
 	sendWelcomeEmail : function (newUser, password, account) {
+		if (api.config.skipMail === true) {
+			return;
+		}
+		
 		if (!newUser || !newUser.local) return;
 
 		// todo: SSL
