@@ -1341,8 +1341,8 @@ module.exports = function(app, passport) {
 	*   "updated": ['phone', 'company'],
 	*   "user": {
 	*       lastUpdated: '2016-01-19T12:49:49.076Z',
-    *       created: '2016-01-19T12:49:48.943Z',
-    *       ... etc
+	*       created: '2016-01-19T12:49:48.943Z',
+	*       ... etc
 	*   }
 	* }
 	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
@@ -1386,6 +1386,34 @@ module.exports = function(app, passport) {
 	// UPDATE USER INFORMATION  ============
 	// =====================================
 	app.post('/api/user/update', checkAccess, api.user.update, errorHandler);
+
+
+	/**
+	* @api {post} /api/user/info Get info on authenticated user
+	* @apiName info
+	* @apiGroup User
+	* @apiUse token
+	* @apiSuccess {Object} user User
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "user": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+	*       created: '2016-01-19T12:49:48.943Z',
+	*       ... etc
+	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	*/
+	// =====================================
+	// UPDATE USER INFORMATION  ============
+	// =====================================
+	app.post('/api/user/info', checkAccess, api.user.info, errorHandler);
+
 
 	// =====================================
 	// CREATE NEW USER =====================

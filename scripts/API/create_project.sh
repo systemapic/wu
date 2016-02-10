@@ -1,14 +1,15 @@
 #!/bin/bash
 
 USERNAME=knutole@systemapic.com
-PASSWORD=92f5422658601ae9f23b4921b4bd6b8e
+PASSWORD=***REMOVED***
 SERVER=dev.systemapic.com
 
+PROJECTNAME=test_from_bash
+
 # get access token
-ACCESS_TOKEN=$(curl -s --header "Authorization: Basic YWJjMTIzOnNzaC1zZWNyZXQ=" --data "grant_type=password&username=$USERNAME&password=$PASSWORD&scope=offline_access" https://$SERVER/oauth/token | jq -r ".access_token")
+ACCESS_TOKEN=$(curl -s --data "grant_type=password&username=$USERNAME&password=$PASSWORD" https://$SERVER/api/token | jq -r ".access_token")
 
 # get resource
-curl -s --header "Authorization: Bearer $ACCESS_TOKEN" --data "" https://$SERVER/api/project/create | python -mjson.tool
-
+curl -s --data "access_token=$ACCESS_TOKEN&name=$PROJECTNAME" https://$SERVER/api/project/create | python -mjson.tool
 
 # works! :)
