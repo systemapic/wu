@@ -1638,13 +1638,56 @@ module.exports = function(app, passport) {
 		api.user.acceptContactRequest(req, res);
 	});
 
+	/**
+	* @api {post} /api/user/inviteToProjects Invite user to projects
+	* @apiName Invite user to projects
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} user User id
+	* @apiParam {Array} edit Array of project ids which user will be able to edit 
+	* @apiParam {String} read Array of project ids which user will be able to read
+	* @apiSuccess {Object} error error object
+	* @apiSuccess {array} projects error object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  error: null,
+	*  projects: [{
+	*    project: 'uuid-mocha-test-project',
+	*    access: {
+	*      read: ['second_test-user-uuid'],
+	*      edit: [],
+	*      options: {
+	*        share: true,
+	*        download: false,
+	*        isPublic: false
+	*      }
+	*    }
+	*  }]
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request User, edits and reads do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['user']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// INVITE TO PROJECTS ==================
 	// =====================================
 	// todo: see if this can be removed (replaced by /api/user/invite?)
-	app.post('/api/user/inviteToProjects', checkAccess, function (req,res) {
-		api.user.inviteToProjects(req, res);
-	});
+	app.post('/api/user/inviteToProjects', checkAccess, api.user.inviteToProjects, errorHandler);
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
