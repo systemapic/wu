@@ -315,7 +315,6 @@ module.exports = api.user = {
 
 		if (!options.user) {
 			next({
-				message: 
 				code: httpStatus.UNAUTHORIZED
 			});
 		}
