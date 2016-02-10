@@ -84,6 +84,9 @@ module.exports = api.token = {
 			// update cookie
 			req.session.tokens = api.utils.parse(tokens);
 
+
+
+
 			// return tokens
 			res.send(tokens);
 		});
