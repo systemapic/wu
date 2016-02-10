@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # enter details
-USERNAME=knutole@systemapic.com
-PASSWORD=***REMOVED***
-SERVER=dev.systemapic.com
+USERNAME=email
+PASSWORD=passord
+SERVER=maps.globesar.com
 FILEPATH=/home/tsx_tiny.tar.gz
 
 # prepare
