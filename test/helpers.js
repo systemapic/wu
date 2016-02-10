@@ -71,8 +71,9 @@ module.exports = util = {
             username : util.test_user.email,
             password : util.test_user.password
         })
-        .expect(200)
         .end(function (err, res) {
+            assert.ifError(err);
+            assert.equal(res.status, 200);
             var tokens = util.parse(res.text);
             assert.equal(tokens.token_type, 'multipass');
             assert.equal(_.size(tokens.access_token), 43);
@@ -93,8 +94,9 @@ module.exports = util = {
             username : _user.email,
             password : _user.password
         })
-        .expect(200)
         .end(function (err, res) {
+            assert.ifError(err);
+            assert.equal(res.status, 200);
             callback(err, util.parse(res.text));
         });
     },
@@ -158,9 +160,9 @@ module.exports = util = {
                 name : 'mocha-test-project', 
                 access_token : access_token
             })
-            .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
+                assert.equal(res.status, 200);
                 var project = util.parse(res.text).project;
                 assert.ok(project);
                 assert.ok(project.uuid);
@@ -180,8 +182,11 @@ module.exports = util = {
                 projectUuid : util.test_user.pid, 
                 access_token : access_token
             })
-            .expect(200)
-            .end(done);
+            .end(function (err, res) {
+                assert.ifError(err);
+                assert.equal(res.status, 200);
+                done();
+            });
         });
     },
 

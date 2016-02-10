@@ -4,7 +4,6 @@ var fs = require('fs-extra');
 var kue = require('kue');
 var path = require('path');
 var zlib = require('zlib');
-var uuid = require('uuid');
 var async = require('async');
 var redis = require('redis');
 var carto = require('carto');
@@ -21,12 +20,13 @@ var RASTERPATH   = '/data/raster_tiles/';
 var GRIDPATH     = '/data/grid_tiles/';
 
 // config
-var config = require('../config/wu-config');
+var config = require('/systemapic/config/wu-config').serverConfig;
 
+console.log('cinfig', config);
 
 var redis = require('redis');
 var redisStore = redis.createClient(6379, 'redis', {detect_buffers : true});
-redisStore.auth('9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE');
+redisStore.auth(config.redis.layers.auth);
 redisStore.on('error', function (err) { console.error('redisStore err: ', err); });
 
 

@@ -53,8 +53,11 @@ module.exports = api.token = {
 	},
 
 	// middleware for socket routes
-	authenticate_socket : function (access_token, done) {
+	authenticate_socket : function (req, done) {
+		console.log('#101 auth socket', req.data, done);
+		var access_token = req.data.access_token;	
 		api.token._authenticate(access_token, function (err, user) {
+			console.log('#102 auth socket:', err, user);
 			if (err) return done(err);
 			if (!user) return done(new Error('Invalid access token.'));
 			done(null, user);
@@ -89,44 +92,6 @@ module.exports = api.token = {
 		});
 	},
 
-	// route: refresh access token
-	refresh : function (req, res) {
-		api.token.reset(req.user, function (err, access_token) {
-			if (err) return res.status(401).send(err.message);
-			res.send(access_token);
-		});
-	},
-
-	// route: check if existing session, returns tokens only
-	checkSession : function (req, res) {
-		// first request - check if active user in session, if not return public
-
-		var ops = [];
-
-		// check for access_token in session
-		var tokens = _.isObject(req.session) ? req.session.tokens : false;
-
-		// no session, return public user
-		if (!tokens) return api.token.getPublicToken(function (err, public_token) {
-			res.send(public_token);
-		});
-
-		// got some session, either public or user
-		api.token.check(tokens.access_token, function (err, user) {
-
-			// return err
-			// if (err) res.status(422).send({error : err.message});
-
-			// no session, return public user
-			if (err) return api.token.getPublicToken(function (err, public_token) {
-				res.send(public_token);
-			});
-
-			// return user
-			res.send(tokens);
-		});
-	},
-
 	// get access token from password
 	_get_token_from_password : function (options, done) {
 
@@ -135,6 +100,7 @@ module.exports = api.token = {
 		var refresh = (options.refresh == 'true');
 		var username = options.username || options.email;
 		var password = options.password;
+		
 		// throw if no credentials
 		if (_.isEmpty(username) || _.isEmpty(password)) return done(new Error('Invalid credentials.'));
 
@@ -172,6 +138,81 @@ module.exports = api.token = {
 		});
 
 	},
+
+	// should always return an access_token (get or create)
+	get_create_token : function (user, done) {
+		api.token.get(user, function (err, access_token) {
+			if (err) return done(err);
+
+			// create if not exists
+			if (!access_token) {
+
+				// create token
+				api.token.createToken(user, function (err, access_token) {
+					done(err, JSON.stringify(access_token));
+				});
+			} else {
+				// return token
+				done(null, access_token);
+			}
+			
+			
+		});
+	},
+
+	// create access token
+	createToken : function (user, done) {
+		var token = {
+			access_token : 'pk.' + api.token.generateToken(40),
+			expires : api.token.calculateExpirationDate(36000),
+			token_type : 'multipass'
+		};
+
+		// save token
+		api.token.set({
+			user : user,
+			token : token
+		}, function (err) {
+			done(err, token);
+		});
+	},
+
+
+	// route: refresh access token
+	refresh : function (req, res) {
+		api.token.reset(req.user, function (err, access_token) {
+			if (err) return res.status(401).send(err.message);
+			res.send(access_token);
+		});
+	},
+
+	// route: check if existing session, returns tokens only
+	checkSession : function (req, res) {
+
+		var ops = [];
+
+		// check for access_token in session
+		var tokens = _.isObject(req.session) ? req.session.tokens : false;
+
+		// no session, return public user
+		if (!tokens) return api.token.getPublicToken(function (err, public_token) {
+			res.send(public_token);
+		});
+
+		// got some session, either public or user
+		api.token.check(tokens.access_token, function (err, user) {
+
+			// no session, return public user
+			if (err) return api.token.getPublicToken(function (err, public_token) {
+				res.send(public_token);
+			});
+
+			// return user
+			res.send(tokens);
+		});
+	},
+
+
 
 	// retrieve access token
 	get : function (user, done) {
@@ -216,34 +257,6 @@ module.exports = api.token = {
 		});
 	},
 
-	// should always return an access_token (get or create)
-	get_create_token : function (user, done) {
-		api.token.get(user, function (err, access_token) {
-			if (err) return done(err);
-
-			// create if not exists
-			if (!access_token) return api.token.createToken(user, done);
-			
-			// return token
-			done(null, access_token);
-		});
-	},
-
-	// create access token
-	createToken : function (user, done) {
-		var token = {
-			access_token : 'pk.' + api.token.generateToken(40),
-			expires : api.token.calculateExpirationDate(36000),
-			token_type : 'multipass',
-			user_id : user.uuid
-		};
-
-		// save token
-		api.token.set({
-			user : user,
-			token : token
-		}, done);
-	},
 
 	// create public access token
 	createPublicToken : function (user, done) {
@@ -258,9 +271,7 @@ module.exports = api.token = {
 		api.token.set({
 			user : user,
 			token : token
-		}, function (err, user) {
-			done(err, user);
-		});
+		}, done);
 	},
 
 	// reset access token
