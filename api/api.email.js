@@ -39,6 +39,8 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+api.config.skipMail = api.config.skipMail || {};
+
 // exports
 module.exports = api.email = { 
 
