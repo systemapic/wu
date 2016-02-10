@@ -84,7 +84,7 @@ module.exports = api.email = {
 		var email          = user.getEmail();
 		var token          = api.auth.setPasswordResetToken(user);
 		var link           = api.config.portalServer.uri + 'reset?token=' + token + '&email=' + email;
-		var to             = email;
+		var to             = !api.config.skipMail.resetPassword ? email : api.config.skipMail.resetPassword;
 		var subject        = 'Please confirm your request for a password reset';
 
 		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
@@ -202,11 +202,7 @@ module.exports = api.email = {
 	},
 
 
-	sendWelcomeEmail : function (newUser, password, account) {
-		if (api.config.skipMail === true) {
-			return;
-		}
-		
+	sendWelcomeEmail : function (newUser, password, account) {		
 		if (!newUser || !newUser.local) return;
 
 		// todo: SSL
@@ -326,7 +322,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : email,	
+			to      : !api.config.skipMail.welcome ? email : api.config.skipMail.welcome,	
 			subject : 'Congratulations! Here are your access details for Systemapic.com',
 			html    : body
 		});
@@ -470,7 +466,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : email,	
+			to      : !api.config.skipMail.invited ? email : api.config.skipMail.invited,
 			subject : subject,
 			html    : body
 		});
@@ -618,7 +614,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : email,	
+			to      : !api.config.skipMail.invite ? email : api.config.skipMail.invite,
 			subject : subject,
 			html    : body
 		});
@@ -745,7 +741,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : email,	
+			to      : !api.config.skipMail.joinBeta ? email : api.config.skipMail.joinBeta,	
 			subject : subject,
 			html    : body
 		});
@@ -892,7 +888,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : email,	
+			to      : !api.config.skipMail.contactRequest ? email : api.config.skipMail.contactRequest,	
 			subject : subject,
 			html    : body
 		});
