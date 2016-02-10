@@ -117,7 +117,6 @@ module.exports = api.user = {
 			}, function (err, changed_edit_projects) {
 				
 				async.each(reads, function (projectUuid, done) {
-
 					Project
 					.findOne({uuid : projectUuid})
 					.exec(function (err, project) {
@@ -125,12 +124,10 @@ module.exports = api.user = {
 
 						// check if isEditable by account
 						if (!project.isEditable(account.getUuid())) return done('No access.');
-						console.log("ERROR: ", project);
 
 						// check if user is already editor
 						var isAlreadyEditor = _.contains(project.access.edit, invited_user.getUuid()) || project.createdBy == invited_user.getUuid();
 
-						console.log("ERROR", isAlreadyEditor)
 						if (isAlreadyEditor) return done('Can\'t add viewer that\'s already editor.');
 
 						// add invited_user to edit
