@@ -1614,9 +1614,7 @@ module.exports = function(app, passport) {
 	// INVITE TO PROJECTS ==================
 	// =====================================
 	// todo: see if this can be removed (replaced by /api/user/invite?)
-	app.post('/api/user/inviteToProjects', checkAccess, function (req,res) {
-		api.user.inviteToProjects(req, res);
-	});
+	app.post('/api/user/inviteToProjects', checkAccess, api.user.inviteToProjects, errorHandler);
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
