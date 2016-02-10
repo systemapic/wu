@@ -39,8 +39,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-api.config.skipMail = api.config.skipMail || {};
-
 // exports
 module.exports = api.email = { 
 
@@ -86,7 +84,7 @@ module.exports = api.email = {
 		var email          = user.getEmail();
 		var token          = api.auth.setPasswordResetToken(user);
 		var link           = api.config.portalServer.uri + 'reset?token=' + token + '&email=' + email;
-		var to             = !api.config.skipMail.resetPassword ? email : api.config.skipMail.resetPassword;
+		var to             = email;
 		var subject        = 'Please confirm your request for a password reset';
 
 		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
@@ -204,7 +202,7 @@ module.exports = api.email = {
 	},
 
 
-	sendWelcomeEmail : function (newUser, password, account) {		
+	sendWelcomeEmail : function (newUser, password, account) {
 		if (!newUser || !newUser.local) return;
 
 		// todo: SSL
@@ -324,7 +322,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : !api.config.skipMail.welcome ? email : api.config.skipMail.welcome,	
+			to      : email,	
 			subject : 'Congratulations! Here are your access details for Systemapic.com',
 			html    : body
 		});
@@ -468,7 +466,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : !api.config.skipMail.invited ? email : api.config.skipMail.invited,
+			to      : email,	
 			subject : subject,
 			html    : body
 		});
@@ -616,7 +614,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : !api.config.skipMail.invite ? email : api.config.skipMail.invite,
+			to      : email,	
 			subject : subject,
 			html    : body
 		});
@@ -743,7 +741,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : !api.config.skipMail.joinBeta ? email : api.config.skipMail.joinBeta,	
+			to      : email,	
 			subject : subject,
 			html    : body
 		});
@@ -890,7 +888,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : !api.config.skipMail.contactRequest ? email : api.config.skipMail.contactRequest,	
+			to      : email,	
 			subject : subject,
 			html    : body
 		});
