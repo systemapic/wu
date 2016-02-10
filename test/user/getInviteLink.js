@@ -16,7 +16,7 @@ var second_test_user = {
 
 module.exports = function () {
 
-    describe('/api/invite/link', function () {
+    describe.only('/api/invite/link', function () {
     	
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/invite/link')
