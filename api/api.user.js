@@ -306,10 +306,20 @@ module.exports = api.user = {
 
 
 	// from shareable link flow
-	getInviteLink : function (req, res) {
-		var options = req.body;
+	getInviteLink : function (req, res, next) {
+		var options = req.body || {};
 		options.user = req.user;
 
+		if (!options.user) {
+			next({
+				message: 
+				code: httpStatus.UNAUTHORIZED
+			});
+		}
+
+		if (!options.access) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access']));	
+		}
 
 		// create invite link
 		api.user._createInviteLink({
@@ -317,7 +327,11 @@ module.exports = api.user = {
 			access : options.access,
 			type : 'link'
 		}, function (err, invite_link) {
-			res.end(invite_link);
+			if (err) {
+				return next(err);
+			}
+
+			res.send(invite_link);
 		});
 	},
 

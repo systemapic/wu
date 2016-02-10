@@ -1649,9 +1649,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/invite/link', checkAccess, function (req,res) {
-		api.user.getInviteLink(req, res);
-	});
+	app.post('/api/invite/link', checkAccess, api.user.getInviteLink, next);
 
 	// =====================================
 	// access: SET PROJECT ACCESS  =========
