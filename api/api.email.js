@@ -204,7 +204,7 @@ module.exports = api.email = {
 	},
 
 
-	sendWelcomeEmail : function (newUser, password, account) {		
+	sendWelcomeEmail : function (newUser, password, account) {
 		if (!newUser || !newUser.local) return;
 
 		// todo: SSL
@@ -468,7 +468,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : !api.config.skipMail.invited ? email : api.config.skipMail.invited,
+			to      : !api.config.skipMail.invited ? email : api.config.skipMail.invited,	
 			subject : subject,
 			html    : body
 		});
@@ -616,7 +616,7 @@ module.exports = api.email = {
 
 		// send email
 		api.email._send({
-			to      : !api.config.skipMail.invite ? email : api.config.skipMail.invite,
+			to      : !api.config.skipMail.invite ? email : api.config.skipMail.invite,	
 			subject : subject,
 			html    : body
 		});
