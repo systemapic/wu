@@ -31,12 +31,13 @@ var clientSession = require('client-sessions');
 var api = require('../api/api');
 
 // function exports
-module.exports = function(app, passport) {
+module.exports = function(app) {
 
 
 
 
 	app.io.route('ready', function (req) {
+		console.log('socket -> ready');
 		// checkAccess(req, function (err) {
 		// 	if (err) return;
 		// 	// console.log('ready: ', req);
@@ -84,29 +85,12 @@ module.exports = function(app, passport) {
 	});
 
 	// helper function : if is logged in
-	function checkAccess(req, done) {
-		// console.log('isLogged In req.dta:', req);
-		// console.log('api.app.io.sockets', api.app.io.sockets.sockets);
-
-
-		api.token.authenticate_socket(req, done);
-		// return true;
-		// if (req.session.passport) return true;
-		// return false;
+	function checkAccess(req, next) {
+		console.log('#103 checkAccess');
+		console.log('netx:', next);
+		api.token.authenticate_socket(req, next);
 	}
 
-
-	// helper function : if is logged in
-	function isLoggedIn(req, done) {
-		// console.log('isLogged In req.dta:', req.data);
-		// console.log('api.app.io.sockets', api.app.io.sockets.sockets);
-
-
-		api.token.authenticate_socket(req, done);
-		// return true;
-		// if (req.session.passport) return true;
-		// return false;
-	}
 
 
 };

@@ -70,7 +70,7 @@ function clean_up() {
 
 echo "    Importing SHAPFILE DEBUG!"
 echo "    Shapfile: $SHAPEFILE"
-echo "    DATABSE: $DATABSE"
+echo "    DATABASE: $DATABASE"
 echo "    TABLE: $TABLE"
 
 # import shapefile to postgis
