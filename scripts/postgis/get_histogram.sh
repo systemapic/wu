@@ -27,16 +27,17 @@ fi
 
 # get config
 source /systemapic/config/env.sh
-# echo $SYSTEMAPIC_PGSQL_USERNAME
-# echo $SYSTEMAPIC_PGSQL_PASSWORD
-# echo $SYSTEMAPIC_PGSQL_DBNAME
 
+export PGUSER=${SYSTEMAPIC_PGSQL_USERNAME}
+export PGPASSWORD=${SYSTEMAPIC_PGSQL_PASSWORD}
+export PGHOST=postgis
+export PGDATABASE=$1
 
 # set -f
 if [ "$5" == "bar" ]; then
 
 	# with bars (for terminal fun)
-	PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c 'with column_stats as (
+	psql -c 'with column_stats as (
 	    select min("'$3'") as min,
 	           max("'$3'") as max
 	      from '$2'
@@ -55,7 +56,7 @@ if [ "$5" == "bar" ]; then
 
 else 
 
-	PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c 'select row_to_json(t) from (with column_stats as (
+psql -c 'select row_to_json(t) from (with column_stats as (
 	    select min("'$3'") as min,
 	           max("'$3'") as max
 	      from '$2'
