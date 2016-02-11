@@ -392,16 +392,12 @@ module.exports = api.user = {
 		var options = req.body || {};
 
 		var emails = options.emails;
-		var customMessage = options.customMessage;
+		var customMessage = options.customMessage || '';
 		var access = options.access;
 		var missingRequiredRequestFields = [];
 
 		if (!emails || !emails.length) {
 			missingRequiredRequestFields.push('emails');
-		}
-
-		if (!customMessage) {
-			missingRequiredRequestFields.push('customMessage');
 		}
 
 		if (!access) {
