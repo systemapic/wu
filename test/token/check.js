@@ -1,40 +1,38 @@
-var assert = require('assert');
-var mongoose = require('mongoose');
-var async = require('async');
-var fs = require('fs');
-var crypto = require('crypto');
-var request = require('request');
-var User = require('../models/user');
-var config = require('../config/wu-config.js').serverConfig;
-var helpers = require('./helpers');
-var token = util.token;
 var supertest = require('supertest');
+var chai = require('chai');
+var expect = chai.expect;
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var helpers = require('../helpers');
 var httpStatus = require('http-status');
+var expected = require('../../shared/errors');
+var token = util.token;
 
-describe('Access', function () {
-    this.slow(200);
+module.exports = function () {
 
-    before(function (done) {
-        helpers.create_user(done);
-    });
-    after(function (done) {
-        helpers.delete_user(done);
-    });
+    describe('/api/token/refresh', function () {
 
-    context('/api/token/check', function () {
+        it('should respond with status code 401 when not authenticated', function (done) {
+            api.post('/api/token/check')
+                .send({})
+                .expect(httpStatus.UNAUTHORIZED)
+                .end(done);
+        });
+
         it('should get user with access_token', function (done) {
             token(function (err, access_token) {
                 api.post('/api/token/check')
                 .send({ 
                     access_token : access_token
                 })
-                .expect(200)
+                .expect(httpStatus.OK)
                 .end(function (err, res) {
-                    assert.ifError(err);
+                    if (err) {
+                        return done(err);
+                    }
+
                     var user = helpers.parse(res.text);
-                    assert.ok(user);
-                    assert.equal(user.uuid, helpers.test_user.uuid);
+                    expect(user).to.exist;
+                    expect(user.uuid).to.be.equal(helpers.test_user.uuid);
                     done();
                 });
             });
@@ -48,11 +46,14 @@ describe('Access', function () {
                 })
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(function (err, res) {
-                    assert.ifError(err);
+                    if (err) {
+                        return done(err);
+                    }
+
                     var response = helpers.parse(res.text);
-                    assert.ok(response);
-                    assert.ok(response.error);
-                    assert.equal(response.error, 'Invalid access token.');
+                    expect(response).to.exist;
+                    expect(response.error).to.exist;
+                    expect(response.error).to.be.equal(expected.invalid_token.errorMessage);
                     done();
                 });
             });
@@ -64,15 +65,20 @@ describe('Access', function () {
                 .send()
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(function (err, res) {
-                    assert.ifError(err);
+                    if (err) {
+                        return done(err);
+                    }
+
                     var response = helpers.parse(res.text);
-                    assert.ok(response);
-                    assert.ok(response.error);
-                    assert.equal(response.error, 'Invalid access token.');
+                    expect(response).to.exist;
+                    expect(response.error).to.exist;
+                    expect(response.error).to.be.equal(expected.invalid_token.errorMessage);
                     done();
                 });
             });
         });
+
+
     });
 
-});
+};
