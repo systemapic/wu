@@ -1689,6 +1689,34 @@ module.exports = function(app, passport) {
 	// todo: see if this can be removed (replaced by /api/user/invite?)
 	app.post('/api/user/inviteToProjects', checkAccess, api.user.inviteToProjects, errorHandler);
 
+	/**
+	* @api {post} /api/user/inviteToProjects Invite user to projects
+	* @apiName Invite user to projects
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} access Access parameter
+	* @apiSuccess {Stringy} link Invite link
+	* @apiSuccessExample {json} Success-Response:
+	* https://dev3.systemapic.com/invite/7Tf7Bc8
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request access does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['access']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
