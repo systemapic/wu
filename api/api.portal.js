@@ -223,7 +223,7 @@ module.exports = api.portal = {
 
 		req.session.hotlink = hotlink;
 		res.render('../../views/app.serve.ejs', {
-			hotlink : hotlink || {},
+			hotlink : hotlink || {}
 		});
 	
 		return;
@@ -247,15 +247,17 @@ module.exports = api.portal = {
 		var options = {
 			hotlink : {},
 			access_token : req.session.tokens || {}
-		}
+		};
 
 		res.render('../../views/app.serve.ejs', options);
 
 	},
 
 
-	joinBeta : function (req, res) {
-		if (!req.query) return res.end();
+	joinBeta : function (req, res, next) {
+		if (!req.query) {
+			return res.end();
+		}
 
 		var email = req.query.email;
 
@@ -313,35 +315,35 @@ module.exports = api.portal = {
 			}, function (err, project_json) {
 				callback(null, project_json);
 			});
-		}	
+		};
 
 		// get account
 		a.account = function (callback) {
 			api.user.getAccount({
 				user : account
 			}, callback);
-		}
+		};
 
 		// get projects
 		a.projects = function (callback) { 
 			api.project.getAll({
 				user : account
 			}, callback);
-		}
+		};
 
 		// get users
 		a.users = function (callback) {
 			api.user.getAll({
 				user : account
 			}, callback);
-		}
+		};
 
 		// portal access
 		a.access = function (callback) {
 			api.access.getAll({
 				user : account
 			}, callback);
-		}
+		};
 
 		// series
 		async.series(a, function (err, result) {
@@ -372,7 +374,7 @@ module.exports = api.portal = {
 		console.log('');
 	},
 
-	status : function (req, res) {
+	status : function (req, res, next) {
 
 		// if .. req.isAuthenticated()
 
@@ -383,19 +385,26 @@ module.exports = api.portal = {
 		// get versions
 		ops.versions = function (callback) {
 			api.portal.getVersions(function (err, versions) {
+				if (err) {
+					return callback(err);
+				}
+
 				var versions = versions || {};
 				callback(null, {
 					systemapic_api : api.version, 
 					postgis : versions.postgis,
 					postgres : versions.postgres, 
 					mongodb : versions.mongo,
-					redis : versions.redis,
+					redis : versions.redis
 				});
 			});
-		}
+		};
 
 		async.series(ops, function (err, status) {
-			if (err) return res.end('Error');
+			if (err) {
+				return next(err);
+			}
+
 			res.send({
 				status : status
 			});
@@ -423,7 +432,7 @@ module.exports = api.portal = {
 				// callback
 				callback(null, replaced);
 			});
-		}
+		};
 
 		ops.postgres = function (callback) {
 
@@ -439,7 +448,7 @@ module.exports = api.portal = {
 				// callback
 				callback(null, data.version);
 			});
-		}
+		};
 
 		ops.mongo = function (callback) {
 
@@ -452,13 +461,13 @@ module.exports = api.portal = {
 					callback(null, info.version);
 				});
 			});
-		}
+		};
 
 		ops.redis = function (callback) {
 
 
 			api.redis.stats.info(function (err, stats) {
-				console.log('err, stats', err, stats)
+				console.log('err, stats', err, stats);
 
 				var redis_info = require('redis-info');
 				var info = redis_info.parse(stats);
@@ -468,7 +477,7 @@ module.exports = api.portal = {
 				callback(err, info.redis_version);
 			});
 
-		}
+		};
 
 		async.parallel(ops, function (err, versions) {
 			if (err) return done(err);
@@ -508,8 +517,8 @@ module.exports = api.portal = {
 
 			done(null, versions);
 		});
-	},
+	}
 
-}
+};
 
 
