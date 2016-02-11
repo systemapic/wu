@@ -212,10 +212,43 @@ module.exports = function(app, passport) {
 	* }
 	*/
 	// =====================================
-	// CREATE NEW PROJECT  =================
+	// CHECK THAT PROJECT IS PUBLIC ========
 	// =====================================
 	app.post('/api/project/get/public', checkAccess, api.project.getPublic, errorHandler);
 
+	/**
+	* @api {post} /api/project/get/private Get private project
+	* @apiName get private project
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project_id Project id
+	* @apiParam {String} user_access_token User access token
+	* @apiSuccess {JSON} emptyObject Just now it is return empty object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request project_id or user_access_token don't exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project_id', 'user_access_token']
+	*		}
+	*	}
+	* }
+	*/
+	// =====================================
+	// CHECK THAT PROJECT IS PRIVATE =======
+	// =====================================
 	app.post('/api/project/get/private', checkAccess, api.project.getPrivate, errorHandler);
 
 	/**
@@ -236,6 +269,12 @@ module.exports = function(app, passport) {
 	*       "redis": "3.0.6"
 	*     }
 	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
 	* }
 	*/
 	// =====================================
@@ -261,17 +300,41 @@ module.exports = function(app, passport) {
 	*	"expires_in":"36000",
 	*	"token_type":"Bearer"
 	* }
-	* @apiError {json} Unauthorized Missing or invalid information.
+	* @apiError {json} Bad_request username and email or password don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
+	* Error 400: Bad request
 	* {
-	*     "error": "Please provide username/email and password."
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['username and email', 'password']
+	*		}
+	*	 }
+	* }
+	* @apiError Not_found If user doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such user.",
+	*		"code": "404"
+	*	 }
+	* }
+	* @apiError {json} Bad_request Wrong password (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Invalid credentials.",
+	*		"code": "400"
+	*	 }
 	* }
 	*/
 	// ================================
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
-	app.post('/api/token', api.token.getTokenFromPassword);
+	app.post('/api/token', api.token.getTokenFromPassword, errorHandler);
 
 	/**
 	* @api {post} /api/token/refresh Refresh access token
@@ -286,11 +349,17 @@ module.exports = function(app, passport) {
 	*	"expires_in":"36000",
 	*	"token_type":"Bearer"
 	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
 	*/
 	// ================================
 	// REFRESH TOKEN ==================
 	// ================================
-	app.post('/api/token/refresh', checkAccess, api.token.refresh);
+	app.post('/api/token/refresh', checkAccess, api.token.refresh, errorHandler);
 	
 	/**
 	* @api {post} /api/token/check Check access token
@@ -299,6 +368,12 @@ module.exports = function(app, passport) {
 	* @apiUse token
 	*
 	* @apiSuccess {json} status Access token JSON
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
 	*/
 	// ================================
 	// CHECK TOKEN ====================
@@ -540,12 +615,23 @@ module.exports = function(app, passport) {
 		api.upload.getUploadStatus(req, res);
 	});
 
+	/**
+	 * @apiIgnore
+	 * @api {get} /api/joinbeta Joinbeta
+	 * @apiName Joinbeta
+	 * @apiGroup Admin
+	 * @apiUse token
+	 * @apiParam {Buffer} email User email
+	 *
+	 * @apiSuccess {json} status Upload Status JSON
+	 * @apiSuccessExample {json} Success-Response:
+	 * {
+	 * }
+	 */
 	// =====================================
 	// JOIN BETA MAIL ======================
 	// =====================================
-	app.get('/api/joinbeta', function (req, res) {
-		api.portal.joinBeta(req, res);
-	});
+	app.get('/api/joinbeta', api.portal.joinBeta, errorHandler);
 
 	/**
 	* @api {post} /api/project/update Update project
@@ -1689,8 +1775,36 @@ module.exports = function(app, passport) {
 	// todo: see if this can be removed (replaced by /api/user/invite?)
 	app.post('/api/user/inviteToProjects', checkAccess, api.user.inviteToProjects, errorHandler);
 
+	/**
+	* @api {post} /api/user/inviteToProjects Invite user to projects
+	* @apiName Invite user to projects
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} access Access parameter
+	* @apiSuccess {Stringy} link Invite link
+	* @apiSuccessExample {json} Success-Response:
+	* https://dev3.systemapic.com/invite/7Tf7Bc8
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request access does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['access']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
-	// CHECK UNIQUE USER/EMAIL =============
+	// GENERATE ACCESS LINK ================
 	// =====================================
 	app.post('/api/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
 

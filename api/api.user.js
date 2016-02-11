@@ -306,8 +306,6 @@ module.exports = api.user = {
 		res.end('ok'); // todo
 	},
 
-
-
 	// from shareable link flow
 	getInviteLink : function (req, res, next) {
 		var options = req.body || {};

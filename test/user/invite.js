@@ -88,7 +88,7 @@ module.exports = function () {
                 
                 api.post('/api/user/invite')
                     .send({
-                        emails: ['test@mocha.com'],
+                        emails: [helpers.test_user.email],
                         customMessage: 'test customMessage',
                         access: {},
                         access_token: access_token
@@ -118,7 +118,7 @@ module.exports = function () {
                 
                 api.post('/api/user/invite')
                     .send({
-                        emails: ['test@mocha.com'],
+                        emails: [helpers.test_user.email],
                         customMessage: 'test customMessage',
                         access: {
                             read: [],
