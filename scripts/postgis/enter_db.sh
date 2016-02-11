@@ -5,4 +5,4 @@ source /systemapic/config/env.sh
 
 export PAGER="/usr/bin/less -S"
 export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD 
-psql -h postgis --username=$SYSTEMAPIC_PGSQL_USERNAME $SYSTEMAPIC_PGSQL_DBNAME
+psql -h postgis --username=$SYSTEMAPIC_PGSQL_USERNAME template1
