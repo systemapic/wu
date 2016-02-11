@@ -383,6 +383,10 @@ module.exports = api.portal = {
 		// get versions
 		ops.versions = function (callback) {
 			api.portal.getVersions(function (err, versions) {
+				if (err) {
+					return callback(err);
+				}
+
 				var versions = versions || {};
 				callback(null, {
 					systemapic_api : api.version, 
@@ -395,7 +399,10 @@ module.exports = api.portal = {
 		};
 
 		async.series(ops, function (err, status) {
-			if (err) return res.end('Error');
+			if (err) {
+				return next(err);
+			}
+
 			res.send({
 				status : status
 			});
