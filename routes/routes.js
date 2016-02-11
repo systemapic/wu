@@ -212,10 +212,43 @@ module.exports = function(app, passport) {
 	* }
 	*/
 	// =====================================
-	// CREATE NEW PROJECT  =================
+	// CHECK THAT PROJECT IS PUBLIC ========
 	// =====================================
 	app.post('/api/project/get/public', checkAccess, api.project.getPublic, errorHandler);
 
+	/**
+	* @api {post} /api/project/get/private Get private project
+	* @apiName get private project
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project_id Project id
+	* @apiParam {String} user_access_token User access token
+	* @apiSuccess {JSON} emptyObject Just now it is return empty object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request project_id or user_access_token don't exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project_id', 'user_access_token']
+	*		}
+	*	}
+	* }
+	*/
+	// =====================================
+	// CHECK THAT PROJECT IS PRIVATE =======
+	// =====================================
 	app.post('/api/project/get/private', checkAccess, api.project.getPrivate, errorHandler);
 
 	/**
@@ -1718,7 +1751,7 @@ module.exports = function(app, passport) {
 	* }
 	*/
 	// =====================================
-	// CHECK UNIQUE USER/EMAIL =============
+	// GENERATE ACCESS LINK ================
 	// =====================================
 	app.post('/api/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
 
