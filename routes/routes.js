@@ -349,6 +349,12 @@ module.exports = function(app, passport) {
 	*	"expires_in":"36000",
 	*	"token_type":"Bearer"
 	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
 	*/
 	// ================================
 	// REFRESH TOKEN ==================
