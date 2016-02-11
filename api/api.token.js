@@ -199,9 +199,13 @@ module.exports = api.token = {
 
 
 	// route: refresh access token
-	refresh : function (req, res) {
+	refresh : function (req, res, next) {
 		api.token.reset(req.user, function (err, access_token) {
-			if (err) return res.status(401).send(err.message);
+			if (err) {
+				err.code = err.code || 401;
+				next(err);
+			}
+
 			res.send(access_token);
 		});
 	},
