@@ -34,6 +34,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -109,7 +111,7 @@ module.exports = api.token = {
 
 		// throw if no credentials
 		if (!_.isEmpty(missingRequiredFields)) {
-			return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields);
+			return done(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
 		}
 
 		// find user from email or username
@@ -121,11 +123,20 @@ module.exports = api.token = {
 		ops.push(function (user, callback) {
 
 			// no user
-			if (!user) return callback(new Error('Invalid credentials.'));
+			if (!user) {
+				return callback({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_user.errorMessage
+				});
+			}
 
 			// check password
-			if (!user.validPassword(password)) return callback(new Error('Invalid credentials.'));
-
+			if (!user.validPassword(password)) {
+				return callback({
+					code: httpStatus.BAD_REQUEST,
+					message: errors.invalid_credentials.errorMessage
+				});
+			}
 			// next
 			callback(null, user);
 		});
@@ -139,8 +150,9 @@ module.exports = api.token = {
 
 		// run ops
 		async.waterfall(ops, function (err, access_token) {
-			if (err) return done(new Error('Invalid credentials.'));
-
+			if (err) {
+				return done(err);
+			}
 			// all good, return access_token
 			done(null, access_token);
 		});
