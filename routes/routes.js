@@ -368,6 +368,12 @@ module.exports = function(app, passport) {
 	* @apiUse token
 	*
 	* @apiSuccess {json} status Access token JSON
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
 	*/
 	// ================================
 	// CHECK TOKEN ====================
