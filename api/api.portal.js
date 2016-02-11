@@ -254,8 +254,10 @@ module.exports = api.portal = {
 	},
 
 
-	joinBeta : function (req, res) {
-		if (!req.query) return res.end();
+	joinBeta : function (req, res, next) {
+		if (!req.query) {
+			return res.end();
+		}
 
 		var email = req.query.email;
 

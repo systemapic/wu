@@ -615,12 +615,23 @@ module.exports = function(app, passport) {
 		api.upload.getUploadStatus(req, res);
 	});
 
+	/**
+	 * @apiIgnore
+	 * @api {get} /api/joinbeta Joinbeta
+	 * @apiName Joinbeta
+	 * @apiGroup Admin
+	 * @apiUse token
+	 * @apiParam {Buffer} email User email
+	 *
+	 * @apiSuccess {json} status Upload Status JSON
+	 * @apiSuccessExample {json} Success-Response:
+	 * {
+	 * }
+	 */
 	// =====================================
 	// JOIN BETA MAIL ======================
 	// =====================================
-	app.get('/api/joinbeta', function (req, res) {
-		api.portal.joinBeta(req, res);
-	});
+	app.get('/api/joinbeta', api.portal.joinBeta, errorHandler);
 
 	/**
 	* @api {post} /api/project/update Update project
