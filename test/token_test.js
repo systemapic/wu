@@ -22,58 +22,6 @@ describe('Access', function () {
         helpers.delete_user(done);
     });
 
-    context('/api/token/refresh', function () {
-        it('should get a refreshed access token with access token', function (done) {
-            token(function (err, access_token) {
-                api.post('/api/token/refresh')
-                .send({ 
-                    access_token : access_token
-                })
-                .expect(200)
-                .end(function (err, res) {
-                    assert.ifError(err);
-                    var tokens = helpers.parse(res.text);
-                    assert.ok(tokens);
-                    assert.ok(tokens.access_token);
-                    assert.ok(tokens.access_token != access_token);
-                    done();
-                });
-            });
-        });
-
-        it('should get 401 with invalid access token', function (done) {
-            token(function (err, access_token) {
-                api.post('/api/token/refresh')
-                .send({ 
-                    access_token : 'invalid'
-                })
-                .expect(httpStatus.UNAUTHORIZED)
-                .end(function (err, res) {
-                    assert.ifError(err);
-                    var response = helpers.parse(res.text);
-                    assert.ok(response);
-                    assert.ok(response.error);
-                    assert.equal(response.error, 'Invalid access token.');
-                    done();
-                });
-            });
-        });
-
-        it('should get 401 if missing information', function (done) {
-            api.post('/api/token/refresh')
-            .send()
-            .expect(httpStatus.UNAUTHORIZED)
-            .end(function (err, res) {
-                assert.ifError(err);
-                var response = helpers.parse(res.text);
-                assert.ok(response);
-                assert.ok(response.error);
-                assert.equal(response.error, 'Invalid access token.');
-                done();
-            });
-        });
-    });
-
     context('/api/token/check', function () {
         it('should get user with access_token', function (done) {
             token(function (err, access_token) {

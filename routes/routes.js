@@ -330,6 +330,7 @@ module.exports = function(app, passport) {
 	*		"code": "400"
 	*	 }
 	* }
+	*/
 	// ================================
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
@@ -352,7 +353,7 @@ module.exports = function(app, passport) {
 	// ================================
 	// REFRESH TOKEN ==================
 	// ================================
-	app.post('/api/token/refresh', checkAccess, api.token.refresh);
+	app.post('/api/token/refresh', checkAccess, api.token.refresh, errorHandler);
 	
 	/**
 	* @api {post} /api/token/check Check access token
