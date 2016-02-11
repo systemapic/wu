@@ -300,13 +300,36 @@ module.exports = function(app, passport) {
 	*	"expires_in":"36000",
 	*	"token_type":"Bearer"
 	* }
-	* @apiError {json} Unauthorized Missing or invalid information.
+	* @apiError {json} Bad_request username and email or password don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
+	* Error 400: Bad request
 	* {
-	*     "error": "Please provide username/email and password."
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['username and email', 'password']
+	*		}
+	*	 }
 	* }
-	*/
+	* @apiError Not_found If user doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such user.",
+	*		"code": "404"
+	*	 }
+	* }
+	* @apiError {json} Bad_request Wrong password (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Invalid credentials.",
+	*		"code": "400"
+	*	 }
+	* }
 	// ================================
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
