@@ -4,5 +4,9 @@
 # get config
 source /systemapic/config/env.sh
 
-# PGPASSWORD=docker psql -U docker -d $1 -h postgis -c "CREATE TABLE owner_info ( name text, uuid text, created_at integer);"
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $SYSTEMAPIC_PGSQL_DBNAME -h postgis -c "SELECT row_to_json(t) FROM ( SELECT version()) t;"
+export PGUSER=$SYSTEMAPIC_PGSQL_USERNAME
+export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
+export PGHOST=postgis
+export PGDATABASE=template1
+
+psql -c "select row_to_json(t) from ( SELECT version() ) t";
