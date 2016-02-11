@@ -9,7 +9,7 @@ var token = util.token;
 
 module.exports = function () {
 
-    describe('/api/token/refresh', function () {
+    describe('/api/token/check', function () {
 
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post('/api/token/check')
