@@ -205,7 +205,7 @@ module.exports = api.project = {
 		}
 
 		// TODO: check access token and access!!!
-		res.send() // debug
+		res.send(); // debug
 		return;
 
 		Project
@@ -665,7 +665,7 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (params, callback) {
-			console.log(project)
+			console.log(project);
 			Project.findOne({uuid: options.project_id})
 				.exec(function (err, res) {
 					if (err) {
