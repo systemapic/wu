@@ -310,7 +310,7 @@ module.exports = function(app, passport) {
 	// ================================
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
-	app.post('/api/token', api.token.getTokenFromPassword);
+	app.post('/api/token', api.token.getTokenFromPassword, errorHandler);
 
 	/**
 	* @api {post} /api/token/refresh Refresh access token
