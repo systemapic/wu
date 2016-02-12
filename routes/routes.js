@@ -739,6 +739,56 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
 
+	/**
+	* @api {post} /api/project/hash/set Set project hash
+	* @apiName Set hash
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project_id Uuid of project
+	* @apiParam {Bollean}  saveState Save prject state flag
+	* @apiParam {Object} hash Hash object
+	* @apiSuccess {Object} error Error object
+	* @apiSuccess {Object} hash Created hash
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   error: null,
+	*   hash: {
+	*     __v: 0,
+	*     lastUpdated: '2016-02-12T10:22:20.535Z',
+	*     created: '2016-02-12T10:22:20.535Z',
+	*     project: 'uuid-mocha-test-project-for-hash-set',
+	*     createdByName: 'mocha test',
+	*     createdBy: 'uuid-mocha-test-project',
+	*     id: 'some id',
+	*     uuid: 'hash-1225da89-7d03-4df9-981c-804cd119a1f8',
+	*     _id: '56bdb25c78c5e3cd164f1f1d',
+	*     layers: ['some layer'],
+	*     position: {
+	*       lat: '1',
+	*       lng: '1',
+	*       zoom: '1'
+	*     }
+	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request project_id or saveState or hash or hash.position or hash.layers or hash.id don't not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project_id', 'saveState', 'hash', 'hash.position', 'hash.layers', 'hash.id']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// SET PROJECT HASH ====================
 	// =====================================
