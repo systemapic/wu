@@ -825,7 +825,7 @@ module.exports = api.project = {
 		}
 
 		var projectUuid = params.project_id;
-		var	saveState   = params.saveState;
+		var	saveState = params.saveState;
 
 		if (!projectUuid) {
 			missingRequiredRequestFields.push('project_id');
@@ -849,20 +849,20 @@ module.exports = api.project = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
 		}
 
-		var	position 	= params.hash.position;
-		var	layers 	= params.hash.layers;
-		var	id 		= params.hash.id;
+		var	position = params.hash.position;
+		var	layers = params.hash.layers;
+		var	id = params.hash.id;
 
 		// create new hash
-		var hash 	= new Hash();
+		var hash = new Hash();
 		
-		hash.uuid 	= 'hash-' + uuid.v4();
-		hash.position 	= position;
-		hash.layers 	= layers;
-		hash.id 	= id;
-		hash.createdBy 	= req.user.uuid;
+		hash.uuid = 'hash-' + uuid.v4();
+		hash.position = position;
+		hash.layers = layers;
+		hash.id = id;
+		hash.createdBy = req.user.uuid;
 		hash.createdByName = req.user.firstName + ' ' + req.user.lastName;
-		hash.project 	= projectUuid;
+		hash.project = projectUuid;
 
 		hash.save(function (err, doc) {
 			var ops = [];
@@ -877,10 +877,10 @@ module.exports = api.project = {
 			}
 
 			async.series(ops, function (error) {
-				res.send(JSON.stringify({
+				res.send({
 					error: err || error || null,
 					hash : doc
-				}));
+				});
 			})
 		});
 	},
