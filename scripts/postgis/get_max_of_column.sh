@@ -22,9 +22,6 @@ fi
 
 # get config
 source /systemapic/config/env.sh || exit 1
-# echo $SYSTEMAPIC_PGSQL_USERNAME
-# echo $SYSTEMAPIC_PGSQL_PASSWORD
-# echo $SYSTEMAPIC_PGSQL_DBNAME
 
 export PGDATABASE=$1
 export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD

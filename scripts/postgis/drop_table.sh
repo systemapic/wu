@@ -15,9 +15,12 @@ fi
 
 # get config
 source /systemapic/config/env.sh
-# echo $SYSTEMAPIC_PGSQL_USERNAME
-# echo $SYSTEMAPIC_PGSQL_PASSWORD
-# echo $SYSTEMAPIC_PGSQL_DBNAME
 
-# PGPASSWORD=docker psql -U docker -d $1 -h postgis -c "CREATE TABLE owner_info ( name text, uuid text, created_at integer);"
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "DROP TABLE $2;"
+export PGUSER=${SYSTEMAPIC_PGSQL_USERNAME}
+export PGPASSWORD=${SYSTEMAPIC_PGSQL_PASSWORD}
+export PGHOST=postgis
+export PSQL="psql --no-password"
+export PGDATABASE=$1
+
+# PGPASSWORD=docker $PSQL -U docker -d $1 -h postgis -c "CREATE TABLE owner_info ( name text, uuid text, created_at integer);"
+$PSQL -c "DROP TABLE $2;"
