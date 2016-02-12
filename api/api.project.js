@@ -774,19 +774,42 @@ module.exports = api.project = {
 	},
 
 
-	getHash : function (req, res) {
-		if (!req.body) return api.error.general(req, res);
+	getHash : function (req, res, next) {
+		var params = req.body || {};
+		var id = params.id;
+		var	projectUuid = params.project_id;		// todo: access restrictions
+		var missingRequiredRequestFields = [];
 
-		var id = req.body.id,
-			projectUuid = req.body.projectUuid;		// todo: access restrictions
+		if (!id) {
+			missingRequiredRequestFields.push('id');
+		}
+
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project_id');
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		Hash
 			.findOne({id : id, project : projectUuid})
 			.exec(function (err, doc) {
-				res.end(JSON.stringify({
-					error: err,
+				if (err) {
+					return next(err);
+				}
+
+				if (!doc) {
+					return next({
+						message: errors.no_such_hash.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
+
+				res.send({
+					error: null,
 					hash : doc
-				}));
+				});
 			});
 	},
 

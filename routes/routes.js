@@ -795,13 +795,12 @@ module.exports = function(app, passport) {
 	// change to /api/project/setHash
 	app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
 
+
 	// =====================================
 	// GET PROJECT HASH ====================
 	// =====================================
 	// change to /api/project/getHash
-	app.post('/api/project/hash/get', checkAccess, function (req,res) {
-		api.project.getHash(req, res);
-	});
+	app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
 
 	// =====================================
 	// UPLOAD PROJECT LOGO  ================
