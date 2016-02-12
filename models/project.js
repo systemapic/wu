@@ -130,7 +130,7 @@ var projectSchema = mongoose.Schema({
 		inspect 	: { type: Boolean, default: false },
 		geolocation 	: { type: Boolean, default: false },
 		vectorstyle 	: { type: Boolean, default: false },
-		baselayertoggle : { type: Boolean, default: false },
+		baselayertoggle : { type: Boolean, default: true },
 		cartocss 	: { type: Boolean, default: false }
 	},
 
