@@ -10,10 +10,10 @@ var fs = require('fs');
 var path = require('path');
 
 module.exports = function () {
-    describe('/api/upload/uploadlogo', function () {
+    describe.only('/api/project/uploadlogo', function () {
 
         it("should respond with status code 401 when not authenticated", function (done) {
-            api.get('/api/upload/uploadlogo')
+            api.post('/api/project/uploadlogo')
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -22,7 +22,7 @@ module.exports = function () {
 
         it('should respond with status code 400 and specific error message if image_id or resumableIdentifier don\'t exist in request body', function (done) {
             token(function (err, access_token) {
-                api.post('/api/upload/uploadlogo')
+                api.post('/api/project/uploadlogo')
                     .send({
                         access_token: access_token
                     })
