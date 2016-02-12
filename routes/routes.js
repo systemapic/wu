@@ -795,7 +795,57 @@ module.exports = function(app, passport) {
 	// change to /api/project/setHash
 	app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
 
-
+	/**
+	* @api {post} /api/project/hash/get Get project hash
+	* @apiName Get hash
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project_id Uuid of project
+	* @apiParam {String}  id Hash id
+	* @apiSuccess {Object} error Error object
+	* @apiSuccess {Object} hash Hash object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+ 	*   error: null,
+ 	*   hash: {
+ 	*     _id: '56bdc6fbc7ec6af66dfc92f0',
+	*     lastUpdated: '2016-02-12T11:50:19.231Z',
+	*     created: '2016-02-12T11:50:19.231Z',
+	*     id: 'some hash id',
+	*     project: 'some project id',
+	*     uuid: 'test_mocha_hash',
+	*     __v: 0,
+	*     layers: []
+	*   }
+	* }
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request project_id or project_id or id don't not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['project_id', 'id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If hash doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such hash.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// GET PROJECT HASH ====================
 	// =====================================
