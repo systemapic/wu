@@ -286,7 +286,7 @@ module.exports = api.provider = {
 					// create Layers object
 					var layer 		= new Layer();
 					layer.uuid 		= 'layer-' + uuid.v4(); // unique uuid
-					layer.title 		= ml.name;
+					layer.title 		= 'Mapbox ' + ml.name;
 					layer.description 	= ml.description;
 					layer.legend		= ml.legend;
 					layer.maxZoom 		= ml.maxzoom;
