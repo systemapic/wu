@@ -266,6 +266,7 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.layermenu.js',
 					'public/js/src/controls/control.description.js',
 					'public/js/src/controls/control.mouseposition.js',
+					'public/js/src/controls/control.baselayertoggle.js',
 					'public/js/src/controls/control.style.js',
 					'public/js/src/controls/control.tooltip.js',				
 					'public/js/src/controls/control.spinningmap.js',
