@@ -204,6 +204,6 @@ module.exports = api.socket = {
 
 	_getProcessing : function (id) {
 		return api.socket._processing[id];
-	},
+	}
 	
-}
+};

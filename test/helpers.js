@@ -204,6 +204,8 @@ module.exports = util = {
         project.categories = info.categories;
         project.layers = info.layers;
         project.access = info.access;
+        project.state = info.state;
+        project.settings = info.settings;
 
         project.save(callback);
 

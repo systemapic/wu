@@ -90,5 +90,17 @@
     "invalid_credentials": {
         "errorMessage": "Invalid credentials.",
         "code": "401"
+    },
+    "no_projects_provided": {
+        "errorMessage": "No projects provided.",
+        "code": "400"
+    },
+    "unauthorized": {
+        "errorMessage": "You are not authorized.",
+        "code": "401"
+    },
+    "no_such_hash": {
+        "errorMessage": "No such hash.",
+        "code": "401"        
     }
 }

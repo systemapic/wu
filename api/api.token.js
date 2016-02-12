@@ -34,6 +34,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -77,15 +79,14 @@ module.exports = api.token = {
 	},
 
 	// route: get access token from password
-	getTokenFromPassword : function (req, res) {
-		api.token._get_token_from_password(req.body, function (err, tokens) {
-			if (err) return res.status(401).send({error : err.message});
+	getTokenFromPassword : function (req, res, next) {
+		api.token._get_token_from_password(req.body || {}, function (err, tokens) {
+			if (err) {
+				return next(err);
+			}
 
 			// update cookie
 			req.session.tokens = api.utils.parse(tokens);
-
-
-
 
 			// return tokens
 			res.send(tokens);
@@ -94,15 +95,24 @@ module.exports = api.token = {
 
 	// get access token from password
 	_get_token_from_password : function (options, done) {
-
 		// details
 		var ops = [];
-		var refresh = (options.refresh == 'true');
 		var username = options.username || options.email;
 		var password = options.password;
-		
+		var missingRequiredFields = [];
+
+		if (!username) {
+			missingRequiredFields.push('username or email');
+		}
+
+		if (!password) {
+			missingRequiredFields.push('password');
+		}
+
 		// throw if no credentials
-		if (_.isEmpty(username) || _.isEmpty(password)) return done(new Error('Invalid credentials.'));
+		if (!_.isEmpty(missingRequiredFields)) {
+			return done(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
+		}
 
 		// find user from email or username
 		ops.push(function (callback) {
@@ -113,11 +123,20 @@ module.exports = api.token = {
 		ops.push(function (user, callback) {
 
 			// no user
-			if (!user) return callback(new Error('Invalid credentials.'))
+			if (!user) {
+				return callback({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_user.errorMessage
+				});
+			}
 
 			// check password
-			if (!user.validPassword(password)) return callback(new Error('Invalid credentials.'));
-
+			if (!user.validPassword(password)) {
+				return callback({
+					code: httpStatus.BAD_REQUEST,
+					message: errors.invalid_credentials.errorMessage
+				});
+			}
 			// next
 			callback(null, user);
 		});
@@ -131,8 +150,9 @@ module.exports = api.token = {
 
 		// run ops
 		async.waterfall(ops, function (err, access_token) {
-			if (err) return done(new Error('Invalid credentials.'));
-
+			if (err) {
+				return done(err);
+			}
 			// all good, return access_token
 			done(null, access_token);
 		});
@@ -179,9 +199,13 @@ module.exports = api.token = {
 
 
 	// route: refresh access token
-	refresh : function (req, res) {
+	refresh : function (req, res, next) {
 		api.token.reset(req.user, function (err, access_token) {
-			if (err) return res.status(401).send(err.message);
+			if (err) {
+				err.code = err.code || 401;
+				next(err);
+			}
+
 			res.send(access_token);
 		});
 	},
@@ -351,6 +375,6 @@ module.exports = api.token = {
 	},
 	getRandomInt : function (min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
-	},
+	}
 
-}
+};

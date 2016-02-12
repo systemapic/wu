@@ -43,9 +43,9 @@ var api = module.parent.exports;
 // exports
 module.exports = api.user = { 
 
-	inviteToProjects : function (req, res) {
+	inviteToProjects : function (req, res, next) {
 	
-		var options = req.body;
+		var options = req.body || {};
 
 		var edits = options.edit || [];
 		var reads = options.read || [];
@@ -53,14 +53,21 @@ module.exports = api.user = {
 		var account = req.user;
 		var ops = [];
 		var changed_projects = [];
+		var missingRequiredRequestFields = [];
 
 		// check
-		if (!userUuid) return api.error.missingInformation(req, res, 'No user uuid provided.');
-		if (!edits.length && !reads.length) return api.error.missingInformation(req, res, 'No projects provided.');
- 
+		if (!userUuid) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['user']));
+		}
 
+		if (_.isEmpty(edits) && _.isEmpty(reads)) {
+			return next({
+				message: errors.no_projects_provided.errorMessage,
+				code: httpStatus.BAD_REQUEST
+			});
+		}
+			
 		ops.push(function (callback) {
-
 			User
 			.findOne({uuid : userUuid})
 			.exec(callback);
@@ -68,6 +75,12 @@ module.exports = api.user = {
 
 		ops.push(function (invited_user, callback) {
 
+			if (!invited_user) {
+				return callback({
+					message: errors.no_such_user.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
 			// add to read (if not already in edit)
 
 			// check that USER has access to invite to project
@@ -104,7 +117,6 @@ module.exports = api.user = {
 			}, function (err, changed_edit_projects) {
 				
 				async.each(reads, function (projectUuid, done) {
-
 					Project
 					.findOne({uuid : projectUuid})
 					.exec(function (err, project) {
@@ -144,25 +156,16 @@ module.exports = api.user = {
 
 			});
 
-		});		
-
-
-		ops.push(function (projects, callback) {
-
-
-			res.json({
-				error : null,
-				projects : projects
-			});
-
-			callback(null);
 		});
 
-		async.waterfall(ops, function (err, results) {
-			if (err) console.log('api.user.inviteToProjects err: ', err);
+		async.waterfall(ops, function (err, projects) {
+			if (err) {
+				return next(err)
+			}
 
-			if (err) res.json({
-				error : err
+			res.send({
+				error : null,
+				projects : projects
 			});
 			
 		})
@@ -303,13 +306,20 @@ module.exports = api.user = {
 		res.end('ok'); // todo
 	},
 
-
-
 	// from shareable link flow
-	getInviteLink : function (req, res) {
-		var options = req.body;
+	getInviteLink : function (req, res, next) {
+		var options = req.body || {};
 		options.user = req.user;
 
+		if (!options.user) {
+			next({
+				code: httpStatus.UNAUTHORIZED
+			});
+		}
+
+		if (!options.access) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access']));	
+		}
 
 		// create invite link
 		api.user._createInviteLink({
@@ -317,7 +327,11 @@ module.exports = api.user = {
 			access : options.access,
 			type : 'link'
 		}, function (err, invite_link) {
-			res.end(invite_link);
+			if (err) {
+				return next(err);
+			}
+
+			res.send(invite_link);
 		});
 	},
 
@@ -376,16 +390,12 @@ module.exports = api.user = {
 		var options = req.body || {};
 
 		var emails = options.emails;
-		var customMessage = options.customMessage;
+		var customMessage = options.customMessage || '';
 		var access = options.access;
 		var missingRequiredRequestFields = [];
 
 		if (!emails || !emails.length) {
 			missingRequiredRequestFields.push('emails');
-		}
-
-		if (!customMessage) {
-			missingRequiredRequestFields.push('customMessage');
 		}
 
 		if (!access) {

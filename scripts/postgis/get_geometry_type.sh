@@ -15,9 +15,9 @@ fi
 
 # get config
 source /systemapic/config/env.sh
-# echo $SYSTEMAPIC_PGSQL_USERNAME
-# echo $SYSTEMAPIC_PGSQL_PASSWORD
-# echo $SYSTEMAPIC_PGSQL_DBNAME
 
+export PGUSER=${SYSTEMAPIC_PGSQL_USERNAME}
+export PGPASSWORD=${SYSTEMAPIC_PGSQL_PASSWORD}
+export PGHOST=postgis
 
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "select row_to_json(t) from (SELECT ST_GeometryType(geom) FROM $2 LIMIT 1) t"
+psql -d $1 -c "select row_to_json(t) from (SELECT ST_GeometryType(geom) FROM $2 LIMIT 1) t"
