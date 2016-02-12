@@ -289,7 +289,20 @@ module.exports = api.geo = {
 				var string = '\n    [' + column + ' ' + operator + ' ' + value + '] {';
 				string += '\n        marker-fill: ' + color + ';';
 				string += '\n        marker-opacity: ' + opacity + ';';
-				string += '\n        marker-width: ' + width + ';';
+				// string += '\n        marker-width: ' + width + ';';
+
+				string += '\n        [zoom<10] { marker-width: 0.2 * ' + width + '; }';
+				string += '\n        [zoom=10] { marker-width: 0.3 * ' + width + '; }';
+				string += '\n        [zoom=11] { marker-width: 0.5 * ' + width + '; }';
+				string += '\n        [zoom=12] { marker-width: 1   * ' + width + '; }';
+				string += '\n        [zoom=13] { marker-width: 1   * ' + width + '; }';
+				string += '\n        [zoom=14] { marker-width: 2   * ' + width + '; }';
+				string += '\n        [zoom=15] { marker-width: 4   * ' + width + '; }';
+				string += '\n        [zoom=16] { marker-width: 6   * ' + width + '; }';
+				string += '\n        [zoom=17] { marker-width: 8   * ' + width + '; }';
+				string += '\n        [zoom=18] { marker-width: 12  * ' + width + '; }';
+
+
 				string += '\n    }\n';
 
 				css.style += string;
@@ -457,6 +470,7 @@ module.exports = api.geo = {
 
 	buildCarto_pointColor : function (options) {
 
+
 		var style = options.style.point;
 		var color = style.color || {};
 
@@ -465,42 +479,94 @@ module.exports = api.geo = {
 			style   : ''
 		}		
 
+
+
 		if ( color.column ) {
 
 			var minMax = color.range;// ? color.customMinMax : color.minMax;
 
-			// color range experiment
-			var color_range = [];
-			var colorLerp = require('color-lerp');
+
+			// colorLerp :: Does NOT work properly... sometimes it generates random colors...
+			// see 
+
+
+			// // color range experiment
+			// var color_range = [];
+			// var colorLerp = require('color-lerp');
+
+			// // Get color values
+			// var color1 = color.value[0];
+			// var color2 = color.value[1];
+			// var color3 = color.value[2];
+			// var color4 = color.value[3];
+			// var color5 = color.value[4];
+			
+
+			// // get three, four colors in between each 5-color => 12
+			// var triad12 = colorLerp(color1, color2, 4, 'rgb');
+			// var triad23 = colorLerp(color2, color3, 4, 'rgb');
+			// var triad34 = colorLerp(color3, color4, 4, 'rgb');
+			// var triad45 = colorLerp(color4, color5, 4, 'rgb');
+
+			// // flatten
+			// color_range = _.flatten(color_range);
+
+			// // remove duplicates
+			// color_range = _.unique(color_range);
+
+
+			// // override with new color_range
+			// var colorArray = color_range;
+
+
+
 
 			// Get color values
-			var color1 = color.value[0];
-			var color2 = color.value[1];
-			var color3 = color.value[2];
-			var color4 = color.value[3];
-			var color5 = color.value[4];
+			var c1 = color.value[0];
+			var c9 = color.value[1];
+			var c17 = color.value[2];
+			var c25 = color.value[3];
+			var c33 = color.value[4];
 
-			// get three, four colors in between each 5-color => 12
-			var triad12 = colorLerp(color1, color2, 4, 'rgb');
-			var triad23 = colorLerp(color2, color3, 4, 'rgb');
-			var triad34 = colorLerp(color3, color4, 4, 'rgb');
-			var triad45 = colorLerp(color4, color5, 4, 'rgb');
+			// Interpolate
+			var c5 = api.geo.hexAverage([c1, c9]);
+			var c13 = api.geo.hexAverage([c9, c17]);
+			var c21 = api.geo.hexAverage([c17, c25]);
+			var c29 = api.geo.hexAverage([c25, c33]);
 
-			// concat
-			color_range.push(triad12);
-			color_range.push(triad23);
-			color_range.push(triad34);
-			color_range.push(triad45);
+			// Interpolate
+			var c3 = api.geo.hexAverage([c1, c5]);
+			var c7 = api.geo.hexAverage([c5, c9]);
+			var c11 = api.geo.hexAverage([c9, c13]);
+			var c15 = api.geo.hexAverage([c13, c17]);
+			var c19 = api.geo.hexAverage([c17, c21]);
+			var c23 = api.geo.hexAverage([c21, c25]);
+			var c27 = api.geo.hexAverage([c25, c29]);
+			var c31 = api.geo.hexAverage([c29, c33]);
 
-			// flatten
-			color_range = _.flatten(color_range);
+			// Interpolate
+			var c2 = api.geo.hexAverage([c1, c3]);
+			var c4 = api.geo.hexAverage([c3, c5]);
+			var c6 = api.geo.hexAverage([c5, c7]);
+			var c8 = api.geo.hexAverage([c7, c9]);
+			var c10 = api.geo.hexAverage([c9, c11]);
+			var c12 = api.geo.hexAverage([c11, c13]);
+			var c14 = api.geo.hexAverage([c13, c15]);
+			var c16 = api.geo.hexAverage([c15, c17]);
+			var c18 = api.geo.hexAverage([c17, c19]);
+			var c20 = api.geo.hexAverage([c19, c21]);
+			var c22 = api.geo.hexAverage([c21, c23]);
+			var c24 = api.geo.hexAverage([c23, c25]);
+			var c26 = api.geo.hexAverage([c25, c27]);
+			var c28 = api.geo.hexAverage([c27, c29]);
+			var c30 = api.geo.hexAverage([c29, c31]);
+			var c32 = api.geo.hexAverage([c31, c33]);
 
-			// remove duplicates
-			color_range = _.unique(color_range);
+			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
 
 
-			// override with new color_range
-			var colorArray = color_range;
+
+
 
 
 			// CREATE VARS
@@ -554,7 +620,7 @@ module.exports = api.geo = {
 				if ( no > 1 && no < colorArray.length ) {
 
 					cartObj.style += '\t[' + fieldName + ' >= ' + fieldName + '_step_' + no + ']';
-					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+					cartObj.style += '[' + fieldName + ' <= ' + fieldName + '_step_' + (no+1) + ']';
 					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
 
 				}
