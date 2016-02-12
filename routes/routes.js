@@ -743,9 +743,7 @@ module.exports = function(app, passport) {
 	// SET PROJECT HASH ====================
 	// =====================================
 	// change to /api/project/setHash
-	app.post('/api/project/hash/set', checkAccess, function (req,res) {
-		api.project.setHash(req, res);
-	});
+	app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
 
 	// =====================================
 	// GET PROJECT HASH ====================
