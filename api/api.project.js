@@ -774,65 +774,137 @@ module.exports = api.project = {
 	},
 
 
-	getHash : function (req, res) {
-		if (!req.body) return api.error.general(req, res);
+	getHash : function (req, res, next) {
+		var params = req.body || {};
+		var id = params.id;
+		var	projectUuid = params.project_id;		// todo: access restrictions
+		var missingRequiredRequestFields = [];
 
-		var id = req.body.id,
-			projectUuid = req.body.projectUuid;		// todo: access restrictions
+		if (!id) {
+			missingRequiredRequestFields.push('id');
+		}
+
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project_id');
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		Hash
 			.findOne({id : id, project : projectUuid})
 			.exec(function (err, doc) {
-				res.end(JSON.stringify({
-					error: err,
+				if (err) {
+					return next(err);
+				}
+
+				if (!doc) {
+					return next({
+						message: errors.no_such_hash.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
+
+				res.send({
+					error: null,
 					hash : doc
-				}));
+				});
 			});
 	},
 
-	setHash : function (req, res) {
-		if (!req.body || !req.user) return api.error.general(req, res);
+	setHash : function (req, res, next) {
+		var params = req.body || {};
+		var missingRequiredRequestFields = [];
 
-		var projectUuid = req.body.projectUuid,
-			position 	= req.body.hash.position,
-			layers 	= req.body.hash.layers,
-			id 		= req.body.hash.id,
-			saveState   = req.body.saveState;
+		if (!req.user) {
+			return {
+				code: httpStatus.UNAUTHORIZED,
+				message: errors.unauthorized.errorMessage
+			};
+		}
+
+		var projectUuid = params.project_id;
+		var	saveState = params.saveState;
+
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project_id');
+		}
+
+		if (!params.hash) {
+			missingRequiredRequestFields.push('hash');	
+		} else {
+			if (!params.hash.position) {
+				missingRequiredRequestFields.push('hash.position');
+			}
+			if (!params.hash.layers) {
+				missingRequiredRequestFields.push('hash.layers');
+			}
+			if (!params.hash.id) {
+				missingRequiredRequestFields.push('hash.id');
+			}
+		}
+
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
+
+		var	position = params.hash.position;
+		var	layers = params.hash.layers;
+		var	id = params.hash.id;
 
 		// create new hash
-		var hash 	= new Hash();
+		var hash = new Hash();
 		
-		hash.uuid 	= 'hash-' + uuid.v4();
-		hash.position 	= position;
-		hash.layers 	= layers;
-		hash.id 	= id;
-		hash.createdBy 	= req.user.uuid;
+		hash.uuid = 'hash-' + uuid.v4();
+		hash.position = position;
+		hash.layers = layers;
+		hash.id = id;
+		hash.createdBy = req.user.uuid;
 		hash.createdByName = req.user.firstName + ' ' + req.user.lastName;
-		hash.project 	= projectUuid;
+		hash.project = projectUuid;
 
 		hash.save(function (err, doc) {
-			res.end(JSON.stringify({
-				error: err,
-				hash : doc
-			}));
+			var ops = [];
 
-			if (saveState) api.project._saveState({
-				projectUuid : projectUuid,
-				hashId : id
-			});
+			if (saveState) {
+				ops.push(function (callback) {
+					api.project._saveState({
+						projectUuid : projectUuid,
+						hashId : id
+					}, callback);
+				});
+			}
+
+			async.series(ops, function (error) {
+				res.send({
+					error: err || error || null,
+					hash : doc
+				});
+			})
 		});
 	},
 
-	_saveState : function (options) {
-		var projectUuid = options.projectUuid,
-			hashId = options.hashId;
+	_saveState : function (options, callback) {
+		var projectUuid = options.projectUuid;
+		var	hashId = options.hashId;
 
 		Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
+				if (err) {
+					return callback(err);
+				}
+
+				if (!project) {
+					return callback({
+						code: httpStatus.NOT_FOUND,
+						message: errors.no_such_project.errorMessage
+					})
+				}
+
 				project.state = hashId;
-				project.save(function (err, doc) {
-				});
+				project.save(callback);
 			});
 
 	},
