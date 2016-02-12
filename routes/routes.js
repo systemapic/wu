@@ -852,6 +852,36 @@ module.exports = function(app, passport) {
 	// change to /api/project/getHash
 	app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
 
+	/**
+	* @api {post} /api/project/uploadlogo Upload project logo
+	* @apiName Upload project logo
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} image_id Image id
+	* @apiParam {String} resumableIdentifier Resumable identifier
+	* @apiSuccess {Object} error Error object
+	* @apiSuccess {String} image Image uuid 
+	* @apiSuccessExample {json} Success-Response:
+	* '56bdc6fbc7ec6af66dfc92f0'
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
+	* @apiError Bad_request image_id or resumableIdentifier or id don't not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['image_id', 'resumableIdentifier']
+	*		}
+	*	}
+	* }
+	*/
 	// =====================================
 	// UPLOAD PROJECT LOGO  ================
 	// =====================================
