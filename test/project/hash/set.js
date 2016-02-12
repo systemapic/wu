@@ -48,7 +48,7 @@ module.exports = function () {
                 .end(done);
         });
 
-        it('should respond with status code 400 and specific error message if projectUuid and hash don\'t exist in request body', function (done) {
+        it('should respond with status code 400 and specific error message if project_id and hash don\'t exist in request body', function (done) {
             token(function (err, access_token) {
                 api.post('/api/project/hash/set')
                     .send({
@@ -64,7 +64,7 @@ module.exports = function () {
                         expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
                         expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
                         expect(result.error.errors.missingRequiredFields).to.be.an.array;
-                        expect(result.error.errors.missingRequiredFields).to.include('projectUuid');
+                        expect(result.error.errors.missingRequiredFields).to.include('project_id');
                         expect(result.error.errors.missingRequiredFields).to.include('hash');
                         done();
                     });
@@ -88,7 +88,7 @@ module.exports = function () {
                         expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
                         expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
                         expect(result.error.errors.missingRequiredFields).to.be.an.array;
-                        expect(result.error.errors.missingRequiredFields).to.include('projectUuid');
+                        expect(result.error.errors.missingRequiredFields).to.include('project_id');
                         expect(result.error.errors.missingRequiredFields).to.include('hash.position');
                         expect(result.error.errors.missingRequiredFields).to.include('hash.layers');
                         expect(result.error.errors.missingRequiredFields).to.include('hash.id');
@@ -110,7 +110,7 @@ module.exports = function () {
 		            api.post('/api/project/hash/set')
 		                .send({
 		                    access_token: access_token,
-		                    projectUuid: 'some project id',
+		                    project_id: 'some project id',
 		                    hash: {
 		                    	position: {
 									lat : '1',
@@ -158,7 +158,7 @@ module.exports = function () {
 	                api.post('/api/project/hash/set')
 	                    .send({
 	                        access_token: access_token,
-	                        projectUuid: tmpProject.uuid,
+	                        project_id: tmpProject.uuid,
 	                        saveState: false,
 	                        hash: {
 	                        	position: {
@@ -219,7 +219,7 @@ module.exports = function () {
 	                api.post('/api/project/hash/set')
 	                    .send({
 	                        access_token: access_token,
-	                        projectUuid: 'some id',
+	                        project_id: 'some id',
 	                        saveState: true,
 	                        hash: {
 	                        	position: {
@@ -270,7 +270,7 @@ module.exports = function () {
 	                api.post('/api/project/hash/set')
 	                    .send({
 	                        access_token: access_token,
-	                        projectUuid: tmpProject.uuid,
+	                        project_id: tmpProject.uuid,
 	                        saveState: true,
 	                        hash: {
 	                        	position: {
@@ -299,7 +299,6 @@ module.exports = function () {
 	                        expect(result.hash.layers).to.include('some layer');
 	                        expect(result.hash.id).to.be.equal('some id');
 	                        hash.uuid = result.hash.uuid;
-
 							Project
 								.findOne({uuid : tmpProject.uuid})
 								.exec(function (err, _project) {

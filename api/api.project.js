@@ -801,11 +801,11 @@ module.exports = api.project = {
 			};
 		}
 
-		var projectUuid = params.projectUuid;
+		var projectUuid = params.project_id;
 		var	saveState   = params.saveState;
 
 		if (!projectUuid) {
-			missingRequiredRequestFields.push('projectUuid');
+			missingRequiredRequestFields.push('project_id');
 		}
 
 		if (!params.hash) {
