@@ -425,10 +425,20 @@ module.exports = api.portal = {
 
 				var json = stdout.split('\n')[2];
 				var data = api.utils.parse(json);
-				if (!data) return callback('no data');
+				var replaced = '';
+				
+				if (!data) {
+					return callback('no data');
+				}
+				
+				if (data.default_version && _.isFunction(data.default_version.replace)) {
+					replaced = data.default_version.replace(/"/g, "");
+				}
 
-				var replaced = data.postgis_full_version.replace(/"/g, "");
-
+				if (data.postgis_full_version && _.isFunction(data.postgis_full_version.replace)) {
+					replaced = replaced.replace(/"/g, "");
+				}
+				
 				// callback
 				callback(null, replaced);
 			});
