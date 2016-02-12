@@ -244,7 +244,6 @@ module.exports = function(grunt) {
 					'public/js/src/chrome/settings/chrome.settings.filters.js',
 					'public/js/src/chrome/settings/chrome.settings.cartocss.js',
 					'public/js/src/chrome/settings/chrome.settings.tooltip.js',
-					'public/js/src/chrome/settings/chrome.settings.mapsettings.js',
 					'public/js/src/chrome/settings/chrome.settings.settingsselector.js',
 					'public/js/src/chrome/settings/chrome.settings.styler.js',
 					'public/js/src/chrome/settings/styler.js',
