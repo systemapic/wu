@@ -98,5 +98,9 @@
     "unauthorized": {
         "errorMessage": "You are not authorized.",
         "code": "401"
+    },
+    "no_such_hash": {
+        "errorMessage": "No such hash.",
+        "code": "401"        
     }
 }

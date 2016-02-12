@@ -10,7 +10,7 @@ var Hash 	= require('../../../models/hash');
 var Project 	= require('../../../models/project');
 
 module.exports = function () {
-	describe.only('/api/project/hash/set', function () {
+	describe('/api/project/hash/set', function () {
 		var hash = {};
 		var tmpProject = {};
 
