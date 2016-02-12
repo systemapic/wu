@@ -856,9 +856,7 @@ module.exports = function(app, passport) {
 	// UPLOAD PROJECT LOGO  ================
 	// =====================================
 	// change to /api/project/setLogo
-	app.post('/api/project/uploadlogo', checkAccess, function (req,res) {
-		api.upload.projectLogo(req, res);
-	});
+	app.post('/api/project/uploadlogo', checkAccess, api.upload.projectLogo, errorHandler);
 
 	// =====================================
 	// UPLOAD IMAGE ========================
