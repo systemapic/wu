@@ -6,6 +6,7 @@ var projectDelete = require('./delete');
 var getPublic = require('./getPublic');
 var projectAddInvites = require('./addInvites');
 var getPrivate = require('./getPrivate');
+var projectHashSet = require('./hash/set');
 
 describe('Project', function () {
 
@@ -19,4 +20,5 @@ describe('Project', function () {
 	projectAddInvites();
 	getPublic();
 	getPrivate();
+	projectHashSet();
 });

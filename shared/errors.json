@@ -94,5 +94,9 @@
     "no_projects_provided": {
         "errorMessage": "No projects provided.",
         "code": "400"
+    },
+    "unauthorized": {
+        "errorMessage": "You are not authorized.",
+        "code": "401"
     }
 }
