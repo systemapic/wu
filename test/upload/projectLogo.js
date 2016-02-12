@@ -10,7 +10,7 @@ var fs = require('fs');
 var path = require('path');
 
 module.exports = function () {
-    describe.only('/api/project/uploadlogo', function () {
+    describe('/api/project/uploadlogo', function () {
 
         it("should respond with status code 401 when not authenticated", function (done) {
             api.post('/api/project/uploadlogo')
