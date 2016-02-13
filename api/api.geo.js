@@ -1755,8 +1755,10 @@ module.exports = api.geo = {
 
 	getTilesetMeta : function (req, done) {
 
+		console.log('getTilesetMeta', req.user);
+
 		var file_id = req.data.file_id;
-		var user_id = req.session.passport.user;
+		var user_id = req.user._id;
 		var folder = api.config.path.raster_tiles + file_id + '/raster/';
 
 		var ops = {};
