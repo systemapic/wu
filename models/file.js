@@ -27,6 +27,7 @@ var fileSchema = mongoose.Schema({
 	type            :  String,
 	format          : [String],       // .shp, .kml, .zip, .jpg
    
+   	styleTemplates : [String], // array of JSON
 
 	data : {
 

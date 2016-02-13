@@ -939,7 +939,8 @@ module.exports = api.file = {
 			'category',
 			'version',
 			'copyright',
-			'data'
+			'data',
+			'styleTemplates'
 		];
 
 		updates = _.pick(options, valid);
@@ -971,24 +972,7 @@ module.exports = api.file = {
 	},
 
 
-	// async mongo update queue
-	// _enqueueUpdate : function (job) {
-	// 	var queries = job.queries,
-	// 	    field = job.field,
-	// 	    file = job.file,
-	// 	    options = job.options;
-
-	// 	// create update queue op
-	// 	queries[field] = function(callback) {	
-	// 		file[field] = options[field];
-	// 		file.markModified(field);
-	// 		file.save(callback);
-	// 	};
-	// 	return queries;
-	// },
-
-
-
+	
 	// #########################################
 	// ###  FILER: unzip                     ###
 	// #########################################
