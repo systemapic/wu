@@ -74,8 +74,10 @@ module.exports = function(app) {
 
 	// get stats
 	app.io.route('tileset_meta', function (req) {
-		
-		api.geo.getTilesetMeta(req);
+		checkAccess(req, function (err, user) {
+			req.user = user;
+			api.geo.getTilesetMeta(req);
+		});
 	});
 
 	// get stats
