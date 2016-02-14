@@ -20,7 +20,7 @@ var Role 	 = require('../models/role');
 var Group 	 = require('../models/group');
 
 // config
-var config  = require('../config/wu-config.js').serverConfig;
+var config  = require('../../config/wu-config.js').serverConfig;
 
 // connect to our database
 mongoose.connect(config.mongo.url); 
