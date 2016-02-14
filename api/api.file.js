@@ -928,8 +928,8 @@ module.exports = api.file = {
 		    updates = {}
 		    ops = [];
 
-		// console.log('update file'.green, options);
-		
+		// todo: check for bullshit values!
+
 		// valid fields
 		var valid = [
 			'name', 
