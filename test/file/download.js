@@ -8,6 +8,8 @@ var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
 var async = require('async');
 var Project = require('../../models/project');
+var config = require('../../config/wu-config.js').serverConfig;
+var fs = require('fs');
 
 module.exports = function () {
     describe.only('/api/file/download', function () {
@@ -46,11 +48,22 @@ module.exports = function () {
         context("when type is zip", function () {
 
         	before(function (done) {
-        		done();
+        		fs.open(config.path.temp + 'testZip.zip', 'w', function (err, fd) {
+        			if (err) {
+        				return done(err);
+        			}
+        			fs.close(fd, done);
+        		});
         	});
 
         	after(function (done) {
-				done();
+				fs.unlink(config.path.temp + 'testZip.zip', function (err, fd) {
+        			if (err) {
+        				return done(err);
+        			}
+
+        			done();
+				});
         	});
 
 			it('should respond with status code 404 if zip file doesn\'t exist', function (done) {
@@ -77,6 +90,33 @@ module.exports = function () {
 
 	                        expect(result.error.message).to.be.equal(expected.file_not_found.errorMessage);
 	                        expect(result.error.code).to.be.equal(httpStatus.NOT_FOUND);
+	                        done();
+	                    });
+	            });
+	        });
+
+			it('should respond with status code 404 if zip file exists', function (done) {
+	            token(function (err, access_token) {
+	                if (err) {
+	                    return done(err);
+	                }
+
+	                api.get('/api/file/download')
+	                    .send({
+	                        access_token: access_token
+	                    })
+	                    .query({
+	                    	file: 'testZip',
+	                    	type: 'zip'
+	                    })
+	                    .expect(httpStatus.NOT_FOUND)
+	                    .end(function (err, res) {
+	                        if (err) {
+	                            return done(err);
+	                        }
+
+	                        var result = helpers.parse(res.text);
+
 	                        done();
 	                    });
 	            });

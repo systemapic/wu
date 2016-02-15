@@ -255,9 +255,8 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (options, callback) {
-			var record = options.file,
-			    name = record.name.replace(/\s+/g, '');
-			
+			var record = options.file;
+			var name = record.name.replace(/\s+/g, '');
 
 			var folder = api.config.path.file + fileUuid;
 
@@ -388,11 +387,13 @@ module.exports = api.file = {
 		// 	not solid! FIX!
 		
 		// find zip file
-		dive(folder, 
+		dive(folder,
 
 			// each file callback
 			function(err, file) {
-				if (err) console.log('ERR 13'.red, err);
+				if (err) {
+					console.log('ERR 13'.red, err);
+				}
 
 				if (err || !file) {
 					return next({
@@ -406,7 +407,7 @@ module.exports = api.file = {
 					return res.download(file);
 					// todo: delete zip file
 				}
-			}, 
+			},
 
 			// callback
 			function (err) { 
