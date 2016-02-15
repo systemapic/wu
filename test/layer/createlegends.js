@@ -12,10 +12,10 @@ var async = require('async');
 var httpStatus = require('http-status');
 
 module.exports = function () {
-    describe('/api/layers/createlegends', function () {
+    describe('/api/layer/createlegends', function () {
 
         it('should respond with status code 401 when not authenticated', function (done) {
-            api.post('/api/layers/createlegends')
+            api.post('/api/layer/createlegends')
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
