@@ -67,13 +67,11 @@ module.exports = api.upload = {
 	 *      https://dev.systemapic.com/api/data/import
 	 */
 	upload : function (req, res) {
-		// if (!req.files || !req.files.data) return api.error.missingInformation(res, 'Missing file.');
+		if (!req.files || !req.files.data) return api.error.missingInformation(res, 'Missing file.');
 
 		var files = req.files;
 		var user = req.user;
 		var response = {};
-
-		console.log('upload', files);
 
 		// set upload status
 		var uploadStatus = {
@@ -94,13 +92,11 @@ module.exports = api.upload = {
 			// table_name : null,
 			// database_name : null,
 		};
-		var key = 'uploadStatus:' + uploadStatus.file_id;
 
+		// set upload status
+		var key = 'uploadStatus:' + uploadStatus.file_id;
 		api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
-			if (err) {
-				console.log('api.upload.upload done: ', err);
-			}
-			
+			if (err) console.log('api.upload.upload done: ', err);
 			res.send(uploadStatus);
 		});
 		
@@ -201,9 +197,7 @@ module.exports = api.upload = {
 
 					// release
 					callback();
-					
 				});
-
 			});
 		});
 
@@ -279,7 +273,6 @@ module.exports = api.upload = {
 			var key = 'uploadStatus:' + globalUploadStatus.file_id;
 			api.redis.layers.set(key, JSON.stringify(globalUploadStatus), function (err) {
 				if (err) return callback(err);
-
 				callback(null, globalUploadStatus);
 			});
 		});
@@ -315,16 +308,15 @@ module.exports = api.upload = {
 			// update status with error if any
 			if (err) api.upload._setStatusError(globalUploadStatus, err);
 
-			console.log('...always arriving here: upload done (or failed)');
+			console.log('====================');
+			console.log('Chunked upload done');
+			console.log('err? ', err);
+			console.log('result: ', result);
+			console.log('====================');
 
 			// clean up, remove chunks
 			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
-			// fs.remove(removePath, console.log);
-
-			// // clean up redis count
-			// api.redis.temp.del('done-chunks-' + redis_id, function (err) {
-			// 	if (err) console.log('rem done chunks err!', err);
-			// });
+			fs.remove(removePath, console.log);
 		});
 		
 	},
