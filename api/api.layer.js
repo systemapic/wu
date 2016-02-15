@@ -43,36 +43,103 @@ var api = module.parent.exports;
 // exports
 module.exports = api.layer = {
 
+	// default styler JSON
+	defaultStyleJSON : {
+		
+		point : { 
+			enabled : false, 
+			color : { 
+				column : false, 
+				range : [-426.6, 105.9], 
+				staticVal : "yellow",
+				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+			},
+			opacity : { 
+				column : false,
+				range : [-426.6, 105.9],
+				value : 0.5
+			}, 
+			pointsize : { 
+				column :false,
+				range : [0, 10],
+				value : 1
+			}
+		},
+
+		polygon : { 
+			enabled : false, 
+			color : { 
+				column : false, 
+				range : [-426.6, 105.9], 
+				staticVal : "red",
+				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+			},
+			opacity : { 
+				column : false,
+				range : [-426.6, 105.9],
+				value : 0.5
+			}, 
+			line : {
+				width : { 
+					column :false,
+					range : false,
+					value : 1
+				},
+				opacity : {
+					column : false,
+					range : [-426.6, 105.9],
+					value : 0.5
+				},
+				color : {
+					column : false, 
+					range : [-426.6, 105.9], 
+					staticVal : "green",
+					value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+				}
+			}
+		},
+
+		line : {
+			enabled : false,
+			width : { 
+				column :false,
+				range : false,
+				value : 1
+			},
+			opacity : {
+				column : false,
+				value : 0.5
+			},
+			color : {
+				column : false, 
+				range : [-426.6, 105.9], 
+				staticVal : "green",
+				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+			}
+		}
+	},
+
 	// create layer
 	create : function (req, res) {
 		var options = req.body;
 		var ops = [];
-		// res.json(options);
-		// ops.push(function (callback) {
-		// 	api.layer._checkExistingLayer(options, callback);
-		// });
-
+		
 		ops.push(function (callback) {
 			api.layer.createModel(options, callback);
 		});
 
 		async.waterfall(ops, function (err, doc) {
-			console.log('create layer, err, doc', err, doc);
-
-			console.log(err);
 			if (err) return api.error.general(req, res, err);
-
-			res.json(doc);
+			res.send(doc);
 		});
 	},
 
 
 	// create OSM layer
 	createOSM : function (req, res, next) {
-
 		var projectUuid = req.body.projectUuid;
 		var title = req.body.title;
-		var layer 		= new Layer();
+		var layer = new Layer();
 		var missingRequiredFields = [];
 		var ops = [];
 
@@ -108,26 +175,19 @@ module.exports = api.layer = {
 
 		ops.push(function (doc, callback) {
 			api.layer.addToProject(doc._id, projectUuid, function (err, result) {
-				if (err) {
-					return callback(err)
-				}
-
+				if (err) return callback(err)
 				callback(null, doc);
 			});
 		});
 
 		async.waterfall(ops, function (err, result) { 
-			if (err) {
-				return next(err);
-			}
-
+			if (err) return next(err);
 			res.send(result);
 		});
 	},
 
 
 	createPileLayer : function (options, callback) {
-
 		var host = api.config.portalServer.uri;
 
 		// send to tileserver storage
@@ -135,15 +195,67 @@ module.exports = api.layer = {
 			method : 'POST',
 			uri : host + 'api/db/createLayer',
 			json : options
-		}, 
-
+		
 		// callback
-		function (err, response, body) {
+		}, function (err, response, body) {
 			callback(err, body);
-
 		});
 
 	},
+
+	createDefaultLayers : function (req, res, next) {
+		 var options = req.body;
+		 api.layer._createDefaultLayers(options, function (err, layers) {
+		 	if (err) return next(err);
+		 	res.send(layers);
+		 });
+	},
+
+
+	_createDefaultLayers : function (options, done) {
+
+		console.log('_createDefault options: ', options);
+
+		// - get default style json
+		// - create carto from json
+		// - create pile layer
+		// - create wu layer
+		// - return both
+
+		var ops = [];
+
+
+		ops.push(function (callback) {
+			// default styling
+
+			var defaultStyleJSON = api.layer.defaultStyleJSON;
+
+			api.geo._json2carto(defaultStyleJSON, function (err, cartoCSS) {
+
+				console.log('json2carto: ', err, cartoCSS);
+
+
+			})
+
+
+		})
+
+
+		async.waterfall(ops, function (err, results) {
+
+
+			done(null, {
+				pile : 'ok', 
+				wu : 'ok'
+			});
+
+		})
+
+		
+
+
+	},
+
 
 
 	// create layer from geojson
