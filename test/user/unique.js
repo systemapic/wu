@@ -20,7 +20,7 @@ module.exports = function () {
                 .end(done);
         });
 
-        it('should respond with status code 400 and error if email doesn\'t exist in request body', function (done) {
+        it('should respond with status code 401 and error if email doesn\'t exist in request body', function (done) {
             token(function (err, access_token) {
                 if (err) {
                     return done(err);
@@ -30,7 +30,7 @@ module.exports = function () {
 	                .send({
                         access_token: access_token
                     })
-	                .expect(httpStatus.BAD_REQUEST)
+	                .expect(httpStatus.UNAUTHORIZED)
 	                .end(function (err, res) {
 	                	if (err) {
 	                		return done(err);
@@ -38,7 +38,7 @@ module.exports = function () {
 
                         var result = helpers.parse(res.text);
 
-                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        expect(result.error.code).to.be.equal(httpStatus.UNAUTHORIZED);
                         expect(result.error.errors.missingRequiredFields).to.include('email');
                         
                         done();
