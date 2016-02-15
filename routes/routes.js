@@ -976,9 +976,7 @@ module.exports = function(app, passport) {
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
 	// change to /api/layer/legends/create
-	app.post('/api/layer/createlegends', checkAccess, function (req, res) {
-		api.legend.create(req, res);
-	});
+	app.post('/api/layer/createlegends', checkAccess, api.legend.create, errorHandler);
 
 	// =====================================
 	// GET GEOJSON FILES ===================

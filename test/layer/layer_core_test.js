@@ -4,6 +4,7 @@ var layerNew = require('./new');
 var layerUpdate = require('./update');
 var layerGet = require('./get');
 var layerOsm = require('./osm');
+var layerCreatelegends = require('./createlegends');
 var layerReloadmeta = require('./reloadmeta');
 
 describe('Layer', function () {
@@ -16,4 +17,5 @@ describe('Layer', function () {
     layerGet();
 	layerReloadmeta();
     layerOsm();
+    layerCreatelegends();
 });
