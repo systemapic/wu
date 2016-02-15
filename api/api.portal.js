@@ -39,6 +39,7 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+
 // exports
 module.exports = api.portal = { 
 
@@ -527,8 +528,17 @@ module.exports = api.portal = {
 
 			done(null, versions);
 		});
-	}
+	},
+
+	clearTemporaryFolder : function () {
+		var path = api.config.path.temp;
+		console.log('clearTemporaryFolder', path);
+		fs.emptyDir(path, function (err) {
+			console.log('emptied Dir', err);
+		})
+	},
 
 };
 
-
+// delete tmp folder on resta
+api.portal.clearTemporaryFolder();
