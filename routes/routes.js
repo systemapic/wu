@@ -1620,12 +1620,6 @@ module.exports = function(app, passport) {
 	*       ... etc
 	*   }
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	*/
 	// =====================================
 	// UPDATE USER INFORMATION  ============
@@ -1636,13 +1630,28 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE NEW USER =====================
 	// =====================================
-	app.post('/api/user/new', checkAccess, function (req,res) { // todo: remove /new route
-		api.user.create(req, res);
-	});
-	// keep only this route, not /api/user/new
-	app.post('/api/user/create', checkAccess, function (req,res) {
-		api.user.create(req, res);
-	});
+	/**
+	* @api {post} /api/user/create Create new user
+	* @apiName info
+	* @apiGroup User
+	* @apiParam {String} username Unique username
+	* @apiParam {String} firstname First name
+	* @apiParam {String} lastname Last name
+	* @apiParam {String} [company] Company
+	* @apiParam {String} [position] Position in company
+	* @apiParam {String} email Email
+	* @apiParam {String} password Password
+	* @apiSuccess {Object} user User
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "user": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+	*       created: '2016-01-19T12:49:48.943Z',
+	*       ... etc
+	*   }
+	* }
+	*/
+	app.post('/api/user/create', api.user.create, errorHandler);
 
 	// TODO this endpoint does not exist
 	// =====================================
@@ -1693,7 +1702,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/unique', checkAccess, api.user.checkUniqueEmail, errorHandler);
+	app.post('/api/user/unique', api.user.checkUniqueEmail, errorHandler);
 
 	/**
 	* @apiIgnore
@@ -1802,7 +1811,44 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SEND INVITE MAIL ====================
 	// =====================================
+	// rename to /api/user/invite/email
 	app.post('/api/user/invite', checkAccess, api.user.invite, errorHandler);
+
+
+	/**
+	* @api {post} /api/user/invite/accept Accept invite
+	* @apiName Accept invite
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} invite_token Invite token (for example 55mRbPA)
+	* @apiSuccess {Object} invite Accepted invite
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*     "email": false,
+	*     "access": {
+	*         "edit": [
+	*             "project-ef990c38-f16c-478e-9ed1-65ed2808b070"
+	*         ],
+	*         "read": [
+	*             "project-65f99b5c-a645-4f3a-8905-9fad85c59c40",
+	*             "project-f7a9dd0b-4113-44a0-8e2d-e0d752f1cc04",
+	*             "project-c72c3d83-ff96-4483-8f39-f942c0187108"
+	*         ]
+	*     },
+	*     "token": "L9Jfxks",
+	*     "invited_by": "user-805dc4a1-2535-41f3-9a1b-af32ad134692",
+	*     "timestamp": 1455569798000,
+	*     "type": "link"
+	* }
+	*/
+	// =====================================
+	// PROCESS INVITE FOR USER =============
+	// =====================================
+	// rename to /api/user/invite/email
+	app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
+
+
+
 
 	/**
 	* @api {post} /api/user/requestContact Request contact

@@ -153,6 +153,36 @@ module.exports = api.project = {
 
 	},
 
+	giveReadAccess : function (options, done) {
+		var user = options.user;
+		var project_id = options.project_id;
+		if (!user || !project_id) return done('Missing params');
+
+		Project
+		.findOne({uuid : project_id})
+		.exec(function (err, project) {
+			project.access.read.addToSet(user.uuid);
+			project.save(function (err) {
+				done(err);
+			});
+		});
+	},
+
+	giveEditAccess : function (options, done) {
+		var user = options.user;
+		var project_id = options.project_id;
+		if (!user || !project_id) return done('Missing params');
+
+		Project
+		.findOne({uuid : project_id})
+		.exec(function (err, project) {
+			project.access.edit.addToSet(user.uuid);
+			project.save(function (err) {
+				done(err);
+			});
+		});
+	},
+
 	getPublic : function (req, res, next) {
 		var params = req.body || {};
 		var username = params.username;
