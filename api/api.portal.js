@@ -262,6 +262,8 @@ module.exports = api.portal = {
 
 		var email = req.query.email;
 
+		if (_.isEmpty(email)) return res.end();
+
 		// add to redis
 		api.redis.stats.lpush('beta_access', email);
 
