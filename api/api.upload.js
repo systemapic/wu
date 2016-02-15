@@ -72,6 +72,7 @@ module.exports = api.upload = {
 		var files = req.files;
 		var user = req.user;
 		var response = {};
+		var projectUuid = req.body.projectUuid;
 
 		// set upload status
 		var uploadStatus = {
@@ -104,7 +105,9 @@ module.exports = api.upload = {
 			files : req.files,
 			user : req.user,
 			uploadStatus : uploadStatus,
-			body : req.body
+			body : req.body,
+			use_sockets : false,
+			addToProject : projectUuid
 		};
 
 		api.import.import(options, function (err, results) {
@@ -290,7 +293,8 @@ module.exports = api.upload = {
 				user : user,
 				uploadStatus : uploadStatus,
 				body : body,
-				access_token : access_token
+				access_token : access_token,
+				use_sockets : true
 			};
 
 			// import file

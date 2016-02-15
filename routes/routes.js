@@ -1476,6 +1476,11 @@ module.exports = function(app, passport) {
 	app.post('/api/layers/new', checkAccess, api.layer.create);
 
 	// =====================================
+	// CREATE NEW DEFAULT LAYER ============
+	// =====================================
+	app.post('/api/layers/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
+
+	// =====================================
 	// NEW OSM LAYERS ======================
 	// =====================================
 	// change to /api/layer/osm/create 
