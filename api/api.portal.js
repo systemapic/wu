@@ -46,8 +46,6 @@ module.exports = api.portal = {
 
 	invite : function (req, res) {
 
-		console.log('patrh:', path);
-
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var invite_token = path[2];
@@ -538,6 +536,9 @@ module.exports = api.portal = {
 	},
 
 };
+
+// convert logo image from base64
+api.utils.preRenderLogos();
 
 // delete tmp folder on resta
 api.portal.clearTemporaryFolder();
