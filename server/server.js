@@ -20,10 +20,6 @@ var api = require('../api/api');
 var config = api.config;
 var port = config.port;
 
-
-// convert logo image from base64
-api.utils.preRenderLogos();
-
 // socket enabled server
 var app = express().http().io();
 
@@ -39,11 +35,11 @@ app.use(multipart()); // for resumable.js uploads
 // cookie session options
 var sessionOptions = {
 	cookieName: 'session',
-	secret: 'eg[isfd-8yF9-7w233315df{}+Ijsli;;to8',
+	secret: 'eg[isfd-8yF9-7w233315df{}+Ijsli;;to8', 
 	duration: 24 * 60 * 60 * 1000, // 24h
 	activeDuration: 60 * 60 * 1000, // 1h
 	cookie: {
-		path: '/', // cookie will only be sent to requests under '/api'
+		path: '/', 
 		ephemeral: false, // when true, cookie expires when the browser closes
 		httpOnly: true, // when true, cookie is not accessible from javascript
 		secureProxy : true,
@@ -91,13 +87,8 @@ require('../routes/routes.js')(app);
 // load our socket api
 require('../routes/socket.routes.js')(app);
 
-
-
 // launch 
 var server = app.listen(port);
 
 // brag
 console.log('The magic happens @ ', port);
-
-// debug cleanup
-api.upload._deleteDoneChunks(); // todo: fix this, see https://github.com/systemapic/wu/issues/375
