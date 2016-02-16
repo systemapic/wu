@@ -12,7 +12,7 @@ var config = require('../../config/wu-config.js').serverConfig;
 var fs = require('fs');
 
 module.exports = function () {
-    describe.only('/api/file/download', function () {
+    describe('/api/file/download', function () {
 
         it('should respond with status code 401 when not authenticated', function (done) {
             api.get('/api/file/download')
