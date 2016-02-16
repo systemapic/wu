@@ -52,11 +52,8 @@ module.exports = api.geo = {
 
 		// convert json to cartocss
 		api.geo._json2carto(options, function (err, css) {
-			if (err) {
-				return next(err);
-			}
-
-			res.end(css);
+			if (err) return next(err);
+			res.send(css);
 		});
 	},
 

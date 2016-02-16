@@ -78,12 +78,6 @@ module.exports = function(app, passport) {
 	* @apiUse token
 	* @apiParam {String} name Name of project
 	* @apiSuccess {JSON} Project JSON object of the newly created project
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request name doesn't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -115,12 +109,6 @@ module.exports = function(app, passport) {
 	*    "project": "project-o121l2m-12d12dlk-addasml",
 	*    "deleted": true
 	*  }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request project_id doesn't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -164,12 +152,6 @@ module.exports = function(app, passport) {
 	*  createdBy: 'uuid-mocha-test-project',
 	*  uuid: 'uuid-mocha-test-project_public',
 	*  etc..
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request username or project_slug don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -227,12 +209,6 @@ module.exports = function(app, passport) {
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request project_id or user_access_token don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -269,12 +245,6 @@ module.exports = function(app, passport) {
 	*       "redis": "3.0.6"
 	*     }
 	*   }
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	*/
 	// =====================================
@@ -349,12 +319,6 @@ module.exports = function(app, passport) {
 	*	"expires_in":"36000",
 	*	"token_type":"Bearer"
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	*/
 	// ================================
 	// REFRESH TOKEN ==================
@@ -368,12 +332,6 @@ module.exports = function(app, passport) {
 	* @apiUse token
 	*
 	* @apiSuccess {json} status Access token JSON
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	*/
 	// ================================
 	// CHECK TOKEN ====================
@@ -476,12 +434,6 @@ module.exports = function(app, passport) {
 	*    isPublic: false
 	*  }
 	*}
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request access or project do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -546,12 +498,6 @@ module.exports = function(app, passport) {
 	*    files: []
 	*  },
 	*  layer: null
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request file_id do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -671,12 +617,6 @@ module.exports = function(app, passport) {
 	*	 etc...
   	*   }
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request project_id doesn't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -729,12 +669,6 @@ module.exports = function(app, passport) {
 	*	 etc...
   	*   }
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	*/
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
@@ -771,12 +705,6 @@ module.exports = function(app, passport) {
 	*       zoom: '1'
 	*     }
 	*   }
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request project_id or saveState or hash or hash.position or hash.layers or hash.id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -820,12 +748,6 @@ module.exports = function(app, passport) {
 	*     layers: []
 	*   }
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request project_id or project_id or id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -865,12 +787,6 @@ module.exports = function(app, passport) {
 	* @apiSuccess {String} image Image uuid 
 	* @apiSuccessExample {json} Success-Response:
 	* '56bdc6fbc7ec6af66dfc92f0'
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request image_id or resumableIdentifier or id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -993,9 +909,7 @@ module.exports = function(app, passport) {
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/data/download
-	app.get('/api/file/download', checkAccess, function (req, res) {
-		api.file.download(req, res);
-	});
+	app.get('/api/file/download', checkAccess, api.file.download, errorHandler);
 
 	// =====================================
 	// GET FILE DOWNLOAD ===================
@@ -1021,12 +935,6 @@ module.exports = function(app, passport) {
 	*	polygon-fill: red;
 	*
 	*}"
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -1080,12 +988,6 @@ module.exports = function(app, passport) {
     *       ... etc
 	*   }
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError File with uuid <code>uuid</code> doesn't exist. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: File doesn't exist
@@ -1116,12 +1018,6 @@ module.exports = function(app, passport) {
 	*	  ... etc
 	*   }
 	* ]
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Missing required fields. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: Missing type parameter or database_name and table_name for postgis type
@@ -1162,12 +1058,6 @@ module.exports = function(app, passport) {
 	*  }
 	*  users_shared_with : ['userId']
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request dataset or users do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -1207,12 +1097,6 @@ module.exports = function(app, passport) {
 	* {
 	*   "success": true,
 	*   "err": {}
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request file_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -1296,12 +1180,6 @@ module.exports = function(app, passport) {
 	*  name: 'relatedProjectName'
 	* etc...
 	*}
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request file_id or project_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -1351,12 +1229,6 @@ module.exports = function(app, passport) {
 	* {
 	*   "success": true,
 	*   "err": {}
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request layer_id or project_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -1413,12 +1285,6 @@ module.exports = function(app, passport) {
 	*    lastUpdated: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
 	*    _id: 56 a60908fdce40a15eca6773
 	*}, and etc]
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }	
 	* @apiError Bad_request project does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
@@ -1462,18 +1328,17 @@ module.exports = function(app, passport) {
 	*    uuid: 'layer-ae4fc38c-58f0-4468-81e7-7330d226dc24',
 	*    _id: '569f67a2ebb7233b667d8a02'
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	*/
 	// =====================================
 	// CREATE NEW LAYER ====================
 	// =====================================
 	// change to /api/layer/create 
 	app.post('/api/layers/new', checkAccess, api.layer.create);
+
+	// =====================================
+	// CREATE NEW DEFAULT LAYER ============
+	// =====================================
+	app.post('/api/layers/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
 
 	// =====================================
 	// NEW OSM LAYERS ======================
@@ -1501,12 +1366,6 @@ module.exports = function(app, passport) {
 	* @apiSuccess {String} response Update info 
 	* @apiSuccessExample {String} Success-Response:
 	* 'save done'
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Missing required fields. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: Missing layer parameter or layer with such id doesn't exist
@@ -1557,12 +1416,6 @@ module.exports = function(app, passport) {
 	*       created: '2016-01-19T12:49:48.943Z',
 	*       ... etc
 	*   }
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -1615,12 +1468,6 @@ module.exports = function(app, passport) {
 	*       ... etc
 	*   }
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	*/
 	// =====================================
 	// UPDATE USER INFORMATION  ============
@@ -1631,13 +1478,28 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE NEW USER =====================
 	// =====================================
-	app.post('/api/user/new', checkAccess, function (req,res) { // todo: remove /new route
-		api.user.create(req, res);
-	});
-	// keep only this route, not /api/user/new
-	app.post('/api/user/create', checkAccess, function (req,res) {
-		api.user.create(req, res);
-	});
+	/**
+	* @api {post} /api/user/create Create new user
+	* @apiName info
+	* @apiGroup User
+	* @apiParam {String} username Unique username
+	* @apiParam {String} firstname First name
+	* @apiParam {String} lastname Last name
+	* @apiParam {String} [company] Company
+	* @apiParam {String} [position] Position in company
+	* @apiParam {String} email Email
+	* @apiParam {String} password Password
+	* @apiSuccess {Object} user User
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "user": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+	*       created: '2016-01-19T12:49:48.943Z',
+	*       ... etc
+	*   }
+	* }
+	*/
+	app.post('/api/user/create', api.user.create, errorHandler);
 
 	// TODO this endpoint does not exist
 	// =====================================
@@ -1666,12 +1528,6 @@ module.exports = function(app, passport) {
 	* {
 	*   "unique": true
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request Email does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -1688,7 +1544,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/unique', checkAccess, api.user.checkUniqueEmail, errorHandler);
+	app.post('/api/user/unique', api.user.checkUniqueEmail, errorHandler);
 
 	/**
 	* @apiIgnore
@@ -1701,12 +1557,6 @@ module.exports = function(app, passport) {
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*   "unique": true
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request Username does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -1737,12 +1587,6 @@ module.exports = function(app, passport) {
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*   "unique": true
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request Email does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -1775,12 +1619,6 @@ module.exports = function(app, passport) {
 	* {
 	*   "error": null
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request Emails or customMessage or access do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -1797,7 +1635,44 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SEND INVITE MAIL ====================
 	// =====================================
+	// rename to /api/user/invite/email
 	app.post('/api/user/invite', checkAccess, api.user.invite, errorHandler);
+
+
+	/**
+	* @api {post} /api/user/invite/accept Accept invite
+	* @apiName Accept invite
+	* @apiGroup User
+	* @apiUse token
+	* @apiParam {String} invite_token Invite token (for example 55mRbPA)
+	* @apiSuccess {Object} invite Accepted invite
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*     "email": false,
+	*     "access": {
+	*         "edit": [
+	*             "project-ef990c38-f16c-478e-9ed1-65ed2808b070"
+	*         ],
+	*         "read": [
+	*             "project-65f99b5c-a645-4f3a-8905-9fad85c59c40",
+	*             "project-f7a9dd0b-4113-44a0-8e2d-e0d752f1cc04",
+	*             "project-c72c3d83-ff96-4483-8f39-f942c0187108"
+	*         ]
+	*     },
+	*     "token": "L9Jfxks",
+	*     "invited_by": "user-805dc4a1-2535-41f3-9a1b-af32ad134692",
+	*     "timestamp": 1455569798000,
+	*     "type": "link"
+	* }
+	*/
+	// =====================================
+	// PROCESS INVITE FOR USER =============
+	// =====================================
+	// rename to /api/user/invite/email
+	app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
+
+
+
 
 	/**
 	* @api {post} /api/user/requestContact Request contact
@@ -1809,12 +1684,6 @@ module.exports = function(app, passport) {
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*   "error": null
-	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
 	* }
 	* @apiError Bad_request Contact does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -1877,12 +1746,6 @@ module.exports = function(app, passport) {
 	*    }
 	*  }]
 	* }
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request User, edits and reads do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -1911,12 +1774,6 @@ module.exports = function(app, passport) {
 	* @apiSuccess {Stringy} link Invite link
 	* @apiSuccessExample {json} Success-Response:
 	* https://dev3.systemapic.com/invite/7Tf7Bc8
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (401)
-	* @apiErrorExample {json} Error-Response:
-	* Error 401: Unauthorized
-	* {
-	*    "error": "Invalid access token."
-	* }
 	* @apiError Bad_request access does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request

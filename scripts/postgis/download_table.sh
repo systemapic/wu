@@ -27,5 +27,5 @@ export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
 export PGUSERNAME=$SYSTEMAPIC_PGSQL_USERNAME
 export PGHOST=postgis
 
-pgsql2shp -f "$2" "$1" "$3"
+pgsql2shp -u $PGUSERNAME -P $PGPASSWORD -f "$2" "$1" "$3"
 

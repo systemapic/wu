@@ -73,7 +73,15 @@
     },
     "checking_user_name": {
         "errorMessage": "Couldn't create layer.",
-        "code": "500"
+        "code": "400"
+    },
+    "username_taken": {
+        "message": "Username is already taken.",
+        "code": "400"
+    },
+    "email_taken": {
+        "message": "Email is already taken.",
+        "code": "400"
     },
     "no_such_upload_status_id": {
         "errorMessage": "no such upload status id",
@@ -102,5 +110,9 @@
     "no_such_hash": {
         "errorMessage": "No such hash.",
         "code": "401"        
+    },
+    "file_not_found": {
+        "errorMessage": "File not found.",
+        "code": "404"  
     }
 }
