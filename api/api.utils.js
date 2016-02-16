@@ -103,8 +103,10 @@ module.exports = api.utils = {
 	},
 
 	createNameSlug : function (name) {
-		var slug = name.replace(/\s+/g, '').toLowerCase();
-		slug =api.utils.stripAccents(slug);
+		// strip everything but letters, numbers, !, ? and remove accents
+		var slug = api.utils.stripAccents(name.replace(/[^\w\s!?]/g,'').toLowerCase());
+		slug = slug.replace(/\s/g, '')
+		console.log('slug: ', slug);
 		return slug;
 	},
 
