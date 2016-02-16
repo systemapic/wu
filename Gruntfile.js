@@ -189,7 +189,8 @@ module.exports = function(grunt) {
 					'public/js/lib/moment.js/moment.min.js',
 					'public/js/lib/sniffer/sniffer.module.js',
 					'public/js/lib/cryptojs/sha3.js',
-					'public/js/lib/nouislider/nouislider.js'
+					'public/js/lib/nouislider/nouislider.js',
+					'public/js/lib/jscookie/js.cookie.js'
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
