@@ -110,5 +110,9 @@
     "no_such_hash": {
         "errorMessage": "No such hash.",
         "code": "401"        
+    },
+    "file_not_found": {
+        "errorMessage": "File not found.",
+        "code": "404"  
     }
 }
