@@ -492,6 +492,111 @@ module.exports = api.user = {
 
 	},
 
+
+	create : function (req, res, next) {
+		var options = req.body;
+		var username = options.username;
+		var firstname = options.firstname;
+		var lastname = options.lastname;
+		var company = options.company;
+		var position = options.position;
+		var email = options.email;
+		var password = options.password;
+		var invite_token = options.invite;
+		var missing = [];
+		var ops = [];
+
+		// check valid fields
+		if (!username) 	missing.push('username');
+		if (!firstname) missing.push('firstname');
+		if (!lastname) 	missing.push('lastname');
+		if (!email) 	missing.push('email');
+		if (!password) 	missing.push('password');
+		console.log(missing);
+		if (!_.isEmpty(missing)) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing));
+
+
+		// ensure unique username
+		ops.push(function (callback) {
+			api.user._checkUniqueUsername(username, callback);
+		});
+
+		// check unique email
+		ops.push(function (callback) {
+			api.user._checkUniqueEmail(email, callback);
+		});
+
+		// create user
+		ops.push(function (callback) {
+			api.user.createUserModel(options, callback);
+		});
+
+		// run ops
+		async.series(ops, function (err, results) {
+			if (err) return next(err);
+
+			// return user
+			var user = results[2];
+			res.send(user);
+		});
+
+	},
+
+	createUserModel : function (options, done) {
+		var user            	= new User();
+		user.uuid 		= 'user-' + uuid.v4();
+		user.local.email    	= options.email;	
+		user.local.password 	= user.generateHash(options.password);
+		user.firstName 		= options.firstname;
+		user.lastName 		= options.lastname;
+		user.company 		= options.company;
+		user.position 		= options.position;
+		user.username 		= options.username;
+		user.save(function (err, user) {
+			done(err, user);
+		});
+	},
+
+
+	// _create : function (job, callback) {
+	// 	var options = job.options,
+	// 	    account = job.account;
+
+	// 	if (!options || !account) return callback('Missing information.5');
+
+	// 	// create the user
+	// 	var user            	= new User();
+	// 	var password 		= crypto.randomBytes(16).toString('hex');
+	// 	user.uuid 		= 'user-' + uuid.v4();
+	// 	user.local.email    	= options.email;	
+	// 	user.local.password 	= user.generateHash(password);
+	// 	user.firstName 		= options.firstName;
+	// 	user.lastName 		= options.lastName;
+	// 	user.company 		= options.company;
+	// 	user.position 		= options.position;
+	// 	user.phone 		= options.phone;
+	// 	user.createdBy		= account.getUuid();
+		
+	// 	// save the user
+	// 	user.save(function(err, user) { 
+	// 		callback(err, user, password); // todo: password plaintext
+	// 	});
+	// },
+
+
+
+	_checkUniqueEmail : function (email, done) {
+		User
+		.findOne({'local.email' : email})
+		.exec(function (err, user) {
+			if (err || user) return done(errors.email_taken);
+			console.log('existing user? err, user', email, err, user);
+			done(null);
+		});
+	},
+
+
+
 	// called from passport.js (no req.user exists here)
 	register : function (options, done) {
 
@@ -689,6 +794,89 @@ module.exports = api.user = {
 	},
 
 
+	// user accepts invite (user must already exist)
+	acceptInvite : function (req, res, next) {
+		console.log('acceptInvite');
+		var user = req.user;
+		var options = req.body;
+		var missing = [];
+		var ops = [];
+		var invitation;
+
+		// check if valid request
+		if (!options.invite_token) missing.push('invite_token');
+		if (!user) missing.push('access_token');
+		if (!_.isEmpty(missing)) return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing);
+
+
+		api.user._acceptInvite(user, options, function (err, invitation) {
+			if (err) return next(err);
+			res.send(invitation);
+		})
+	},
+
+	_acceptInvite : function (user, options, done) {
+		var missing = [];
+		var ops = [];
+		var invitation;
+
+		// check if valid request
+		if (!options.invite_token) missing.push('invite_token');
+		if (!user) missing.push('access_token');
+		if (!_.isEmpty(missing)) return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing);
+
+		// get token store from redis
+		ops.push(function (callback) {
+			var invite_id = 'invite:token:' + options.invite_token;
+			api.redis.tokens.get(invite_id, callback);
+		});
+
+		// get projects
+		ops.push(function (inviteJSON, callback) {
+			
+			// parse
+			invitation = JSON.parse(inviteJSON);
+			if (!invitation) return callback('Invitation is expired or does not exist.');
+
+			callback(null, {
+				read : invitation.access.read,
+				edit : invitation.access.edit
+			});
+		});
+
+
+		// give read access
+		ops.push(function (projectAccess, callback) {
+			async.each(projectAccess.read, function (project_id, cb) {
+				api.project.giveReadAccess({
+					user : user,
+					project_id : project_id
+				}, cb)
+			}, function (err) {
+				callback(err, projectAccess);
+			});
+		});
+
+		// give edit access
+		ops.push(function (projectAccess, callback) {
+			async.each(projectAccess.edit, function (project_id, cb) {
+				api.project.giveEditAccess({
+					user : user,
+					project_id : project_id
+				}, cb)
+			}, callback);
+		});
+
+		// done
+		async.waterfall(ops, function (err, results) {
+			return done(err, invitation);
+			// if (err) return next(err);
+			// res.send(invitation);
+		});
+		
+	},
+
+
 	_processInviteToken : function (options, done) {
 		var user = options.user,
 		    invite_token,
@@ -749,30 +937,30 @@ module.exports = api.user = {
 
 
 
-	_create : function (job, callback) {
-		var options = job.options,
-		    account = job.account;
+	// _create : function (job, callback) {
+	// 	var options = job.options,
+	// 	    account = job.account;
 
-		if (!options || !account) return callback('Missing information.5');
+	// 	if (!options || !account) return callback('Missing information.5');
 
-		// create the user
-		var user            	= new User();
-		var password 		= crypto.randomBytes(16).toString('hex');
-		user.uuid 		= 'user-' + uuid.v4();
-		user.local.email    	= options.email;	
-		user.local.password 	= user.generateHash(password);
-		user.firstName 		= options.firstName;
-		user.lastName 		= options.lastName;
-		user.company 		= options.company;
-		user.position 		= options.position;
-		user.phone 		= options.phone;
-		user.createdBy		= account.getUuid();
+	// 	// create the user
+	// 	var user            	= new User();
+	// 	var password 		= crypto.randomBytes(16).toString('hex');
+	// 	user.uuid 		= 'user-' + uuid.v4();
+	// 	user.local.email    	= options.email;	
+	// 	user.local.password 	= user.generateHash(password);
+	// 	user.firstName 		= options.firstName;
+	// 	user.lastName 		= options.lastName;
+	// 	user.company 		= options.company;
+	// 	user.position 		= options.position;
+	// 	user.phone 		= options.phone;
+	// 	user.createdBy		= account.getUuid();
 		
-		// save the user
-		user.save(function(err, user) { 
-			callback(err, user, password); // todo: password plaintext
-		});
-	},
+	// 	// save the user
+	// 	user.save(function(err, user) { 
+	// 		callback(err, user, password); // todo: password plaintext
+	// 	});
+	// },
 
 	// validate request parameters for update user
 	_validateUserUpdates : function (req) {
@@ -921,6 +1109,7 @@ module.exports = api.user = {
 		return queries;
 	},
 
+
 	// check unique email
 	checkUniqueEmail : function (req, res, next) {
 		if (!req.body) {
@@ -935,7 +1124,6 @@ module.exports = api.user = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['email']));
 		}
 	
-	    console.log('check unique EMAIL', email);
 
 		User.findOne({'local.email' : email}, function (err, result) {
 			if (err) {
@@ -970,13 +1158,13 @@ module.exports = api.user = {
 				var new_username = username + api.utils.getRandomChars(3, '0123456789');
 
 				// flood safe
-				if (n>100) return done('too many attempts.');
+				if (n>10) return done('too many attempts.');
 
 				// check again
-				api.user.ensureUniqueUsername(new_username, done, n++);
+				return api.user.ensureUniqueUsername(new_username, done, n++);
 			}
 
-			// return 
+			// return
 			done(err, username);
 		});
 	},
@@ -985,13 +1173,14 @@ module.exports = api.user = {
 		User
 		.findOne({username : username}) 
 		.exec(function (err, user) {
-			var unique = _.isEmpty(user);
-			done && done(err, unique);
+			if (err || user) return done(errors.username_taken);
+			done(null);
 		});
 	},
 
 	// check unique username
 	checkUniqueUsername : function (req, res, next) {
+		console.log('req.body userna', req.body);
 		if (!req.body) {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
 		}
@@ -1002,16 +1191,16 @@ module.exports = api.user = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['username']));
 		}
 
-		// check if unique
-		api.user._checkUniqueUsername(username, function (err, unique) {
+		User
+		.findOne({username : username}) 
+		.exec(function (err, user) {
+
 			if (err) {
 				err.message = errors.checking_user_name.errorMessage;
 				return next(err);
 			}
 
-			res.send({
-				unique : unique
-			});
+			res.send({ unique : _.isEmpty(user) });
 		});
 
 	},

@@ -1,4 +1,3 @@
-// 
 // API: api.import.js
 
 // database schemas
@@ -50,13 +49,15 @@ module.exports = api.import = {
 
 	import : function (options, done) {
 
-		var files = options.files,
-		    user = options.user,
-		    uploadStatus = options.uploadStatus,
-		    body = options.body,
-		    access_token = options.access_token,
-		    file_id = uploadStatus.file_id,
-		    import_start_time = new Date().getTime();
+		var files = options.files;
+		var user = options.user;
+		var uploadStatus = options.uploadStatus;
+		var body = options.body;
+		var access_token = options.access_token;
+		var file_id = uploadStatus.file_id;
+		var import_start_time = new Date().getTime();
+		var use_sockets = options.use_sockets;
+		var addToProject = options.addToProject;
 		var ops = [];
 
 		// import data
@@ -72,7 +73,7 @@ module.exports = api.import = {
 			}
 
 			// ping progress
-			api.socket.processingProgress({
+			use_sockets && api.socket.processingProgress({
 				user_id : user._id,
 				progress : {
 					text : 'Preparing import...',
@@ -90,7 +91,7 @@ module.exports = api.import = {
 				opts.uniqueIdentifier = uploadStatus.uniqueIdentifier;
 
 				// ping progress
-				api.socket.processingProgress({
+				use_sockets && api.socket.processingProgress({
 					user_id : user._id,
 					progress : {
 						text : 'Importing...',
@@ -103,11 +104,7 @@ module.exports = api.import = {
 				// get uploadStatus, get meta, set to file
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
-					console.log('uploadSTATUSSTSUTA', uploadStatus);
-					console.log('TYPE', uploadStatus.data_type);
-
 					if (uploadStatus.data_type == 'raster') {
-
 						api.geo.handleRaster(opts, callback);
 
 					} else {
@@ -137,7 +134,7 @@ module.exports = api.import = {
 						file.data.raster.metadata = JSON.stringify(meta);
 					}
 					
-
+					// save file
 					file.save(function (err, doc) {
 
 						// add to user
@@ -180,7 +177,7 @@ module.exports = api.import = {
 				}, function (err2) {
 
 					// send error message on socket
-					api.socket.sendError(user._id, {
+					use_sockets && api.socket.sendError(user._id, {
 						title : 'Upload failed.',
 						description : err,
 						uniqueIdentifier : uploadStatus.uniqueIdentifier,
@@ -197,14 +194,14 @@ module.exports = api.import = {
 			var import_took_ms = import_stop_time - import_start_time;
 
 			// ping client
-			api.upload._notifyProcessingDone({
+			use_sockets && api.upload._notifyProcessingDone({
 				file_id : file_id,
 				user_id : user._id,
 				import_took_ms : import_took_ms
 			});
 
 			// ping progress
-			api.socket.processingProgress({
+			use_sockets && api.socket.processingProgress({
 				user_id : user._id,
 				progress : {
 					text : 'Processing done!',
@@ -213,6 +210,16 @@ module.exports = api.import = {
 					uniqueIdentifier : uploadStatus.uniqueIdentifier,
 				}
 			});
+
+
+			// add to project
+			if (addToProject) {
+
+				console.log('adding to project!!!');
+
+
+			}
+
 
 			// all done
 			done(err);

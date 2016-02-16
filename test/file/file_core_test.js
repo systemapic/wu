@@ -2,6 +2,7 @@ var fileDelete = require('./delete');
 var fileUpdate = require('./update');
 var fileAddToProject = require('./addtoproject');
 var fileGetLayers = require('./getLayers');
+var fileDownload = require('./download');
 var helpers = require('../helpers');
 
 describe('File', function () {
@@ -22,4 +23,5 @@ describe('File', function () {
     fileUpdate();
     fileAddToProject();
     fileGetLayers();
+    fileDownload();
 });

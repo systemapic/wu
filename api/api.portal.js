@@ -39,13 +39,12 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+
 // exports
 module.exports = api.portal = { 
 
 
 	invite : function (req, res) {
-
-		console.log('patrh:', path);
 
 		// get client/project
 		var path = req.originalUrl.split('/');
@@ -260,6 +259,8 @@ module.exports = api.portal = {
 		}
 
 		var email = req.query.email;
+
+		if (_.isEmpty(email)) return res.end();
 
 		// add to redis
 		api.redis.stats.lpush('beta_access', email);
@@ -527,8 +528,17 @@ module.exports = api.portal = {
 
 			done(null, versions);
 		});
-	}
+	},
+
+	clearTemporaryFolder : function () {
+		var path = api.config.path.temp;
+		fs.emptyDir(path, function () {});
+	},
 
 };
 
+// convert logo image from base64
+api.utils.preRenderLogos();
 
+// delete tmp folder on resta
+api.portal.clearTemporaryFolder();

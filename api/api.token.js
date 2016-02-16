@@ -226,6 +226,8 @@ module.exports = api.token = {
 		// got some session, either public or user
 		api.token.check(tokens.access_token, function (err, user) {
 
+			console.log('checked for token..', err, user);
+
 			// no session, return public user
 			if (err) return api.token.getPublicToken(function (err, public_token) {
 				res.send(public_token);

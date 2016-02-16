@@ -2,11 +2,10 @@
 
 // api
 var api = {};
-// api.version = require('fs').readFileSync('../public/js/src/core/app.js').toString().split("'")[1];
-api.version = '1.3.7';
+api.version = '1.3.8';
 
 // config
-var config = require('../config/wu-config.js');
+var config = require('../../config/wu-config.js');
 api.config = config.serverConfig;
 api.clientConfig = config.clientConfig;
 api.loginConfig = config.loginConfig;

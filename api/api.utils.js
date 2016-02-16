@@ -696,10 +696,9 @@ module.exports = api.utils = {
 			var base64Data = api.clientConfig.logos.clientLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
 			fs.writeFile(path.resolve(__dirname, '../public/images/portal-logo.png'), base64Data, 'base64', function (err) {
 				if (err) {
-					console.log("file with portal-logo.png was not created");
+					console.log("Error creating portal-logo.png!");
 				}
 
-				console.log("file with portal-logo.png was created successfully");
 			});
 		}
 	}
