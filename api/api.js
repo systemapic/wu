@@ -2,7 +2,7 @@
 
 // api
 var api = {};
-api.version = '1.3.8';
+api.version = '1.4.0';
 
 // config
 var config = require('../../config/wu-config.js');
