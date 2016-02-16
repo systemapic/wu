@@ -224,12 +224,14 @@ module.exports = api.file = {
 
 
 	// handle file downloads
-	downloadPDF : function (req, res) {
+	downloadPDF : function (req, res, next) {
 		var fileUuid = req.query.file,
 		    account = req.user,
 		    ops = [];
 
-		if (!fileUuid) return api.error.missingInformation(req, res);
+		if (!fileUuid) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['file']));
+		}
 
 		ops.push(function (callback) {
 			File
@@ -238,6 +240,14 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (file, callback) {
+
+			if (!file) {
+				return next({
+					message: errors.file_not_found.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
+
 			api.access.to.download_file({
 				file : file,
 				user : account
@@ -245,9 +255,8 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (options, callback) {
-			var record = options.file,
-			    name = record.name.replace(/\s+/g, '');
-			
+			var record = options.file;
+			var name = record.name.replace(/\s+/g, '');
 
 			var folder = api.config.path.file + fileUuid;
 
@@ -369,60 +378,76 @@ module.exports = api.file = {
 
 
 	// download zip
-	downloadZip : function (req, res) {
-		var file = req.query.file,
-		    dive = require('dive'),
-		    folder = api.config.path.temp + file,
-		    found,
-		    ops = [];
+	downloadZip : function (req, res, next) {
+		var folder = api.config.path.temp + req.query.file;
+		var found;
+		var ops = [];
 	
 		// todo: this is #$SD. not even dealing with a file object here, just paths.. 
 		// 	not solid! FIX!
 		
 		// find zip file
-		dive(folder, 
+		dive(folder,
 
 			// each file callback
 			function(err, file) {
-				if (err) console.log('ERR 13'.red, err);
+				if (err) {
+					console.log('ERR 13'.red, err);
+				}
 
-				if (err || !file) return api.error.general(req, res, 'File not found.');
+				if (err || !file) {
+					return next({
+						message: errors.file_not_found.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
 
 				if (file.slice(-3) == 'zip') {
 					found = true;
 					return res.download(file);
 					// todo: delete zip file
 				}
-			}, 
+			},
 
 			// callback
 			function (err) { 
-				if (err) console.log('ERR 14'.red, err);
+				if (err) {
+				  console.log('ERR 14'.red, err);
+				  next(err); 
+				}
 
-				if (!found) return api.error.general(req, res, 'File not found.');
+				if (!found) {
+					return next({
+						message: errors.file_not_found.errorMessage,
+						code: httpStatus.NOT_FOUND
+					});
+				}
 			}	
 		);
 	},
 
 
 	// handle file download
-	download : function (req, res) {
-		var file = req.query.file,
-		    type = req.query.type || 'file';
+	download : function (req, res, next) {
+		var query = req.query || {};
+		var file = query.file;
+		var type = query.type || 'file';
 	
-		if (!file) return api.error.missingInformation(req, res);
+		if (!file) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['file']));
+		}
 		
 		// zip file
-		if (type == 'zip') return api.file.downloadZip(req, res);
+		if (type == 'zip') return api.file.downloadZip(req, res, next);
 		
 		// pdf
-		if (type == 'pdf') return api.file.downloadPDF(req, res);
+		if (type == 'pdf') return api.file.downloadPDF(req, res, next);
 
 		// pdf
-		if (type == 'shp') return api.file.downloadShape(req, res);
+		if (type == 'shp') return api.file.downloadShape(req, res, next);
 
 		// normal file
-		return api.file.downloadFile(req, res);
+		return api.file.downloadFile(req, res, next);
 	},
 
 

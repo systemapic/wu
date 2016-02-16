@@ -993,9 +993,7 @@ module.exports = function(app, passport) {
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/data/download
-	app.get('/api/file/download', checkAccess, function (req, res) {
-		api.file.download(req, res);
-	});
+	app.get('/api/file/download', checkAccess, api.file.download, errorHandler);
 
 	// =====================================
 	// GET FILE DOWNLOAD ===================
