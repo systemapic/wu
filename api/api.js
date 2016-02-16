@@ -8,7 +8,6 @@ api.version = '1.3.8';
 var config = require('../../config/wu-config.js');
 api.config = config.serverConfig;
 api.clientConfig = config.clientConfig;
-api.loginConfig = config.loginConfig;
 
 // exports
 module.exports 		= api;
