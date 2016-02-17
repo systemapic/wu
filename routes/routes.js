@@ -69,7 +69,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET PORTAL  =========================
 	// =====================================
-	app.post('/api/portal', checkAccess, api.portal.getPortal);
+	// app.post('/api/portal', checkAccess, api.portal.getPortal);
+	app.post('/v2/portal', checkAccess, api.portal.getPortal);
 	
 	/**
 	* @api {post} /api/project/create Create a project
@@ -94,7 +95,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/api/project/create', checkAccess, api.project.create, errorHandler);
+	// app.post('/api/project/create', checkAccess, api.project.create, errorHandler);
+	app.post('/v2/projects/create', checkAccess, api.project.create, errorHandler);
 
 	/**
 	* @api {post} /api/project/delete Delete a project
@@ -134,7 +136,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
-	app.post('/api/project/delete', checkAccess, api.project.deleteProject, errorHandler);
+	// app.post('/api/project/delete', checkAccess, api.project.deleteProject, errorHandler);
+	app.post('/v2/projects/delete', checkAccess, api.project.deleteProject, errorHandler);
 
 	/**
 	* @api {post} /api/project/get/public Get a public project
@@ -196,7 +199,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK THAT PROJECT IS PUBLIC ========
 	// =====================================
-	app.post('/api/project/get/public', checkAccess, api.project.getPublic, errorHandler);
+	// app.post('/api/project/get/public', checkAccess, api.project.getPublic, errorHandler);
+	app.post('/v2/projects/public', checkAccess, api.project.getPublic, errorHandler);
 
 	/**
 	* @api {post} /api/project/get/private Get private project
@@ -225,7 +229,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK THAT PROJECT IS PRIVATE =======
 	// =====================================
-	app.post('/api/project/get/private', checkAccess, api.project.getPrivate, errorHandler);
+	// app.post('/api/project/get/private', checkAccess, api.project.getPrivate, errorHandler);
+	app.post('/v2/projects/private', checkAccess, api.project.getPrivate, errorHandler);
 
 	/**
 	* @api {get} /api/status Get portal status
@@ -253,7 +258,7 @@ module.exports = function(app, passport) {
 	app.get('/api/status', checkAccess, api.portal.status);
 
 	// deprecated
-	app.post('/oauth/token', api.oauth2.getToken);
+	// app.post('/oauth/token', api.oauth2.getToken);
 		
 	/**
 	* @api {post} /api/token Get access token
@@ -304,7 +309,8 @@ module.exports = function(app, passport) {
 	// ================================
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
-	app.post('/api/token', api.token.getTokenFromPassword, errorHandler);
+	// app.post('/api/token', api.token.getTokenFromPassword, errorHandler);
+	app.post('/v2/users/token', api.token.getTokenFromPassword, errorHandler);
 
 	/**
 	* @api {post} /api/token/refresh Refresh access token
@@ -323,7 +329,8 @@ module.exports = function(app, passport) {
 	// ================================
 	// REFRESH TOKEN ==================
 	// ================================
-	app.post('/api/token/refresh', checkAccess, api.token.refresh, errorHandler);
+	// app.post('/api/token/refresh', checkAccess, api.token.refresh, errorHandler);
+	app.post('/v2/users/token/refresh', checkAccess, api.token.refresh, errorHandler);
 	
 	/**
 	* @api {post} /api/token/check Check access token
@@ -336,7 +343,8 @@ module.exports = function(app, passport) {
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.post('/api/token/check', checkAccess, function (req, res) {
+	// app.post('/api/token/check', checkAccess, function (req, res) {
+	app.post('/v2/users/token/check', checkAccess, function (req, res) {
 		res.send(req.user);
 	});
 
@@ -355,9 +363,8 @@ module.exports = function(app, passport) {
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.get('/api/token/check', checkAccess, function (req, res) {
-
-		// todo: fix this
+	// app.get('/api/token/check', checkAccess, function (req, res) {
+	app.get('/v2/users/token/check', checkAccess, function (req, res) {
 		res.send({valid : true});
 	});
 	
@@ -371,22 +378,26 @@ module.exports = function(app, passport) {
 	// ================================
 	// CHECK SESSION ==================
 	// ================================
-	app.post('/api/user/session', api.token.checkSession);
+	// app.post('/api/user/session', api.token.checkSession);
+	app.post('/v2/users/session', api.token.checkSession);
 
 	// =====================================
 	// ERROR LOGGING =======================
 	// =====================================
-	app.post('/api/error/log', checkAccess, api.error.clientLog);
+	// app.post('/api/error/log', checkAccess, api.error.clientLog);
+	app.post('/v2/log/error', checkAccess, api.error.clientLog);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.post('/api/analytics/set', checkAccess, api.analytics.set);
+	// app.post('/api/analytics/set', checkAccess, api.analytics.set);
+	app.post('/v2/log', checkAccess, api.analytics.set);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.post('/api/analytics/get', checkAccess, api.analytics.get);
+	// app.post('/api/analytics/get', checkAccess, api.analytics.get);
+	app.post('/v2/log/get', checkAccess, api.analytics.get);
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
@@ -410,9 +421,10 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
-	// SET ACCESS / deprecated =============
+	// SET ACCESS ==========================
 	// =====================================
-	app.post('/api/project/setAccess', checkAccess, function (req,res) {
+	// app.post('/api/project/setAccess', checkAccess, function (req,res) {
+	app.post('/v2/projects/access', checkAccess, function (req,res) {
 		api.project.setAccess(req, res);
 	});
 
@@ -460,7 +472,8 @@ module.exports = function(app, passport) {
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	// change route to /api/project/invite
-	app.post('/api/project/addInvites', checkAccess, api.project.addInvites, errorHandler);
+	// app.post('/api/project/addInvites', checkAccess, api.project.addInvites, errorHandler);
+	app.post('/v2/users/invite/project', checkAccess, api.project.addInvites, errorHandler);
 
 	/**
 	* @api {post} /api/upload/get Get upload
@@ -651,7 +664,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/api/project/update', checkAccess, api.project.update, errorHandler);
+	// app.post('/api/project/update', checkAccess, api.project.update, errorHandler);
+	app.post('/v2/projects/update', checkAccess, api.project.update, errorHandler);
 
 	/**
 	* @api {post} /api/project/unique Unique project
@@ -723,7 +737,8 @@ module.exports = function(app, passport) {
 	// SET PROJECT HASH ====================
 	// =====================================
 	// change to /api/project/setHash
-	app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
+	// app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
+	app.post('/v2/hashes/create', checkAccess, api.project.setHash, errorHandler);
 
 	/**
 	* @api {post} /api/project/hash/get Get project hash
@@ -774,7 +789,8 @@ module.exports = function(app, passport) {
 	// GET PROJECT HASH ====================
 	// =====================================
 	// change to /api/project/getHash
-	app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
+	// app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
+	app.post('/v2/hashes/get', checkAccess, api.project.getHash, errorHandler);
 
 	/**
 	* @api {post} /api/project/uploadlogo Upload project logo
@@ -868,7 +884,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// create snapshot of current map
 	// change to /api/tools/snap/create
-	app.post('/api/util/snapshot', checkAccess, function (req, res) {
+	// app.post('/api/util/snapshot', checkAccess, function (req, res) {
+	app.post('/v2/static/screen', checkAccess, function (req, res) {
 		api.pixels.createSnapshot(req, res);
 	});
 
@@ -876,7 +893,8 @@ module.exports = function(app, passport) {
 	// CREATE THUMBNAIL ====================
 	// =====================================
 	// change to /api/tools/thumb/create
-	app.post('/api/util/createThumb', checkAccess, function (req, res) {
+	// app.post('/api/util/createThumb', checkAccess, function (req, res) {
+	app.post('/v2/static/thumb', checkAccess, function (req, res) {
 		api.pixels.createThumb(req, res);
 	});
 
@@ -884,7 +902,8 @@ module.exports = function(app, passport) {
 	// CREATE PDF SNAPSHOT =================
 	// =====================================
 	// change to /api/tools/pdf/create
-	app.post('/api/util/pdfsnapshot', checkAccess, function (req, res) {
+	// app.post('/api/util/pdfsnapshot', checkAccess, function (req, res) {
+	app.post('/v2/static/pdf', checkAccess, function (req, res) {
 		api.pixels.createPDFSnapshot(req, res);
 	});
 
@@ -892,7 +911,8 @@ module.exports = function(app, passport) {
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
 	// change to /api/layer/legends/create
-	app.post('/api/layer/createlegends', checkAccess, function (req, res) {
+	// app.post('/api/layer/createlegends', checkAccess, function (req, res) {
+	app.post('/v2/legends/create', checkAccess, function (req, res) {
 		api.legend.create(req, res);
 	});
 
@@ -952,13 +972,15 @@ module.exports = function(app, passport) {
 	// GET GEOJSON FILES ===================
 	// =====================================
 	// change to /api/tools/json2carto
-	app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
+	// app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
+	app.post('/v2/layers/carto/json', checkAccess, api.geo.json2carto, errorHandler);
 
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/data/download (POST/GET routes with same name no problem)
-	app.post('/api/file/downloadDataset', checkAccess, function (req,res) {
+	// app.post('/api/file/downloadDataset', checkAccess, function (req,res) {
+	app.post('/v2/data/download', checkAccess, function (req,res) {
 		api.postgis.downloadDatasetFromFile(req, res);
 	});
 
@@ -966,7 +988,8 @@ module.exports = function(app, passport) {
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/layer/download
-	app.post('/api/layer/downloadDataset', checkAccess, function (req,res) {
+	// app.post('/api/layer/downloadDataset', checkAccess, function (req,res) {
+	app.post('/v2/layers/download', checkAccess, function (req,res) {
 		api.postgis.downloadDatasetFromLayer(req, res);
 	});
 	
@@ -999,7 +1022,8 @@ module.exports = function(app, passport) {
 	// UPDATE FILE =========================
 	// =====================================
 	// change to /api/data/update
-	app.post('/api/file/update', checkAccess, api.file.update, errorHandler);
+	// app.post('/api/file/update', checkAccess, api.file.update, errorHandler);
+	app.post('/v2/data/update', checkAccess, api.file.update, errorHandler);
 
 	/**
 	* @api {post} /api/file/getLayers Get layers
@@ -1035,7 +1059,8 @@ module.exports = function(app, passport) {
 	// GET LAYERS OF FILE ==================
 	// =====================================
 	// change to /api/data/getLayers
-	app.post('/api/file/getLayers', checkAccess, api.file.getLayers);
+	// app.post('/api/file/getLayers', checkAccess, api.file.getLayers);
+	app.post('/v2/data/layers', checkAccess, api.file.getLayers);
 
 	/**
 	* @api {post} /api/dataset/share Share dataset
@@ -1084,7 +1109,8 @@ module.exports = function(app, passport) {
 	// SHARE DATASET =======================
 	// =====================================
 	// change to /api/data/share
-	app.post('/api/dataset/share', checkAccess, api.file.shareDataset, errorHandler);
+	// app.post('/api/dataset/share', checkAccess, api.file.shareDataset, errorHandler);
+	app.post('/v2/data/share', checkAccess, api.file.shareDataset, errorHandler);
 	
 	/**
 	* @api {post} /api/file/delete Delete data
@@ -1142,7 +1168,8 @@ module.exports = function(app, passport) {
 	// DELETE DATA =========================
 	// =====================================
 	// change to /api/data/delete
-	app.post('/api/file/delete', checkAccess, api.file.deleteFile, errorHandler);
+	// app.post('/api/file/delete', checkAccess, api.file.deleteFile, errorHandler);
+	app.post('/v2/data/delete', checkAccess, api.file.deleteFile, errorHandler);
 
 	/**
 	* @api {post} /api/file/addtoproject Add file to the project
@@ -1215,7 +1242,8 @@ module.exports = function(app, passport) {
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	// change to /api/project/addData
-	app.post('/api/file/addtoproject', checkAccess, api.file.addFileToProject, errorHandler);
+	// app.post('/api/file/addtoproject', checkAccess, api.file.addFileToProject, errorHandler);
+	app.post('/v2/projects/data', checkAccess, api.file.addFileToProject, errorHandler);
 
 	/**
 	* @api {post} /api/layers/delete Delete data
@@ -1265,7 +1293,8 @@ module.exports = function(app, passport) {
 	// DELETE LAYER(S) =====================
 	// =====================================
 	// change to /api/layer/delete (layer, not layers)
-	app.post('/api/layers/delete', checkAccess, api.layer.deleteLayer, errorHandler);
+	// app.post('/api/layers/delete', checkAccess, api.layer.deleteLayer, errorHandler);
+	app.post('/v2/layers/delete', checkAccess, api.layer.deleteLayer, errorHandler);
 
 	/**
 	* @api {post} /api/layers Get layers related with project
@@ -1304,6 +1333,8 @@ module.exports = function(app, passport) {
 	// change to /api/layer/get 
 	app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
 
+	// todo: /v2/projects/layers GET request
+
 	/**
 	* @api {post} /api/layers/new Create layer
 	* @apiName create
@@ -1333,18 +1364,21 @@ module.exports = function(app, passport) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	// change to /api/layer/create 
-	app.post('/api/layers/new', checkAccess, api.layer.create);
+	// app.post('/api/layers/new', checkAccess, api.layer.create);
+	app.post('/v2/layers/create', checkAccess, api.layer.create);
 
 	// =====================================
 	// CREATE NEW DEFAULT LAYER ============
 	// =====================================
-	app.post('/api/layers/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
+	// app.post('/api/layers/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
+	app.post('/v2/layers/create/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
 
 	// =====================================
 	// NEW OSM LAYERS ======================
 	// =====================================
 	// change to /api/layer/osm/create 
-	app.post('/api/layers/osm/new', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
+	// app.post('/api/layers/osm/new', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
+	// app.post('/v2/layers/create/osm', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
 
 	/**
 	* @api {post} /api/layer/update Update layer
@@ -1376,19 +1410,22 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
-	app.post('/api/layer/update', checkAccess, api.layer.update);
+	// app.post('/api/layer/update', checkAccess, api.layer.update);
+	app.post('/v2/layers/update', checkAccess, api.layer.update);
 
 	// =====================================
 	// RELOAD LAYER METADATA ===============
 	// =====================================
 	// change to /api/layer/reloadMeta (camelcase) 
-	app.post('/api/layer/reloadmeta', checkAccess, api.layer.reloadMeta, errorHandler);
+	// app.post('/api/layer/reloadmeta', checkAccess, api.layer.reloadMeta, errorHandler);
+	app.post('/v2/layers/meta', checkAccess, api.layer.reloadMeta, errorHandler);
 
 	// =====================================
 	// SET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/set 
-	app.post('/api/layers/cartocss/set', checkAccess, function (req, res) {
+	// app.post('/api/layers/cartocss/set', checkAccess, function (req, res) {
+	app.post('/v2/layers/carto', checkAccess, function (req, res) {
 		api.layer.setCartoCSS(req, res);
 	});
 
@@ -1396,7 +1433,8 @@ module.exports = function(app, passport) {
 	// GET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/get 
-	app.post('/api/layers/cartocss/get', checkAccess, function (req, res) {
+	// app.post('/api/layers/cartocss/get', checkAccess, function (req, res) {
+	app.post('/v2/layers/carto/get', checkAccess, function (req, res) {
 		api.layer.getCartoCSS(req, res);
 	});
 
@@ -1451,7 +1489,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	app.post('/api/user/update', checkAccess, api.user.update, errorHandler);
+	// app.post('/api/user/update', checkAccess, api.user.update, errorHandler);
+	app.post('/v2/users/update', checkAccess, api.user.update, errorHandler);
 
 
 	/**
@@ -1499,22 +1538,24 @@ module.exports = function(app, passport) {
 	*   }
 	* }
 	*/
-	app.post('/api/user/create', api.user.create, errorHandler);
+	// app.post('/api/user/create', api.user.create, errorHandler);
+	app.post('/v2/users/create', api.user.create, errorHandler);
 
 	// TODO this endpoint does not exist
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
-	app.post('/api/user/delete', checkAccess, function (req,res) {
+	// app.post('/api/user/delete', checkAccess, function (req,res) {
+	app.post('/v2/users/delete', checkAccess, function (req,res) {
 		api.user.deleteUser(req, res);
 	});
 
-	// =====================================
-	// DELETGATE USER ======================
-	// =====================================
-	app.post('/api/user/delegate', checkAccess, function (req,res) {
-		api.delegateUser(req, res);
-	});
+	// // =====================================
+	// // DELETGATE USER ======================
+	// // =====================================
+	// app.post('/api/user/delegate', checkAccess, function (req,res) {
+	// 	api.delegateUser(req, res);
+	// });
 
 	/**
 	* @apiIgnore
@@ -1544,7 +1585,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/unique', api.user.checkUniqueEmail, errorHandler);
+	// app.post('/api/user/unique', api.user.checkUniqueEmail, errorHandler);
+	app.post('/v2/users/email/unique', api.user.checkUniqueEmail, errorHandler);
 
 	/**
 	* @apiIgnore
@@ -1574,7 +1616,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/api/user/uniqueUsername', api.user.checkUniqueUsername, errorHandler);
+	// app.post('/api/user/uniqueUsername', api.user.checkUniqueUsername, errorHandler);
+	app.post('/v2/users/username/unique', api.user.checkUniqueUsername, errorHandler);
 
 	/**
 	* @apiIgnore
@@ -1601,10 +1644,11 @@ module.exports = function(app, passport) {
 	*	}
 	* }
 	*/
-	// =====================================
-	// CHECK UNIQUE USER/EMAIL =============
-	// =====================================
-	app.post('/api/user/uniqueEmail', api.user.checkUniqueEmail, errorHandler);
+	// // =====================================
+	// // CHECK UNIQUE USER/EMAIL =============
+	// // =====================================
+	// // app.post('/api/user/uniqueEmail', api.user.checkUniqueEmail, errorHandler);
+	// app.post('/v2/user/uniqueEmail', api.user.checkUniqueEmail, errorHandler);
 
 	/**
 	* @api {post} /api/user/invite Send invite mail
@@ -1636,7 +1680,8 @@ module.exports = function(app, passport) {
 	// SEND INVITE MAIL ====================
 	// =====================================
 	// rename to /api/user/invite/email
-	app.post('/api/user/invite', checkAccess, api.user.invite, errorHandler);
+	// app.post('/api/user/invite', checkAccess, api.user.invite, errorHandler);
+	app.post('/v2/users/invite', checkAccess, api.user.invite, errorHandler);
 
 
 	/**
@@ -1710,13 +1755,14 @@ module.exports = function(app, passport) {
 	// =====================================
 	// REQUEST CONTACT =====================
 	// =====================================
-	app.post('/api/user/requestContact', checkAccess, api.user.requestContact, errorHandler);
+	// app.post('/api/user/requestContact', checkAccess, api.user.requestContact, errorHandler);
+	app.post('/v2/users/contacts/request', checkAccess, api.user.requestContact, errorHandler);
 
 	// =====================================
 	// REQUEST CONTACT =====================
 	// =====================================
 	// change to /api/user/acceptContact/*
-	app.get('/api/user/acceptContactRequest/*', function (req,res) {
+	app.get('/api/user/acceptContactRequest/*', function (req,res) {	// todo: POST?
 		api.user.acceptContactRequest(req, res);
 	});
 
@@ -1763,7 +1809,8 @@ module.exports = function(app, passport) {
 	// INVITE TO PROJECTS ==================
 	// =====================================
 	// todo: see if this can be removed (replaced by /api/user/invite?)
-	app.post('/api/user/inviteToProjects', checkAccess, api.user.inviteToProjects, errorHandler);
+	// app.post('/api/user/inviteToProjects', checkAccess, api.user.inviteToProjects, errorHandler);
+	app.post('/v2/users/invite/projects', checkAccess, api.user.inviteToProjects, errorHandler);
 
 	/**
 	* @api {post} /api/user/inviteToProjects Invite user to projects
@@ -1790,49 +1837,50 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GENERATE ACCESS LINK ================
 	// =====================================
-	app.post('/api/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
+	// app.post('/api/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
+	app.post('/v2/users/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
 
-	// =====================================
-	// access: SET PROJECT ACCESS  =========
-	// =====================================
-	app.post('/api/access/set/project', checkAccess, function (req,res) {
-		api.access.setProject(req, res);
-	});
+	// // =====================================
+	// // access: SET PROJECT ACCESS  =========
+	// // =====================================
+	// app.post('/api/access/set/project', checkAccess, function (req,res) {
+	// 	api.access.setProject(req, res);
+	// });
 
-	// =====================================
-	// access: GET ROLE  ===============
-	// =====================================
-	app.post('/api/access/getrole', checkAccess, function (req,res) {
-		api.access.getRole(req, res);
-	});
+	// // =====================================
+	// // access: GET ROLE  ===============
+	// // =====================================
+	// app.post('/api/access/getrole', checkAccess, function (req,res) {
+	// 	api.access.getRole(req, res);
+	// });
 
-	// =====================================
-	// access: SET ROLE  ===============
-	// =====================================
-	app.post('/api/access/setrolemember', checkAccess, function (req,res) {
-		api.access.setRoleMember(req, res);
-	});
+	// // =====================================
+	// // access: SET ROLE  ===============
+	// // =====================================
+	// app.post('/api/access/setrolemember', checkAccess, function (req,res) {
+	// 	api.access.setRoleMember(req, res);
+	// });
 
-	// =====================================
-	// access: SET ROLE SUPERADMIN =========
-	// =====================================
-	app.post('/api/access/super/setrolemember', checkAccess, function (req,res) {
-		api.access.setSuperRoleMember(req, res);
-	});
+	// // =====================================
+	// // access: SET ROLE SUPERADMIN =========
+	// // =====================================
+	// app.post('/api/access/super/setrolemember', checkAccess, function (req,res) {
+	// 	api.access.setSuperRoleMember(req, res);
+	// });
 
-	// =====================================
-	// access: SET ROLE  ===============
-	// =====================================
-	app.post('/api/access/portal/setrolemember', checkAccess, function (req,res) {
-		api.access.setPortalRoleMember(req, res);
-	});
+	// // =====================================
+	// // access: SET ROLE  ===============
+	// // =====================================
+	// app.post('/api/access/portal/setrolemember', checkAccess, function (req,res) {
+	// 	api.access.setPortalRoleMember(req, res);
+	// });
 
-	// =====================================
-	// access: SET NO ROLE  ================
-	// =====================================
-	app.post('/api/access/setnorole', checkAccess, function (req,res) {
-		api.access.setNoRole(req, res);
-	});
+	// // =====================================
+	// // access: SET NO ROLE  ================
+	// // =====================================
+	// app.post('/api/access/setnorole', checkAccess, function (req,res) {
+	// 	api.access.setNoRole(req, res);
+	// });
 
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========
@@ -1873,7 +1921,8 @@ module.exports = function(app, passport) {
 	// RESET PASSWORD ======================
 	// =====================================
 	// change to /api/... 
-	app.post('/reset', api.auth.requestPasswordReset, errorHandler);
+	// app.post('/reset', api.auth.requestPasswordReset, errorHandler);
+	app.post('/v2/users/password/reset', api.auth.requestPasswordReset, errorHandler);
 
 	// =====================================
 	// RESET PASSWORD ======================
@@ -1948,7 +1997,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// PRIVACY POLICY ======================
 	// =====================================
-	// change to /api/privacy-policy
+	// change to /v2/docs/privacy-policy
 	app.get('/privacy-policy', function(req, res) {
 		// api.portal.login(req, res);
 		res.render('../../views/privacy.ejs');
