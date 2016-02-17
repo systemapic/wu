@@ -29,10 +29,11 @@ var userEmail = process.argv[2];
 var username = process.argv[3];
 var userFirstname = process.argv[4];
 var userLastname = process.argv[5];
+var userPassword = process.argv[6];
 var userUuid = 'user-' + uuid.v4();
 
 if (!userEmail || !userFirstname || !userLastname || !username) {
-	console.log('Usage: node create_betauser.js EMAIL USERNAME FIRST_NAME LAST_NAME'.yellow);
+	console.log('Usage: node create_betauser.js EMAIL USERNAME FIRST_NAME LAST_NAME [password]'.yellow);
 	process.exit(1);
 }
 
@@ -46,7 +47,7 @@ ops.push(function (callback) {
 ops.push(function (callback) {
 
 	// create user
-	var password 		= crypto.randomBytes(16).toString('hex');
+	var password 		= userPassword || crypto.randomBytes(16).toString('hex');
 	var user            	= new User();
 	user.uuid 		= userUuid;
 	user.local.email    	= userEmail;	
