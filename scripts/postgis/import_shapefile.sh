@@ -1,42 +1,35 @@
 #!/bin/bash
 
+set -o pipefail
+
 if [ -z "$3" ]; then
-	echo "Usage: $0 <shapefile> <table> <database>" >&2
+	echo "Usage: $0 <shapefile> <table> <database> [<srid>] [<encoding_switches>]" >&2
 	exit 1 # missing args
 fi
+SHAPEFILE=$1
+TABLE=$2
+export PGDATABASE=$3
+SRID="-s $4"
+if [ "$4" == "" ]; then SRID=""; fi
+ENCODING=$5
 
 # get config
 . /systemapic/config/env.sh || exit 1
 
+
 # env
-SHAPEFILE=$1
-TABLE=$2
-DATABASE=$3
-PGHOST=postgis
-ENCODING=$5
-SRID="-s $4"
-if [ "$4" == "" ]; then SRID=""; fi
+export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD 
+export PGUSER=$SYSTEMAPIC_PGSQL_USERNAME
+export PGHOST=postgis
 
 # error file
 TIMESTAMP=$(date +"%s")
-ERRORFILE="shp2pgsql.$TIMESTAMP.error"
-
-function check_errors() {
-
-	# ERROR: encoding
-	if grep -q 'LATIN' ./$ERRORFILE ; then
-	    	
-	    	# import with LATIN1 encoding
-	    	import_latin_encoding
-
-	fi
-}
 
 function import_latin_encoding() {
 
 	# import with LATIN1 encoding
 	echo "Importing with LATIN1 encoding..."
-	ENCODING="-W 'LATIN1"
+	ENCODING="-W 'LATIN1'"
 
 	# import again
 	import
@@ -45,17 +38,24 @@ function import_latin_encoding() {
 function import() {
 
 	# import shapefile
-	shp2pgsql -t 2D -D $SRID $ENCODING "$SHAPEFILE" $TABLE 2>./$ERRORFILE | PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -q --host=$PGHOST --username=$SYSTEMAPIC_PGSQL_USERNAME $DATABASE
-
-	# check for errors
-	check_errors
+	shp2pgsql -t 2D -D $SRID $ENCODING "$SHAPEFILE" $TABLE | psql -q --set ON_ERROR_STOP=1
+	if [ "$?" != 0 ]; then
+		echo "Import failed with encoding $ENCODING"
+		if ! expr "$ENCODING" : '.*LATIN1' > /dev/null; then
+			echo "Will try with latin encoding"
+	    		# import with LATIN1 encoding
+	    		import_latin_encoding
+		else
+			return 1
+		fi
+	else
+		echo "Import succeeded with encoding $ENCODING"
+	fi
 }
 
 
 function clean_up() {
 	echo "Cleaning up"
-	# remove shp2pgsql.error file
-	rm ./$ERRORFILE
 }
 
 
@@ -64,8 +64,7 @@ echo "    Shapfile: $SHAPEFILE"
 echo "    DATABASE: $DATABASE"
 echo "    TABLE: $TABLE"
 
+trap 'clean_up' EXIT
+
 # import shapefile to postgis
 import
-
-# clean up
-clean_up
