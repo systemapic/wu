@@ -9,6 +9,6 @@ which docker && {
   container=${SYSTEMAPIC_DOMAIN}_wu_1
   echo "Executing myself inside container ${container}"
   exec docker exec -ti ${container} \
-    ./scripts/postgis/`basename $0`
+    ./scripts/postgis/`basename $0` $@
 }
 
