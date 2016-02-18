@@ -1317,7 +1317,7 @@ module.exports = function(app, passport) {
 	*}, and etc]
 	* @apiError Bad_request project does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
-	* Error 404: Not found
+	* Error 400: Bad request
 	* {
 	*    "error": {
 	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
@@ -1381,9 +1381,9 @@ module.exports = function(app, passport) {
 	// change to /api/layer/osm/create 
 	// app.post('/api/layers/osm/new', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
 	// app.post('/v2/layers/create/osm', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
-
+	
 	/**
-	* @api {post} /api/layer/update Update layer
+	* @api {post} /v2/layers/update Update layer
 	* @apiName update
 	* @apiGroup Layer
 	* @apiUse token
@@ -1401,19 +1401,78 @@ module.exports = function(app, passport) {
 	* @apiParam {Object} data New data of updated layer
 	* @apiSuccess {String} response Update info 
 	* @apiSuccessExample {String} Success-Response:
-	* 'save done'
-	* @apiError Missing required fields. (422)
-	* @apiErrorExample {json} Error-Response:
-	* Error 422: Missing layer parameter or layer with such id doesn't exist
 	* {
-	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+	*   updated: ['satellite_position',
+	*     'description',
+	*     'copyright',
+	*     'title',
+	*     'tooltip',
+	*     'style',
+	*     'filter',
+	*     'legends',
+	*     'opacity',
+	*     'zIndex',
+	*     'data'
+	*   ],
+	*   layer: {
+	*     _id: '56c5b2570bfe2137063a6c44',
+	*     lastUpdated: '2016-02-18T12:00:23.471Z',
+	*     created: '2016-02-18T12:00:23.471Z',
+	*     description: 'update mocha test layer description',
+	*     title: 'update mocha test layer title',
+	*     uuid: 'new mocha test layer uuid',
+	*     __v: 0,
+	*     satellite_position: 'update mocha test layer satellite_position',
+	*     copyright: 'update mocha test layer copyright',
+	*     tooltip: 'update mocha test layer tooltip',
+	*     style: 'update mocha test layer style',
+	*     filter: 'update mocha test layer filter',
+	*     legends: 'update mocha test layer legends',
+	*     opacity: 'update mocha test layer opacity',
+	*     zIndex: 4,
+	*     data: {
+	*       geojson: 'update mocha test layer geojson',
+	*       topojson: 'update mocha test layer topojson',
+	*       cartoid: 'update mocha test layer cartoid',
+	*       raster: 'update mocha test layer raster',
+	*       rastertile: 'update mocha test layer rastertile',
+	*       vectortile: 'update mocha test layer vectortile',
+	*       mapbox: 'update mocha test layer mapbox',
+	*       cartodb: 'update mocha test layer cartodb',
+	*       osm: 'update mocha test layer osm',
+	*       norkart: 'update mocha test layer norkart',
+	*       google: 'update mocha test layer google',
+	*       postgis: [Object]
+	*     }
+	*   }
+	* }
+	* @apiError Bad_request layer does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['layer']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If layer doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such layer.",
+	*		"code": "404"
+	*	}
 	* }
 	*/
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
 	// app.post('/api/layer/update', checkAccess, api.layer.update);
-	app.post('/v2/layers/update', checkAccess, api.layer.update);
+	app.post('/v2/layers/update', checkAccess, api.layer.update, errorHandler);
 
 	// =====================================
 	// RELOAD LAYER METADATA ===============
