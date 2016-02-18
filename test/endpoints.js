@@ -41,7 +41,8 @@ module.exports = endpoint = {
         invite : {
             invite : '/v2/users/invite',
             projects : '/v2/users/invite/projects',
-            link : '/v2/users/invite/link'
+            link : '/v2/users/invite/link',
+            accept: '/api/user/invite/accept'
         },
         contacts : {
             request : '/v2/users/contacts/request'
