@@ -1413,7 +1413,7 @@ module.exports = function(app, passport) {
 	// UPDATE LAYERS =======================
 	// =====================================
 	// app.post('/api/layer/update', checkAccess, api.layer.update);
-	app.post('/v2/layers/update', checkAccess, api.layer.update);
+	app.post('/v2/layers/update', checkAccess, api.layer.update, errorHandler);
 
 	// =====================================
 	// RELOAD LAYER METADATA ===============
