@@ -104,7 +104,7 @@ module.exports = api.import = {
 				// get uploadStatus, get meta, set to file
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
-					if (uploadStatus.data_type == 'raster') {
+					if (0 && uploadStatus.data_type == 'raster') {
 						api.geo.handleRaster(opts, callback);
 
 					} else {
