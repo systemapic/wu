@@ -120,8 +120,8 @@ module.exports = api.layer = {
 	},
 
 	// create layer
-	create : function (req, res) {
-		var options = req.body;
+	create : function (req, res, next) {
+		var options = req.body || {};
 		var ops = [];
 		
 		ops.push(function (callback) {
@@ -129,7 +129,9 @@ module.exports = api.layer = {
 		});
 
 		async.waterfall(ops, function (err, doc) {
-			if (err) return api.error.general(req, res, err);
+			if (err) {
+				return next(err);
+			}
 			res.send(doc);
 		});
 	},
