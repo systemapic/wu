@@ -8,19 +8,20 @@ var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var fs = require('fs');
 var path = require('path')
+var endpoints = require('../endpoints.js');
 
 module.exports = function () {
-    describe('/api/upload/get', function () {
+    describe(endpoints.upload.get, function () {
         var tmp = {};
 
         before(function (done) {   
             this.timeout(21000);     
             this.slow(20000);     
             token(function (err, access_token) {
-                api.post('/api/import')
+                api.post(endpoints.import)
                 .type('form')
                 .field('access_token', access_token)
-                .field('data', fs.createReadStream(path.resolve(__dirname, '../data/shapefile.polygon.zip')))
+                .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.polygon.zip')))
                 .expect(httpStatus.OK)
                 .end(function (err, res) {
                     if (err) {
@@ -42,7 +43,7 @@ module.exports = function () {
 
         after(function (done) {
             token(function (err, access_token) {
-                api.post('/api/file/delete')
+                api.post('/v2/data/delete')
                 .send({file_id : tmp.file_id, access_token : access_token})
                 .expect(httpStatus.OK)
                 .end(function (err, res) {
@@ -59,7 +60,7 @@ module.exports = function () {
         });
 
         it("should respond with status code 401 when not authenticated", function (done) {
-            api.get('/api/upload/get')
+            api.get(endpoints.upload.get)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -71,7 +72,7 @@ module.exports = function () {
                     return done(err);
                 }
 
-                api.get('/api/upload/get')
+                api.get(endpoints.upload.get)
                     .query({})
                     .send({
                         access_token: access_token
@@ -96,7 +97,7 @@ module.exports = function () {
                     return done(err);
                 }
 
-                api.get('/api/upload/get')
+                api.get(endpoints.upload.get)
                     .query({file_id: 'some id'})
                     .send({
                         access_token: access_token
@@ -120,7 +121,7 @@ module.exports = function () {
                     return done(err);
                 }
 
-                api.get('/api/upload/get')
+                api.get(endpoints.upload.get)
                     .query({file_id: tmp.file_id})
                     .send({
                         access_token: access_token
