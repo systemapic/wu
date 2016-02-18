@@ -1,21 +1,12 @@
 #!/bin/bash
 
-if [ "$1" == "" ]; then
+if [ -z "$3" ]; then
+	echo "Usage: $0 <shapefile> <table> <database>" >&2
 	exit 1 # missing args
 fi
-
-if [ "$2" == "" ]; then
-	exit 1 # missing args
-fi
-
-if [ "$3" == "" ]; then
-	exit 1 # missing args
-fi
-
-
 
 # get config
-source /systemapic/config/env.sh
+. /systemapic/config/env.sh || exit 1
 
 # env
 SHAPEFILE=$1
