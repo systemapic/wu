@@ -1718,9 +1718,6 @@ module.exports = function(app, passport) {
 	// rename to /api/user/invite/email
 	app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
 
-
-
-
 	/**
 	* @api {post} /api/user/requestContact Request contact
 	* @apiName Request contact
