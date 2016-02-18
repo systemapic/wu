@@ -8,7 +8,12 @@ which docker && {
   }
   container=${SYSTEMAPIC_DOMAIN}_wu_1
   echo "Executing myself inside container ${container}"
-  exec docker exec -ti ${container} \
+  if test -t 0; then
+    TTYSWITCH=-t
+  else
+    TTYSWITCH=
+  fi
+  exec docker exec -i ${TTYSWITCH} ${container} \
     ./scripts/postgis/`basename $0` $@
 }
 
