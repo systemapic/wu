@@ -6,6 +6,7 @@ var helpers = require('./helpers');
 var token = helpers.token;
 var httpStatus = require('http-status');
 var expected = require('../shared/errors');
+var endpoints = require('./endpoints.js');
 
 describe('Status', function () {
 
@@ -19,7 +20,7 @@ describe('Status', function () {
     describe('/api/status', function () {
 
         it('should respond with status code 401 when not authenticated', function (done) {
-            api.get('/api/status')
+            api.get(endpoints.status)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -27,7 +28,7 @@ describe('Status', function () {
 
         it('should respond with status code 200 and version object', function (done) {
             token(function (err, access_token) {
-                api.get('/api/status')
+                api.get(endpoints.status)
                     .send({
                         access_token: access_token
                     })
