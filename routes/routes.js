@@ -1367,7 +1367,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// change to /api/layer/create 
 	// app.post('/api/layers/new', checkAccess, api.layer.create);
-	app.post('/v2/layers/create', checkAccess, api.layer.create);
+	app.post('/v2/layers/create', checkAccess, api.layer.create, errorHandler);
 
 	// =====================================
 	// CREATE NEW DEFAULT LAYER ============
