@@ -19,6 +19,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var expected = require('../shared/errors');
 var httpStatus = require('http-status');
+var endpoints = require('./endpoints.js');
 
 describe('Import', function () {
     // prepare
@@ -39,7 +40,7 @@ describe('Import', function () {
                     api.post('/api/import')
                     .type('form')
                     .field('access_token', access_token)
-                    .field('data', fs.createReadStream(__dirname + '/data/shapefile.polygon.zip'))
+                    .field('data', fs.createReadStream(__dirname + '/resources/shapefile.polygon.zip'))
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
@@ -88,7 +89,7 @@ describe('Import', function () {
                     .type('form')
                     .field('userUuid', util.test_user.uuid)
                     .field('access_token', access_token)
-                    .field('data', fs.createReadStream(__dirname + '/data/shapefile.missing-prj.zip'))
+                    .field('data', fs.createReadStream(__dirname + '/resources/shapefile.missing-prj.zip'))
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
                         assert.ifError(err);
@@ -100,7 +101,6 @@ describe('Import', function () {
                         assert.equal(result.status, 'Processing');
                         assert.ifError(result.error_code);
                         assert.ifError(result.error_text);
-
                         tmp.file_id = result.file_id;
                         done();
                     });
@@ -229,7 +229,7 @@ describe('Import', function () {
 
                     ops.push(function (callback) {
                         token(function (err, access_token) {
-                            api.post('/api/file/delete')
+                            api.post(endpoints.data.delete)
                             .send({file_id : tmp.file_id, access_token : access_token})
                             .expect(httpStatus.OK)
                             .end(function (err, res) {
@@ -288,5 +288,3 @@ describe('Import', function () {
     });
 
 });
-
-       

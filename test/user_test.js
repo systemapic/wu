@@ -10,8 +10,10 @@ var helpers = require('./helpers');
 var token = helpers.token;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var endpoints = require('./endpoints.js');
 
 describe('User', function () {
+    this.slow(400);
     it('should be created', function (done) {
         helpers.create_user(done);
     });
@@ -45,7 +47,7 @@ describe('User', function () {
 
     it('should get user info with access token', function (done) {
         token(function (err, access_token) {
-            api.post('/api/token/check')
+            api.post(endpoints.users.token.check)
             .send({access_token : access_token})
             .expect(200)
             .end(function (err, res) {
@@ -62,7 +64,7 @@ describe('User', function () {
     it('should get portal store with access token', function (done) {
         this.slow(700);
         token(function (err, access_token) {
-            api.post('/api/portal')
+            api.post(endpoints.portal)
             .send({access_token : access_token})
             .expect(200)
             .end(function (err, res) {

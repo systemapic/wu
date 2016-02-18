@@ -29,7 +29,6 @@ module.exports = function () {
 
                     done();
                 });
-
         });
 
         it('should respond with status code 400 and error if password doesn\'t exist in request body', function (done) {
@@ -93,17 +92,7 @@ module.exports = function () {
 
         });
 
-        it('should get access token with token() shorthand', function (done) {
-            token(function (err, access_token) {
-                if (err) {
-                    return done(err);
-                }
-
-                expect(access_token).to.exist;
-                expect(access_token.length).to.be.equal(43);
-                done();
-            });
-        });
+     
 
         it('should respond with status code 400 and error if user with specific username exists but password is wrong', function (done) {
 
