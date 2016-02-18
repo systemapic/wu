@@ -136,7 +136,6 @@ module.exports = function () {
                 var ops = [];
                 layerUpdates.access_token = access_token;
                 layerUpdates.layer = tmpLayer.uuid;
-                console.log(tmpLayer.layer)
                 ops.push(function (callback) {
                     api.post(endpoints.layers.update)
                         .send(layerUpdates)
