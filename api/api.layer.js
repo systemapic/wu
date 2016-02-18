@@ -333,105 +333,80 @@ module.exports = api.layer = {
 
 
 	// update layer
-	update : function (req, res) {
-
-		var layerUuid 	= req.body.layer || false;
+	update : function (req, res, next) {
+		var parameters = req.body || {};
+		var layerUuid 	= parameters.layer;
 		var user 	= req.user;
 
-		console.log('layerUuid', layerUuid, user.username, req.body);
+		console.log('layerUuidlayerUuidlayerUuidlayerUuidlayerUuid', layerUuid, user.username, req.body);
 
 		// error if no project or user
-		if (!layerUuid) return api.error.missingInformation(req, res);
+		if (!layerUuid) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['layer']));
+		}
 
-
-		console.log('up[date layer!', req.body);
+		console.log('update layer!', req.body);
 
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
-			if (err || !layer) return api.error.missingInformation(req, res);
-
-
-			// update satpos
-			if (req.body.hasOwnProperty('satellite_position')) {
-				var satellite_position = req.body.satellite_position;
-				layer.satellite_position = satellite_position;
-				layer.save();
-			};
-
-			// update description
-			if (req.body.hasOwnProperty('description')) {
-				var description = req.body.description;
-				layer.description = description;
-				layer.save();
-			};
-
-			// update description
-			if (req.body.hasOwnProperty('copyright')) {
-				var copyright = req.body.copyright;
-				layer.copyright = copyright;
-				layer.save();
-			};
-
-			// update title
-			if (req.body.hasOwnProperty('title')) {
-				console.log('TITLE!!');
-				var title = req.body.title;
-				layer.title = title;
-				layer.save();
-			};
-
-			// update tooltip
-			if (req.body.hasOwnProperty('tooltip')) {
-				var tooltip = req.body.tooltip;
-				layer.tooltip = tooltip;
-				layer.save();
+			if (err) {
+				return next(err);
 			}
 
-			// update style
-			if (req.body.hasOwnProperty('style')) {
-				var style = req.body.style;
-				layer.style = style;
-				layer.save();
+			if (!layer) {
+				return next({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_layers.errorMessage
+				});
 			}
 
-			// update filter
-			if (req.body.hasOwnProperty('filter')) {
-				var filter = req.body.filter;
-				layer.filter = filter;
+			var valid = [
+				'satellite_position', 
+				'description', 
+				'copyright', 
+				'title',
+				'tooltip',
+				'style',
+				'filter',
+				'legends',
+				'opacity',
+				'zIndex',
+				'data'
+			];
+			var ops = [];
 
-				console.log('filteR: ', filter);
-				layer.save();
-			}
+			updates = _.pick(parameters, valid);
 
-			// update legends
-			if (req.body.hasOwnProperty('legends')) {
-				var legends = req.body.legends;
-				layer.legends = legends;
-				layer.save();
-			}
+			ops.push(function (callback) {
+				layer.update({ $set: _.pick(parameters, valid) })
+					.exec(function (err, result) {
+						if (err) {
+							callback(err);
+						}
 
-			// update opacity
-			if (req.body.hasOwnProperty('opacity')) {
-				var opacity = req.body.opacity;
-				layer.opacity = opacity;
-				layer.save();
-			}
+						callback(null, {
+							updated: _.keys(updates)
+						});
+					});
+			});
 
-			// update zIndex
-			if (req.body.hasOwnProperty('zIndex')) {
-				var zIndex = req.body.zIndex;
-				layer.zIndex = zIndex;
-				layer.save();
-			}
+			ops.push(function (params, callback) {
+				Layer.findOne({uuid: layerUuid})
+					.exec(function (err, res) {
+						if (err) {
+							return callback(err);
+						}
+						params.layer = res;
+						callback(null, params);
+					});
+			});
 
-			// update data
-			if (req.body.hasOwnProperty('data')) {
-				var data = req.body.data;
-				layer.data = data;
-				layer.markModified('data');
-				layer.save();
-			}
+			async.waterfall(ops, function (err, result) {
+				if (err) {
+					return next(err);
+				}
 
-			res.end('save done');
+				res.send(JSON.stringify(result));
+			});
 		});
 
 	},
