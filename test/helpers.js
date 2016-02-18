@@ -10,12 +10,15 @@ var File = require('../models/file');
 var Layer = require('../models/layer');
 var Project = require('../models/project');
 var config = require('../config/wu-config.js').serverConfig;
-mongoose.connect(config.mongo.url); 
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
+var endpoints = require('./endpoints.js');
+
+mongoose.connect(config.mongo.url); 
 
 module.exports = util = {
 
+    // variables, todo: move to shared file
     test_user : {
         email : 'mocha_test_user@systemapic.com',
         firstName : 'mocha',
@@ -66,12 +69,13 @@ module.exports = util = {
     },
 
     get_access_token : function (done) {
-        api.post('/api/token')
+        api.post(endpoints.users.token.token)
         .send({ 
             username : util.test_user.email,
             password : util.test_user.password
         })
         .end(function (err, res) {
+            console.log('res.status', res.status);
             assert.ifError(err);
             assert.equal(res.status, 200);
             var tokens = util.parse(res.text);
@@ -82,13 +86,14 @@ module.exports = util = {
     },
 
     token : function (done) {
+        console.log('tokenn');
         util.get_access_token(function (err, tokens) {
             done(err, tokens.access_token);
         });
     },
 
     get_users_access_token : function (_user, callback) {
-      api.post('/api/token')
+      api.post(endpoints.users.token.token)
         .send({
             grant_type : 'password',
             username : _user.email,
@@ -130,9 +135,10 @@ module.exports = util = {
     },
 
     delete_user : function (done) {
-        User.findOne({uuid : util.test_user.uuid})
-            .remove()
-            .exec(done);
+        User
+        .findOne({uuid : util.test_user.uuid})
+        .remove()
+        .exec(done);
     },
 
     create_user_by_parameters : function (_user, callback) {
@@ -147,15 +153,15 @@ module.exports = util = {
     },
 
     delete_user_by_id: function (_userId, callback) {
-        User.findOne({uuid : _userId})
-            .remove()
-            .exec(callback);
+        User
+        .findOne({uuid : _userId})
+        .remove()
+        .exec(callback);
     },
 
     create_project : function (done) {
         util.token(function (err, access_token) {
-            api.post('/api/project/create')
-            // .set('Authorization', 'Bearer ' + token)
+            api.post(endpoints.projects.create)
             .send({
                 name : 'mocha-test-project', 
                 access_token : access_token
@@ -167,7 +173,6 @@ module.exports = util = {
                 assert.ok(project);
                 assert.ok(project.uuid);
                 assert.equal(project.name, 'mocha-test-project');
-                // tmp.project = project;
                 util.test_user.pid = project.uuid;
                 done();
             });
@@ -176,8 +181,7 @@ module.exports = util = {
 
     delete_project : function (done) {
         util.token(function (err, access_token) {
-            api.post('/api/project/delete')
-            // .set('Authorization', 'Bearer ' + token)
+            api.post(endpoints.projects.delete)
             .send({
                 projectUuid : util.test_user.pid, 
                 access_token : access_token
@@ -192,7 +196,6 @@ module.exports = util = {
 
     create_project_by_info : function (info, callback) {
         var project = new Project();
-
         project.uuid = info.uuid;
         project.createdBy = info.createdBy;
         project.createdByName = info.createdByName;
@@ -206,20 +209,18 @@ module.exports = util = {
         project.access = info.access;
         project.state = info.state;
         project.settings = info.settings;
-
         project.save(callback);
-
     },
 
     delete_project_by_id : function (id, callback) {
-        Project.findOne({uuid : id})
-            .remove()
-            .exec(callback);
+        Project
+        .findOne({uuid : id})
+        .remove()
+        .exec(callback);
     },
 
     create_file : function (callback) {
         var file = new File();
-
         file.uuid = util.test_file.uuid;
         file.family = util.test_file.family;
         file.createdBy = util.test_file.createdBy;
@@ -239,19 +240,18 @@ module.exports = util = {
         file.keywords = util.test_file.keywords;
         file.type = util.test_file.type;
         file.format = util.test_file.format;
-
         file.save(callback);
     },
 
     delete_file: function (callback) {
-        File.findOne({uuid : util.test_file.uuid})
-            .remove()
-            .exec(callback);
+        File
+        .findOne({uuid : util.test_file.uuid})
+        .remove()
+        .exec(callback);
     },
 
     create_file_by_parameters : function (newFile, callback) {
         var file = new File();
-
         file.uuid = newFile.uuid;
         file.family = newFile.family;
         file.createdBy = newFile.createdBy;
@@ -272,49 +272,47 @@ module.exports = util = {
         file.type = newFile.type;
         file.format = newFile.format;
         file.data = newFile.data;
-
         file.save(callback);
     },
 
     delete_file_by_id : function (fileId, callback) {
-        File.findOne({uuid : fileId})
-            .remove()
-            .exec(callback);
+        File
+        .findOne({uuid : fileId})
+        .remove()
+        .exec(callback);
     },
 
     createLayer: function (callback) {
         var layer = new Layer();
-
         layer.uuid = util.test_layer.uuid;
         layer.title = util.test_layer.title;
         layer.description = util.test_layer.description;
         layer.file = util.test_layer.file;
         layer.data = util.test_layer.data;
-        
         layer.save(callback);
     },
 
     deleteLayer: function (callback) {
-        Layer.findOne({uuid : util.test_layer.uuid})
-            .remove()
-            .exec(callback);
+        Layer
+        .findOne({uuid : util.test_layer.uuid})
+        .remove()
+        .exec(callback);
     },
 
     create_layer_by_parameters: function (layerInfo, callback) {
         var layer = new Layer();
-
         layer.uuid = layerInfo.uuid;
         layer.title = layerInfo.title;
         layer.description = layerInfo.description;
         layer.file = layerInfo.file;
         layer.data = layerInfo.data;
-        
         layer.save(callback);
     },
 
     delete_layer_by_id: function (layerId, callback) {
-        Layer.findOne({uuid: layerId})
-            .remove()
-            .exec(callback);
+        Layer
+        .findOne({uuid: layerId})
+        .remove()
+        .exec(callback);
     }
 }
