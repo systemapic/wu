@@ -6,13 +6,14 @@ var helpers = require('../helpers');
 var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var token = util.token;
+var endpoints = require('../endpoints.js');
 
 module.exports = function () {
 
-    describe('/api/token/check', function () {
+    describe(endpoints.users.token.check, function () {
 
         it('should respond with status code 401 when not authenticated', function (done) {
-            api.post('/api/token/check')
+            api.post(endpoints.users.token.check)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -20,7 +21,7 @@ module.exports = function () {
 
         it('should get user with access_token', function (done) {
             token(function (err, access_token) {
-                api.post('/api/token/check')
+                api.post(endpoints.users.token.check)
                 .send({ 
                     access_token : access_token
                 })
@@ -40,7 +41,7 @@ module.exports = function () {
 
         it('should get 401 with invalid access token', function (done) {
             token(function (err, access_token) {
-                api.post('/api/token/check')
+                api.post(endpoints.users.token.check)
                 .send({ 
                     access_token : 'invalid'
                 })
@@ -61,7 +62,7 @@ module.exports = function () {
 
         it('should get 401 with missing information', function (done) {
             token(function (err, access_token) {
-                api.post('/api/token/check')
+                api.post(endpoints.users.token.check)
                 .send()
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(function (err, res) {

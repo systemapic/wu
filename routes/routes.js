@@ -255,7 +255,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET STATUS   ====================
 	// =====================================
-	app.get('/api/status', checkAccess, api.portal.status);
+	// app.get('/api/status', checkAccess, api.portal.status);
+	app.get('/v2/status', checkAccess, api.portal.status);
 
 	// deprecated
 	// app.post('/oauth/token', api.oauth2.getToken);
@@ -738,7 +739,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// change to /api/project/setHash
 	// app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
-	app.post('/v2/hashes/create', checkAccess, api.project.setHash, errorHandler);
+	app.post('/v2/hashes/set', checkAccess, api.project.setHash, errorHandler);
 
 	/**
 	* @api {post} /api/project/hash/get Get project hash
@@ -1332,6 +1333,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// change to /api/layer/get 
 	app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
+	// app.post('/v2/layers/get', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
 
 	// todo: /v2/projects/layers GET request
 
@@ -1965,7 +1967,8 @@ module.exports = function(app, passport) {
 	// CREATE PASSWORD =====================
 	// ===================================== 
 	// change to /api/... 
-	app.post('/reset/password', api.auth.createPassword, errorHandler);
+	// app.post('/reset/password', api.auth.createPassword, errorHandler);
+	app.post('/v2/users/password', api.auth.resetPassword, errorHandler);
 
 	// =====================================
 	// ZXCVBN DICTIONARY =================
