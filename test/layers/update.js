@@ -7,13 +7,14 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var Layer = require('../../models/layer');
 var endpoints = require('../endpoints.js');
-
+var expected = require('../../shared/errors');
+var async = require('async');
 
 // todo: implement this test!
 
 
 module.exports = function () {
-    describe.skip(endpoints.layers.update, function () {
+    describe(endpoints.layers.update, function () {
 
         var newLayerParameters = {
             uuid: 'new mocha test layer uuid', // @igor: it should throw error if trying to update uuid. need a test for this.
@@ -88,17 +89,26 @@ module.exports = function () {
                 .end(done);
         });
 
-        it('should respond with status code 422 and error if layer doesn\'t exist in request body', function (done) {
+        it('should respond with status code 400 and error if layer doesn\'t exist in request body', function (done) {
             token(function (err, access_token) {
                 if (err) return done(err);
                 api.post(endpoints.layers.update)
                     .send({access_token: access_token})
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+
+                        if (err) return done(err);
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
+                        expect(result.error.errors.missingRequiredFields).to.include('layer');
+                        done();
+                    });
             });
         });
 
-        it('should respond with status code 422 and error if layer doesn\'t exist', function (done) {
+        it('should respond with status code 404 and error if layer doesn\'t exist', function (done) {
             token(function (err, access_token) {
                 if (err) return done(err);
                 api.post(endpoints.layers.update)
@@ -106,8 +116,16 @@ module.exports = function () {
                         layer: 'bad layer',
                         access_token: access_token
                     })
-                    .expect(422, helpers.createExpectedError(expected.missing_information.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.NOT_FOUND)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.no_such_layers.errorMessage);
+                        done();
+                    });
             });
         });
 
@@ -117,11 +135,11 @@ module.exports = function () {
                 if (err) return done(err);
                 var ops = [];
                 layerUpdates.access_token = access_token;
-                layerUpdates.layer = tmpLayer.layer;
+                layerUpdates.layer = tmpLayer.uuid;
                 ops.push(function (callback) {
                     api.post(endpoints.layers.update)
                         .send(layerUpdates)
-                        .expect(200)
+                        .expect(httpStatus.OK)
                         .end(function (err, res) {
                             if (err) return callback(err);
                             callback(null, res);
@@ -132,8 +150,24 @@ module.exports = function () {
                     Layer
                     .findOne({uuid: layerUpdates.layer})
                     .exec(function (err, res) {
-                        if (err) return callback(err);
-                        expect(options.text).to.be.equal('save done');
+                        if (err) {
+                            return callback(err);
+                        }
+
+                        var result = helpers.parse(options.text);
+
+                        expect(result.updated).to.be.not.empty;
+                        expect(result.updated).to.include('satellite_position');
+                        expect(result.updated).to.include('description');
+                        expect(result.updated).to.include('copyright');
+                        expect(result.updated).to.include('title');
+                        expect(result.updated).to.include('tooltip');
+                        expect(result.updated).to.include('style');
+                        expect(result.updated).to.include('filter');
+                        expect(result.updated).to.include('legends');
+                        expect(result.updated).to.include('opacity');
+                        expect(result.updated).to.include('zIndex');
+                        expect(result.updated).to.include('data');
                         expect(res.uuid).to.be.equal(layerUpdates.layer);
                         expect(res.title).to.be.equal(layerUpdates.title);
                         expect(res.description).to.be.equal(layerUpdates.description);

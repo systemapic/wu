@@ -8,11 +8,9 @@ var expected = require('../../shared/errors');
 var token = util.token;
 var endpoints = require('../endpoints.js');
 
-
 module.exports = function () {
 
     describe(endpoints.users.token.token, function () {
-
         it('should respond with status code 400 and error if username and email don\'t exist in request body', function (done) {
 
             api.post(endpoints.users.token.token)
@@ -126,6 +124,7 @@ module.exports = function () {
         });
 
         it('should get access token with email and password', function (done) {
+
             api.post(endpoints.users.token.token)
             .send({ 
                 username : helpers.test_user.email,

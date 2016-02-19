@@ -5,14 +5,15 @@ var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var helpers = require('../helpers');
 var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
+var endpoints = require('../endpoints.js');
 
 module.exports = function () {
 
-    describe('/reset', function () {
+    describe(endpoints.users.password.reset, function () {
 
         it('should respond with status code 400 and error if emai doesn\'t exist in request body', function (done) {
 
-            api.post('/reset')
+            api.post(endpoints.users.password.reset)
                 .send({})
                 .expect(httpStatus.BAD_REQUEST)
                 .end(function (err, res) {
@@ -30,7 +31,7 @@ module.exports = function () {
 
         it('should respond with status code 404 and error if user with specific email doesn\'t exist', function (done) {
 
-            api.post('/reset')
+            api.post(endpoints.users.password.reset)
                 .send({
                     email: 'some.email.com'
                 })
@@ -45,11 +46,11 @@ module.exports = function () {
                     done();
                 });
 
-        });        
+        });
 
         it('should respond with status code 200', function (done) {
 
-            api.post('/reset')
+            api.post(endpoints.users.password.reset)
                 .send({
                 	email: helpers.test_user.email
                 })

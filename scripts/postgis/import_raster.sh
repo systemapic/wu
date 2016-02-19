@@ -1,25 +1,28 @@
 #!/bin/bash
 
-if [ "$1" == "" ]; then
-	exit 1 # missing args
+if [ -z "$3" ]; then
+	echo "Usage: $0 <raster> <table> <database> [<srid>]" >&2
+	exit 1
 fi
 
-if [ "$2" == "" ]; then
-	exit 1 # missing args
-fi
-
-if [ "$3" == "" ]; then
-	exit 1 # missing args
-fi
+RASTERFILE=$1
+TABLENAME=$2
+export PGDATABASE=$3
+SRID=
+test -n "$4" && SRID="-s $4"
 
 
 # get config
-source /systemapic/config/env.sh
+. /systemapic/config/env.sh || exit 1
 
 # env vars
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
-PGUSERNAME=$SYSTEMAPIC_PGSQL_USERNAME
-PGHOST=postgis
+export PGUSER=$SYSTEMAPIC_PGSQL_USERNAME
+export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
+export PGHOST=postgis
 
 # import raster
-raster2pgsql -I -C $1 $2 | PGPASSWORD=$PGPASSWORD psql --host=$PGHOST --username=$PGUSERNAME $3
+set -o pipefail # needed to get an error if raster2pgsql errors out
+raster2pgsql \
+	${SRID} -I -C \
+	$RASTERFILE $TABLENAME |
+	psql -q --set ON_ERROR_STOP=1

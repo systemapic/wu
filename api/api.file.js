@@ -948,10 +948,10 @@ module.exports = api.file = {
 	},
 
 	_update : function (job, done) {
-		var file = job.file,
-		    options = job.options,
-		    updates = {}
-		    ops = [];
+		var file = job.file;
+		var options = job.options;
+		var updates = {};
+		var ops = [];
 
 		// todo: check for bullshit values!
 

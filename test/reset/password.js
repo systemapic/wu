@@ -10,16 +10,18 @@ var async = require('async');
 var apiModule = {
 	auth: require('../../api/api.auth'),
 	redis: require('../../api/api.redis')
-}
+};
+var endpoints = require('../endpoints.js');
+
 module.exports = function () {
 
-    describe('/reset/password', function () {
+    describe(endpoints.users.password.set, function () {
 
 		var token = apiModule.auth.setPasswordResetToken({uuid: helpers.test_user.uuid});
 
         it('should respond with status code 400 and error if token or password don\'t exist in request body', function (done) {
 
-            api.post('/reset/password')
+            api.post(endpoints.users.password.set)
                 .send({})
                 .expect(httpStatus.BAD_REQUEST)
                 .end(function (err, res) {
@@ -38,7 +40,7 @@ module.exports = function () {
 
         it('should respond with status code 400 and error if token is invalid', function (done) {
 
-            api.post('/reset/password')
+            api.post(endpoints.users.password.set)
                 .send({
                 	token: 'Bad token',
                 	password: 'some password'
@@ -58,7 +60,7 @@ module.exports = function () {
 
         it('should respond with status code 200 and error if token is valid', function (done) {
 
-            api.post('/reset/password')
+            api.post(endpoints.users.password.set)
                 .send({
                 	token: token,
                 	password: 'some password'

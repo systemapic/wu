@@ -29,7 +29,7 @@ module.exports = endpoint = {
         token : {
             check : '/v2/users/token/check',
             refresh : '/v2/users/token/refresh',
-            token : '/v2/users/token', 
+            token : '/v2/users/token'
         },
         update : '/v2/users/update',
         email : {
@@ -58,7 +58,12 @@ module.exports = endpoint = {
         set : '/v2/hashes/set'
     },
 
+    upload: {
+        get: '/api/upload/get'
+    },
+
     portal : '/v2/portal',
     status : '/v2/status',
-    
+    import : '/api/import'
+
 }
