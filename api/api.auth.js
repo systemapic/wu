@@ -65,7 +65,7 @@ module.exports = api.auth = {
 		res.render('../../views/reset.ejs');
 	},
 
-	createPassword : function (req, res, next) {
+	resetPassword : function (req, res, next) {
 
 		// check token
 		var params = req.body || {};

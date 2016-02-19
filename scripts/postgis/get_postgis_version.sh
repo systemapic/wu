@@ -1,5 +1,6 @@
 #!/bin/bash
 
+. `dirname $0`/run_in_docker.inc
 
 # get config
 source /systemapic/config/env.sh
