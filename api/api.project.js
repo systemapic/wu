@@ -161,6 +161,17 @@ module.exports = api.project = {
 		Project
 		.findOne({uuid : project_id})
 		.exec(function (err, project) {
+			if (err) {
+				return done(err)
+			}
+
+			if (!project) {
+				return done({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_project.errorMessage
+				});
+			}
+
 			project.access.read.addToSet(user.uuid);
 			project.save(function (err) {
 				done(err);
@@ -176,6 +187,17 @@ module.exports = api.project = {
 		Project
 		.findOne({uuid : project_id})
 		.exec(function (err, project) {
+			if (err) {
+				return done(err)
+			}
+
+			if (!project) {
+				return done({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_project.errorMessage
+				});
+			}
+
 			project.access.edit.addToSet(user.uuid);
 			project.save(function (err) {
 				done(err);

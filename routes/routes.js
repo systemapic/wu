@@ -1770,15 +1770,33 @@ module.exports = function(app, passport) {
 	*     "timestamp": 1455569798000,
 	*     "type": "link"
 	* }
+	* @apiError Bad_request Invite_token does not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['invite_token']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found Some of project does not exist (404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
 	*/
 	// =====================================
 	// PROCESS INVITE FOR USER =============
 	// =====================================
 	// rename to /api/user/invite/email
 	app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
-
-
-
 
 	/**
 	* @api {post} /api/user/requestContact Request contact
