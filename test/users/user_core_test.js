@@ -10,6 +10,7 @@ var userSetPassword = require('./setPassword');
 var userToken = require('./token');
 var userTokenCheck = require('./tokenCheck');
 var userTokenRefresh = require('./tokenRefresh');
+var userAcceptInvite = require('./acceptInvite');
 var helpers = require('../helpers');
 
 describe('User', function () {
@@ -29,4 +30,5 @@ describe('User', function () {
     userToken();
     userTokenRefresh();
     userTokenCheck();
+    userAcceptInvite();
 });
