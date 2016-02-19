@@ -1,5 +1,6 @@
 #!/bin/bash
 
+. `dirname $0`/run_in_docker.inc
 
 if [ "$1" == "" ]; then
 	echo "Must provide database as first argument,"

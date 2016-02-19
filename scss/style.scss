@@ -9,13 +9,6 @@ $green: #71C4A8;
 $greenHover: #67B097;
 $greenActive: #5a9b87;
 
-
-
-// FONT-WEIGHT
-// Cannot be 100 as it renders too thin with fonth smoothing
-// That's not a problem in Chrome or Firefox, but it fucks up
-// in Safari and on PC... 
-
 $lean: 200;
 $median: 400;
 $fat: 500;
@@ -37,7 +30,3 @@ $obese: 600;
 @import 'chrome_extras';	// Chrome
 @import 'c3chart';		// Chart for Globesar pop-ups
 @import 'shame';		// Basic shamefull CSS list-line
-
-
-/* @import 'color_picker';	// Color picker */
-/* @import 'mediaLibrary';	// Media Library */
