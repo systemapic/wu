@@ -143,6 +143,16 @@ module.exports = function () {
             });
 
             ops.push(function (result, callback) {
+                expect(result.email).to.be.equal('mocha_test_user@systemapic.com');
+                expect(result.access.edit).to.be.an.array;
+                expect(result.access.edit).to.be.not.empty;
+                expect(result.access.edit).to.include('uuid-mocha-test-project');
+                expect(result.access.read).to.be.an.array;
+                expect(result.access.read).to.be.empty;
+                expect(result.invited_by).to.be.equal('uuid-mocha-test-project');
+                expect(result.timestamp).to.exist;
+                expect(result.type).to.be.equal('email');
+
                 Project.findOne({
                     uuid: tmpProject.uuid
                 }).exec(function (err, _project) {

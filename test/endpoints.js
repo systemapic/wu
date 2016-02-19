@@ -60,8 +60,5 @@ module.exports = endpoint = {
 
     portal : '/v2/portal',
     status : '/v2/status',
-
-
-
-
+    
 }
