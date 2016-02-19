@@ -334,7 +334,7 @@ module.exports = util = {
                     }
 
                     if (!user) {
-                        return new Error('No such user');
+                        return callback(new Error('No such user'));
                     }
 
                     return callback(null, user);

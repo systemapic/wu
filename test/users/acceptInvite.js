@@ -21,7 +21,7 @@ var testProject = {
 
 module.exports = function () {
 
-    describe.only(endpoints.users.invite.accept, function () {
+    describe(endpoints.users.invite.accept, function () {
         var inviteToken;
         var tmpProject;
         var tmpInviteToken;
