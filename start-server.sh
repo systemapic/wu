@@ -3,6 +3,10 @@
 # source config
 source /systemapic/config/env.sh
 
+# ensure npm modules are installed
+echo 'Installing modules...'
+npm install
+
 # start prodmode
 if $SYSTEMAPIC_PRODMODE; then
 	cd server

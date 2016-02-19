@@ -1938,29 +1938,11 @@ module.exports = function(app, passport) {
 		res.end(configString);
 	});
 
-	// ===================================== // todo: rename route to /api/loginConfig.js
-	// SERVER LOGIN CONFIG =================
-	// ===================================== 
-	// change to /api/... 
-	app.get('/loginConfig.js', function (req, res) {
-		var configString = 'var loginConfig = ' + JSON.stringify(api.loginConfig);
-		res.setHeader("content-type", "application/javascript");
-		res.end(configString);
-	});
-
 	// =====================================
 	// DEBUG: PHANTOMJS FEEDBACK ===========
 	// ===================================== 
 	app.post('/api/debug/phantom', checkAccess, function (req, res) {
 		res.end();
-	});
-
-	// =====================================
-	// LOGIN ===============================
-	// =====================================
-	app.get('/login', function(req, res) {
-		console.log('get login');
-		api.portal.login(req, res);
 	});
 
 	// =====================================
@@ -1971,13 +1953,6 @@ module.exports = function(app, passport) {
 		// api.portal.login(req, res);
 		res.render('../../views/privacy.ejs');
 	});
-
-	// // =====================================
-	// // SIGNUP ==============================
-	// // =====================================
-	// app.get('/signup', function(req, res) {
-	// 	api.portal.signup(req, res);
-	// });
 
 	// =====================================
 	// LOGOUT ==============================
@@ -1992,22 +1967,6 @@ module.exports = function(app, passport) {
 	app.get('/invite/*', function(req, res) {
 		api.portal.invite(req, res);
 	});
-
-	// // =====================================
-	// // INVITE ==============================
-	// // =====================================
-	// app.get('/api/invitation/*', function(req, res) {
-	// 	api.portal.invitation(req, res);
-	// });
-
-	// =====================================
-	// LOGIN ===============================
-	// =====================================
-	// app.post('/login', passport.authenticate('local-login', {
-	// 	successRedirect : '/', // redirect to the portal
-	// 	failureRedirect : '/login', // redirect back to the signup page if there is an error
-	// 	failureFlash : true // allow flash messages
-	// }));
 
 	// =====================================
 	// FORGOT PASSWORD =====================
@@ -2024,14 +1983,6 @@ module.exports = function(app, passport) {
 		});
 	});
 
-	// =====================================
-	// REGISTER ACCOUNT ====================
-	// =====================================
-	// app.post('/register', passport.authenticate('local-signup', {
-	// 	successRedirect : '/', // redirect to the secure profile section
-	// 	failureRedirect : '/invite', // redirect back to the signup page if there is an error
-	// 	failureFlash : true // allow flash messages
-	// }));	
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================

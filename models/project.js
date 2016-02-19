@@ -72,15 +72,15 @@ var projectSchema = mongoose.Schema({
 
 	bounds : {
 		northEast : {
-			lat : String,
-			lng : String
+			lat : { type: String, default: '90' },
+			lng : { type: String, default: '180' },
 		},
 		southWest : {
-			lat : String,
-			lng : String
+			lat : { type: String, default: '-90' },
+			lng : { type: String, default: '-180' },
 		},
-		minZoom : String,
-		maxZoom : String
+		minZoom : { type: String, default: '1' },
+		maxZoom : { type: String, default: '20' },
 	},
 	
 	// map initial position

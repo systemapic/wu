@@ -58,8 +58,9 @@ module.exports = function(grunt) {
 				// another target 
 				options:{  
 					// dictionary of render options 
-					sourceMap:false,
-						extDot:'last'
+					sourceMap: true,
+					sourceMapEmbed: true,
+					// extDot:'last'
 				},
 				files:{  
 					'public/css/style.css':'scss/style.scss'

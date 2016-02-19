@@ -2043,7 +2043,17 @@ module.exports = api.geo = {
 		var file_id = req.data.file_id;
 		var zoom_min = req.data.zoom_min;
 		var zoom_max = req.data.zoom_max;
-		var user_id = req.session.passport.user;
+		// var user_id = req.session.passport.user;
+		var user_id;
+
+		if (req && req.session && req.session.passport && req.session.passport.user) {
+			var user_id = req.session.passport.user;
+		} else {
+			// send socket err
+			return api.socket.send('generate_tiles', user_id, {
+				err : 'no user'
+			});
+		}
 
 		var ops = [];
 
