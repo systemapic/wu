@@ -852,7 +852,6 @@ module.exports = api.user = {
 
 		// get projects
 		ops.push(function (inviteJSON, callback) {
-			
 			// parse
 			invitation = JSON.parse(inviteJSON);
 			if (!invitation) return callback('Invitation is expired or does not exist.');
@@ -866,24 +865,32 @@ module.exports = api.user = {
 
 		// give read access
 		ops.push(function (projectAccess, callback) {
-			async.each(projectAccess.read, function (project_id, cb) {
-				api.project.giveReadAccess({
-					user : user,
-					project_id : project_id
-				}, cb)
-			}, function (err) {
-				callback(err, projectAccess);
-			});
+			if (projectAccess.read && _.isArray(projectAccess.read)) {
+				async.each(projectAccess.read, function (project_id, cb) {
+					api.project.giveReadAccess({
+						user : user,
+						project_id : project_id
+					}, cb)
+				}, function (err) {
+					callback(err, projectAccess);
+				});
+			} else {
+				callback(null, projectAccess);
+			}
 		});
 
 		// give edit access
 		ops.push(function (projectAccess, callback) {
-			async.each(projectAccess.edit, function (project_id, cb) {
-				api.project.giveEditAccess({
-					user : user,
-					project_id : project_id
-				}, cb)
-			}, callback);
+			if (projectAccess.edit && _.isArray(projectAccess.edit)) {			
+				async.each(projectAccess.edit, function (project_id, cb) {
+					api.project.giveEditAccess({
+						user : user,
+						project_id : project_id
+					}, cb);
+				}, callback);
+			} else {
+				callback(null, projectAccess);	
+			}
 		});
 
 		// done
