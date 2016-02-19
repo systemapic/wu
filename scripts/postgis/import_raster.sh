@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$3" ]; then
-	echo "Usage: $0 <raster> <table> <database> [<srid>]" >&2
+	echo "Usage: $0 <raster> <table> <database> [<source_srid>]" >&2
 	exit 1
 fi
 
