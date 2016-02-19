@@ -14,8 +14,8 @@ var userAcceptInvite = require('./acceptInvite');
 var helpers = require('../helpers');
 
 describe('User', function () {
-    before(helpers.create_user);
-    after(helpers.delete_user);
+    beforeEach(function(done) { helpers.create_user(done); });
+    afterEach(function(done) { helpers.delete_user(done); });
     this.slow(500);
 
     userUpdate();
