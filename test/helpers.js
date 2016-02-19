@@ -82,7 +82,6 @@ module.exports = util = {
             password : util.test_user.password
         })
         .end(function (err, res) {
-            console.log('res.status', res.status);
             assert.ifError(err);
             assert.equal(res.status, 200);
             var tokens = util.parse(res.text);
@@ -93,7 +92,6 @@ module.exports = util = {
     },
 
     token : function (done) {
-        console.log('tokenn');
         util.get_access_token(function (err, tokens) {
             done(err, tokens.access_token);
         });
