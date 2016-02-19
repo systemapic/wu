@@ -13,6 +13,13 @@ var config = require('../config/wu-config.js').serverConfig;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var endpoints = require('./endpoints.js');
+var apiModule = {
+    auth: require('../api/api.auth'),
+    redis: require('../api/api.redis'),
+    user: require('../api/api.user'),
+    utils: require('../api/api.utils'),
+    config: require('../config/wu-config.js').serverConfig
+};
 
 mongoose.connect(config.mongo.url); 
 
@@ -75,7 +82,6 @@ module.exports = util = {
             password : util.test_user.password
         })
         .end(function (err, res) {
-            console.log('res.status', res.status);
             assert.ifError(err);
             assert.equal(res.status, 200);
             var tokens = util.parse(res.text);
@@ -86,7 +92,6 @@ module.exports = util = {
     },
 
     token : function (done) {
-        console.log('tokenn');
         util.get_access_token(function (err, tokens) {
             done(err, tokens.access_token);
         });
@@ -314,5 +319,49 @@ module.exports = util = {
         .findOne({uuid: layerId})
         .remove()
         .exec(callback);
+    },
+
+    createInviteToken: function (inviteParameters, done) {
+        var ops = [];
+
+        ops.push(function (callback) {
+            User.findOne({uuid: util.test_user.uuid})
+                .exec(function (err, user) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    if (!user) {
+                        return callback(new Error('No such user'));
+                    }
+
+                    return callback(null, user);
+                });
+        });
+
+        ops.push(function (user, callback) {
+
+            var inviteToken = apiModule.utils.getRandomChars(7, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890');
+            var invite_options = JSON.stringify(inviteParameters);
+
+            // save token to redis
+            var redis_key = 'invite:token:' + inviteToken;
+            apiModule.redis.tokens.set(redis_key, invite_options, function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                
+                callback(null, inviteToken);
+            });
+
+        });
+
+        async.waterfall(ops, function (err, inviteToken) {
+            if (err) {
+                return done(err);
+            }
+
+            done(null, inviteToken);
+        });
     }
 }
