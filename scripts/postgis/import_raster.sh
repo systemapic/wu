@@ -5,11 +5,11 @@ if [ -z "$3" ]; then
 	exit 1
 fi
 
-RASTERFILE=$1
+INPUTRASTERFILE=$1
 TABLENAME=$2
 export PGDATABASE=$3
-SRID=
-test -n "$4" && SRID="-s $4"
+S_SRS=
+test -n "$4" && S_SRS="-s_srs EPSG:$4"
 
 
 # get config
@@ -20,9 +20,13 @@ export PGUSER=$SYSTEMAPIC_PGSQL_USERNAME
 export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
 export PGHOST=postgis
 
+# Reproject to EPSG:3857
+RASTERFILE=/tmp/import_raster_$$.tif
+gdalwarp -t_srs EPSG:3857 ${S_SRS} ${INPUTRASTERFILE} ${RASTERFILE} || exit 1
+
 # import raster
 set -o pipefail # needed to get an error if raster2pgsql errors out
 raster2pgsql \
-	${SRID} -I -C \
-	$RASTERFILE $TABLENAME |
+	-s 3857 -I -C \
+	${RASTERFILE} $TABLENAME |
 	psql -q --set ON_ERROR_STOP=1
