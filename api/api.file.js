@@ -248,7 +248,7 @@ module.exports = api.file = {
 				});
 			}
 
-			api.access.to.download_file({
+			api.file.access.toDownload({
 				file : file,
 				user : account
 			}, callback);
@@ -307,7 +307,7 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (file, callback) {
-			api.access.to.download_file({
+			api.file.access.toDownload({
 				file : file,
 				user : account
 			}, callback);
@@ -924,7 +924,7 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (file, callback) {
-			api.access.to.edit_file({
+			api.file.access.toEdit({
 				file : file,
 				user : account
 			}, callback);
@@ -994,6 +994,37 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, done);
+	},
+
+
+	access : {
+
+		toEdit : function (options, done) {
+			if (!options || !options.file) {
+				return done(new Error(errors.bad_file_uuid.errorMessage));
+			}
+
+			if (!options || !options.user) {
+				return done(new Error(errors.bad_user_uuid.errorMessage));
+			}
+
+			File
+			.findOne({uuid : options.file.uuid})
+			.exec(function (err, f) {
+
+				if (f.createdBy == options.user.uuid) {
+					return done(null, options);
+				}
+
+				done(new Error(errors.no_access.errorMessage));
+			});
+		},
+
+		toDownload : function (options, done) {
+			console.log('TODO: access to download!');
+			done(null, options);
+		}
+
 	},
 
 
