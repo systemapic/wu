@@ -218,7 +218,6 @@ module.exports = function(grunt) {
 					
 					// Panes
 					'public/js/src/panes/pane.js',
-					'public/js/src/panes/pane.header.js',
 					'public/js/src/panes/pane.progress.js',
 					'public/js/src/panes/pane.map.js',
 					'public/js/src/panes/pane.status.js',
