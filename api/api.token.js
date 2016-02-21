@@ -48,7 +48,8 @@ module.exports = api.token = {
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
-			if (err || !user) return res.status(401).send({error : err.message});
+			if (err) return res.status(401).send({error : err });
+			if (!user) return res.status(401).send({error : 'No such user.' });
 			req.user = user;
 			next();
 		});
