@@ -17,7 +17,6 @@ module.exports.geo 	= require('./api.geo');
 module.exports.file 	= require('./api.file');
 module.exports.auth 	= require('./api.auth');
 module.exports.user 	= require('./api.user');
-module.exports.oauth2   = require('./api.oauth2');
 module.exports.layer 	= require('./api.layer');
 module.exports.email 	= require('./api.email');
 module.exports.error 	= require('./api.error');

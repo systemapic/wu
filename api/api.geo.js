@@ -1808,7 +1808,6 @@ module.exports = api.geo = {
 		console.log('reaq.data', req.data);
 		console.log('########### req', req);
 		console.log('cookie', req.session.cookie);
-		console.log('passport', req.session.passport);
 
 		ops.push(function (callback) {
 			File
@@ -1889,9 +1888,9 @@ module.exports = api.geo = {
 
 		ops.push(function (data, callback) {
 
-			var user_id = req.session.passport.user;
-
-			
+			// var user_id = req.session.passport.user;
+			console.log('TODO: user_id');
+				
 			if (done) {
 
 				// return callback
@@ -1915,125 +1914,6 @@ module.exports = api.geo = {
 
 
 	},
-
-
-
-	// tileCount : function (req, done) {
-
-	// 	var file_id = req.data.file_id;
-	// 	var zoom_min = req.data.zoom_min;
-	// 	var zoom_max = req.data.zoom_max;
-
-
-	// 	var ops = [];
-
-	// 	console.log('reaq.data', req.data);
-	// 	console.log('########### req', req);
-
-
-	// 	console.log('cookie', req.session.cookie);
-	// 	console.log('passport', req.session.passport);
-
-	// 	ops.push(function (callback) {
-	// 		File
-	// 		.findOne({uuid : file_id})
-	// 		.exec(callback);
-	// 	})
-		
-	// 	ops.push(function (file, callback) {
-			
-	// 		if (!file.data.raster) return callback('Not raster.');
-			
-	// 		// get extent
-	// 		var metadata = api.utils.parse(file.data.raster.metadata);
-
-	// 		var extent = metadata.extent;
-
-	// 		console.log('metadata extent:', extent, metadata);
-
-	// 		// http://tools.geofabrik.de/tiledb?map=geofabrik_standard&
-	// 		// l=5.538061999999896
-	// 		// r=13.613258562499794
-	// 		// t=51.852097592066265
-	// 		// b=47.23631199999996
-	// 		// z=6
-
-	// 		// [ -49, -7.0000000000008, -47.9999999999992, -6 ]
-
-	// 		var extent_left 	= (-1) * extent[3];
-	// 		var extent_right 	= (-1) * extent[1];
-	// 		var extent_top 		= (-1) * extent[2];
-	// 		var extent_bottom 	= (-1) * extent[0];
-
-	// 		var url = 'http://tools.geofabrik.de/tiledb?map=geofabrik_standard&l=5.538061999999896&r=13.613258562499794&t=51.852097592066265&b=47.23631199999996&z=6'
-			
-	// 		var url = [
-	// 			'http://tools.geofabrik.de/tiledb?map=geofabrik_standard',
-	// 			'&l=' + extent_left,
-	// 			'&r=' + extent_right,
-	// 			'&t=' + extent_top,
-	// 			'&b=' + extent_bottom,
-	// 			'&z=' + zoom_min
-	// 		].join('');
-
-			
-	// 		request(url, function (err, response, body) {
-	// 			// err handling
-	// 			// console.log('err, response, body)', err, response, body)
-
-	// 			// parse result
-	// 			var tile_count = JSON.parse(body);
-
-	// 			var tiles = tile_count.tiles;
-
-	// 			console.log('tiles: ', tiles);
-
-	// 			// calc tiles
-	// 			var lower = tiles[zoom_max];
-
-				
-
-	// 			var data = {
-	// 				zoom_max : zoom_max,
-	// 				tiles : tile_count.tiles[zoom_max],
-	// 				extent : {
-	// 					extent_left : extent_left,
-	// 					extent_right : extent_right,
-	// 					extent_top : extent_top,
-	// 					extent_bottom : extent_bottom,
-	// 				}
-	// 			}
-
-	// 			// return layers to async ops
-	// 			callback(null, data);
-	// 		});
-
-
-	// 	});
-
-	// 	ops.push(function (data, callback) {
-
-	// 		var user_id = req.session.passport.user;
-
-	// 		// callback
-	// 		if (done) return done(null, data);
-
-	// 		// send socket
-	// 		api.socket.send('tile_count', user_id, data);
-
-	// 		// '{"memory":[0,0,0,0,0,0,1449.5,1021.921875,763.8984375,422383,1077127.9223632812,3342917.5869140625,11203657.877197266,568200005.8731743,1078945199.609375,5169977867.444824,8563502655.513611,79728201110.9375,0,0],"tiles":[1,1,1,1,1,2,2,2,2,1536,5115,18396,73548,285950,1143800,4509564,18037980,71889950,287558700,1149709767]}' },
-
-	// 	});
-
-
-	// 	async.waterfall(ops, function (err, result) {
-
-
-
-	// 	});
-
-
-	// },
 
 
 
