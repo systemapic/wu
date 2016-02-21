@@ -30,7 +30,6 @@ module.exports.import 	= require('./api.import');
 module.exports.legend 	= require('./api.legend');
 module.exports.pixels 	= require('./api.pixels');
 module.exports.portal 	= require('./api.portal');
-module.exports.access 	= require('./api.access');
 module.exports.socket 	= require('./api.socket');
 module.exports.postgis  = require('./api.postgis');
 module.exports.project 	= require('./api.project');

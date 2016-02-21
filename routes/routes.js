@@ -1919,47 +1919,7 @@ module.exports = function(app, passport) {
 	// app.post('/api/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
 	app.post('/v2/users/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
 
-	// // =====================================
-	// // access: SET PROJECT ACCESS  =========
-	// // =====================================
-	// app.post('/api/access/set/project', checkAccess, function (req,res) {
-	// 	api.access.setProject(req, res);
-	// });
-
-	// // =====================================
-	// // access: GET ROLE  ===============
-	// // =====================================
-	// app.post('/api/access/getrole', checkAccess, function (req,res) {
-	// 	api.access.getRole(req, res);
-	// });
-
-	// // =====================================
-	// // access: SET ROLE  ===============
-	// // =====================================
-	// app.post('/api/access/setrolemember', checkAccess, function (req,res) {
-	// 	api.access.setRoleMember(req, res);
-	// });
-
-	// // =====================================
-	// // access: SET ROLE SUPERADMIN =========
-	// // =====================================
-	// app.post('/api/access/super/setrolemember', checkAccess, function (req,res) {
-	// 	api.access.setSuperRoleMember(req, res);
-	// });
-
-	// // =====================================
-	// // access: SET ROLE  ===============
-	// // =====================================
-	// app.post('/api/access/portal/setrolemember', checkAccess, function (req,res) {
-	// 	api.access.setPortalRoleMember(req, res);
-	// });
-
-	// // =====================================
-	// // access: SET NO ROLE  ================
-	// // =====================================
-	// app.post('/api/access/setnorole', checkAccess, function (req,res) {
-	// 	api.access.setNoRole(req, res);
-	// });
+	
 
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========

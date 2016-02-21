@@ -339,12 +339,12 @@ module.exports = api.portal = {
 			}, callback);
 		};
 
-		// portal access
-		a.access = function (callback) {
-			api.access.getAll({
-				user : account
-			}, callback);
-		};
+		// // portal access
+		// a.access = function (callback) {
+		// 	api.access.getAll({
+		// 		user : account
+		// 	}, callback);
+		// };
 
 		// series
 		async.series(a, function (err, result) {
