@@ -474,10 +474,10 @@ module.exports = function(grunt) {
 				dest : 'views/tmp/app.temp.ejs'
 			},
 
-			login : {
-				src : 'views/login.ejs',
-				dest : 'views/login.serve.ejs'
-			}
+			// login : {
+			// 	src : 'views/login.ejs',
+			// 	dest : 'views/login.serve.ejs'
+			// }
 		},
 
 
@@ -581,7 +581,7 @@ module.exports = function(grunt) {
 			'env:prod', 
 			'preprocess:prod',
 			'login',
-			'preprocess:login',
+			// 'preprocess:login',
 			'htmlmin'
 
 
@@ -596,7 +596,7 @@ module.exports = function(grunt) {
 			'env:dev', 
 			'preprocess:dev',
 			'login',
-			'preprocess:login'
+			// 'preprocess:login'
 	])});
 
 	grunt.registerTask('test', function () { grunt.task.run([
