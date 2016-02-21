@@ -31,7 +31,7 @@ var errorHandler = require('../middleware/error-handler')();
 var api = require('../api/api');
 
 // function exports
-module.exports = function(app, passport) {
+module.exports = function(app) {
 
 	// link app
 	api.app = app;
