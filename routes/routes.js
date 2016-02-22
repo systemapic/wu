@@ -70,7 +70,7 @@ module.exports = function(app) {
 	// GET PORTAL  =========================
 	// =====================================
 	// app.post('/api/portal', checkAccess, api.portal.getPortal);
-	app.post('/v2/portal', checkAccess, api.portal.getPortal);
+	app.get('/v2/portal', checkAccess, api.portal.getPortal);
 	
 	/**
 	* @api {post} /api/project/create Create a project
@@ -200,7 +200,7 @@ module.exports = function(app) {
 	// CHECK THAT PROJECT IS PUBLIC ========
 	// =====================================
 	// app.post('/api/project/get/public', checkAccess, api.project.getPublic, errorHandler);
-	app.post('/v2/projects/public', checkAccess, api.project.getPublic, errorHandler);
+	app.get('/v2/projects/public', checkAccess, api.project.getPublic, errorHandler);
 
 	/**
 	* @api {post} /api/project/get/private Get private project
@@ -230,7 +230,7 @@ module.exports = function(app) {
 	// CHECK THAT PROJECT IS PRIVATE =======
 	// =====================================
 	// app.post('/api/project/get/private', checkAccess, api.project.getPrivate, errorHandler);
-	app.post('/v2/projects/private', checkAccess, api.project.getPrivate, errorHandler);
+	app.get('/v2/projects/private', checkAccess, api.project.getPrivate, errorHandler);
 
 	/**
 	* @api {get} /api/status Get portal status
@@ -311,7 +311,7 @@ module.exports = function(app) {
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
 	// app.post('/api/token', api.token.getTokenFromPassword, errorHandler);
-	app.post('/v2/users/token', api.token.getTokenFromPassword, errorHandler);
+	app.get('/v2/users/token', api.token.getTokenFromPassword, errorHandler);
 
 	/**
 	* @api {post} /api/token/refresh Refresh access token
@@ -380,7 +380,7 @@ module.exports = function(app) {
 	// CHECK SESSION ==================
 	// ================================
 	// app.post('/api/user/session', api.token.checkSession);
-	app.post('/v2/users/session', api.token.checkSession);
+	app.get('/v2/users/session', api.token.checkSession);
 
 	// =====================================
 	// ERROR LOGGING =======================
@@ -1061,7 +1061,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/getLayers
 	// app.post('/api/file/getLayers', checkAccess, api.file.getLayers);
-	app.post('/v2/data/layers', checkAccess, api.file.getLayers, errorHandler);
+	app.get('/v2/data/layers', checkAccess, api.file.getLayers, errorHandler);
 
 	/**
 	* @api {post} /api/dataset/share Share dataset
