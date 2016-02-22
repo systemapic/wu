@@ -33,9 +33,10 @@ module.exports = function () {
         it('should respond with status code 400 and error if password doesn\'t exist in request body', function (done) {
 
             api.get(endpoints.users.token.token)
-                .send({
+                .query({
                     username: 'some user'
                 })
+                .send()
                 .expect(httpStatus.BAD_REQUEST)
                 .end(function (err, res) {
                     if (err) {
@@ -54,10 +55,11 @@ module.exports = function () {
         it('should respond with status code 404 and error if user with specific username doesn\'t exist', function (done) {
 
             api.get(endpoints.users.token.token)
-                .send({
+                .query({
                     username: 'some user',
                     password: 'some password'
                 })
+                .send()
                 .expect(httpStatus.NOT_FOUND)
                 .end(function (err, res) {
                     if (err) {
@@ -74,10 +76,11 @@ module.exports = function () {
         it('should respond with status code 404 and error if user with specific email doesn\'t exist', function (done) {
 
             api.get(endpoints.users.token.token)
-                .send({
+                .query({
                     email: 'some user',
                     password: 'some password'
                 })
+                .send()
                 .expect(httpStatus.NOT_FOUND)
                 .end(function (err, res) {
                     if (err) {
@@ -106,10 +109,11 @@ module.exports = function () {
         it('should respond with status code 400 and error if user with specific username exists but password is wrong', function (done) {
 
             api.get(endpoints.users.token.token)
-                .send({
+                .query({
                     username: helpers.test_user.username,
                     password: 'some password'
                 })
+                .send()
                 .expect(httpStatus.BAD_REQUEST)
                 .end(function (err, res) {
                     if (err) {
@@ -126,10 +130,11 @@ module.exports = function () {
         it('should get access token with email and password', function (done) {
 
             api.get(endpoints.users.token.token)
-            .send({ 
+            .query({
                 username : helpers.test_user.email,
                 password : helpers.test_user.password
             })
+            .send()
             .expect(httpStatus.OK)
             .end(function (err, res) {
                 if (err) {
@@ -147,10 +152,11 @@ module.exports = function () {
 
         it('should get access token with username and password', function (done) {
             api.get(endpoints.users.token.token)
-            .send({ 
+            .query({
                 username : helpers.test_user.username,
                 password : helpers.test_user.password
             })
+            .send()
             .expect(httpStatus.OK)
             .end(function (err, res) {
                 if (err) {

@@ -297,10 +297,10 @@ module.exports = api.portal = {
 		api.portal.printDebug(req);
 
 		// options
-		var options = req.body,
-		    account = req.user,
-		    a = {}, 
-		    invite = api.portal._checkInvite(options);	 // check for invite token
+		var options = req.query;
+		var account = req.user;
+		var a = {};
+		var invite = api.portal._checkInvite(options);	 // check for invite token
 
 
 		// api.debug.hardCrash();
@@ -351,7 +351,7 @@ module.exports = api.portal = {
 			if (err || !result) return api.error.general(req, res, err || 'No result.');
 
 			var gzip = true;
-			if (req.body.gzip === 'false') gzip = false;
+			if (req.query.gzip === 'false') gzip = false;
 
 			if (!gzip) return res.send(result);
 			
