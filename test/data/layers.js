@@ -9,9 +9,6 @@ var httpStatus = require('http-status');
 var format = require('util').format;
 var endpoints = require('../endpoints.js');
 
-
-
-
 module.exports = function () {
     describe(endpoints.data.layers, function () {
         this.slow(500);
@@ -24,7 +21,7 @@ module.exports = function () {
 
         // test 1
         it('should respond with status code 401 when not authenticated', function (done) {
-            api.post(endpoints.data.layers)
+            api.get(endpoints.data.layers)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -35,7 +32,7 @@ module.exports = function () {
         // test 2
         it('should respond with status code 400 and error if type is not postgis or raster', function (done) {
             token(function (err, access_token) {
-                api.post(endpoints.data.layers)
+                api.get(endpoints.data.layers)
                     .send({
                         type: 'not postgis or raster',
                         access_token: access_token
@@ -55,7 +52,7 @@ module.exports = function () {
             // test 3
             it('should respond with status code 400 and error if data.file_id doesn\'t exist in request body', function (done) {
                 token(function (err, access_token) {
-                    api.post(endpoints.data.layers)
+                    api.get(endpoints.data.layers)
                         .send({
                             type: 'raster',
                             access_token: access_token
@@ -70,7 +67,7 @@ module.exports = function () {
             // test 4
             it('should respond with status code 200 and empty array of layers if layers with specific file doesn\'t exist', function (done) {
                 token(function (err, access_token) {
-                    api.post(endpoints.data.layers)
+                    api.get(endpoints.data.layers)
                         .send({
                             type: 'raster',
                             data: {file_id: 'some file id'},
@@ -92,7 +89,7 @@ module.exports = function () {
             // test 5
             it('should respond with status code 200 and array of layers if type is raster and all parameters are correct', function (done) {
                 token(function (err, access_token) {
-                    api.post(endpoints.data.layers)
+                    api.get(endpoints.data.layers)
                         .send({
                             type: 'raster',
                             data: {file_id: helpers.test_layer.file},
@@ -119,7 +116,7 @@ module.exports = function () {
             // test 6
             it('should respond with status code 400 and error if table_name doesn\'t exist in request parameters', function (done) {
                 token(function (err, access_token) {
-                    api.post(endpoints.data.layers)
+                    api.get(endpoints.data.layers)
                         .send({
                             type: 'postgis',
                             data: {database_name: 'some database_name'},
@@ -135,7 +132,7 @@ module.exports = function () {
             // test 7
             it('should respond with status code 400 and error if database_name doesn\'t exist in request parameters', function (done) {
                 token(function (err, access_token) {
-                    api.post(endpoints.data.layers)
+                    api.get(endpoints.data.layers)
                         .send({
                             type: 'postgis',
                             data: {table_name: 'some table_name'},
@@ -151,7 +148,7 @@ module.exports = function () {
             // test 8
             it('should respond with status code 200 and empty array of layers if layers with specific table_name doesn\'t exist', function (done) {
                 token(function (err, access_token) {
-                    api.post(endpoints.data.layers)
+                    api.get(endpoints.data.layers)
                         .send({
                             type: 'postgis',
                             data: {table_name: 'some table_name', database_name: 'some database_name'},
@@ -173,7 +170,7 @@ module.exports = function () {
             // test 9
             it('should respond with status code 200 and array of specific layers if and all parameters are correctly', function (done) {
                 token(function (err, access_token) {
-                    api.post(endpoints.data.layers)
+                    api.get(endpoints.data.layers)
                         .send({
                             type: 'postgis',
                             data: {
