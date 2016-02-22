@@ -43,7 +43,7 @@ module.exports = endpoint = {
             invite      : '/v2/users/invite',
             projects    : '/v2/users/invite/projects',
             link        : '/v2/users/invite/link',
-            accept      : '/api/user/invite/accept'
+            accept      : '/v2/users/invite/accept'
         },
         contacts : {
             request     : '/v2/users/contacts/request'
@@ -55,8 +55,8 @@ module.exports = endpoint = {
     },
 
     hashes : {
-        get             : '/v2/hashes/get',
-        set             : '/v2/hashes/set'
+        get             : '/v2/hashes',
+        set             : '/v2/hashes'
     },
 
     // upload: {

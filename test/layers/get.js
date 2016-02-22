@@ -8,6 +8,7 @@ var httpStatus = require('http-status');
 var async = require('async');
 var expected = require('../../shared/errors');
 var Project =  require('../../models/project');
+var endpoints = require('../endpoints.js');
 
 
 
@@ -18,7 +19,7 @@ var Project =  require('../../models/project');
 module.exports = function () {
 
 
-    describe('/api/layers', function () {
+    describe(endpoints.layers.get, function () {
         var projectWithoutLayers = {
             uuid: 'relatedProjectWithoutLayersUuid',
             createdBy: 'relatedProjectWithoutLayersCreatedBy',
