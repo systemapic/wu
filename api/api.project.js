@@ -116,40 +116,38 @@ module.exports = api.project = {
 		}
 
 		Project
-			.findOne({uuid : projectUuid})
-			.exec(function (err, project) {
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			if (err) return next(err);
+
+			if (!project) {
+				return next({
+					message: errors.no_such_project.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
+
+			if (!access.read || !_.isArray(access.read)) {
+				return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access.read']));			
+			}
+
+			access.read.forEach(function (u) {
+				// add read (if not in edit)
+				if (!_.contains(project.access.edit, u)) {
+					project.access.read.addToSet(u);
+				}
+			});
+
+			project.save(function (err, updatedProject) {
 				if (err) {
 					return next(err);
 				}
 
-				if (!project) {
-					return next({
-						message: errors.no_such_project.errorMessage,
-						code: httpStatus.NOT_FOUND
-					});
-				}
-
-				if (!access.read || !_.isArray(access.read)) {
-					return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access.read']));			
-				}
-
-				access.read.forEach(function (u) {
-					// add read (if not in edit)
-					if (!_.contains(project.access.edit, u)) {
-						project.access.read.addToSet(u);
-					}
-				});
-
-				project.save(function (err, updatedProject) {
-					if (err) {
-						return next(err);
-					}
-
-					// return updated access
-					res.send(updatedProject.access);
-				});
-
+				// return updated access
+				res.send(updatedProject.access);
 			});
+
+		});
 
 	},
 
