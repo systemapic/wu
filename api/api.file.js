@@ -911,11 +911,13 @@ module.exports = api.file = {
 
 	// update a file
 	update : function (req, res) {
-		var fileUuid = req.body.uuid,
-		    account = req.user,
-		    ops = [];
+		var fileUuid = req.body.uuid;
+		var account = req.user;
+		var ops = [];
 
-		if (!fileUuid) return api.error.missingInformation(req, res);
+		if (!fileUuid) {
+			return api.error.missingInformation(req, res);
+		}
 
 		ops.push(function (callback) {
 			File

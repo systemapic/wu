@@ -29,17 +29,18 @@ module.exports = function () {
         before(function (done) { helpers.create_user_by_parameters(second_test_user, done); });
         after(function (done) { helpers.delete_user_by_id(second_test_user.uuid, done); });
 
-
-
         // test 1
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post(endpoints.data.update)
                 .send({})
-                .expect(httpStatus.UNAUTHORIZED, helpers.createExpectedError(expected.invalid_token.errorMessage))
+                .expect(httpStatus.UNAUTHORIZED, {
+                    error: {
+                        code: httpStatus.UNAUTHORIZED, 
+                        message: expected.invalid_token.errorMessage
+                    }
+                })
                 .end(done);
         });
-
-
 
         // test 2
         it('should respond with status code 400 if fileUuid doesn\'t exist in request body', function (done) {

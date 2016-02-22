@@ -256,7 +256,7 @@ module.exports = function(app) {
 	// GET STATUS   ====================
 	// =====================================
 	// app.get('/api/status', checkAccess, api.portal.status);
-	app.get('/v2/status', checkAccess, api.portal.status);
+	app.get('/v2/status', checkAccess, api.portal.status, errorHandler);
 
 	// deprecated
 	// app.post('/oauth/token', api.oauth2.getToken);
@@ -347,7 +347,7 @@ module.exports = function(app) {
 	// app.post('/api/token/check', checkAccess, function (req, res) {
 	app.post('/v2/users/token/check', checkAccess, function (req, res) {
 		res.send(req.user);
-	});
+	}, errorHandler);
 
 	/**
 	* @api {get} /api/token/check Check access token
@@ -1061,7 +1061,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/getLayers
 	// app.post('/api/file/getLayers', checkAccess, api.file.getLayers);
-	app.post('/v2/data/layers', checkAccess, api.file.getLayers);
+	app.post('/v2/data/layers', checkAccess, api.file.getLayers, errorHandler);
 
 	/**
 	* @api {post} /api/dataset/share Share dataset

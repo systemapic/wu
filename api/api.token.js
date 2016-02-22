@@ -48,8 +48,18 @@ module.exports = api.token = {
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
-			if (err) return res.status(401).send({error : err });
-			if (!user) return res.status(401).send({error : 'No such user.' });
+			if (err) {
+				return next({
+					code: httpStatus.UNAUTHORIZED,
+					message: err.message || errors.invalid_token.errorMessage
+				});
+			}
+			if (!user) {
+				return next({
+					code: httpStatus.UNAUTHORIZED,
+					message: errors.no_such_user.errorMessage
+				});
+			}
 			req.user = user;
 			next();
 		});
@@ -279,7 +289,7 @@ module.exports = api.token = {
 
 			User
 			.findOne({_id : stored_token.user_id})
-			.exec(done)
+			.exec(done);
 		});
 	},
 
