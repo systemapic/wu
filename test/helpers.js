@@ -77,18 +77,19 @@ module.exports = util = {
 
     get_access_token : function (done) {
         api.get(endpoints.users.token.token)
-        .send({ 
-            username : util.test_user.email,
-            password : util.test_user.password
-        })
-        .end(function (err, res) {
-            assert.ifError(err);
-            assert.equal(res.status, 200);
-            var tokens = util.parse(res.text);
-            assert.equal(tokens.token_type, 'multipass');
-            assert.equal(_.size(tokens.access_token), 43);
-            done(err, tokens);
-        });
+            .query({
+                username : util.test_user.email,
+                password : util.test_user.password
+            })
+            .send()
+            .end(function (err, res) {
+                assert.ifError(err);
+                assert.equal(res.status, 200);
+                var tokens = util.parse(res.text);
+                assert.equal(tokens.token_type, 'multipass');
+                assert.equal(_.size(tokens.access_token), 43);
+                done(err, tokens);
+            });
     },
 
     token : function (done) {
@@ -99,15 +100,16 @@ module.exports = util = {
 
     get_users_access_token : function (_user, callback) {
       api.get(endpoints.users.token.token)
-        .send({
-            grant_type : 'password',
-            username : _user.email,
-            password : _user.password
-        })
-        .end(function (err, res) {
-            assert.ifError(err);
-            assert.equal(res.status, 200);
-            callback(err, util.parse(res.text));
+          .query({
+              grant_type : 'password',
+              username : _user.email,
+              password : _user.password
+          })
+          .send()
+          .end(function (err, res) {
+              assert.ifError(err);
+              assert.equal(res.status, 200);
+              callback(err, util.parse(res.text));
         });
     },
 

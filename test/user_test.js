@@ -65,19 +65,20 @@ describe('User', function () {
         this.slow(700);
         token(function (err, access_token) {
             api.get(endpoints.portal)
-            .send({access_token : access_token})
-            .expect(200)
-            .end(function (err, res) {
-                assert.ifError(err);
-                var store = helpers.parse(res.text);
-                assert.ok(store);
-                assert.ok(store.account);
-                assert.ok(store.projects);
-                assert.ok(store.users);
-                assert.equal(store.account.local.email, helpers.test_user.email);
-                assert.equal(store.account.firstName, helpers.test_user.firstName);
-                done();
-            });
+                .query({access_token : access_token})
+                .send()
+                .expect(200)
+                .end(function (err, res) {
+                    assert.ifError(err);
+                    var store = helpers.parse(res.text);
+                    assert.ok(store);
+                    assert.ok(store.account);
+                    assert.ok(store.projects);
+                    assert.ok(store.users);
+                    assert.equal(store.account.local.email, helpers.test_user.email);
+                    assert.equal(store.account.firstName, helpers.test_user.firstName);
+                    done();
+                });
         })
     });
 

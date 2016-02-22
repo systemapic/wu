@@ -25,7 +25,10 @@ module.exports = function () {
 	        it('should respond with status code 400 and specific error message if project_id or user_access_token don\'t exist in request body', function (done) {
 	            token(function (err, access_token) {
 	                api.get(endpoints.projects.private)
-	                    .send({ access_token: access_token })
+						.query({
+							access_token: access_token
+						})
+	                    .send()
 	                    .expect(httpStatus.BAD_REQUEST)
 	                    .end(function (err, res) {
 	                        if (err) return done(err);
@@ -45,11 +48,12 @@ module.exports = function () {
 	        it('should respond with status code 200', function (done) {
 	            token(function (err, access_token) {
 	                api.get(endpoints.projects.private)
-	                    .send({
-	                        access_token: access_token,
-	                        project_id: 'some project_id',
-	                        user_access_token: 'some user_access_token'
-	                    })
+						.query({
+							access_token: access_token,
+							project_id: 'some project_id',
+							user_access_token: 'some user_access_token'
+						})
+	                    .send()
 	                    .expect(httpStatus.OK)
 	                    .end(done);
 	            });

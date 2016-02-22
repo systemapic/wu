@@ -204,7 +204,7 @@ module.exports = api.project = {
 	},
 
 	getPublic : function (req, res, next) {
-		var params = req.body || {};
+		var params = req.query || {};
 		var username = params.username;
 		var project_slug = params.project_slug;
 		var missingRequiredRequestFields = [];
@@ -236,8 +236,8 @@ module.exports = api.project = {
 	},
 
 	getPrivate : function (req, res, next) {
-		console.log('api.project.getPrivate', req.body);
-		var params = req.body || {};
+		console.log('api.project.getPrivate', req.query);
+		var params = req.query || {};
 		var project_id = params.project_id;
 		var access_token = params.user_access_token;		
 		var missingRequiredRequestFields = [];
@@ -825,9 +825,9 @@ module.exports = api.project = {
 
 
 	getHash : function (req, res, next) {
-		var params = req.body || {};
-		var id = params.id;
-		var	projectUuid = params.project_id;		// todo: access restrictions
+		var query = req.query || {};
+		var id = query.id;
+		var	projectUuid = query.project_id;		// todo: access restrictions
 		var missingRequiredRequestFields = [];
 
 		if (!id) {
