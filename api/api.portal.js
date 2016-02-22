@@ -353,7 +353,7 @@ module.exports = api.portal = {
 			var gzip = true;
 			if (req.body.gzip === 'false') gzip = false;
 
-			if (!gzip) return res.json(result);
+			if (!gzip) return res.send(result);
 			
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
