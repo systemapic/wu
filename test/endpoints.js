@@ -22,7 +22,8 @@ module.exports = endpoint = {
     	create          : '/v2/layers/create',
     	update          : '/v2/layers/update',
     	meta            : '/v2/layers/meta',
-    	carto           : '/v2/layers/carto/json'
+    	carto           : '/v2/layers/carto/json',
+        get             : '/v2/projects/layers', // GET request // todo: move to projects test
     },
 
     users : {
@@ -65,9 +66,11 @@ module.exports = endpoint = {
     portal              : '/v2/portal',
     status              : '/v2/status',
     import : {
-        post            : '/api/import',
-        status          : '/api/import/status',
-        download        : '/api/upload/get'
+        // post            : '/api/import',
+        post            : '/v2/data/import',
+        status          : '/v2/data/import/status',
+        // download        : '/api/upload/get'
+        download        : '/v2/data/import' // GET
         
 
     } 

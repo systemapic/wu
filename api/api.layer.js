@@ -293,7 +293,8 @@ module.exports = api.layer = {
 
 	// get layers and send to client
 	get : function (req, res, next) {
-		var project = req.body.project;
+		// var project = req.body.project;
+		var project = req.query.project;
 		var user = req.user.uuid;
 
 		// error if no project or user
