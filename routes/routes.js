@@ -398,7 +398,7 @@ module.exports = function(app) {
 	// ANALYTICS ===================
 	// =====================================
 	// app.post('/api/analytics/get', checkAccess, api.analytics.get);
-	app.post('/v2/log/get', checkAccess, api.analytics.get);
+	app.get('/v2/log/get', checkAccess, api.analytics.get);
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
@@ -791,7 +791,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/getHash
 	// app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
-	app.post('/v2/hashes/get', checkAccess, api.project.getHash, errorHandler);
+	app.get('/v2/hashes/get', checkAccess, api.project.getHash, errorHandler);
 
 	/**
 	* @api {post} /api/project/uploadlogo Upload project logo
@@ -1495,7 +1495,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/layer/carto/get 
 	// app.post('/api/layers/cartocss/get', checkAccess, function (req, res) {
-	app.post('/v2/layers/carto/get', checkAccess, function (req, res) {
+	app.get('/v2/layers/carto/get', checkAccess, function (req, res) {
 		api.layer.getCartoCSS(req, res);
 	});
 
@@ -1917,9 +1917,7 @@ module.exports = function(app) {
 	// GENERATE ACCESS LINK ================
 	// =====================================
 	// app.post('/api/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
-	app.post('/v2/users/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
-
-	
+	app.get('/v2/users/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
 
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========
