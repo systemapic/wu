@@ -91,7 +91,7 @@ module.exports = api.token = {
 
 	// route: get access token from password
 	getTokenFromPassword : function (req, res, next) {
-		api.token._get_token_from_password(req.body || {}, function (err, tokens) {
+		api.token._get_token_from_password(req.query || {}, function (err, tokens) {
 			if (err) {
 				return next(err);
 			}
