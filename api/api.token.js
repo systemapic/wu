@@ -48,7 +48,8 @@ module.exports = api.token = {
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
-			if (err) return res.status(401).send({error : err });
+			console.log('err, user', err, user);
+			if (err) return res.status(401).send({error : err.message });
 			if (!user) return res.status(401).send({error : 'No such user.' });
 			req.user = user;
 			next();
@@ -279,7 +280,10 @@ module.exports = api.token = {
 
 			User
 			.findOne({_id : stored_token.user_id})
-			.exec(done)
+			.exec(function (err, user) {
+				if (err || !user) return done(new Error('Invalid access token.'));
+				done(null, user);
+			})
 		});
 	},
 
