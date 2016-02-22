@@ -266,10 +266,7 @@ module.exports = api.analytics = {
 
 	// NOT IN USE YET
 	get : function (req, res) {
-
 		var options = req.query;
-		// called from routes.js:64, /api/analytics/get
-
 		if (!options) return api.error.missingInformation(req, res);
 
 		// return to client
