@@ -76,7 +76,7 @@ module.exports = util = {
     },
 
     get_access_token : function (done) {
-        api.get(endpoints.users.token.token
+        api.get(endpoints.users.token.token)
             .query({
                 username : util.test_user.email,
                 password : util.test_user.password
@@ -89,7 +89,7 @@ module.exports = util = {
                 assert.equal(tokens.token_type, 'multipass');
                 assert.equal(_.size(tokens.access_token), 43);
                 done(err, tokens);
-            }));
+            });
     },
 
     token : function (done) {
