@@ -33,12 +33,8 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app) {
 
-	// link app
-	api.app = app;
 
-	// authenticate shorthand
-	var checkAccess = api.token.authenticate;
-
+	// define apiDocs tokens
 	/**
 	* @apiDefine token
 	* @apiParam {String} access_token A valid access token
@@ -49,12 +45,19 @@ module.exports = function(app) {
 	*    "error": "Invalid access token."
 	* }
 	*/
+	
+
+	// link app
+	api.app = app;
+
+	// authenticate shorthand
+	var checkAccess = api.token.authenticate;
+
+
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
-	app.get('/', function(req, res) {
-		api.portal.getBase(req, res);
-	});
+	app.get('/', api.portal.getBase);
 	
 	/**
 	* @api {get} /v2/portal Get portal store
@@ -252,8 +255,6 @@ module.exports = function(app) {
 	// =====================================
 	app.get('/v2/status', checkAccess, api.portal.status, errorHandler);
 
-	// deprecated
-	// app.post('/oauth/token', api.oauth2.getToken);
 		
 	/**
 	* @api {get} /v2/users/token Get access token
@@ -337,7 +338,7 @@ module.exports = function(app) {
 	// CHECK TOKEN ====================
 	// ================================
 	app.post('/v2/users/token/check', checkAccess, function (req, res) {
-		res.send(req.user);
+		res.send(req.user); 	// todo: create endpoint in api.users.js for this
 	}, errorHandler);
 
 	/**
@@ -356,7 +357,7 @@ module.exports = function(app) {
 	// CHECK TOKEN ====================
 	// ================================
 	app.get('/v2/users/token/check', checkAccess, function (req, res) {
-		res.send({valid : true});
+		res.send({valid : true}); // todo: create endpoint in api.users.js for this
 	});
 	
 	/**
@@ -371,6 +372,7 @@ module.exports = function(app) {
 	// ================================
 	app.get('/v2/users/session', api.token.checkSession);
 
+	// todo: document these routes
 	// =====================================
 	// ERROR LOGGING =======================
 	// =====================================
@@ -384,83 +386,32 @@ module.exports = function(app) {
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.post('/v2/log/get', checkAccess, api.analytics.get);
+	app.get('/v2/log', checkAccess, api.analytics.get);
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/api/data/upload/chunked', checkAccess, function (req, res) {
-		api.upload.chunkedCheck(req, res);
-	});
+	// app.get('/api/data/upload/chunked', checkAccess, function (req, res) {
+	app.get('/v2/data/import/chunked', checkAccess, api.upload.chunkedCheck);
 
 	// =====================================
-	// RESUMABLE.js UPLOADS ================
+	// UPLOAD DATA IN CHUNKS (RESUMABLE) === 
 	// =====================================
-	app.get('/download/:identifier', checkAccess, function (req, res) {
-		api.upload.chunkedIdent(req, res);
-	});
-
-	// todo: this route is now DEAD; still alive in wu.js (?? still true?)
-	// =====================================
-	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked (still true??)
-	// =====================================
-	app.post('/api/data/upload/chunked', checkAccess, api.upload.chunkedUpload);
+	// app.post('/api/data/upload/chunked', checkAccess, api.upload.chunkedUpload);
+	app.post('/v2/data/import/chunked', checkAccess, api.upload.chunkedUpload);
 
 
-	// =====================================
-	// SET ACCESS ==========================
-	// =====================================
-	// app.post('/api/project/setAccess', checkAccess, function (req,res) {
-	app.post('/v2/projects/access', checkAccess, api.project.setAccess);
+	// // =====================================
+	// // RESUMABLE.js UPLOADS ================
+	// // =====================================
+	// app.get('/download/:identifier', checkAccess, function (req, res) {
+	// 	api.upload.chunkedIdent(req, res);
+	// });
+
+	
 
 	/**
-	* @api {post} /v2/users/invite/project Add invites
-	* @apiName add invites
-	* @apiGroup Project
-	* @apiUse token
-	* @apiParam {String} project Uuid of project
-	* @apiParam {Object} access Access object
-	* @apiSuccess {json} access Project access object
-	* @apiSuccessExample {json} Success-Response:
-	* {
-  	*  read: ['test'],
-  	*  edit: ['uuid-mocha-test-project'],
-	*  options: {
-	*    share: true,
-	*    download: false,
-	*    isPublic: false
-	*  }
-	*}
-	* @apiError Bad_request access or project do not exist in request body (400)
-	* @apiErrorExample {json} Error-Response:
-	* Error 400: Bad request
-	* {
-	*    "error": {
-	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
-	*		"code": "400",
-	*		"errors": {
-	*			"missingRequiredFields": ['access', 'project']
-	*		}
-	*	}
-	* }
-	* @apiError Not_found If project doesn't exist(404)
-	* @apiErrorExample {json} Error-Response:
-	* Error 404: Not found
-	* {
-	*    "error": {
-	*		"message": "No such project.",
-	*		"code": "404"
-	*	}
-	* }
-	*/
-	// =====================================
-	// CREATE NEW PROJECT  =================
-	// =====================================
-	// change route to /api/project/invite
-	app.post('/v2/users/invite/project', checkAccess, api.project.addInvites, errorHandler);
-
-	/**
-	* @api {get} /api/upload/get Get upload
+	* @api {get} /v2/data/import Get upload 
 	* @apiName get upload
 	* @apiGroup Upload
 	* @apiUse token
@@ -521,10 +472,11 @@ module.exports = function(app) {
 	// =====================================
 	// GET UPLOAD ==========================
 	// =====================================
-	app.get('/api/upload/get', checkAccess, api.upload.getUpload, errorHandler);
+	// app.get('/api/upload/get', checkAccess, api.upload.getUpload, errorHandler);
+	app.get('/v2/data/import', checkAccess, api.upload.getUpload, errorHandler);
 
 	/**
-	* @api {post} /api/import Import data
+	* @api {post} /v2/data/import Import data
 	* @apiName import
 	* @apiGroup Data
 	* @apiUse token
@@ -548,17 +500,17 @@ module.exports = function(app) {
 	// IMPORT DATA to POSTGIS ==============
 	// =====================================
 	// change to /api/data/import
-	app.post('/api/import', checkAccess, function (req, res) {
-		api.upload.upload(req, res);
-	});
+	// app.post('/api/import', checkAccess, function (req, res) {
+	app.post('/v2/data/import', checkAccess, api.upload.upload);
 
+
+	// todo: document
 	// =====================================
 	// GET UPLOAD STATUS ===================
 	// =====================================
 	// change to /api/import/status
-	app.get('/api/import/status', checkAccess, function (req, res) {
-		api.upload.getUploadStatus(req, res);
-	});
+	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
+	app.get('/v2/data/import/status', checkAccess, api.upload.getUploadStatus);
 
 	/**
 	 * @apiIgnore
@@ -672,8 +624,62 @@ module.exports = function(app) {
 	// =====================================
 	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
 
+
+	// =====================================
+	// SET ACCESS ==========================
+	// =====================================
+	// app.post('/api/project/setAccess', checkAccess, function (req,res) {
+	app.post('/v2/projects/access', checkAccess, api.project.setAccess);
+
 	/**
-	* @api {post} /v2/hashes/set Set project hash
+	* @api {post} /v2/users/invite/project Add invites
+	* @apiName add invites
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project Uuid of project
+	* @apiParam {Object} access Access object
+	* @apiSuccess {json} access Project access object
+	* @apiSuccessExample {json} Success-Response:
+	* {
+  	*  read: ['test'],
+  	*  edit: ['uuid-mocha-test-project'],
+	*  options: {
+	*    share: true,
+	*    download: false,
+	*    isPublic: false
+	*  }
+	*}
+	* @apiError Bad_request access or project do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['access', 'project']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If project doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
+	// =====================================
+	// CREATE NEW PROJECT  =================
+	// =====================================
+	// change route to /api/project/invite
+	app.post('/v2/users/invite/project', checkAccess, api.project.addInvites, errorHandler);
+
+
+	/**
+	* @api {post} /v2/hashes Set project hash
 	* @apiName Set hash
 	* @apiGroup Project
 	* @apiUse token
@@ -721,10 +727,10 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/setHash
 	// app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
-	app.post('/v2/hashes/set', checkAccess, api.project.setHash, errorHandler);
+	app.post('/v2/hashes', checkAccess, api.project.setHash, errorHandler);
 
 	/**
-	* @api {get} /v2/hashes/get Get project hash
+	* @api {get} /v2/hashes Get project hash
 	* @apiName Get hash
 	* @apiGroup Project
 	* @apiUse token
@@ -773,9 +779,13 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/getHash
 	// app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
-	app.get('/v2/hashes/get', checkAccess, api.project.getHash, errorHandler);
+	app.get('/v2/hashes', checkAccess, api.project.getHash, errorHandler);
+
+
 
 	/**
+	* // this route is deprecated
+	* @apiIgnore 
 	* @api {post} /api/project/uploadlogo Upload project logo
 	* @apiName Upload project logo
 	* @apiGroup Project
@@ -803,64 +813,52 @@ module.exports = function(app) {
 	// UPLOAD PROJECT LOGO  ================
 	// =====================================
 	// change to /api/project/setLogo
-	app.post('/api/project/uploadlogo', checkAccess, api.upload.projectLogo, errorHandler);
+	// app.post('/api/project/uploadlogo', checkAccess, api.upload.projectLogo, errorHandler);
 
+	// todo: remove, deprecated
 	// =====================================
 	// UPLOAD IMAGE ========================
 	// =====================================
 	// change to /api/import/image
-	app.post('/api/upload/image', checkAccess, function (req,res) {
-		api.upload.image(req, res);
-	});
+	app.post('/api/upload/image', checkAccess, api.upload.image);
+
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// special route, don't touch for now
-	app.get('/images/*', checkAccess, function (req,res) {
-		api.file.sendImage(req, res);
-	});
+	app.get('/images/*', checkAccess, api.file.sendImage);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
 	// special route, don't touch for now
-	app.get('/pixels/fit/*',checkAccess, function (req,res) {
-		api.pixels.serveFitPixelPerfection(req, res);
-	});
+	app.get('/pixels/fit/*', checkAccess, api.pixels.serveFitPixelPerfection);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/image/*', checkAccess, function (req,res) {
-		api.pixels.serveImagePixelPerfection(req, res);
-	});
+	app.get('/pixels/image/*', checkAccess, api.pixels.serveImagePixelPerfection);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/screenshot/*', function (req,res) {
-		api.pixels.serveScreenshot(req, res);
-	});
+	app.get('/pixels/screenshot/*', api.pixels.serveScreenshot);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/*', checkAccess, function (req,res) {
-		api.pixels.servePixelPerfection(req, res);
-	});
+	app.get('/pixels/*', checkAccess, api.pixels.servePixelPerfection);
 
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
 	// =====================================
 	// change to /api/tools/mapbox/get
-	app.post('/api/util/getmapboxaccount', checkAccess, function (req, res) {
-		api.provider.mapbox.getAccount(req, res);
-	});
+	app.post('/api/util/getmapboxaccount', checkAccess, api.provider.mapbox.getAccount);
 	
 	// =====================================
 	// CREATE SNAPSHOT =====================
@@ -868,59 +866,53 @@ module.exports = function(app) {
 	// create snapshot of current map
 	// change to /api/tools/snap/create
 	// app.post('/api/util/snapshot', checkAccess, function (req, res) {
-	app.post('/v2/static/screen', checkAccess, function (req, res) {
-		api.pixels.createSnapshot(req, res);
-	});
+	app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
 
 	// =====================================
 	// CREATE THUMBNAIL ====================
 	// =====================================
 	// change to /api/tools/thumb/create
 	// app.post('/api/util/createThumb', checkAccess, function (req, res) {
-	app.post('/v2/static/thumb', checkAccess, function (req, res) {
-		api.pixels.createThumb(req, res);
-	});
+	app.post('/v2/static/thumb', checkAccess, api.pixels.createThumb);
 
 	// =====================================
 	// CREATE PDF SNAPSHOT =================
 	// =====================================
 	// change to /api/tools/pdf/create
 	// app.post('/api/util/pdfsnapshot', checkAccess, function (req, res) {
-	app.post('/v2/static/pdf', checkAccess, function (req, res) {
-		api.pixels.createPDFSnapshot(req, res);
-	});
+	app.post('/v2/static/pdf', checkAccess, api.pixels.createPDFSnapshot);
 
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
 	// change to /api/layer/legends/create
 	// app.post('/api/layer/createlegends', checkAccess, function (req, res) {
-	app.post('/v2/legends/create', checkAccess, function (req, res) {
-		api.legend.create(req, res);
-	});
+	app.post('/v2/legends/create', checkAccess, api.legend.create);
 
+	// todo: remove, deprecated
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
 	// change to /api/data/get ... 
 	// todo: perhaps improve this, put all downloads together, with type/format in query/form.. todo later
-	app.post('/api/geojson', checkAccess, function (req,res) {
-		api.file.getGeojsonFile(req, res);
-	});
+	// app.post('/api/geojson', checkAccess, function (req,res) {
+	// 	api.file.getGeojsonFile(req, res);
+	// });
 	
+	// todo: remove, deprecated
 	// =====================================
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/data/download
-	app.get('/api/file/download', checkAccess, api.file.download, errorHandler);
+	// app.get('/api/file/download', checkAccess, api.file.download, errorHandler);
 
+
+	// todo: remove, deprecated (will be removed with new raster import (branch: postgis_raster))
 	// =====================================
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/tools/tilecount
-	app.get('/api/util/getTilecount', checkAccess, function (req, res) {
-		api.geo.getTilecount(req, res);
-	});
+	// app.get('/api/util/getTilecount', checkAccess, api.geo.getTilecount);
 
 	/**
 	* @api {post} /v2/layers/carto/json Return carto css
@@ -958,23 +950,22 @@ module.exports = function(app) {
 	// app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
 	app.post('/v2/layers/carto/json', checkAccess, api.geo.json2carto, errorHandler);
 
+
+	// todo: document
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/data/download (POST/GET routes with same name no problem)
 	// app.post('/api/file/downloadDataset', checkAccess, function (req,res) {
-	app.post('/v2/data/download', checkAccess, function (req,res) {
-		api.postgis.downloadDatasetFromFile(req, res);
-	});
+	app.post('/v2/data/download', checkAccess, api.postgis.downloadDatasetFromFile);
 
+	// todo: document
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/layer/download
 	// app.post('/api/layer/downloadDataset', checkAccess, function (req,res) {
-	app.post('/v2/layers/download', checkAccess, function (req,res) {
-		api.postgis.downloadDatasetFromLayer(req, res);
-	});
+	app.post('/v2/layers/download', checkAccess, api.postgis.downloadDatasetFromLayer);
 	
 	/**
 	* @api {post} /v2/data/update Update a file
@@ -990,8 +981,8 @@ module.exports = function(app) {
 	*   "updated": ['name', 'description'],
 	*   "file": {
 	*       lastUpdated: '2016-01-19T12:49:49.076Z',
-    *       created: '2016-01-19T12:49:48.943Z',
-    *       ... etc
+    	*       created: '2016-01-19T12:49:48.943Z',
+    	*       ... etc
 	*   }
 	* }
 	* @apiError File with uuid <code>uuid</code> doesn't exist. (422)
@@ -1275,7 +1266,7 @@ module.exports = function(app) {
 	app.post('/v2/layers/delete', checkAccess, api.layer.deleteLayer, errorHandler);
 
 	/**
-	* @api {post} /api/layers Get layers related with project
+	* @api {get} /v2/projects/layers Get layers related with project
 	* @apiName get layers by project id
 	* @apiGroup Layer
 	* @apiUse token
@@ -1309,8 +1300,8 @@ module.exports = function(app) {
 	// LAYERS ==============================
 	// =====================================
 	// change to /api/layer/get 
-	app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
-	// app.post('/v2/layers/get', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
+	// app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
+	app.get('/v2/projects/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
 
 	// todo: /v2/projects/layers GET request
 
@@ -1345,19 +1336,13 @@ module.exports = function(app) {
 	// change to /api/layer/create 
 	app.post('/v2/layers/create', checkAccess, api.layer.create, errorHandler);
 
+	// todo: refactor to /v2/layers/create with default flag
 	// =====================================
 	// CREATE NEW DEFAULT LAYER ============
 	// =====================================
 	// app.post('/api/layers/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
 	app.post('/v2/layers/create/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
 
-	// =====================================
-	// NEW OSM LAYERS ======================
-	// =====================================
-	// change to /api/layer/osm/create 
-	// app.post('/api/layers/osm/new', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
-	// app.post('/v2/layers/create/osm', checkAccess, api.layer.createOSM, errorHandler); // todo: api.layer.osm.create()
-	
 	/**
 	* @api {post} /v2/layers/update Update layer
 	* @apiName update
@@ -1465,7 +1450,7 @@ module.exports = function(app) {
 	// GET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/get 
-	app.get('/v2/layers/carto/get', checkAccess, api.layer.getCartoCSS);
+	app.get('/v2/layers/carto', checkAccess, api.layer.getCartoCSS);
 
 	/**
 	* @api {post} /v2/users/update Update user
@@ -1522,7 +1507,7 @@ module.exports = function(app) {
 
 
 	/**
-	* @api {post} /api/user/info Get info on authenticated user
+	* @api {get} /v2/users/info Get info on authenticated user
 	* @apiName info
 	* @apiGroup User
 	* @apiUse token
@@ -1539,6 +1524,9 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
+	app.get('/v2/users/info', checkAccess, api.user.info, errorHandler);
+
+	// old route, keeping for backwards compatibility
 	app.post('/api/user/info', checkAccess, api.user.info, errorHandler);
 
 
@@ -1574,10 +1562,7 @@ module.exports = function(app) {
 	// =====================================
 	// app.post('/v2/users/delete', checkAccess, api.user.deleteUser);
 
-	// // =====================================
-	// // DELETGATE USER ======================
-	// // =====================================
-
+	
 	/**
 	* @apiIgnore
 	* @api {post} /v2/users/email/unique Is unique email
@@ -1672,7 +1657,7 @@ module.exports = function(app) {
 	app.post('/v2/users/invite', checkAccess, api.user.invite, errorHandler);
 
 	/**
-	* @api {post} /api/user/invite/accept Accept invite
+	* @api {post} /v2/users/invite/accept Accept invite
 	* @apiName Accept invite
 	* @apiGroup User
 	* @apiUse token
@@ -1722,7 +1707,8 @@ module.exports = function(app) {
 	// PROCESS INVITE FOR USER =============
 	// =====================================
 	// rename to /api/user/invite/email
-	app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
+	// app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
+	app.post('/v2/users/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
 
 	/**
 	* @api {post} /v2/users/contacts/request Request contact
@@ -1843,9 +1829,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========
 	// =====================================
-	app.post('/reset/checktoken', function (req, res) {
-		api.auth.checkResetToken(req, res);
-	});
+	app.post('/reset/checktoken', api.auth.checkResetToken);
 
 	/**
 	* @api {post} /v2/users/password/reset Send reset password mail
@@ -1884,9 +1868,7 @@ module.exports = function(app) {
 	// RESET PASSWORD ======================
 	// =====================================
 	// change to /api/... 
-	app.get('/reset', function (req, res) {
-		api.auth.serveResetPage(req, res);
-	});
+	app.get('/reset', api.auth.serveResetPage);
 
 	/**
 	* @api {post} /v2/users/password Reset password
@@ -1922,6 +1904,8 @@ module.exports = function(app) {
 	// ===================================== 
 	app.post('/v2/users/password', api.auth.resetPassword, errorHandler);
 
+
+	// todo: remove
 	// =====================================
 	// ZXCVBN DICTIONARY =================
 	// ===================================== 
@@ -1945,9 +1929,9 @@ module.exports = function(app) {
 	// =====================================
 	// DEBUG: PHANTOMJS FEEDBACK ===========
 	// ===================================== 
-	app.post('/api/debug/phantom', checkAccess, function (req, res) {
-		res.end();
-	});
+	// app.post('/api/debug/phantom', checkAccess, function (req, res) {
+	// 	res.end();
+	// });
 
 	// =====================================
 	// PRIVACY POLICY ======================
@@ -1961,30 +1945,23 @@ module.exports = function(app) {
 	// =====================================
 	// LOGOUT ==============================
 	// =====================================
-	app.get('/logout', function(req, res) {
-		api.portal.logout(req, res);
-	});
+	app.get('/logout', api.portal.logout);
 
 	// =====================================
 	// INVITE ==============================
 	// =====================================
-	app.get('/invite/*', function(req, res) {
-		api.portal.invite(req, res);
-	});
+	app.get('/invite/*', api.portal.invite);
 
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
-	app.post('/api/forgot', function (req, res) {
-		api.auth.forgotPassword(req, res);
-	});
+	app.post('/api/forgot', api.auth.forgotPassword);
 
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
 	app.get('/forgot', function (req, res) {
-		res.render('../../views/forgot.ejs', {
-		});
+		res.render('../../views/forgot.ejs', {});
 	});
 
 	// =====================================
@@ -1994,10 +1971,10 @@ module.exports = function(app) {
 		api.portal.wildcard(req, res);
 	});
 
-	// helper function : if is logged in
-	function isLoggedIn(req, res, next) {
-		if (req.isAuthenticated()) return next();
-		res.redirect('/');
-	}
+	// // helper function : if is logged in
+	// function isLoggedIn(req, res, next) {
+	// 	if (req.isAuthenticated()) return next();
+	// 	res.redirect('/');
+	// }
 	
 };
