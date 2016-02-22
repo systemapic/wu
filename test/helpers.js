@@ -76,7 +76,7 @@ module.exports = util = {
     },
 
     get_access_token : function (done) {
-        api.post(endpoints.users.token.token)
+        api.get(endpoints.users.token.token)
         .send({ 
             username : util.test_user.email,
             password : util.test_user.password
@@ -98,7 +98,7 @@ module.exports = util = {
     },
 
     get_users_access_token : function (_user, callback) {
-      api.post(endpoints.users.token.token)
+      api.get(endpoints.users.token.token)
         .send({
             grant_type : 'password',
             username : _user.email,

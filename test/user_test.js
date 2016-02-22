@@ -64,7 +64,7 @@ describe('User', function () {
     it('should get portal store with access token', function (done) {
         this.slow(700);
         token(function (err, access_token) {
-            api.post(endpoints.portal)
+            api.get(endpoints.portal)
             .send({access_token : access_token})
             .expect(200)
             .end(function (err, res) {
