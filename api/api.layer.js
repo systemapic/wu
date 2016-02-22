@@ -297,6 +297,8 @@ module.exports = api.layer = {
 		var project = req.query.project;
 		var user = req.user.uuid;
 
+		console.log('apilauyer.get proejcT:', project);
+
 		// error if no project or user
 		if (!project || !user) {
 			return next({
