@@ -773,7 +773,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/getHash
 	// app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
-	app.post('/v2/hashes/get', checkAccess, api.project.getHash, errorHandler);
+	app.get('/v2/hashes/get', checkAccess, api.project.getHash, errorHandler);
 
 	/**
 	* @api {post} /api/project/uploadlogo Upload project logo
@@ -1465,7 +1465,7 @@ module.exports = function(app) {
 	// GET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/get 
-	app.post('/v2/layers/carto/get', checkAccess, api.layer.getCartoCSS);
+	app.get('/v2/layers/carto/get', checkAccess, api.layer.getCartoCSS);
 
 	/**
 	* @api {post} /v2/users/update Update user
@@ -1814,7 +1814,7 @@ module.exports = function(app) {
 	app.post('/v2/users/invite/projects', checkAccess, api.user.inviteToProjects, errorHandler);
 
 	/**
-	* @api {post} /v2/users/invite/link Invite user to projects
+	* @api {get} /v2/users/invite/link Invite user to projects
 	* @apiName Invite user to projects
 	* @apiGroup User
 	* @apiUse token
@@ -1838,7 +1838,7 @@ module.exports = function(app) {
 	// =====================================
 	// GENERATE ACCESS LINK ================
 	// =====================================
-	app.post('/v2/users/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
+	app.get('/v2/users/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
 
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========

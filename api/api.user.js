@@ -308,7 +308,7 @@ module.exports = api.user = {
 
 	// from shareable link flow
 	getInviteLink : function (req, res, next) {
-		var options = req.body || {};
+		var options = req.query || {};
 		options.user = req.user;
 
 		if (!options.user) {

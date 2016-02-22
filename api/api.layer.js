@@ -656,7 +656,7 @@ module.exports = api.layer = {
 
 	// get cartocss
 	getCartoCSS : function (req, res) {
-		var cartoId = req.body.cartoid;
+		var cartoId = req.query.cartoid;
 		var path = api.config.path.cartocss + cartoId + '.mss';
 		fs.readFile(path, {encoding : 'utf8'}, function (err, data) {
 			if (err || !data) return api.error.general(req, res, err || 'No data.');
