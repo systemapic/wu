@@ -13,20 +13,18 @@ var endpoints = require('../endpoints.js');
 module.exports = function () {
 	describe(endpoints.projects.private, function () {
 
-
 		// test 1
 	        it("should respond with status code 401 when not authenticated", function (done) {
-	            api.post(endpoints.projects.private)
+	            api.get(endpoints.projects.private)
 	                .send()
 	                .expect(httpStatus.UNAUTHORIZED)
 	                .end(done);
 	        });
 
-
 	        // test 2
 	        it('should respond with status code 400 and specific error message if project_id or user_access_token don\'t exist in request body', function (done) {
 	            token(function (err, access_token) {
-	                api.post(endpoints.projects.private)
+	                api.get(endpoints.projects.private)
 	                    .send({ access_token: access_token })
 	                    .expect(httpStatus.BAD_REQUEST)
 	                    .end(function (err, res) {
@@ -46,7 +44,7 @@ module.exports = function () {
 	        // test 3
 	        it('should respond with status code 200', function (done) {
 	            token(function (err, access_token) {
-	                api.post(endpoints.projects.private)
+	                api.get(endpoints.projects.private)
 	                    .send({
 	                        access_token: access_token,
 	                        project_id: 'some project_id',

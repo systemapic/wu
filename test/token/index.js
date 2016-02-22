@@ -13,7 +13,7 @@ module.exports = function () {
     describe(endpoints.users.token.token, function () {
         it('should respond with status code 400 and error if username and email don\'t exist in request body', function (done) {
 
-            api.post(endpoints.users.token.token)
+            api.get(endpoints.users.token.token)
                 .send({})
                 .expect(httpStatus.BAD_REQUEST)
                 .end(function (err, res) {
@@ -32,7 +32,7 @@ module.exports = function () {
 
         it('should respond with status code 400 and error if password doesn\'t exist in request body', function (done) {
 
-            api.post(endpoints.users.token.token)
+            api.get(endpoints.users.token.token)
                 .send({
                     username: 'some user'
                 })
@@ -53,7 +53,7 @@ module.exports = function () {
 
         it('should respond with status code 404 and error if user with specific username doesn\'t exist', function (done) {
 
-            api.post(endpoints.users.token.token)
+            api.get(endpoints.users.token.token)
                 .send({
                     username: 'some user',
                     password: 'some password'
@@ -73,7 +73,7 @@ module.exports = function () {
 
         it('should respond with status code 404 and error if user with specific email doesn\'t exist', function (done) {
 
-            api.post(endpoints.users.token.token)
+            api.get(endpoints.users.token.token)
                 .send({
                     email: 'some user',
                     password: 'some password'
@@ -105,7 +105,7 @@ module.exports = function () {
 
         it('should respond with status code 400 and error if user with specific username exists but password is wrong', function (done) {
 
-            api.post(endpoints.users.token.token)
+            api.get(endpoints.users.token.token)
                 .send({
                     username: helpers.test_user.username,
                     password: 'some password'
@@ -125,7 +125,7 @@ module.exports = function () {
 
         it('should get access token with email and password', function (done) {
 
-            api.post(endpoints.users.token.token)
+            api.get(endpoints.users.token.token)
             .send({ 
                 username : helpers.test_user.email,
                 password : helpers.test_user.password
@@ -146,7 +146,7 @@ module.exports = function () {
         });
 
         it('should get access token with username and password', function (done) {
-            api.post(endpoints.users.token.token)
+            api.get(endpoints.users.token.token)
             .send({ 
                 username : helpers.test_user.username,
                 password : helpers.test_user.password

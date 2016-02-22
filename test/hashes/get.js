@@ -40,7 +40,7 @@ module.exports = function () {
 		});
 
         it("should respond with status code 401 when not authenticated", function (done) {
-            api.post(endpoints.hashes.get)
+            api.get(endpoints.hashes.get)
                 .send()
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -48,7 +48,7 @@ module.exports = function () {
 
         it('should respond with status code 400 and specific error message if id and project_id don\'t exist in request body', function (done) {
             token(function (err, access_token) {
-                api.post(endpoints.hashes.get)
+                api.get(endpoints.hashes.get)
                     .send({
                         access_token: access_token
                     })
@@ -71,7 +71,7 @@ module.exports = function () {
 
         it('should respond with status code 400 and specific error message if id and project_id don\'t exist in request body', function (done) {
             token(function (err, access_token) {
-                api.post(endpoints.hashes.get)
+                api.get(endpoints.hashes.get)
                     .send({
                         access_token: access_token,
                         project_id: 'some_project_id',
@@ -93,7 +93,7 @@ module.exports = function () {
 
         it('should respond with status code 200', function (done) {
             token(function (err, access_token) {
-                api.post(endpoints.hashes.get)
+                api.get(endpoints.hashes.get)
                     .send({
                         access_token: access_token,
                         project_id: tmpHash.project,
