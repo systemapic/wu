@@ -49,8 +49,18 @@ module.exports = api.token = {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
 			console.log('err, user', err, user);
-			if (err) return res.status(401).send({error : err.message });
-			if (!user) return res.status(401).send({error : 'No such user.' });
+			if (err) {
+				return next({
+					code: httpStatus.UNAUTHORIZED,
+					message: err.message || errors.invalid_token.errorMessage
+				});
+			}
+			if (!user) {
+				return next({
+					code: httpStatus.UNAUTHORIZED,
+					message: errors.no_such_user.errorMessage
+				});
+			}
 			req.user = user;
 			next();
 		});
@@ -283,7 +293,7 @@ module.exports = api.token = {
 			.exec(function (err, user) {
 				if (err || !user) return done(new Error('Invalid access token.'));
 				done(null, user);
-			})
+			});
 		});
 	},
 
