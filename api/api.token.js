@@ -293,7 +293,7 @@ module.exports = api.token = {
 			.exec(function (err, user) {
 				if (err || !user) return done(new Error('Invalid access token.'));
 				done(null, user);
-			})
+			});
 		});
 	},
 
