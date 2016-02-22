@@ -49,31 +49,33 @@ module.exports = function(app) {
 	*    "error": "Invalid access token."
 	* }
 	*/
+
+
+
+
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
-	app.get('/', function(req, res) {
-		api.portal.getBase(req, res);
-	});
+	app.get('/', api.portal.getBase);
 	
 	/**
-	* @api {post} /api/portal Get portal store
+	* @api {get} /v2/portal Get portal store
 	* @apiName getPortal
 	* @apiGroup User
 	* @apiUse token
 	*
 	* @apiSuccess {object} Projects Projects that user have access to
-	* @apiSuccess {object} Datasets Datasets that user owns or have access to
-	* @apiSuccess {object} Contacts Contacts that user has in contact list
 	*/
 	// =====================================
 	// GET PORTAL  =========================
 	// =====================================
 	// app.post('/api/portal', checkAccess, api.portal.getPortal);
-	app.post('/v2/portal', checkAccess, api.portal.getPortal);
+	// app.post('/v2/portal', checkAccess, api.portal.getPortal);
+	app.get('/v2/portal', checkAccess, api.portal.getPortal);
 	
+
 	/**
-	* @api {post} /api/project/create Create a project
+	* @api {post} /v2/projects/create Create a project
 	* @apiName create
 	* @apiGroup Project
 	* @apiUse token
@@ -262,7 +264,7 @@ module.exports = function(app) {
 	// app.post('/oauth/token', api.oauth2.getToken);
 		
 	/**
-	* @api {post} /api/token Get access token
+	* @api {post} /v2/users/token Get access token
 	* @apiName access_token
 	* @apiGroup User
 	* @apiParam {String} username Email or username

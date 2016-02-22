@@ -48,6 +48,7 @@ module.exports = api.token = {
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
+			console.log('err, user', err, user);
 			if (err) {
 				return next({
 					code: httpStatus.UNAUTHORIZED,
@@ -289,7 +290,10 @@ module.exports = api.token = {
 
 			User
 			.findOne({_id : stored_token.user_id})
-			.exec(done);
+			.exec(function (err, user) {
+				if (err || !user) return done(new Error('Invalid access token.'));
+				done(null, user);
+			});
 		});
 	},
 
