@@ -1572,7 +1572,7 @@ module.exports = function(app) {
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
-	app.post('/v2/users/delete', checkAccess, api.user.deleteUser);
+	// app.post('/v2/users/delete', checkAccess, api.user.deleteUser);
 
 	// // =====================================
 	// // DELETGATE USER ======================
