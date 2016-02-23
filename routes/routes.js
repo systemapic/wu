@@ -985,7 +985,7 @@ module.exports = function(app) {
 	app.post('/v2/data/update', checkAccess, api.file.update, errorHandler);
 
 	/**
-	* @api {get} /v2/data/layers Get layers
+	* @api {post} /v2/data/layers Get layers
 	* @apiName getLayers
 	* @apiGroup File
 	* @apiUse token
@@ -1018,7 +1018,7 @@ module.exports = function(app) {
 	// GET LAYERS OF FILE ==================
 	// =====================================
 	// change to /api/data/getLayers
-	app.get('/v2/data/layers', checkAccess, api.file.getLayers, errorHandler);
+	app.post('/v2/data/layers', checkAccess, api.file.getLayers, errorHandler);
 
 	/**
 	* @api {post} /v2/data/share Share dataset

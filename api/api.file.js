@@ -785,9 +785,8 @@ module.exports = api.file = {
 	// get postgis layers on dataset
 	getLayers : function (req, res) {
 
-		var options = req.query,
+		var options = req.body,
 		    type = options.type;
-
 
 		if (type === 'raster') {
 			return api.file._getRasterLayers(req, res);
@@ -801,7 +800,7 @@ module.exports = api.file = {
 	},
 
 	_getRasterLayers : function (req, res) {
-		var options = req.query;
+		var options = req.body;
 		var data = options.data || {};
 		var file_id = data.file_id;
 		
@@ -819,7 +818,7 @@ module.exports = api.file = {
 
 	_getPostGISLayers : function (req, res) {
 
-		var options = req.query,
+		var options = req.body,
 		    data = options.data || {},
 		    database_name = data.database_name,
 		    table_name = data.table_name,
