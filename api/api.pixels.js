@@ -41,6 +41,67 @@ module.exports = api.pixels = {
 
 
 
+	// #########################################
+	// ###  API: Create Snapshot             ###
+	// #########################################
+	snap : function (req, res) {
+
+		var ops = [];
+		var view = req.body;
+		var user = req.user;
+		var script_path = api.config.path.tools + 'phantomJS-snapshot.js';
+		var filename = 'snap-' + api.utils.getRandom(10) + '.png';
+		var outPath = api.config.path.image + filename;
+
+		var options = {
+			url : api.config.portalServer.uri,
+			outPath : outPath,
+			view : view
+		}
+		var snapCommand = [
+			"--ssl-protocol=tlsv1",
+			script_path,
+			JSON.stringify(options),
+		]
+
+		console.log('snap options:, ', options);
+
+		console.log('type', typeof options)
+		console.log('type v', typeof view)
+		
+		// phantomJS: create snapshot
+		ops.push(function (callback) {
+			var util  = require('util');
+			var spawn = require('child_process').spawn;
+			var ls    = spawn('phantomjs', snapCommand);
+
+			console.log('spawning!')
+
+			ls.stdout.on('data', function (data) {
+				console.log('stdout: ' + data);
+			});
+
+			ls.stderr.on('data', function (data) {
+				console.log('stderr: ' + data);
+			});
+
+			ls.on('exit', function (code) {
+				console.log('child process exited with code ' + code);
+				callback(code);
+			});
+		});
+
+		async.series(ops, function (err, result) {
+			console.log('async done', err, result);
+			res.send(view);
+		});
+
+	},
+
+
+
+
+
 	// function removeChars(validChars, inputString) {
 	// 	var regex = new RegExp('[^' + validChars + ']', 'g');
 	// 	return inputString.replace(regex, '');

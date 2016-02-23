@@ -866,7 +866,16 @@ module.exports = function(app) {
 	// create snapshot of current map
 	// change to /api/tools/snap/create
 	// app.post('/api/util/snapshot', checkAccess, function (req, res) {
-	app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
+	// app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
+	app.post('/v2/static/screen', checkAccess, api.pixels.snap);
+
+	// // =====================================
+	// // CREATE SNAPSHOT =====================
+	// // =====================================
+	// // create snapshot of current map
+	// app.post('/api/project/snap', checkAccess, function (req, res) {
+	// 	api.pixels.snap(req, res);
+	// });
 
 	// =====================================
 	// CREATE THUMBNAIL ====================
