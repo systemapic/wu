@@ -292,6 +292,12 @@ module.exports = api.project = {
 
 	_checkProjectAccess : function (user, project) {
 
+		// if not project
+		if (!project) return false;
+
+		// if no user
+		if (!user) return false;
+
 		// if user created project
 		if (project.createdBy == user.uuid) return true;
 
