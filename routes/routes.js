@@ -864,23 +864,9 @@ module.exports = function(app) {
 	// CREATE SNAPSHOT =====================
 	// =====================================
 	// create snapshot of current map
-	// change to /api/tools/snap/create
 	// app.post('/api/util/snapshot', checkAccess, function (req, res) {
-	app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
-
-	// =====================================
-	// CREATE THUMBNAIL ====================
-	// =====================================
-	// change to /api/tools/thumb/create
-	// app.post('/api/util/createThumb', checkAccess, function (req, res) {
-	app.post('/v2/static/thumb', checkAccess, api.pixels.createThumb);
-
-	// =====================================
-	// CREATE PDF SNAPSHOT =================
-	// =====================================
-	// change to /api/tools/pdf/create
-	// app.post('/api/util/pdfsnapshot', checkAccess, function (req, res) {
-	app.post('/v2/static/pdf', checkAccess, api.pixels.createPDFSnapshot);
+	// app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
+	app.post('/v2/static/screen', checkAccess, api.pixels.snap);
 
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
