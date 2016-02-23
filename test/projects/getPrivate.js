@@ -22,24 +22,23 @@ module.exports = function () {
 	        });
 
 	        // test 2
-	        it('should respond with status code 400 and specific error message if project_id or user_access_token don\'t exist in request body', function (done) {
+	        it('should respond with status code 400 and specific error message if project_id doesn\'t exist in request body', function (done) {
 	            token(function (err, access_token) {
 	                api.get(endpoints.projects.private)
-						.query({
-							access_token: access_token
-						})
-	                    .send()
-	                    .expect(httpStatus.BAD_REQUEST)
-	                    .end(function (err, res) {
-	                        if (err) return done(err);
-	                        var result = helpers.parse(res.text);
-	                        expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
-	                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
-	                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
-	                        expect(result.error.errors.missingRequiredFields).to.include('project_id');
-	                        expect(result.error.errors.missingRequiredFields).to.include('user_access_token');
-	                        done();
-	                    });
+			.query({
+				access_token: access_token
+			})
+                        .send()
+                        .expect(httpStatus.BAD_REQUEST)
+                        .end(function (err, res) {
+                        if (err) return done(err);
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.missing_information.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        expect(result.error.errors.missingRequiredFields).to.be.an.array;
+                        expect(result.error.errors.missingRequiredFields).to.include('project_id');
+                        done();
+                        });
 	            });
 	        });
 	        
