@@ -375,7 +375,7 @@ module.exports = api.upload = {
 				return next(err);
 			}
 
-			var status = JSON.parse(uploadStatus);
+			var status = api.utils.parse(uploadStatus);
 
 			if (!status) {
 				return next({
@@ -438,7 +438,7 @@ module.exports = api.upload = {
 		// get info from uploadStatus // todo: too much of a shortcut?
 		var file_id_key = 'uploadStatus:' + file_id;
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
-			var u = JSON.parse(uploadStatus);
+			var u = api.utils.parse(uploadStatus);
 
 			var cleanName = fspath.basename(u.filename, fspath.extname(u.filename));
 			var fileModel = {
@@ -479,7 +479,7 @@ module.exports = api.upload = {
 			if (err) return callback && callback(err);
 
 			// add keys
-			var uploadStatus = JSON.parse(uploadStatusJSON);
+			var uploadStatus = api.utils.parse(uploadStatusJSON);
 
 			callback(null, uploadStatus);
 		});
@@ -492,7 +492,7 @@ module.exports = api.upload = {
 			if (err) return callback && callback(err);
 
 			// add keys
-			var uploadStatus = JSON.parse(uploadStatusJSON);
+			var uploadStatus = api.utils.parse(uploadStatusJSON);
 			for (var s in status) {
 				if (s != 'expire') uploadStatus[s] = status[s]; // set status (except ttl)
 			}
@@ -508,15 +508,12 @@ module.exports = api.upload = {
 
 	// gets queried from pile.js
 	getUploadStatus : function (req, res) {
-		console.log('getupload', file_id);
 		var file_id = req.query.file_id,
 		    file_id_key = 'uploadStatus:' + file_id;
 
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			if (err) return api.error.general(req, res, err);
-			console.log('upst', uploadStatus);
-			// return upload status
-			res.end(uploadStatus || JSON.stringify({ error : 'Upload ID not found or expired.'}));
+			res.send(uploadStatus || { error : 'Upload ID not found or expired.' });
 		});
 	},
 

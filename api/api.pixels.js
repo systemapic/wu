@@ -41,331 +41,51 @@ module.exports = api.pixels = {
 
 
 
-	// function removeChars(validChars, inputString) {
-	// 	var regex = new RegExp('[^' + validChars + ']', 'g');
-	// 	return inputString.replace(regex, '');
-	// }
-
-	// var newString = removeChars('01234567890%-', "The result is -2,003% of the total");
-
-	// #########################################
-	// ###  API: Create PDF Snapshot         ###
-	// #########################################
-	createPDFSnapshot : function (req, res) {
-		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
-
-		var projectUuid = req.body.hash.project;
-		// var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
-		// var filename = req.body.hash.slug + 
-
-		console.log('req.body.hash', req.body.hash);
-
-		var validChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMONPQRSTUVQXYZ0123456789';
-		var regex = new RegExp('[^' + validChars + ']', 'g');
-		var slug = req.body.hash.slug.replace(regex, '');
-		// var slug = req.body.hash.slug.trim().replace(' ', '_').
-		var today = new Date();
-		var dd = today.getDate();
-		var mm = today.getMonth()+1; //January is 0!
-		var yyyy = today.getFullYear();
-		var prettyDate = dd + '.' + dd + '.' + yyyy;
-		var filename = 'Systemapic - Project ' + slug + ' - ' + prettyDate + '.png';
-		var fileUuid = 'file-' + uuid.v4();
-		var folder = api.config.path.file + fileUuid;
-		var path = folder + '/' + filename;
-		var pdfpath = folder + '/' + filename.slice(0, -3) + 'pdf';
-
-		var hash = {
-			position : req.body.hash.position,
-			layers : req.body.hash.layers,
-			id : req.body.hash.id,
-		}
-
-		// "email=info@systemapic.com&password=ee6f143f4bbfce8107b192708f574af2"
-		var phantomLogin = 'email=' + api.config.phantomJS.user + '&password=' + api.config.phantomJS.auth;
-
-		console.log('phantomLogin'.red, phantomLogin);
-
-		var args = {
-			projectUuid : projectUuid,
-			hash : hash,
-			path : path,
-			pdf : true,
-			serverUrl : api.config.portalServer.uri + 'login',
-			serverData : phantomLogin
-		}
-
-
-		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
-		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
-		var ops = [];
-		var dataSize;
-
-		// create file folder
-		ops.push(function (callback) {
-			fs.ensureDir(folder, function(err) {
-				if (err) return callback(err);
-				callback(null);
-			});
-		});
-
-		// phantomJS: create snapshot
-		ops.push(function (callback) {
-			var exec = require('child_process').exec;
-			exec(cmd, function (err, stdout, stdin) {
-				if (err) return callback(err);
-				callback(null);
-			});
-		});
-
-		// create pdf from snapshot image
-		ops.push(function (callback) {
-
-			try {
-				
-				PDFDocument = require('pdfkit');
-				var doc = new PDFDocument({
-					margin : 0,
-					layout: 'landscape',
-					size : 'A4'
-				});
-
-				doc.image(path, {fit : [890, 1140]});
-				doc.pipe(fs.createWriteStream(pdfpath));
-				doc.end();
-
-				callback(null);
-
-			} catch (e) {
-				console.log('pdf error', e);
-				callback(e);
-			}
-
-		});
-
-		// get size
-		ops.push(function (callback) {
-			fs.stat(pdfpath, function (err, stats) {
-				console.log('stat pdfpath', pdfpath, err, stats);
-				if (err) return callback(err);
-
-				dataSize = stats.size;
-	 			callback(null);
-	 		});
-		});
-
-
-		// create File
-		ops.push(function (callback) {
-
-			var f 			= new File();
-			f.uuid 			= fileUuid;
-			f.createdBy 		= req.user.uuid;
-			f.createdByName    	= req.user.firstName + ' ' + req.user.lastName;
-			f.files 		= filename;
-			f.access.users 		= [req.user.uuid];	
-			f.name 			= filename;
-			f.description 		= 'PDF Snapshot';
-			f.type 			= 'document';
-			f.format 		= 'pdf';
-			f.dataSize 		= dataSize;
-			f.data.image.file 	= filename; 
-
-			f.save(function (err, doc) {
-				if (err) return callback(err);
-				callback(null, doc);
-			});
-		});
-
-
-		async.series(ops, function (err, results) {
-			if (err) return api.error.general(req, res, err);
-
-			res.end(JSON.stringify({
-				pdf : fileUuid,
-				error : null
-			}));
-		});
-
-	},			
-
-
-	// #########################################
-	// ###  API: Create Thumbnail            ###
-	// #########################################
-	createThumb : function (req, res) {
-		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
-
-		var projectUuid = req.body.hash.project;
-		var dimensions = req.body.dimensions;
-		var filename = 'thumb-' + uuid.v4() + '.png';
-		var path = api.config.path.image + filename;
-
-		var hash = {
-			position : req.body.hash.position,
-			layers : req.body.hash.layers,
-			id : req.body.hash.id
-		}
-
-		var phantomLogin = 'email=' + api.config.phantomJS.user + '&password=' + api.config.phantomJS.auth;
-
-
-		var args = {
-			projectUuid : projectUuid,
-			hash : hash,
-			path : path,
-			pdf : false,
-			thumb : true,
-			serverUrl : api.config.portalServer.uri + 'login',
-			serverData : phantomLogin
-		}
-
-		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
-		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
-
-		console.log('command:'.yellow, cmd);
-
-		var ops = [];
-		var dataSize;
-
-		// phantomJS: create snapshot
-		ops.push(function (callback) {
-			var exec = require('child_process').exec;
-			exec(cmd, function (err, stdout, stdin) {
-				callback(err);
-			});
-		});
-
-		// get size
-		ops.push(function (callback) {
-			fs.stat(path, function (err, stats) {
-				if (err) return callback(err);
-
-				dataSize = stats ? stats.size : 0;
-	 			callback(null);
-	 		});
-		});
-
-
-		// create File
-		ops.push(function (callback) {
-
-			var f 			= new File();
-			f.uuid 			= 'file-' + uuid.v4();
-			f.createdBy 		= req.user.uuid;
-			f.createdByName    	= req.user.firstName + ' ' + req.user.lastName;
-			f.files 		= filename;
-			f.access.users 		= [req.user.uuid];	
-			f.name 			= filename;
-			f.description 		= 'Thumbnail';
-			f.type 			= 'image';
-			f.format 		= 'png';
-			f.dataSize 		= dataSize;
-			f.data.image.file 	= filename; 
-
-			f.save(function (err, doc) {
-				if (err) return callback(err);
-				callback(null, doc);
-			});
-		});
-
-		ops.push(function (callback) {
-			var options = {
-				height : dimensions.height,
-				width : dimensions.width,
-				quality : 90,
-				file : path
-
-			}
-			api.pixels.resizeImage(options, callback);
-		});
-
-		async.series(ops, function (err, results) {
-			if (err || !results) return api.error.general(req, res, err || 'No results.');
-
-			var doc = results[2]
-			var croppedImage = results[3];
-
-			res.end(JSON.stringify({
-				image : filename,
-				fileUuid : doc.uuid,
-				cropped : croppedImage.file,
-				error : null
-			}));
-		});
-	},
-
-
 	// #########################################
 	// ###  API: Create Snapshot             ###
 	// #########################################
-	createSnapshot : function (req, res) {
-		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
+	snap : function (req, res) {
 
-		var projectUuid = req.body.hash.project;
-		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
-		var path = api.config.path.image + filename;
-
-		var hash = {
-			position : req.body.hash.position,
-			layers : req.body.hash.layers,
-			id : req.body.hash.id
-		}
-
-		var phantomLogin = 'email=' + api.config.phantomJS.user + '&password=' + api.config.phantomJS.auth;
-
-		var user = req.user;
-
-		console.log('###### PHANTOMJS ######')
-		console.log('###### PHANTOMJS ######')
-		console.log('###### PHANTOMJS ######')
-
-		console.log('user: ', user);
-		console.log('session', req.session);
-
-		if (!req.session || !req.session.tokens || !req.session.tokens.access_token) return res.end('nope');
-
-		var access_token = req.session.tokens.access_token;
-
-
-		var args = {
-			projectUuid : projectUuid,
-			hash : hash,
-			path : path,
-			pdf : false,
-			// serverUrl : api.config.portalServer.uri + 'login',
-			serverUrl : api.config.portalServer.uri,
-			serverData : phantomLogin,
-			access_token : access_token
-		}
-
-
-		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
-		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
 		var ops = [];
-		var dataSize;
+		var view = req.body;
+		var user = req.user;
+		var script_path = api.config.path.tools + 'phantomJS-snapshot.js';
+		var filename = 'snap-' + api.utils.getRandom(10) + '.png';
+		var outPath = api.config.path.image + filename;
 
-		console.log('cmd: ', cmd);
+		var options = {
+			url : api.config.portalServer.uri,
+			outPath : outPath,
+			view : view
+		}
+		var snapCommand = [
+			"--ssl-protocol=tlsv1",
+			script_path,
+			JSON.stringify(options),
+		]
 
+		
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
-			var exec = require('child_process').exec;
-			exec(cmd, function (err, stdout, stdin) {
-				console.log('err--> ', err, stdout, stdin);
-				callback(err);
+			var util  = require('util');
+			var spawn = require('child_process').spawn;
+			var ls    = spawn('phantomjs', snapCommand);
+
+			console.log('spawning!')
+
+			ls.stdout.on('data', function (data) {
+				console.log('stdout: ' + data);
+			});
+
+			ls.stderr.on('data', function (data) {
+				console.log('stderr: ' + data);
+			});
+
+			ls.on('exit', function (code) {
+				console.log('child process exited with code ' + code);
+				callback(code);
 			});
 		});
-
-		// get size
-		ops.push(function (callback) {
-			fs.stat(path, function (err, stats) {
-				if (err) return callback(err);
-				if (stats) dataSize = stats.size;
-	 			callback(null);
-	 		});
-
-		});
-
 
 		// create File
 		ops.push(function (callback) {
@@ -380,7 +100,6 @@ module.exports = api.pixels = {
 			f.description 		= 'Snapshot';
 			f.type 			= 'image';
 			f.format 		= 'png';
-			f.dataSize 		= dataSize;
 			f.data.image.file 	= filename; 
 
 			f.save(function (err, doc) {
@@ -389,21 +108,19 @@ module.exports = api.pixels = {
 		});
 
 
-		async.series(ops, function (err, results) {
-			if (err || !results) return api.error.general(req, res, err || 'No results.');
-			
-			var file = results[2]
-			if (!file) return api.error.general(req, res);
+		async.series(ops, function (err, result) {
 
-			res.end(JSON.stringify({
-				image : file.uuid,
-				error : null
-			}));
+			// get file
+			var created_snap = result[1];
+
+			// return to client
+			res.send({
+				image : created_snap.uuid,
+				error : err
+			});
 		});
-		
+
 	},
-
-
 
 
 	handleImage : function (path, callback) {

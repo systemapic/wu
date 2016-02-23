@@ -8,6 +8,7 @@ var httpStatus = require('http-status');
 var async = require('async');
 var expected = require('../../shared/errors');
 var Project =  require('../../models/project');
+var endpoints = require('../endpoints.js');
 
 
 
@@ -18,7 +19,7 @@ var Project =  require('../../models/project');
 module.exports = function () {
 
 
-    describe('/api/layers', function () {
+    describe(endpoints.layers.get, function () {
         var projectWithoutLayers = {
             uuid: 'relatedProjectWithoutLayersUuid',
             createdBy: 'relatedProjectWithoutLayersCreatedBy',
@@ -94,7 +95,7 @@ module.exports = function () {
         });
 
         it('should respond with status code 401 when not authenticated', function (done) {
-            api.post('/api/layers')
+            api.get(endpoints.layers.get)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -106,8 +107,8 @@ module.exports = function () {
                     return done(err);
                 }
 
-                api.post('/api/layers')
-                    .send({
+                api.get(endpoints.layers.get)
+                    .query({
                         access_token: access_token
                     })
                     .expect(400)
@@ -132,8 +133,8 @@ module.exports = function () {
                     return done(err);
                 }
 
-                api.post('/api/layers')
-                    .send({
+                api.get(endpoints.layers.get)
+                    .query({
                         project: 'Bad project uuid',
                         access_token: access_token
                     })
@@ -159,8 +160,8 @@ module.exports = function () {
                         return done(err);
                     }
 
-                    api.post('/api/layers')
-                        .send({
+                    api.get(endpoints.layers.get)
+                        .query({
                             project: projectWithoutLayers.uuid,
                             access_token: access_token
                         })
@@ -203,8 +204,8 @@ module.exports = function () {
                         return done(err);
                     }
 
-                    api.post('/api/layers')
-                        .send({
+                    api.get(endpoints.layers.get)
+                        .query({
                             project: projectWithoutLayers.uuid,
                             access_token: access_token
                         })
@@ -229,8 +230,8 @@ module.exports = function () {
                         return done(err);
                     }
 
-                    api.post('/api/layers')
-                        .send({
+                    api.get(endpoints.layers.get)
+                        .query({
                             project: projectWithLayers.uuid,
                             access_token: access_token
                         })
