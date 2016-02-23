@@ -91,9 +91,49 @@ module.exports = api.pixels = {
 			});
 		});
 
+		// create File
+		ops.push(function (callback) {
+
+			var f 			= new File();
+			f.uuid 			= 'file-' + uuid.v4();
+			f.createdBy 		= req.user.uuid;
+			f.createdByName    	= req.user.firstName + ' ' + req.user.lastName;
+			f.files 		= filename;
+			f.access.users 		= [req.user.uuid];	
+			f.name 			= filename;
+			f.description 		= 'Snapshot';
+			f.type 			= 'image';
+			f.format 		= 'png';
+			f.data.image.file 	= filename; 
+
+			f.save(function (err, doc) {
+				callback(err, doc);
+			});
+		});
+
+
+		// async.series(ops, function (err, results) {
+		// 	if (err || !results) return api.error.general(req, res, err || 'No results.');
+			
+		// 	var file = results[2]
+		// 	if (!file) return api.error.general(req, res);
+
+		// 	res.end(JSON.stringify({
+		// 		image : file.uuid,
+		// 		error : null
+		// 	}));
+		// });
+
 		async.series(ops, function (err, result) {
 			console.log('async done', err, result);
-			res.send(view);
+
+			var created_snap = result[1];
+
+			// res.send(view);
+			res.send({
+				image : created_snap.uuid,
+				error : err
+			})
 		});
 
 	},
