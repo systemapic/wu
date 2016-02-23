@@ -1,46 +1,13 @@
 var WebPage = require('webpage');
 var system = require('system');
-var url = 'https://dev.systemapic.com';
-// parse args
-
-console.log('PHANTOM $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-console.log('');
-
-console.log('systyem', system.args)
-
 var args = JSON.parse(system.args[1]);
-
-console.log('args: ', args);
-
 var outPath = args.outPath || '/tmp/screenshot.png';
-console.log('outPath', outPath);
-
 var url = args.url;// || 'https://dev.systemapic.com/';
-var view_string = JSON.stringify(args.view);// || {"project_id":"project-67c0fa3b-723d-43d6-9a09-56ce12cec6c7","position":{"lat":0,"lng":73.564453125,"zoom":3},"layers":["layer-b554dc0d-a61d-4684-aed8-fb22c016e89e","layer-5b6b209a-76c0-4313-af6b-762ffc9681e0","layer-061984fb-367c-4ee9-ac6c-84696276fe6b"]};
-
-var passed_var = JSON.stringify({
-	test : 'ok'
-});
-
-console.log('url:', url);
-console.log('view: ', view_string);
 
 page = WebPage.create();
 page.viewportSize = { width : 1620, height: 1080 };	// set size...
 page.open(url, 'get', function (status, why) {
 	
-	console.log('status: ', status);
-
 	// pings from client
 	page.onCallback = function(data){
 
@@ -49,8 +16,7 @@ page.open(url, 'get', function (status, why) {
 
 		// all done, capture!
 		if (data.text == 'ready') {
-			console.log('Capturing...');
-			console.log('writing to ', outPath);
+			console.log('Capturing...', outPath);
 			page.render(outPath);
 			phantom.exit();
 		}
@@ -61,10 +27,12 @@ page.open(url, 'get', function (status, why) {
 		page.evaluate(function (view) {
 			if (!window.app || !window.app.phantomjs) return;
 			if (window.app._phantomInited) return;
-			window.app._phantomInited = true;
 
+			// inject project
+			window.app._phantomInited = true;
 			window.app.tokens.access_token = view.access_token;
 			window.app.phantomjs.develop(view);
+			
 		}, args.view);
 	}, 500);
 
