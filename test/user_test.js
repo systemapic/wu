@@ -5,7 +5,6 @@ var fs = require('fs');
 var crypto = require('crypto');
 var request = require('request');
 var User = require('../models/user');
-var config = require('../config/wu-config.js').serverConfig;
 var helpers = require('./helpers');
 var token = helpers.token;
 var supertest = require('supertest');

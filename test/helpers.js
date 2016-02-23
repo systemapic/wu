@@ -9,7 +9,7 @@ var User = require('../models/user');
 var File = require('../models/file');
 var Layer = require('../models/layer');
 var Project = require('../models/project');
-var config = require('../config/wu-config.js').serverConfig;
+var config = require('../../config/wu-config.js').serverConfig;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var endpoints = require('./endpoints.js');
@@ -18,7 +18,7 @@ var apiModule = {
     redis: require('../api/api.redis'),
     user: require('../api/api.user'),
     utils: require('../api/api.utils'),
-    config: require('../config/wu-config.js').serverConfig
+    config: require('../../config/wu-config.js').serverConfig
 };
 
 mongoose.connect(config.mongo.url); 

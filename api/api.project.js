@@ -239,8 +239,9 @@ module.exports = api.project = {
 		console.log('api.project.getPrivate', req.query);
 		var params = req.query || {};
 		var project_id = params.project_id;
-		var access_token = params.user_access_token;		
+		var access_token = params.user_access_token || params.access_token;	
 		var missingRequiredRequestFields = [];
+		var ops = {};
 
 		if (!project_id) {
 			missingRequiredRequestFields.push('project_id');	
@@ -254,18 +255,57 @@ module.exports = api.project = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
 		}
 
-		// TODO: check access token and access!!!
-		res.send(); // debug
-		return;
+		// get user
+		ops.user = function (callback) {
 
-		Project
+			// get owner of access_token
+			api.token.check(access_token, function (err, user) {
+				// don't return error
+				callback(null, user);
+			});
+		};
+
+		// get project
+		ops.project = function (callback) {
+			Project
 			.findOne({uuid : project_id})
 			.populate('files')
 			.populate('layers')
-			.exec(function (err, project) {
-				res.send(project);
-			});
+			.exec(callback);
+		};
 
+		// run ops
+		async.parallel(ops, function (err, results) {
+			var user = results.user;
+			var project = results.project;
+			var got_access = api.project._checkProjectAccess(user, project);
+
+			// return project
+			if (got_access) return res.send(project);
+
+			// no access
+			res.send({ error : 'No access.' });
+		});
+
+
+	},
+
+	_checkProjectAccess : function (user, project) {
+
+		// if user created project
+		if (project.createdBy == user.uuid) return true;
+
+		// if project is public
+		if (project.access.isPublic) return true;
+
+		// if user got read access
+		if (_.contains(project.access.read, user.uuid)) return true;
+
+		// if user got edit access
+		if (_.contains(project.access.edit, user.uuid)) return true;
+
+		// no access
+		return false;
 	},
 
 	checkPublic : function (options, done) {
