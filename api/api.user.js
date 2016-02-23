@@ -505,12 +505,15 @@ module.exports = api.user = {
 		var missing = [];
 		var ops = [];
 
+		console.log('api.user.create');
+
 		// check valid fields
 		if (!username) 	missing.push('username');
 		if (!firstname) missing.push('firstname');
 		if (!lastname) 	missing.push('lastname');
 		if (!email) 	missing.push('email');
 		if (!password) 	missing.push('password');
+		console.log('missing:');
 		console.log(missing);
 		if (!_.isEmpty(missing)) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing));
 
@@ -532,6 +535,7 @@ module.exports = api.user = {
 
 		// run ops
 		async.series(ops, function (err, results) {
+			console.log('err, results', err, results);
 			if (err) return next(err);
 
 			// return user
