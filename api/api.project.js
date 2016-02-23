@@ -671,7 +671,7 @@ module.exports = api.project = {
 
 		var project = job.project;
 		var options = job.options;
-    	var updates = {};
+    		var updates = {};
 		var queries = {};
 		var ops = [];
 
