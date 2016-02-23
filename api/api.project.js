@@ -740,9 +740,18 @@ module.exports = api.project = {
 		];
 
 		updates = _.pick(options, valid);
+
+		console.log('updates:', updates);
+
+		// TODO: need to check that values are valid - ie String, Object, etc.
+		// 	this will not do like this, must check each field.
+		// 	see https://github.com/systemapic/wu/issues/469
+
 		// enqueue updates for valid fields
 		ops.push(function (callback) {
-			project.update({ $set: updates })
+			try {	 // <- temp hack
+				project
+				.update({ $set: updates })
 				.exec(function (err, result) {
 					if (err) {
 						callback(err);
@@ -752,19 +761,23 @@ module.exports = api.project = {
 						updated: _.keys(updates)
 					});
 				});
+			} catch (e) {
+				console.log('FUBAR!!', e);
+				callback(e);
+			}
 		});
 
 		ops.push(function (params, callback) {
-			console.log(project);
-			Project.findOne({uuid: options.project_id})
-				.exec(function (err, res) {
-					if (err) {
-						return callback(err);
-					}
+			Project
+			.findOne({uuid: options.project_id})
+			.exec(function (err, res) {
+				if (err) {
+					return callback(err);
+				}
 
-					params.project = res;
-					callback(null, params);
-				});
+				params.project = res;
+				callback(null, params);
+			});
 		});
 
 		// do updates
