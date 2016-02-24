@@ -866,7 +866,7 @@ module.exports = function(app) {
 	// create snapshot of current map
 	// app.post('/api/util/snapshot', checkAccess, function (req, res) {
 	// app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
-	app.post('/v2/static/screen', checkAccess, api.pixels.snap);
+	app.post('/v2/static/screen', checkAccess, api.pixels.snap, errorHandler);
 
 	// =====================================
 	// AUTO-CREATE LEGENDS =================

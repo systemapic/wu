@@ -38,31 +38,27 @@ var api = module.parent.exports;
 // function exports
 module.exports = api.pixels = {
 
-
-
-
 	// #########################################
 	// ###  API: Create Snapshot             ###
 	// #########################################
-	snap : function (req, res) {
+	snap : function (req, res, next) {
 
 		var ops = [];
-		var view = req.body;
+		var view = req.body || {};
 		var user = req.user;
 		var script_path = api.config.path.tools + 'phantomJS-snapshot.js';
 		var filename = 'snap-' + api.utils.getRandom(10) + '.png';
 		var outPath = api.config.path.image + filename;
-
 		var options = {
 			url : api.config.portalServer.uri,
 			outPath : outPath,
 			view : view
-		}
+		};
 		var snapCommand = [
 			"--ssl-protocol=tlsv1",
 			script_path,
-			JSON.stringify(options),
-		]
+			JSON.stringify(options)
+		];
 
 		
 		// phantomJS: create snapshot
@@ -71,7 +67,7 @@ module.exports = api.pixels = {
 			var spawn = require('child_process').spawn;
 			var ls    = spawn('phantomjs', snapCommand);
 
-			console.log('spawning!')
+			console.log('spawning!');
 
 			ls.stdout.on('data', function (data) {
 				console.log('stdout: ' + data);
@@ -92,10 +88,10 @@ module.exports = api.pixels = {
 
 			var f 			= new File();
 			f.uuid 			= 'file-' + uuid.v4();
-			f.createdBy 		= req.user.uuid;
-			f.createdByName    	= req.user.firstName + ' ' + req.user.lastName;
+			f.createdBy 		= user.uuid;
+			f.createdByName    	= user.firstName + ' ' + user.lastName;
 			f.files 		= filename;
-			f.access.users 		= [req.user.uuid];	
+			f.access.users 		= [user.uuid];
 			f.name 			= filename;
 			f.description 		= 'Snapshot';
 			f.type 			= 'image';
@@ -178,43 +174,11 @@ module.exports = api.pixels = {
 		});
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	// process images straight after upload
 	_processImage : function (entry, callback) {
-		console.log('**********************************')
+		console.log('**********************************');
 		console.log('* fn: crunch._processImage * entry: ', entry);
-		console.log('**********************************')
+		console.log('**********************************');
 
 
 		var file = entry.permanentPath,
@@ -265,16 +229,12 @@ module.exports = api.pixels = {
 		});
 	},
 
-
-
-
-
 	// helper fn to parse exif
 	getExif : {
 		created : function (exif) {
 			if (!exif) return;
 			var time = '';
-			var profile = exif['Profile-EXIF']
+			var profile = exif['Profile-EXIF'];
 			if (profile) time = profile['Date Time'];			// todo: other date formats
 			if (!time) return;
 			var s = time.split(/[-: ]/);
@@ -299,13 +259,13 @@ module.exports = api.pixels = {
 				lng : coords.lng,
 				alt : altitude,
 				dir : direction
-			}
+			};
 	                return gps;
 		},
 
 		cameraType : function (exif) {
 			var cameraType = '';
-			var profile = exif['Profile-EXIF']
+			var profile = exif['Profile-EXIF'];
 			if (profile) cameraType = profile['Model'];
 			return cameraType;
 		},
@@ -317,7 +277,7 @@ module.exports = api.pixels = {
 				'bottomright'	: 3,		// todo: BottomImageRight 
 				'righttop'	: 6, 
 				'leftbottom'	: 8 
-			}
+			};
 
 			// from exif in int format
 			var profile = exif['Profile-EXIF'];
@@ -398,7 +358,7 @@ module.exports = api.pixels = {
 			lon = (lon[0] + (lon[1] / 60) + (lon[2] / 3600)) * ref[lonRef];
 
 			return {lat : lat, lng : lon}
-		},
+		}
 
 	},
 
@@ -489,9 +449,9 @@ module.exports = api.pixels = {
 
 		// wtf
 		gm.prototype.checkSize = function (action) {
-			action()
+			action();
 			return this;
-		}
+		};
 
 		try {
 			// do crunch magic
@@ -510,7 +470,7 @@ module.exports = api.pixels = {
 					height : height,
 					width  : width,
 					path : newPath
-				}
+				};
 
 				// return error and file
 				callback(null, result);
@@ -643,7 +603,7 @@ module.exports = api.pixels = {
 				w : cropW
 			},
 			quality : quality
-		}
+		};
 
 		// create image with dimensions
 		api.pixels.resizeImage(options, function (err, result) {
@@ -744,7 +704,7 @@ module.exports = api.pixels = {
 				var vars = {
 					rawfile : file.data.image.file,
 					image : image
-				}			
+				};
 
 				callback(null, vars);
 			});
@@ -775,7 +735,7 @@ module.exports = api.pixels = {
 					h : cropH,
 					w : cropW
 				}
-			}
+			};
 
 			console.log('gonna resize: ', template);
 
@@ -848,7 +808,7 @@ module.exports = api.pixels = {
 			var imageFile = file.data.image;
 			return api.pixels.returnImage(req, res, imageFile);
 		});
-	},
+	}
 
 
-}
+};
