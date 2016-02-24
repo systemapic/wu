@@ -9,8 +9,6 @@ var httpStatus = require('http-status');
 var Layer = require('../../models/layer');
 var endpoints = require('../endpoints.js');
 
-
-
 module.exports = function () {
     describe(endpoints.layers.create, function () {
 

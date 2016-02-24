@@ -11,9 +11,9 @@ var endpoints = require('../endpoints.js');
 module.exports = function () {
 
     describe(endpoints.users.invite.link, function () {
-    	
+
         it('should respond with status code 401 when not authenticated', function (done) {
-            api.post(endpoints.users.invite.link)
+            api.get(endpoints.users.invite.link)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -25,10 +25,11 @@ module.exports = function () {
                     return done(err);
                 }
                 
-                api.post(endpoints.users.invite.link)
-                    .send({
+                api.get(endpoints.users.invite.link)
+                    .query({
                         access_token: access_token
                     })
+                    .send()
                     .expect(httpStatus.BAD_REQUEST)
                     .end(function (err, res) {
                         if (err) {
@@ -52,11 +53,12 @@ module.exports = function () {
                     return done(err);
                 }
                 
-                api.post(endpoints.users.invite.link)
-                    .send({
+                api.get(endpoints.users.invite.link)
+                    .query({
                         access_token: access_token,
                         access: "test_access"
                     })
+                    .send()
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) {
@@ -73,4 +75,4 @@ module.exports = function () {
 
     });
 
-}
+};

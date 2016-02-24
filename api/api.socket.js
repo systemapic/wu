@@ -191,7 +191,8 @@ module.exports = api.socket = {
 
 	_getSession : function (userId) {
 		var session = _.findKey(api.app.io.handshaken, function (s) {
-			if (!s || !s.session || !s.session.user_id) return false;
+			if (!s || !s.session || !s.session.user_id || !userId) return false;
+
 			return (s.session.user_id.toString() === userId.toString());
 		});
 		return session;

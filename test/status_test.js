@@ -29,9 +29,10 @@ describe('Status', function () {
         it('should respond with status code 200 and version object', function (done) {
             token(function (err, access_token) {
                 api.get(endpoints.status)
-                    .send({
+                    .query({
                         access_token: access_token
                     })
+                    .send()
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) {

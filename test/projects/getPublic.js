@@ -13,21 +13,22 @@ var endpoints = require('../endpoints.js');
 module.exports = function () {
 	describe(endpoints.projects.public, function () {
 
-
 		// test 1
 	        it("should respond with status code 401 when not authenticated", function (done) {
-	            api.post(endpoints.projects.public)
+	            api.get(endpoints.projects.public)
 	                .send()
 	                .expect(httpStatus.UNAUTHORIZED)
 	                .end(done);
 	        });
 
-
 	        // test 2
 	        it('should respond with status code 400 and specific error message if username or project_slug don\'t exist in request body', function (done) {
 	            token(function (err, access_token) {
-	                api.post(endpoints.projects.public)
-	                    .send({ access_token: access_token })
+	                api.get(endpoints.projects.public)
+						.query({
+							access_token: access_token
+						})
+	                    .send()
 	                    .expect(httpStatus.BAD_REQUEST)
 	                    .end(function (err, res) {
 	                        if (err) return done(err);
@@ -41,18 +42,17 @@ module.exports = function () {
 	                    });
 	            });
 	        });
-	        
-
 
 	        // test 3
 	        it('should respond with status code 404 and specific error message if user doesn\'t exist', function (done) {
 	            token(function (err, access_token) {
-	                api.post(endpoints.projects.public)
-	                    .send({
-	                        access_token: access_token,
-	                        username: 'some username',
-	                        project_slug: 'some project_slug'
-	                    })
+	                api.get(endpoints.projects.public)
+						.query({
+							access_token: access_token,
+							username: 'some username',
+							project_slug: 'some project_slug'
+						})
+	                    .send()
 	                    .expect(httpStatus.NOT_FOUND)
 	                    .end(function (err, res) {
 	                        if (err) return done(err);
@@ -70,12 +70,13 @@ module.exports = function () {
 			// test 4
 			it('should respond with status code 404 and specific error message', function (done) {
 				token(function (err, access_token) {
-			                api.post(endpoints.projects.public)
-			                    .send({
-			                        access_token: access_token,
-			                        username: helpers.test_user.username,
-			                        project_slug: 'some project_slug'
-			                    })
+			                api.get(endpoints.projects.public)
+								.query({
+									access_token: access_token,
+									username: helpers.test_user.username,
+									project_slug: 'some project_slug'
+								})
+			                    .send()
 			                    .expect(httpStatus.NOT_FOUND)
 			                    .end(function (err, res) {
 			                        if (err) {
@@ -136,12 +137,13 @@ module.exports = function () {
 			// test 5
 			it('should respond with status code 400 and specific error message if project is not public', function (done) {
 				token(function (err, access_token) {
-			                api.post(endpoints.projects.public)
-			                    .send({
-			                        access_token: access_token,
-			                        username: helpers.test_user.username,
-			                        project_slug: tmpNotPublicProject.slug
-			                    })
+			                api.get(endpoints.projects.public)
+								.query({
+									access_token: access_token,
+									username: helpers.test_user.username,
+									project_slug: tmpNotPublicProject.slug
+								})
+			                    .send()
 			                    .expect(httpStatus.BAD_REQUEST)
 			                    .end(function (err, res) {
 			                        if (err) return done(err);
@@ -157,12 +159,13 @@ module.exports = function () {
 			// test 6
 			it('should respond with status code 200 and specific project', function (done) {
 				token(function (err, access_token) {
-			                api.post(endpoints.projects.public)
-			                    .send({
-			                        access_token: access_token,
-			                        username: helpers.test_user.username,
-			                        project_slug: tmpPublicProject.slug
-			                    })
+			                api.get(endpoints.projects.public)
+								.query({
+									access_token: access_token,
+									username: helpers.test_user.username,
+									project_slug: tmpPublicProject.slug
+								})
+			                    .send()
 			                    .expect(httpStatus.OK)
 			                    .end(function (err, res) {
 			                        if (err) return done(err);

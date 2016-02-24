@@ -10,11 +10,12 @@ var userSetPassword = require('./setPassword');
 var userToken = require('./token');
 var userTokenCheck = require('./tokenCheck');
 var userTokenRefresh = require('./tokenRefresh');
+var userAcceptInvite = require('./acceptInvite');
 var helpers = require('../helpers');
 
 describe('User', function () {
-    before(helpers.create_user);
-    after(helpers.delete_user);
+    beforeEach(function(done) { helpers.create_user(done); });
+    afterEach(function(done) { helpers.delete_user(done); });
     this.slow(500);
 
     userUpdate();
@@ -29,4 +30,5 @@ describe('User', function () {
     userToken();
     userTokenRefresh();
     userTokenCheck();
+    userAcceptInvite();
 });

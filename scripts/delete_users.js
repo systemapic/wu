@@ -7,6 +7,7 @@ var uuid 	 = require('node-uuid');
 var mongoose 	 = require('mongoose');
 var _ 		 = require('lodash');
 var fs 		 = require('fs');
+var prompt 	 = require('prompt');
 
 // database schemas
 var Project 	 = require('../models/project');
@@ -25,17 +26,22 @@ var config  = require('../config/wu-config.js').serverConfig;
 mongoose.connect(config.mongo.url); 
 
 
-User
-.find()
-.remove(function (err, users) {
-	console.log('removed users: ', err, users);
-	process.exit(0);
-})
-// .exec(function (err, users) {
-// 	// console.log(err, users)
-// 	users.forEach(function (u) {
-// 		console.log(u.local.email);
-// 	});
-// 	process.exit(0);
+prompt.get({
+	properties : {
+		confirm : {
+			description : 'Are you sure you want to delete ALL - absolutely ALL - users? Write [yes] to go ahead and delete ALL users'.yellow
+		}
+	}
+}, function (err, answer) {
+	if (err || answer.confirm != 'yes') {
+		console.log('\nAborting! No users deleted.'.red);
+		return process.exit(0);
+	}
 
-// });
+	User
+	.find()
+	.remove(function (err, users) {
+		console.log('removed users: ', err, users);
+		process.exit(0);
+	});
+});

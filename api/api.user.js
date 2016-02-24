@@ -308,7 +308,7 @@ module.exports = api.user = {
 
 	// from shareable link flow
 	getInviteLink : function (req, res, next) {
-		var options = req.body || {};
+		var options = req.query || {};
 		options.user = req.user;
 
 		if (!options.user) {
@@ -339,7 +339,6 @@ module.exports = api.user = {
 	info : function (req, res, next) {
 		// return info on logged-in user
 		var user = req.user;
-
 		res.send(user);
 	},
 
@@ -506,12 +505,15 @@ module.exports = api.user = {
 		var missing = [];
 		var ops = [];
 
+		console.log('api.user.create');
+
 		// check valid fields
 		if (!username) 	missing.push('username');
 		if (!firstname) missing.push('firstname');
 		if (!lastname) 	missing.push('lastname');
 		if (!email) 	missing.push('email');
 		if (!password) 	missing.push('password');
+		console.log('missing:');
 		console.log(missing);
 		if (!_.isEmpty(missing)) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing));
 
@@ -533,6 +535,7 @@ module.exports = api.user = {
 
 		// run ops
 		async.series(ops, function (err, results) {
+			console.log('err, results', err, results);
 			if (err) return next(err);
 
 			// return user
@@ -798,19 +801,28 @@ module.exports = api.user = {
 	acceptInvite : function (req, res, next) {
 		console.log('acceptInvite');
 		var user = req.user;
-		var options = req.body;
+		var options = req.body || {};
 		var missing = [];
 		var ops = [];
 		var invitation;
 
 		// check if valid request
-		if (!options.invite_token) missing.push('invite_token');
-		if (!user) missing.push('access_token');
-		if (!_.isEmpty(missing)) return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing);
+		if (!options.invite_token) {
+			missing.push('invite_token');
+		}
+		
+		if (!user) {
+			missing.push('access_token');
+		}
 
+		if (!_.isEmpty(missing)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing));
+		}
 
 		api.user._acceptInvite(user, options, function (err, invitation) {
-			if (err) return next(err);
+			if (err) {
+				return next(err);
+			}
 			res.send(invitation);
 		})
 	},
@@ -820,10 +832,20 @@ module.exports = api.user = {
 		var ops = [];
 		var invitation;
 
+		options = options || {};
+
 		// check if valid request
-		if (!options.invite_token) missing.push('invite_token');
-		if (!user) missing.push('access_token');
-		if (!_.isEmpty(missing)) return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing);
+		if (!options.invite_token) {
+			missing.push('invite_token');
+		}
+
+		if (!user) {
+			missing.push('access_token');
+		}
+
+		if (!_.isEmpty(missing)) {
+			return api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing);
+		}
 
 		// get token store from redis
 		ops.push(function (callback) {
@@ -833,7 +855,6 @@ module.exports = api.user = {
 
 		// get projects
 		ops.push(function (inviteJSON, callback) {
-			
 			// parse
 			invitation = JSON.parse(inviteJSON);
 			if (!invitation) return callback('Invitation is expired or does not exist.');
@@ -847,24 +868,32 @@ module.exports = api.user = {
 
 		// give read access
 		ops.push(function (projectAccess, callback) {
-			async.each(projectAccess.read, function (project_id, cb) {
-				api.project.giveReadAccess({
-					user : user,
-					project_id : project_id
-				}, cb)
-			}, function (err) {
-				callback(err, projectAccess);
-			});
+			if (projectAccess.read && _.isArray(projectAccess.read)) {
+				async.each(projectAccess.read, function (project_id, cb) {
+					api.project.giveReadAccess({
+						user : user,
+						project_id : project_id
+					}, cb)
+				}, function (err) {
+					callback(err, projectAccess);
+				});
+			} else {
+				callback(null, projectAccess);
+			}
 		});
 
 		// give edit access
 		ops.push(function (projectAccess, callback) {
-			async.each(projectAccess.edit, function (project_id, cb) {
-				api.project.giveEditAccess({
-					user : user,
-					project_id : project_id
-				}, cb)
-			}, callback);
+			if (projectAccess.edit && _.isArray(projectAccess.edit)) {			
+				async.each(projectAccess.edit, function (project_id, cb) {
+					api.project.giveEditAccess({
+						user : user,
+						project_id : project_id
+					}, cb);
+				}, callback);
+			} else {
+				callback(null, projectAccess);	
+			}
 		});
 
 		// done

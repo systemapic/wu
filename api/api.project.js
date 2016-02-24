@@ -116,40 +116,38 @@ module.exports = api.project = {
 		}
 
 		Project
-			.findOne({uuid : projectUuid})
-			.exec(function (err, project) {
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			if (err) return next(err);
+
+			if (!project) {
+				return next({
+					message: errors.no_such_project.errorMessage,
+					code: httpStatus.NOT_FOUND
+				});
+			}
+
+			if (!access.read || !_.isArray(access.read)) {
+				return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access.read']));			
+			}
+
+			access.read.forEach(function (u) {
+				// add read (if not in edit)
+				if (!_.contains(project.access.edit, u)) {
+					project.access.read.addToSet(u);
+				}
+			});
+
+			project.save(function (err, updatedProject) {
 				if (err) {
 					return next(err);
 				}
 
-				if (!project) {
-					return next({
-						message: errors.no_such_project.errorMessage,
-						code: httpStatus.NOT_FOUND
-					});
-				}
-
-				if (!access.read || !_.isArray(access.read)) {
-					return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['access.read']));			
-				}
-
-				access.read.forEach(function (u) {
-					// add read (if not in edit)
-					if (!_.contains(project.access.edit, u)) {
-						project.access.read.addToSet(u);
-					}
-				});
-
-				project.save(function (err, updatedProject) {
-					if (err) {
-						return next(err);
-					}
-
-					// return updated access
-					res.send(updatedProject.access);
-				});
-
+				// return updated access
+				res.send(updatedProject.access);
 			});
+
+		});
 
 	},
 
@@ -161,6 +159,17 @@ module.exports = api.project = {
 		Project
 		.findOne({uuid : project_id})
 		.exec(function (err, project) {
+			if (err) {
+				return done(err)
+			}
+
+			if (!project) {
+				return done({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_project.errorMessage
+				});
+			}
+
 			project.access.read.addToSet(user.uuid);
 			project.save(function (err) {
 				done(err);
@@ -176,6 +185,17 @@ module.exports = api.project = {
 		Project
 		.findOne({uuid : project_id})
 		.exec(function (err, project) {
+			if (err) {
+				return done(err)
+			}
+
+			if (!project) {
+				return done({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_project.errorMessage
+				});
+			}
+
 			project.access.edit.addToSet(user.uuid);
 			project.save(function (err) {
 				done(err);
@@ -184,7 +204,7 @@ module.exports = api.project = {
 	},
 
 	getPublic : function (req, res, next) {
-		var params = req.body || {};
+		var params = req.query || {};
 		var username = params.username;
 		var project_slug = params.project_slug;
 		var missingRequiredRequestFields = [];
@@ -216,11 +236,12 @@ module.exports = api.project = {
 	},
 
 	getPrivate : function (req, res, next) {
-		console.log('api.project.getPrivate', req.body);
-		var params = req.body || {};
+		console.log('api.project.getPrivate', req.query);
+		var params = req.query || {};
 		var project_id = params.project_id;
-		var access_token = params.user_access_token;		
+		var access_token = params.user_access_token || params.access_token;	
 		var missingRequiredRequestFields = [];
+		var ops = {};
 
 		if (!project_id) {
 			missingRequiredRequestFields.push('project_id');	
@@ -234,18 +255,63 @@ module.exports = api.project = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
 		}
 
-		// TODO: check access token and access!!!
-		res.send(); // debug
-		return;
+		// get user
+		ops.user = function (callback) {
 
-		Project
+			// get owner of access_token
+			api.token.check(access_token, function (err, user) {
+				// don't return error
+				callback(null, user);
+			});
+		};
+
+		// get project
+		ops.project = function (callback) {
+			Project
 			.findOne({uuid : project_id})
 			.populate('files')
 			.populate('layers')
-			.exec(function (err, project) {
-				res.send(project);
-			});
+			.exec(callback);
+		};
 
+		// run ops
+		async.parallel(ops, function (err, results) {
+			var user = results.user;
+			var project = results.project;
+			var got_access = api.project._checkProjectAccess(user, project);
+
+			// return project
+			if (got_access) return res.send(project);
+
+			// no access
+			res.send({ error : 'No access.' });
+		});
+
+
+	},
+
+	_checkProjectAccess : function (user, project) {
+
+		// if not project
+		if (!project) return false;
+
+		// if no user
+		if (!user) return false;
+
+		// if user created project
+		if (project.createdBy == user.uuid) return true;
+
+		// if project is public
+		if (project.access.isPublic) return true;
+
+		// if user got read access
+		if (_.contains(project.access.read, user.uuid)) return true;
+
+		// if user got edit access
+		if (_.contains(project.access.edit, user.uuid)) return true;
+
+		// no access
+		return false;
 	},
 
 	checkPublic : function (options, done) {
@@ -651,7 +717,7 @@ module.exports = api.project = {
 
 		var project = job.project;
 		var options = job.options;
-    	var updates = {};
+    		var updates = {};
 		var queries = {};
 		var ops = [];
 
@@ -680,9 +746,18 @@ module.exports = api.project = {
 		];
 
 		updates = _.pick(options, valid);
+
+		console.log('updates:', updates);
+
+		// TODO: need to check that values are valid - ie String, Object, etc.
+		// 	this will not do like this, must check each field.
+		// 	see https://github.com/systemapic/wu/issues/469
+
 		// enqueue updates for valid fields
 		ops.push(function (callback) {
-			project.update({ $set: updates })
+			try {	 // <- temp hack
+				project
+				.update({ $set: updates })
 				.exec(function (err, result) {
 					if (err) {
 						callback(err);
@@ -692,19 +767,23 @@ module.exports = api.project = {
 						updated: _.keys(updates)
 					});
 				});
+			} catch (e) {
+				console.log('FUBAR!!', e);
+				callback(e);
+			}
 		});
 
 		ops.push(function (params, callback) {
-			console.log(project);
-			Project.findOne({uuid: options.project_id})
-				.exec(function (err, res) {
-					if (err) {
-						return callback(err);
-					}
+			Project
+			.findOne({uuid: options.project_id})
+			.exec(function (err, res) {
+				if (err) {
+					return callback(err);
+				}
 
-					params.project = res;
-					callback(null, params);
-				});
+				params.project = res;
+				callback(null, params);
+			});
 		});
 
 		// do updates
@@ -805,9 +884,9 @@ module.exports = api.project = {
 
 
 	getHash : function (req, res, next) {
-		var params = req.body || {};
-		var id = params.id;
-		var	projectUuid = params.project_id;		// todo: access restrictions
+		var query = req.query || {};
+		var id = query.id;
+		var	projectUuid = query.project_id;		// todo: access restrictions
 		var missingRequiredRequestFields = [];
 
 		if (!id) {

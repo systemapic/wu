@@ -48,7 +48,19 @@ module.exports = api.token = {
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
-			if (err || !user) return res.status(401).send({error : err.message});
+			console.log('err, user', err, user);
+			if (err) {
+				return next({
+					code: httpStatus.UNAUTHORIZED,
+					message: err.message || errors.invalid_token.errorMessage
+				});
+			}
+			if (!user) {
+				return next({
+					code: httpStatus.UNAUTHORIZED,
+					message: errors.no_such_user.errorMessage
+				});
+			}
 			req.user = user;
 			next();
 		});
@@ -56,7 +68,6 @@ module.exports = api.token = {
 
 	// middleware for socket routes
 	authenticate_socket : function (req, done) {
-		console.log('#101 auth socket', req.data, done);
 		var access_token = req.data.access_token;	
 		api.token._authenticate(access_token, function (err, user) {
 			console.log('#102 auth socket:', err, user);
@@ -80,7 +91,7 @@ module.exports = api.token = {
 
 	// route: get access token from password
 	getTokenFromPassword : function (req, res, next) {
-		api.token._get_token_from_password(req.body || {}, function (err, tokens) {
+		api.token._get_token_from_password(req.query || {}, function (err, tokens) {
 			if (err) {
 				return next(err);
 			}
@@ -279,7 +290,10 @@ module.exports = api.token = {
 
 			User
 			.findOne({_id : stored_token.user_id})
-			.exec(done)
+			.exec(function (err, user) {
+				if (err || !user) return done(new Error('Invalid access token.'));
+				done(null, user);
+			});
 		});
 	},
 
