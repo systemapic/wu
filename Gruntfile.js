@@ -58,8 +58,9 @@ module.exports = function(grunt) {
 				// another target 
 				options:{  
 					// dictionary of render options 
-					sourceMap:false,
-						extDot:'last'
+					sourceMap: true,
+					sourceMapEmbed: true,
+					// extDot:'last'
 				},
 				files:{  
 					'public/css/style.css':'scss/style.scss'
@@ -217,7 +218,6 @@ module.exports = function(grunt) {
 					
 					// Panes
 					'public/js/src/panes/pane.js',
-					'public/js/src/panes/pane.header.js',
 					'public/js/src/panes/pane.progress.js',
 					'public/js/src/panes/pane.map.js',
 					'public/js/src/panes/pane.status.js',
@@ -282,12 +282,8 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.users.js',
 					'public/js/src/models/model.layers.js',
 					'public/js/src/models/model.files.js',
-					'public/js/src/models/model.roles.js',
 					'public/js/src/models/model.D3List.js',
 
-					// Access
-					'public/js/src/core/access.js',
-			
 					// Analytics
 					'public/js/src/ext/analytics.js',
 
@@ -476,10 +472,10 @@ module.exports = function(grunt) {
 				dest : 'views/tmp/app.temp.ejs'
 			},
 
-			login : {
-				src : 'views/login.ejs',
-				dest : 'views/login.serve.ejs'
-			}
+			// login : {
+			// 	src : 'views/login.ejs',
+			// 	dest : 'views/login.serve.ejs'
+			// }
 		},
 
 
@@ -583,7 +579,7 @@ module.exports = function(grunt) {
 			'env:prod', 
 			'preprocess:prod',
 			'login',
-			'preprocess:login',
+			// 'preprocess:login',
 			'htmlmin'
 
 
@@ -598,7 +594,7 @@ module.exports = function(grunt) {
 			'env:dev', 
 			'preprocess:dev',
 			'login',
-			'preprocess:login'
+			// 'preprocess:login'
 	])});
 
 	grunt.registerTask('test', function () { grunt.task.run([

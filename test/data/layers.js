@@ -9,9 +9,6 @@ var httpStatus = require('http-status');
 var format = require('util').format;
 var endpoints = require('../endpoints.js');
 
-
-
-
 module.exports = function () {
     describe(endpoints.data.layers, function () {
         this.slow(500);
@@ -157,7 +154,7 @@ module.exports = function () {
                             data: {table_name: 'some table_name', database_name: 'some database_name'},
                             access_token: access_token
                         })
-                        .expect(200)
+                        .expect(httpStatus.OK)
                         .end(function (err, res) {
                             if (err) return done(err);
                             var result = helpers.parse(res.text);
@@ -182,7 +179,7 @@ module.exports = function () {
                             },
                             access_token: access_token
                         })
-                        .expect(200)
+                        .expect(httpStatus.OK)
                         .end(function (err, res) {
                             if (err) return done(err);
                             var result = helpers.parse(res.text);

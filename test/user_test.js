@@ -5,7 +5,6 @@ var fs = require('fs');
 var crypto = require('crypto');
 var request = require('request');
 var User = require('../models/user');
-var config = require('../config/wu-config.js').serverConfig;
 var helpers = require('./helpers');
 var token = helpers.token;
 var supertest = require('supertest');
@@ -64,20 +63,21 @@ describe('User', function () {
     it('should get portal store with access token', function (done) {
         this.slow(700);
         token(function (err, access_token) {
-            api.post(endpoints.portal)
-            .send({access_token : access_token})
-            .expect(200)
-            .end(function (err, res) {
-                assert.ifError(err);
-                var store = helpers.parse(res.text);
-                assert.ok(store);
-                assert.ok(store.account);
-                assert.ok(store.projects);
-                assert.ok(store.users);
-                assert.equal(store.account.local.email, helpers.test_user.email);
-                assert.equal(store.account.firstName, helpers.test_user.firstName);
-                done();
-            });
+            api.get(endpoints.portal)
+                .query({access_token : access_token})
+                .send()
+                .expect(200)
+                .end(function (err, res) {
+                    assert.ifError(err);
+                    var store = helpers.parse(res.text);
+                    assert.ok(store);
+                    assert.ok(store.account);
+                    assert.ok(store.projects);
+                    assert.ok(store.users);
+                    assert.equal(store.account.local.email, helpers.test_user.email);
+                    assert.equal(store.account.firstName, helpers.test_user.firstName);
+                    done();
+                });
         })
     });
 

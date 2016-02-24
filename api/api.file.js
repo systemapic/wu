@@ -248,7 +248,7 @@ module.exports = api.file = {
 				});
 			}
 
-			api.access.to.download_file({
+			api.file.access.toDownload({
 				file : file,
 				user : account
 			}, callback);
@@ -307,7 +307,7 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (file, callback) {
-			api.access.to.download_file({
+			api.file.access.toDownload({
 				file : file,
 				user : account
 			}, callback);
@@ -788,7 +788,6 @@ module.exports = api.file = {
 		var options = req.body,
 		    type = options.type;
 
-
 		if (type === 'raster') {
 			return api.file._getRasterLayers(req, res);
 		}
@@ -911,11 +910,13 @@ module.exports = api.file = {
 
 	// update a file
 	update : function (req, res) {
-		var fileUuid = req.body.uuid,
-		    account = req.user,
-		    ops = [];
+		var fileUuid = req.body.uuid;
+		var account = req.user;
+		var ops = [];
 
-		if (!fileUuid) return api.error.missingInformation(req, res);
+		if (!fileUuid) {
+			return api.error.missingInformation(req, res);
+		}
 
 		ops.push(function (callback) {
 			File
@@ -924,7 +925,7 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (file, callback) {
-			api.access.to.edit_file({
+			api.file.access.toEdit({
 				file : file,
 				user : account
 			}, callback);
@@ -948,10 +949,10 @@ module.exports = api.file = {
 	},
 
 	_update : function (job, done) {
-		var file = job.file,
-		    options = job.options,
-		    updates = {}
-		    ops = [];
+		var file = job.file;
+		var options = job.options;
+		var updates = {};
+		var ops = [];
 
 		// todo: check for bullshit values!
 
@@ -994,6 +995,37 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, done);
+	},
+
+
+	access : {
+
+		toEdit : function (options, done) {
+			if (!options || !options.file) {
+				return done(new Error(errors.bad_file_uuid.errorMessage));
+			}
+
+			if (!options || !options.user) {
+				return done(new Error(errors.bad_user_uuid.errorMessage));
+			}
+
+			File
+			.findOne({uuid : options.file.uuid})
+			.exec(function (err, f) {
+
+				if (f.createdBy == options.user.uuid) {
+					return done(null, options);
+				}
+
+				done(new Error(errors.no_access.errorMessage));
+			});
+		},
+
+		toDownload : function (options, done) {
+			console.log('TODO: access to download!');
+			done(null, options);
+		}
+
 	},
 
 

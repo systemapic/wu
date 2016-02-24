@@ -122,28 +122,488 @@
 	font-weight: 900;
 	margin-bottom: 0;
 	margin-top: 4px;  
-	}	
+	}
 
+.chrome-data-inner {
+    padding: 0;
+    }
+
+.chrome-data-outer-scroller {
+    padding-left: 0;  
+    width: 402px;
+    }
+
+.chrome-data-scroller {
+    width: 402px;
+    padding: 0;
+    }
+
+.data-list-line {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    border: none;
+    width: 443px;
+    padding-top: 5px;
+    padding-bottom: 5px;    
+    padding-left: 0;
+    width: 443px;
+    max-width: 100%; 
+    }
+
+.data-list-line .chrome-switch-container {
+    left: 3px;
+    top: 4px;
+    }
+
+.data-list-line.editingName {
+    color: transparent;
+    }
+
+.file-popup-trigger {
+    position: absolute;
+    z-index: 300;
+    box-shadow: none;
+    background: transparent;
+    height: 20px;
+    bottom: 5px;
+    color: #3C4759;
+    border-radius: 0;
+    right: 20px;
+    font-weight: 900;
+    font-size: 12px;
+    width: auto;
+    border: 0;
+    margin-top: 0px;
+    margin-right: 0px;
+    opacity: 0;
+    cursor: pointer;
+    }
+    
+.file-popup-trigger:hover {
+    text-decoration: underline;
+    opacity: 1 !important;    
+    }
+
+
+
+
+
+
+
+
+
+/* LAYERS */
+/* LAYERS */
+/* LAYERS */
+
+.chrome-layer-list-wrapper {
+    padding: 30px;
+    }
+
+.layers-container {
+    margin-bottom: 35px;
+    }
+
+.layer-list-container {
+    margin-top: 0px;   
+    margin-bottom: 0px; 
+    }    
+
+.layer-name-content {
+    text-indent: 43px;
+    width: 325px;    
+    }
+
+.layer-name-input {
+    left: 38px;
+    padding-top: 2px;
+    width: 280px;
+    background: transparent;
+    font-weight: 600;
+    }
+
+.layer-radio {
+    left: -20px;
+    top: 4px;
+    width: 17px;
+    height: 17px;
+    }
+
+
+/* LAYER POPUP TRIGGER */
+/* LAYER POPUP TRIGGER */
+/* LAYER POPUP TRIGGER */
+
+.layer-list-container .file-popup-trigger {
+    width: 20px;
+    opacity: 1;
+    border-radius: 10px;
+    color: #C8c8c8;    
+    border: 1px solid;
+    line-height: 1;    
+    top: 3px;
+    text-align: center;
+    opacity: 0;
+    }
+
+.layer-list-container .data-list-line:hover .file-popup-trigger {
+    opacity: 0.7;
+    }
+
+.layer-list-container .file-popup-trigger:active {
+    opacity: 1;
+    }    
+
+.layer-list-container .file-popup-trigger:before {
+    content: '...';
+    }
+
+/*.file-list-container-file-list .data-list-line:hover .file-popup-trigger,*/
+/*.file-list-container-file-list .data-list-line.file-selected .file-popup-trigger,*/
+/*.file-list-container-file-list .data-list-line.editingFileName .file-popup-trigger,*/
+.data-list-line.editingName .file-popup-trigger,
+.data-list-line:hover .file-popup-trigger {
+    opacity: 1;
+    }
+
+
+.file-popup-trigger.add-layer {
+    bottom: 25px;
+    width: auto;
+    right: 11px;
+    background: none;
+    position: absolute;
+    left: initial;
+    }
+
+
+/* LAYER POP-UP */
+/* LAYER POP-UP */
+/* LAYER POP-UP */
+
+.file-popup {
+    color: #3F4652;
+    top: 37px;
+    right: -5px;
+    }
+
+.file-action {
+    position: relative;
+    }
+
+.file-action:hover:after {
+    content: '';
+    position: absolute;
+    width: 142px;
+    height: 100%;
+    background: #EEE;
+    left: -19px;
+    top: 0;
+    z-index: -1;
+    }
 
 
 /*
 
-@-webkit-keyframes layerFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
-@-moz-keyframes layerFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
-@-o-keyframes layerFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
-@keyframes layerFader {		0% { background-color: #fefae2; } 100% { background-color: white; }}	
+I don't think these are in use?
 
-.new-layer-list-item {
-	-webkit-animation: layerFader 2500ms ease;
-	-webkit-animation-fill-mode: forwards;
-	-moz-animation: layerFader 2500ms ease;
-	-moz-animation-fill-mode: forwards;
-	-o-animation: layerFader 2500ms ease;
-	-o-animation-fill-mode: forwards;
-	animation: layerFader 2500ms ease;
-	animation-fill-mode: forwards;	
-	}
+.file-option {
+    cursor: default;
+    }
+
+.file-option.title {
+    font-size: 18px;
+    padding-top: 20px;
+    font-weight: 600;
+    }
+
+.file-option.sub {
+    padding-left: 2px;
+    }
 
 */
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.baselayer-dropdown-wrapper {
+    padding-left: 0;
+    padding-right: 0;    
+    }
+
+.file-list-separator {
+    border-top: 1px solid #ccc;
+    padding-top: 15px;
+    margin-top: 35px;
+    }
+
+
+
+
+
+
+/* FILES FILES FILES */
+/* FILES FILES FILES */
+/* FILES FILES FILES */
+
+.files-container {
+    padding-bottom: 60px;
+    padding-top: 2px;    
+    }
+
+.file-list-container {
+    margin-top: 10px;
+    }
+
+/* Title (with a database next to it) */
+.chrome-content-header.layer-list-container-title.layer-list {
+    padding-left: 30px;
+    }
+
+
+/* Upload icon */
+.fa.fa-cloud-upload {
+    padding-right: 4px;
+    }    
+
+/* Upload button */
+.upload-button-container {
+    padding-right: 30px;
+    width: 153px;
+    float: right;
+    position: relative;
+    right: 26px;    
+    top: -37px;
+    }
+
+.chrome-upload-button {
+    position: relative;
+    width: auto;
+    margin: 0;
+    right: 0;
+    left: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+    background: #3C4759;
+    padding: 9px;
+    border-radius: 4px;
+    width: auto;
+    top: 0;
+    width: inherit;
+}    
+
+.chrome-upload-button:hover {
+    background: #F9F9F9;
+    color: #3F4652;
+    border: 1px solid #c8c8c8;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    }
+
+.file-list-container-file-list {
+    position: relative;
+    left: 0;
+    }
+
+.file-meta-content {
+    margin-top: 2px;
+    margin-bottom: 0px;
+    }
+
+.file-meta-content .file-meta-author {
+    margin-right: 7px;
+    color: #B9B9B9;
+    }
+
+/* Add layer + Options */
+.fa.fa-bars.file-trigger  {
+    padding: 4px;
+    }
+
+.fa.fa-bars.file-option  {
+    padding: 10px;
+    }
+
+
+/* Each list line */
+.file-list-container .data-list-line {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 30px;
+    padding-right: 30px;
+    cursor: default;
+    }
+
+.file-list-container .data-list-line:nth-child(odd) {
+    background: #F9F9F9;
+    }
+
+.file-list-container .data-list-line:hover {
+    background: #C7CACF !important;
+    color: white !important;
+    }
+
+.file-list-container .data-list-line.editingFileName {
+    color: transparent;
+    }
+
+
+
+.data-list-line.processing,
+.data-list-line.processing:hover {
+    background: #3C4759;
+    color: white;
+    height: 70px;
+    padding: 12px;
+    padding-left: 26px;    
+    }
+
+.data-list-line.processing:hover {
+    color: white;
+    }
+
+
+.data-list-line.file-selected,
+.data-list-line.file-selected:hover {
+    color: #579A84;
+    }    
+
+.data-list-line .file-name-content {
+    font-size: 14px;
+    }
+
+.data-list-line .file-name-input {
+    background: transparent;
+    font-weight: 600;
+    padding-top: 5px;
+    height: 27px;
+    width: 315;
+    left: -5px;
+    left: 25px;
+    top: 5px;
+    visibility: visible;
+    color: #3C4759;
+    }
+
+.data-list-line:hover .file-meta-content {
+    color: #3F4652 !important;
+    }
+
+.data-list-line:hover .file-meta-content .file-meta-author {
+    color: #3F4652 !important;
+    }
+
+
+/* Editing file name */
+
+.data-list-line.editingFileName:hover .file-name-content {
+    visibility: hidden;
+    }
+
+.data-list-line.editingFileName:hover .file-name-input {
+    color: white;
+    }
+
+.data-list-line:hover .file-name-content {
+    color: #3C4759;
+    }
+
+/* Processing */
+
+.data-list-line.processing .file-name-content {
+    color: #fff !important;
+    font-weight: 500 !important;
+    }
+
+.data-list-line.processing.upload-error {
+    background-color: #F13151 !important;
+    }
+
+.data-list-line.processing.upload-error:before {
+    content: 'x';
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    font-weight: 900;
+    background: transparent;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 1.3;
+    box-shadow: 0 0 0 2px white;
+    opacity: 0.4;
+    cursor: pointer;
+    }
+
+.data-list-line.processing.upload-error:hover:before {
+    opacity: 1;
+    }
+
+.file-name-content.processing {
+    padding-left: 5px;
+    position: absolute;
+    }
+
+.file-feedback.processing,
+.file-feedback.processing:hover {
+    padding: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    position: absolute;
+    bottom: 0px;
+    width: 280px;
+    }
+
+.file-feedback-percent.processing {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    padding: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    background: inherit;
+    }
+
+/**/
+
+.file-selected:before {
+    content: '';
+    display: none;
+    }
+
+/*
+
+Doesn't seem to be in use
+
+.chrome-data-top-title {
+    text-transform: uppercase;    
+    }
+
+
+
+.toggles-wrapper.file-options {
+    margin-top: 20px;
+    position: relative;
+    }    
+
+
+*/
 

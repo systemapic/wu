@@ -40,7 +40,7 @@ module.exports = function () {
 		});
 
         it("should respond with status code 401 when not authenticated", function (done) {
-            api.post(endpoints.hashes.get)
+            api.get(endpoints.hashes.get)
                 .send()
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -48,10 +48,11 @@ module.exports = function () {
 
         it('should respond with status code 400 and specific error message if id and project_id don\'t exist in request body', function (done) {
             token(function (err, access_token) {
-                api.post(endpoints.hashes.get)
-                    .send({
+                api.get(endpoints.hashes.get)
+                    .query({
                         access_token: access_token
                     })
+                    .send()
                     .expect(httpStatus.BAD_REQUEST)
                     .end(function (err, res) {
                         if (err) {
@@ -71,12 +72,13 @@ module.exports = function () {
 
         it('should respond with status code 400 and specific error message if id and project_id don\'t exist in request body', function (done) {
             token(function (err, access_token) {
-                api.post(endpoints.hashes.get)
-                    .send({
+                api.get(endpoints.hashes.get)
+                    .query({
                         access_token: access_token,
                         project_id: 'some_project_id',
                         id: 'some_id'
                     })
+                    .send()
                     .expect(httpStatus.NOT_FOUND)
                     .end(function (err, res) {
                         if (err) {
@@ -93,12 +95,13 @@ module.exports = function () {
 
         it('should respond with status code 200', function (done) {
             token(function (err, access_token) {
-                api.post(endpoints.hashes.get)
-                    .send({
+                api.get(endpoints.hashes.get)
+                    .query({
                         access_token: access_token,
                         project_id: tmpHash.project,
                         id: tmpHash.id
                     })
+                    .send()
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) {

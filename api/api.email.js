@@ -60,6 +60,9 @@ module.exports = api.email = {
 		// overwrite to // debug
 		// options.to = 'knutole@systemapic.com';
 
+		// don't send mocha-test emails
+		if (_.contains(options.to, 'mocha_test')) return;
+
 		// send email
 		transporter.sendMail(options);
 
