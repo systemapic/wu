@@ -338,7 +338,6 @@ module.exports = function () {
                         }
                         
                         var result = helpers.parse(res.text);
-                        console.log(result.error.errors);
                         expect(result.error.message).to.be.equal(expected.invalid_fields.errorMessage);
                         expect(result.error.errors).to.be.an.array;
                         expect(result.error.errors).to.be.not.empty;
