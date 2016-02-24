@@ -226,9 +226,9 @@ module.exports = function () {
 	                        saveState: true,
 	                        hash: {
 	                        	position: {
-						lat : '1',
-						lng : '1',
-						zoom : '1'
+									lat : '1',
+									lng : '1',
+									zoom : '1'
 	                        	},
 	                        	layers: ['some layer'],
 	                        	id: 'some id'
@@ -269,55 +269,99 @@ module.exports = function () {
 				.exec(done);
 			});
 
-		        it('should respond with status code 200 and should change project state', function (done) {
-		            token(function (err, access_token) {
-		                api.post(endpoints.hashes.set)
-		                    .send({
-		                        access_token: access_token,
-		                        project_id: tmpProject.uuid,
-		                        saveState: true,
-		                        hash: {
-		                        	position: {
-							lat : '1',
-							lng : '1',
-							zoom : '1'
-		                        	},
-		                        	layers: ['some layer'],
-		                        	id: 'some id'
-		                        }
-		                    })
-		                    .expect(httpStatus.OK)
-		                    .end(function (err, res) {
-		                        if (err) {
-		                            return done(err);
-		                        }
+	        it('should respond with status code 200 and should change project state', function (done) {
+	            token(function (err, access_token) {
+	                api.post(endpoints.hashes.set)
+	                    .send({
+	                        access_token: access_token,
+	                        project_id: tmpProject.uuid,
+	                        saveState: true,
+	                        hash: {
+	                        	position: {
+									lat : '1',
+									lng : '1',
+									zoom : '1'
+	                        	},
+	                        	layers: ['some layer'],
+	                        	id: 'some id'
+	                        }
+	                    })
+	                    .expect(httpStatus.OK)
+	                    .end(function (err, res) {
+	                        if (err) {
+	                            return done(err);
+	                        }
 
-		                        var result = helpers.parse(res.text);
-		                        expect(result.error).to.be.null;
-		                        expect(result.hash.uuid).to.exist;
-		                        expect(result.hash.position).to.exist;
-		                        expect(result.hash.position.lat).to.be.equal('1');
-		                        expect(result.hash.position.lng).to.be.equal('1');
-		                        expect(result.hash.position.zoom).to.be.equal('1');
-		                        expect(result.hash.layers).to.be.an.array;
-		                        expect(result.hash.layers).to.include('some layer');
-		                        expect(result.hash.id).to.be.equal('some id');
-		                        hash.uuid = result.hash.uuid;
-					Project
-					.findOne({uuid : tmpProject.uuid})
-					.exec(function (err, _project) {
-						if (err) {
-							return done(err);
-						}
+	                        var result = helpers.parse(res.text);
+	                        expect(result.error).to.be.null;
+	                        expect(result.hash.uuid).to.exist;
+	                        expect(result.hash.position).to.exist;
+	                        expect(result.hash.position.lat).to.be.equal('1');
+	                        expect(result.hash.position.lng).to.be.equal('1');
+	                        expect(result.hash.position.zoom).to.be.equal('1');
+	                        expect(result.hash.layers).to.be.an.array;
+	                        expect(result.hash.layers).to.include('some layer');
+	                        expect(result.hash.id).to.be.equal('some id');
+	                        hash.uuid = result.hash.uuid;
+				Project
+				.findOne({uuid : tmpProject.uuid})
+				.exec(function (err, _project) {
+					if (err) {
+						return done(err);
+					}
 
-						expect(_project.state).to.be.equal(result.hash.id);
+					expect(_project.state).to.be.equal(result.hash.id);
 
-						done();
-					});
+					done();
+				});
 
-		                    });
-		            	});
-		        });
+	                    });
+	            	});
+	        });
+
+	        it('should should respond with status code 400 if some fields have bad type', function (done) {
+            	var shouldBeAStringButItIsObject = 'should be string, but now it is an object';
+            	var shouldBeArrayOfStringButItIsObject = 'should be array of strings, but now it is an object';
+
+	            token(function (err, access_token) {
+	                api.post(endpoints.hashes.set)
+	                    .send({
+	                        access_token: access_token,
+	                        project_id: tmpProject.uuid,
+	                        saveState: true,
+	                        hash: {
+	                        	position: {
+									lat : {lat: shouldBeAStringButItIsObject},
+									lng : {lng: shouldBeAStringButItIsObject},
+									zoom : {zoom: shouldBeAStringButItIsObject}
+	                        	},
+	                        	layers: {layers: shouldBeArrayOfStringButItIsObject},
+	                        	id: 'some id'
+	                        }
+	                    })
+	                    .expect(httpStatus.BAD_REQUEST)
+	                    .end(function (err, res) {
+	                        if (err) {
+	                            return done(err);
+	                        }
+
+	                        var result = helpers.parse(res.text);
+
+	                        expect(result.error.message).to.be.equal(expected.invalid_fields.errorMessage);
+	                        expect(result.error.errors).to.be.an.array;
+	                        expect(result.error.errors).to.be.not.empty;
+	                        expect(result.error.errors['position.lat'].value.lat).to.be.equal(shouldBeAStringButItIsObject);
+	                        expect(result.error.errors['position.lat'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "position.lat"');
+	                        expect(result.error.errors['position.lng'].value.lng).to.be.equal(shouldBeAStringButItIsObject);
+	                        expect(result.error.errors['position.lng'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "position.lng"');
+	                        expect(result.error.errors['position.zoom'].value.zoom).to.be.equal(shouldBeAStringButItIsObject);
+	                        expect(result.error.errors['position.zoom'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "position.zoom"');
+	                        expect(result.error.errors['layers'].value.layers).to.be.equal(shouldBeArrayOfStringButItIsObject);
+	                        expect(result.error.errors['layers'].message).to.be.equal('Cast to Array failed for value "[object Object]" at path "layers"');
+	                        done();
+	                    });
+	            });
+	        });
 		});
 
 	});
