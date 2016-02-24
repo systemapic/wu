@@ -890,7 +890,7 @@ module.exports = function(app) {
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/data/download
-	// app.get('/api/file/download', checkAccess, api.file.download, errorHandler);
+	app.get('/api/file/download', checkAccess, api.file.download, errorHandler);
 
 
 	// todo: remove, deprecated (will be removed with new raster import (branch: postgis_raster))
