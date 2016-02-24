@@ -65,6 +65,21 @@ module.exports = function () {
                 }
             }
         };
+        var shouldBeAStringButItIsObject = 'should be string, but now it is an object';
+        var notValidlayerUpdates = {
+            title: {title: shouldBeAStringButItIsObject},
+            description: {description: shouldBeAStringButItIsObject},
+            satellite_position: {satellite_position: shouldBeAStringButItIsObject},
+            copyright: {copyright: shouldBeAStringButItIsObject},
+            tooltip: {tooltip: shouldBeAStringButItIsObject},
+            style: {style: shouldBeAStringButItIsObject},
+            filter: {filter: shouldBeAStringButItIsObject},
+            legends: {legends: shouldBeAStringButItIsObject},
+            opacity: {opacity: shouldBeAStringButItIsObject},
+            zIndex: {zIndex: shouldBeAStringButItIsObject},
+            data: 'testData'
+        };
+
         var tmpLayer;
 
         before(function (done) {
@@ -209,6 +224,54 @@ module.exports = function () {
                     if (err) return done(err);
                     done();
                 });
+            });
+        });
+
+        it('should should respond with status code 400 if some fields have bad type', function (done) {
+            token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
+
+                var ops = [];
+                notValidlayerUpdates.access_token = access_token;
+                notValidlayerUpdates.layer = tmpLayer.uuid;
+                api.post(endpoints.layers.update)
+                    .send(notValidlayerUpdates)
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.invalid_fields.errorMessage);
+                        expect(result.error.errors).to.be.an.array;
+                        expect(result.error.errors).to.be.not.empty;
+                        expect(result.error.errors.title.value.title).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.title.message).to.be.equal('Cast to String failed for value "[object Object]" at path "title"');
+                        expect(result.error.errors.description.value.description).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.description.message).to.be.equal('Cast to String failed for value "[object Object]" at path "description"');
+                        expect(result.error.errors.satellite_position.value.satellite_position).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.satellite_position.message).to.be.equal('Cast to String failed for value "[object Object]" at path "satellite_position"');
+                        expect(result.error.errors.copyright.value.copyright).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.copyright.message).to.be.equal('Cast to String failed for value "[object Object]" at path "copyright"');
+                        expect(result.error.errors.tooltip.value.tooltip).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.tooltip.message).to.be.equal('Cast to String failed for value "[object Object]" at path "tooltip"');
+                        expect(result.error.errors.style.value.style).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.style.message).to.be.equal('Cast to String failed for value "[object Object]" at path "style"');
+                        expect(result.error.errors.filter.value.filter).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.filter.message).to.be.equal('Cast to String failed for value "[object Object]" at path "filter"');
+                        expect(result.error.errors.legends.value.legends).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.legends.message).to.be.equal('Cast to String failed for value "[object Object]" at path "legends"');
+                        expect(result.error.errors.opacity.value.opacity).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.opacity.message).to.be.equal('Cast to String failed for value "[object Object]" at path "opacity"');
+                        expect(result.error.errors.zIndex.value.zIndex).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.zIndex.message).to.be.equal('Cast to Number failed for value "[object Object]" at path "zIndex"');
+                        expect(result.error.errors.data.value).to.be.equal('testData');
+                        expect(result.error.errors.data.message).to.be.equal('Cast to Object failed for value "testData" at path "data"');
+                        done();
+                    });
             });
         });
 
