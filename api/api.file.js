@@ -125,7 +125,6 @@ module.exports = api.file = {
 			});
 		});
 
-
 	},
 
 	addFileToProject : function (req, res, next) {
@@ -909,7 +908,7 @@ module.exports = api.file = {
 
 
 	// update a file
-	update : function (req, res) {
+	update : function (req, res, next) {
 		var fileUuid = req.body.uuid;
 		var account = req.user;
 		var ops = [];
@@ -925,6 +924,13 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (file, callback) {
+			if (!file) {
+				callback({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_file.errorMessage
+				});
+			}
+
 			api.file.access.toEdit({
 				file : file,
 				user : account
@@ -941,7 +947,10 @@ module.exports = api.file = {
 		async.waterfall(ops, function (err, result) {
 			if (err) console.log('file update err: '.red + err);
 			if (err) console.log('ERR 16'.red, err);
-			if (err || !result) return api.error.general(req, res, err);
+
+			if (err || !result) {
+				return next(err);
+			}
 
 			res.end(JSON.stringify(result));
 		});
@@ -970,6 +979,18 @@ module.exports = api.file = {
 		];
 
 		updates = _.pick(options, valid);
+
+		_.extend(file, updates);
+
+		validationErrors = file.validateSync();
+
+		if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+			return done({
+				code: httpStatus.BAD_REQUEST,
+				message: errors.invalid_fields.errorMessage,
+				errors: validationErrors.errors
+			});
+		}
 
 		ops.push(function (callback) {
 			file.update({ $set: _.pick(options, valid) })
@@ -1002,11 +1023,17 @@ module.exports = api.file = {
 
 		toEdit : function (options, done) {
 			if (!options || !options.file) {
-				return done(new Error(errors.bad_file_uuid.errorMessage));
+				return done({
+					message: errors.bad_file_uuid.errorMessage,
+					code: httpStatus.BAD_REQUEST
+				});
 			}
 
 			if (!options || !options.user) {
-				return done(new Error(errors.bad_user_uuid.errorMessage));
+				return done({
+					message: errors.bad_user_uuid.errorMessage,
+					code: httpStatus.BAD_REQUEST
+				});
 			}
 
 			File
@@ -1017,7 +1044,10 @@ module.exports = api.file = {
 					return done(null, options);
 				}
 
-				done(new Error(errors.no_access.errorMessage));
+				done({
+					message: errors.no_access.errorMessage,
+					code: httpStatus.BAD_REQUEST
+				});
 			});
 		},
 

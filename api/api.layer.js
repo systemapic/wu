@@ -379,10 +379,7 @@ module.exports = api.layer = {
 
 			updates = _.pick(parameters, valid);
 
-			_.extend(layer, updates)
-			// _.forEach(_.keys(updates), function(key) {
-			// 	layer[key] = updates[key];
-			// });
+			_.extend(layer, updates);
 
 			validationErrors = layer.validateSync();
 

@@ -753,10 +753,7 @@ module.exports = api.project = {
 		// 	this will not do like this, must check each field.
 		// 	see https://github.com/systemapic/wu/issues/469
 		// enqueue updates for valid fieldscontrols
-		_.extend(project, updates)
-		// _.forEach(_.keys(updates), function(key) {
-		// 	project[key] = updates[key];
-		// });
+		_.extend(project, updates);
 
 		validationErrors = project.validateSync();
 
