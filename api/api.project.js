@@ -983,6 +983,16 @@ module.exports = api.project = {
 		hash.createdByName = req.user.firstName + ' ' + req.user.lastName;
 		hash.project = projectUuid;
 
+		validationErrors = hash.validateSync();
+
+		if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+			return next({
+				code: httpStatus.BAD_REQUEST,
+				message: errors.invalid_fields.errorMessage,
+				errors: validationErrors.errors
+			});
+		}
+
 		hash.save(function (err, doc) {
 			var ops = [];
 
@@ -994,7 +1004,7 @@ module.exports = api.project = {
 					}, callback);
 				});
 			}
-
+			
 			async.series(ops, function (error) {
 				res.send({
 					error: err || error || null,
