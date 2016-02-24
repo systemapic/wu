@@ -6,7 +6,9 @@ which docker && {
     echo "Please export SYSTEMAPIC_DOMAIN env variable" >&2
     exit 1
   }
-  container=${SYSTEMAPIC_DOMAIN}_wu_1
+  TMP=${SYSTEMAPIC_DOMAIN%.*} # hacky, lacking bash skillz!
+  DOMAIN=${TMP%.*}             
+  container=${DOMAIN}_wu_1
   echo "Executing myself inside container ${container}"
   if test -t 0; then
     TTYSWITCH=-t
