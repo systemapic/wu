@@ -85,7 +85,7 @@ module.exports = function () {
 
 
         // test 3
-        it('should respond with status code 400 and specific error message if no field to update', function (done) {
+        it('should respond with status code 400 and specific error if no field to update', function (done) {
             token(function (err, access_token) {
                 api.post(endpoints.projects.update)
                     .send({
@@ -286,5 +286,113 @@ module.exports = function () {
             });
         });
 
+        // test 7
+        it('should should respond with status code 400 if some fields have bad type', function (done) {
+            var shouldBeAStringButItIsObject = 'should be string, but now it is an object';
+            var shouldBeArrayOfStringButItIsObject = 'should be array of strings, but now it is an object';
+            token(function (err, access_token) {
+                api.post(endpoints.projects.update)
+                    .send({
+                        access_token: access_token,
+                        name: {name: shouldBeAStringButItIsObject},
+                        slug: {slug: shouldBeAStringButItIsObject},
+                        logo: {logo: shouldBeAStringButItIsObject},
+                        position: {
+                            lat: {lat: shouldBeAStringButItIsObject},
+                            lng: {lng: shouldBeAStringButItIsObject},
+                            zoom: {zoom: shouldBeAStringButItIsObject},
+                        },
+                        bounds: {
+                            northEast: {
+                                lat: {lat: shouldBeAStringButItIsObject},
+                                lng: {lng: shouldBeAStringButItIsObject},
+                            },
+                            southWest: {
+                                lat: {lat: shouldBeAStringButItIsObject},
+                                lng: {lng: shouldBeAStringButItIsObject},
+                            },
+                            minZoom: {minZoom: shouldBeAStringButItIsObject},
+                            maxZoom: {maxZoom: shouldBeAStringButItIsObject}
+                        },
+                        folders: [{
+                            uuid: {uuid: shouldBeAStringButItIsObject},
+                            title: {title: shouldBeAStringButItIsObject},
+                            content: {content: shouldBeAStringButItIsObject}
+                        }],
+                        controls: 'test',
+                        description: {description: shouldBeAStringButItIsObject},
+                        keywords: {keywords: shouldBeArrayOfStringButItIsObject},
+                        colorTheme: {colorTheme: shouldBeAStringButItIsObject},
+                        connectedAccounts: 'test',
+                        settings: 'test',
+                        categories: {categories: shouldBeArrayOfStringButItIsObject},
+                        thumbCreated: true,
+                        state: {state: shouldBeAStringButItIsObject},
+                        pending: {pending: shouldBeArrayOfStringButItIsObject},
+                        project_id: tmpProject.uuid
+                    })
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+                        
+                        var result = helpers.parse(res.text);
+                        console.log(result.error.errors);
+                        expect(result.error.message).to.be.equal(expected.invalid_fields.errorMessage);
+                        expect(result.error.errors).to.be.an.array;
+                        expect(result.error.errors).to.be.not.empty;
+                        expect(result.error.errors.name.value.name).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.name.message).to.be.equal('Cast to String failed for value "[object Object]" at path "name"');
+                        expect(result.error.errors.slug.value.slug).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.slug.message).to.be.equal('Cast to String failed for value "[object Object]" at path "slug"');
+                        expect(result.error.errors.logo.value.logo).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.logo.message).to.be.equal('Cast to String failed for value "[object Object]" at path "logo"');
+                        expect(result.error.errors['position.lat'].value.lat).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['position.lat'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "position.lat"');
+                        expect(result.error.errors['position.lng'].value.lng).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['position.lng'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "position.lng"');
+                        expect(result.error.errors['position.zoom'].value.zoom).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['position.zoom'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "position.zoom"');
+                        expect(result.error.errors['bounds.northEast.lat'].value.lat).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['bounds.northEast.lat'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "bounds.northEast.lat"');
+                        expect(result.error.errors['bounds.northEast.lng'].value.lng).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['bounds.northEast.lng'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "bounds.northEast.lng"');
+                        expect(result.error.errors['bounds.southWest.lat'].value.lat).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['bounds.southWest.lat'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "bounds.southWest.lat"');
+                        expect(result.error.errors['bounds.southWest.lng'].value.lng).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['bounds.southWest.lng'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "bounds.southWest.lng"');
+                        expect(result.error.errors['bounds.maxZoom'].value.maxZoom).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['bounds.maxZoom'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "bounds.maxZoom"');
+                        expect(result.error.errors['bounds.minZoom'].value.minZoom).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['bounds.minZoom'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "bounds.minZoom"');
+                        expect(result.error.errors['folders.0.uuid'].value.uuid).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['folders.0.uuid'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "uuid"');
+                        expect(result.error.errors['folders.0.title'].value.title).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['folders.0.title'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "title"');
+                        expect(result.error.errors['folders.0.content'].value.content).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['folders.0.content'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "content"');
+                        expect(result.error.errors['description'].value.description).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['description'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "description"');
+                        expect(result.error.errors['keywords'].value.keywords).to.be.equal(shouldBeArrayOfStringButItIsObject);
+                        expect(result.error.errors['keywords'].message).to.be.equal('Cast to Array failed for value "[object Object]" at path "keywords"');
+                        expect(result.error.errors['colorTheme'].value.colorTheme).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors['colorTheme'].message).to.be.equal('Cast to String failed for value "[object Object]" at path "colorTheme"');
+                        expect(result.error.errors['connectedAccounts'].value).to.be.equal('test');
+                        expect(result.error.errors['connectedAccounts'].message).to.be.equal('Cast to Object failed for value "test" at path "connectedAccounts"');
+                        expect(result.error.errors['settings'].value).to.be.equal('test');
+                        expect(result.error.errors['settings'].message).to.be.equal('Cast to Object failed for value "test" at path "settings"');
+                        expect(result.error.errors['controls'].value).to.be.equal('test');
+                        expect(result.error.errors['controls'].message).to.be.equal('Cast to Object failed for value "test" at path "controls"');
+                        expect(result.error.errors['categories'].value.categories).to.be.equal(shouldBeArrayOfStringButItIsObject);
+                        expect(result.error.errors['categories'].message).to.be.equal('Cast to Array failed for value "[object Object]" at path "categories"');
+                        expect(result.error.errors.state.value.state).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.state.message).to.be.equal('Cast to String failed for value "[object Object]" at path "state"');
+                        expect(result.error.errors['pending'].value.pending).to.be.equal(shouldBeArrayOfStringButItIsObject);
+                        expect(result.error.errors['pending'].message).to.be.equal('Cast to Array failed for value "[object Object]" at path "pending"');
+                        done();
+                    });
+            });
+        });
     });
 };
