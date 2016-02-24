@@ -720,7 +720,7 @@ module.exports = api.project = {
     		var updates = {};
 		var queries = {};
 		var ops = [];
-
+		var validationErrors = {};
 		// valid fields
 		var valid = [
 			'name',
@@ -752,24 +752,36 @@ module.exports = api.project = {
 		// TODO: need to check that values are valid - ie String, Object, etc.
 		// 	this will not do like this, must check each field.
 		// 	see https://github.com/systemapic/wu/issues/469
+		// enqueue updates for valid fieldscontrols
+		_.forEach(_.keys(updates), function(key) {
+			project[key] = updates[key];
+		});
 
-		// enqueue updates for valid fields
+		validationErrors = project.validateSync();
+
+		if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+			return callback({
+				code: 400,
+				message: errors.invalid_fields.errorMessage,
+				errors: validationErrors.errors
+			});
+		}
+
 		ops.push(function (callback) {
 			try {	 // <- temp hack
 				project
-				.update({ $set: updates })
-				.exec(function (err, result) {
+				.update({ $set: updates }, function (err, result) {
 					if (err) {
-						callback(err);
+						return callback(err);
 					}
 
 					callback(null, {
 						updated: _.keys(updates)
 					});
-				});
+				})
 			} catch (e) {
-				console.log('FUBAR!!', e);
-				callback(e);
+				console.log('Update error', e);
+				return callback(e);
 			}
 		});
 
