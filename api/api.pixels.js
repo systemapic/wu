@@ -72,13 +72,7 @@ module.exports = api.pixels = {
 
 			ls.stdout.on('data', function (data) {
 
-				var dataTextObj = {};
-
-				try {
-					dataTextObj = JSON.parse(data);
-				} catch (e) {
-					dataTextObj = {};
-				}
+				var dataTextObj = api.utils.parse(data) || {};
 
 				if (dataTextObj.error) {
 					errorMessage = dataTextObj.error;
