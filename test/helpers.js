@@ -13,6 +13,7 @@ var config = require('../../config/wu-config.js').serverConfig;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var endpoints = require('./endpoints.js');
+// var apiModule = require('../api/api.js');
 var apiModule = {
     auth: require('../api/api.auth'),
     redis: require('../api/api.redis'),
