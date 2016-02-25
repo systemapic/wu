@@ -755,15 +755,19 @@ module.exports = api.project = {
 		// enqueue updates for valid fieldscontrols
 		_.extend(project, updates);
 
-		validationErrors = project.validateSync();
-
-		if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
-			return callback({
-				code: httpStatus.BAD_REQUEST,
-				message: errors.invalid_fields.errorMessage,
-				errors: validationErrors.errors
+		ops.push(function (callback) {
+			project.validate(function (err) {
+				validationErrors = err;
+				if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+					return callback({
+						code: httpStatus.BAD_REQUEST,
+						message: errors.invalid_fields.errorMessage,
+						errors: validationErrors.errors
+					});
+				}
+				callback(null);
 			});
-		}
+		});
 
 		ops.push(function (callback) {
 			try {	 // <- temp hack
@@ -971,7 +975,7 @@ module.exports = api.project = {
 		var	position = params.hash.position;
 		var	layers = params.hash.layers;
 		var	id = params.hash.id;
-
+		var ops = [];
 		// create new hash
 		var hash = new Hash();
 		
@@ -983,35 +987,54 @@ module.exports = api.project = {
 		hash.createdByName = req.user.firstName + ' ' + req.user.lastName;
 		hash.project = projectUuid;
 
-		validationErrors = hash.validateSync();
-
-		if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
-			return next({
-				code: httpStatus.BAD_REQUEST,
-				message: errors.invalid_fields.errorMessage,
-				errors: validationErrors.errors
+		ops.push(function (callback) {
+			hash.validate(function (err) {
+				validationErrors = err;
+				if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+					return callback(null, {
+						code: httpStatus.BAD_REQUEST,
+						message: errors.invalid_fields.errorMessage,
+						errors: validationErrors.errors
+					});
+				}
+				callback(null);
 			});
-		}
-
-		hash.save(function (err, doc) {
-			var ops = [];
-
-			if (saveState) {
-				ops.push(function (callback) {
-					api.project._saveState({
-						projectUuid : projectUuid,
-						hashId : id
-					}, callback);
-				});
-			}
-			
-			async.series(ops, function (error) {
-				res.send({
-					error: err || error || null,
-					hash : doc
-				});
-			})
 		});
+
+		ops.push(function (callback) {
+			hash.save(function (err, doc) {
+				var opsAfterSave = [];
+
+				if (saveState) {
+					opsAfterSave.push(function (done) {
+						api.project._saveState({
+							projectUuid : projectUuid,
+							hashId : id
+						}, done);
+					});
+				}
+				
+				async.series(opsAfterSave, function (error) {
+					if (error) {
+						return callback(err || error, doc);
+					}
+
+					callback(err, doc);
+				});
+			});
+		});
+
+		async.series(ops, function (err, results) {
+			if (results[0]) {
+				return next(results[0]);
+			}
+
+			res.send({
+				error: err || null,
+				hash : results[1]
+			});
+		});
+
 	},
 
 	_saveState : function (options, callback) {
