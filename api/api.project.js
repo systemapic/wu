@@ -278,6 +278,11 @@ module.exports = api.project = {
 		async.parallel(ops, function (err, results) {
 			var user = results.user;
 			var project = results.project;
+
+			if (!project) {
+				return res.send({});
+			}
+
 			var got_access = api.project._checkProjectAccess(user, project);
 
 			// return project
