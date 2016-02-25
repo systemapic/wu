@@ -980,17 +980,21 @@ module.exports = api.file = {
 
 		updates = _.pick(options, valid);
 
-		_.extend(file, updates);
 
-		validationErrors = file.validateSync();
-
-		if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
-			return done({
-				code: httpStatus.BAD_REQUEST,
-				message: errors.invalid_fields.errorMessage,
-				errors: validationErrors.errors
+		ops.push(function (callback) {
+			_.extend(file, updates);
+			file.validate(function (err) {
+				validationErrors = err;
+				if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+					return callback({
+						code: httpStatus.BAD_REQUEST,
+						message: errors.invalid_fields.errorMessage,
+						errors: validationErrors.errors
+					});
+				}
+				callback(null);
 			});
-		}
+		});
 
 		ops.push(function (callback) {
 			file.update({ $set: _.pick(options, valid) })
