@@ -101,10 +101,9 @@ module.exports = function () {
 		context('saveState is undefined', function () {
 
 			after(function (done) {
-				Hash
-				.findOne({uuid: hash.uuid})
-		            	.remove()
-				.exec(done);
+				Hash.findOne({uuid: hash.uuid})
+	            	.remove()
+					.exec(done);
 			});
 
 		    it('should respond with status code 200 and create hash', function (done) {
@@ -115,9 +114,9 @@ module.exports = function () {
 		                    project_id: 'some project id',
 		                    hash: {
 		                    	position: {
-						lat : '1',
-						lng : '1',
-						zoom : '1'
+									lat : '1',
+									lng : '1',
+									zoom : '1'
 		                    	},
 		                    	layers: ['some layer'],
 		                    	id: 'some id'

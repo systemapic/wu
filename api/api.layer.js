@@ -379,17 +379,20 @@ module.exports = api.layer = {
 
 			updates = _.pick(parameters, valid);
 
-			_.extend(layer, updates);
-
-			validationErrors = layer.validateSync();
-
-			if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
-				return next({
-					code: httpStatus.BAD_REQUEST,
-					message: errors.invalid_fields.errorMessage,
-					errors: validationErrors.errors
+			ops.push(function (callback) {
+				_.extend(layer, updates);
+				layer.validate(function (err) {
+					validationErrors = err;
+					if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+						return callback({
+							code: httpStatus.BAD_REQUEST,
+							message: errors.invalid_fields.errorMessage,
+							errors: validationErrors.errors
+						});
+					}
+					callback(null);
 				});
-			}
+			});
 
 			ops.push(function (callback) {
 				layer.update({ $set: _.pick(parameters, valid) })

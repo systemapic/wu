@@ -1093,15 +1093,20 @@ module.exports = api.user = {
 
 		_.extend(user, updates);
 
-		validationErrors = user.validateSync();
-
-		if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
-			return callback({
-				code: httpStatus.BAD_REQUEST,
-				message: errors.invalid_fields.errorMessage,
-				errors: validationErrors.errors
+		ops.push(function (callback) {
+			_.extend(user, updates);
+			user.validate(function (err) {
+				validationErrors = err;
+				if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+					return callback({
+						code: httpStatus.BAD_REQUEST,
+						message: errors.invalid_fields.errorMessage,
+						errors: validationErrors.errors
+					});
+				}
+				callback(null);
 			});
-		}
+		});
 
 		// enqueue updates for valid fields
 		ops.push(function (callback) {
