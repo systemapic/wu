@@ -31,6 +31,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var httpStatus = require('http-status');
 
 // api
 var api = module.parent.exports;
@@ -42,9 +43,9 @@ module.exports = api.pixels = {
 	// ###  API: Create Snapshot             ###
 	// #########################################
 	snap : function (req, res, next) {
-
 		var ops = [];
 		var view = req.body || {};
+		console.log("VIEW", req.body);
 		var user = req.user;
 		var script_path = api.config.path.tools + 'phantomJS-snapshot.js';
 		var filename = 'snap-' + api.utils.getRandom(10) + '.png';
@@ -59,8 +60,8 @@ module.exports = api.pixels = {
 			script_path,
 			JSON.stringify(options)
 		];
+		var errorMessage = {};
 
-		
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
 			var util  = require('util');
@@ -70,6 +71,19 @@ module.exports = api.pixels = {
 			console.log('spawning!');
 
 			ls.stdout.on('data', function (data) {
+
+				var dataTextObj = {};
+
+				try {
+					dataTextObj = JSON.parse(data);
+				} catch (e) {
+					dataTextObj = {};
+				}
+
+				if (dataTextObj.error) {
+					errorMessage = dataTextObj.error;
+				}
+
 				console.log('stdout: ' + data);
 			});
 
@@ -79,40 +93,44 @@ module.exports = api.pixels = {
 
 			ls.on('exit', function (code) {
 				console.log('child process exited with code ' + code);
-				callback(code);
+				callback(code, code);
 			});
 		});
 
 		// create File
 		ops.push(function (callback) {
+			var f = new File();
 
-			var f 			= new File();
-			f.uuid 			= 'file-' + uuid.v4();
-			f.createdBy 		= user.uuid;
-			f.createdByName    	= user.firstName + ' ' + user.lastName;
-			f.files 		= filename;
-			f.access.users 		= [user.uuid];
-			f.name 			= filename;
-			f.description 		= 'Snapshot';
-			f.type 			= 'image';
-			f.format 		= 'png';
-			f.data.image.file 	= filename; 
+			f.uuid = 'file-' + uuid.v4();
+			f.createdBy = user.uuid;
+			f.createdByName = user.firstName + ' ' + user.lastName;
+			f.files = filename;
+			f.access.users = [user.uuid];
+			f.name = filename;
+			f.description = 'Snapshot';
+			f.type = 'image';
+			f.format = 'png';
+			f.data.image.file = filename; 
 
 			f.save(function (err, doc) {
 				callback(err, doc);
 			});
 		});
 
-
 		async.series(ops, function (err, result) {
 
 			// get file
 			var created_snap = result[1];
+			
+			if (result[0] == 1) {
+				next(errorMessage);
+			}
 
+			console.log(result);
 			// return to client
 			res.send({
-				image : created_snap.uuid,
-				error : err
+				image : created_snap && created_snap.uuid || null,
+				error : err || null
 			});
 		});
 
