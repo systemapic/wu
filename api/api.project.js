@@ -725,7 +725,7 @@ module.exports = api.project = {
     		var updates = {};
 		var queries = {};
 		var ops = [];
-
+		var validationErrors = {};
 		// valid fields
 		var valid = [
 			'name',
@@ -757,24 +757,38 @@ module.exports = api.project = {
 		// TODO: need to check that values are valid - ie String, Object, etc.
 		// 	this will not do like this, must check each field.
 		// 	see https://github.com/systemapic/wu/issues/469
+		// enqueue updates for valid fieldscontrols
+		_.extend(project, updates);
 
-		// enqueue updates for valid fields
+		ops.push(function (callback) {
+			project.validate(function (err) {
+				validationErrors = err;
+				if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+					return callback({
+						code: httpStatus.BAD_REQUEST,
+						message: errors.invalid_fields.errorMessage,
+						errors: validationErrors.errors
+					});
+				}
+				callback(null);
+			});
+		});
+
 		ops.push(function (callback) {
 			try {	 // <- temp hack
 				project
-				.update({ $set: updates })
-				.exec(function (err, result) {
+				.update({ $set: updates }, function (err, result) {
 					if (err) {
-						callback(err);
+						return callback(err);
 					}
 
 					callback(null, {
 						updated: _.keys(updates)
 					});
-				});
+				})
 			} catch (e) {
-				console.log('FUBAR!!', e);
-				callback(e);
+				console.log('Update error', e);
+				return callback(e);
 			}
 		});
 
@@ -966,7 +980,7 @@ module.exports = api.project = {
 		var	position = params.hash.position;
 		var	layers = params.hash.layers;
 		var	id = params.hash.id;
-
+		var ops = [];
 		// create new hash
 		var hash = new Hash();
 		
@@ -978,25 +992,54 @@ module.exports = api.project = {
 		hash.createdByName = req.user.firstName + ' ' + req.user.lastName;
 		hash.project = projectUuid;
 
-		hash.save(function (err, doc) {
-			var ops = [];
+		ops.push(function (callback) {
+			hash.validate(function (err) {
+				validationErrors = err;
+				if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+					return callback(null, {
+						code: httpStatus.BAD_REQUEST,
+						message: errors.invalid_fields.errorMessage,
+						errors: validationErrors.errors
+					});
+				}
+				callback(null);
+			});
+		});
 
-			if (saveState) {
-				ops.push(function (callback) {
-					api.project._saveState({
-						projectUuid : projectUuid,
-						hashId : id
-					}, callback);
+		ops.push(function (callback) {
+			hash.save(function (err, doc) {
+				var opsAfterSave = [];
+
+				if (saveState) {
+					opsAfterSave.push(function (done) {
+						api.project._saveState({
+							projectUuid : projectUuid,
+							hashId : id
+						}, done);
+					});
+				}
+				
+				async.series(opsAfterSave, function (error) {
+					if (error) {
+						return callback(err || error, doc);
+					}
+
+					callback(err, doc);
 				});
+			});
+		});
+
+		async.series(ops, function (err, results) {
+			if (results[0]) {
+				return next(results[0]);
 			}
 
-			async.series(ops, function (error) {
-				res.send({
-					error: err || error || null,
-					hash : doc
-				});
-			})
+			res.send({
+				error: err || null,
+				hash : results[1]
+			});
 		});
+
 	},
 
 	_saveState : function (options, callback) {
