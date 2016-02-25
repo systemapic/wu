@@ -1,7 +1,6 @@
 // server.js
 var express  = require('express.io');
 var mongoose = require('mongoose');
-var passport = require('passport');
 var flash    = require('connect-flash');
 var path     = require('path');
 var compress = require('compression');
