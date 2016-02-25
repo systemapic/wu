@@ -141,7 +141,7 @@ module.exports = function () {
             });
         });
 
-        it('should respond with status code 404 and error if position doesn\'t exist in request body', function (done) {
+        it('should respond with status code 404 and error if project doesn\'t exist', function (done) {
             token(function (err, access_token) {
                 api.post(endpoints.static.screen)
                     .send({
