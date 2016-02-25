@@ -10,8 +10,21 @@ page.open(url, 'get', function (status, why) {
 	
 	// pings from client
 	page.onCallback = function(data){
+		var dataTextObj = {};
+
+		try {
+			dataTextObj = JSON.parse(data.text);	
+		} catch (e) {
+			dataTextObj = {}
+		}
 
 		// feedback
+
+		if (dataTextObj.error) {
+			console.log(data.text);
+			phantom.exit(1);
+		}
+
 		console.log("ping: " + data.text);
 
 		// all done, capture!

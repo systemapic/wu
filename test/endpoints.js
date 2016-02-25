@@ -73,25 +73,8 @@ module.exports = endpoint = {
         download        : '/v2/data/import' // GET
         
 
-    } 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
-}
+    },
+    static: {
+        screen: '/v2/static/screen'
+    }
+};

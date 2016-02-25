@@ -57,7 +57,7 @@ module.exports = function () {
             });
         });
 
-        context('when', function () {
+        context('when request parameters are valid', function () {
             beforeEach(function (done) {
                 helpers.create_project_by_info(testProject, function (err, project) {
                     if (err) {
