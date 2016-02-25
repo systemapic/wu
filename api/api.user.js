@@ -1074,22 +1074,40 @@ module.exports = api.user = {
 			return callback(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['options']));
 		}
 
-		var user = options.user,
-		    options = options.options,
-		    ops = [],
-		    updates = {},
-		    queries = {};
+		var user = options.user;
+		var options = options.options;
+		var ops = [];
+		var updates = {};
+		var queries = {};
 
 		// valid fields
 		var valid = [
-			'company', 
-			'position', 
-			'phone', 
+			'company',
+			'position',
+			'phone',
 			'firstName',
-			'lastName', 
+			'lastName'
 		];
 
 		updates = _.pick(options, valid);
+
+		_.extend(user, updates);
+
+		ops.push(function (callback) {
+			_.extend(user, updates);
+			user.validate(function (err) {
+				validationErrors = err;
+				if (validationErrors && validationErrors.errors && !_.isEmpty(_.keys(validationErrors.errors))) {
+					return callback({
+						code: httpStatus.BAD_REQUEST,
+						message: errors.invalid_fields.errorMessage,
+						errors: validationErrors.errors
+					});
+				}
+				callback(null);
+			});
+		});
+
 		// enqueue updates for valid fields
 		ops.push(function (callback) {
 			user.update({ $set: updates })

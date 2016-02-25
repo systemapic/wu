@@ -105,6 +105,45 @@ module.exports = function () {
             }); 
         });
 
+        it('should should respond with status code 400 if some fields have bad type', function (done) {
+           token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
+
+                var shouldBeAStringButItIsObject = 'should be string, but now it is an object';
+                api.post(endpoints.users.update)
+                    .send({
+                        access_token: access_token,
+                        uuid: helpers.test_user.uuid,
+                        company: {company: shouldBeAStringButItIsObject},
+                        position: {position: shouldBeAStringButItIsObject},
+                        phone: {phone: shouldBeAStringButItIsObject},
+                        firstName: {firstName: shouldBeAStringButItIsObject},
+                        lastName: {lastName: shouldBeAStringButItIsObject}
+                    })
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+                        expect(result.error.errors.company.value.company).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.company.message).to.be.equal('Cast to String failed for value "[object Object]" at path "company"');
+                        expect(result.error.errors.position.value.position).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.position.message).to.be.equal('Cast to String failed for value "[object Object]" at path "position"');
+                        expect(result.error.errors.phone.value.phone).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.phone.message).to.be.equal('Cast to String failed for value "[object Object]" at path "phone"');
+                        expect(result.error.errors.firstName.value.firstName).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.firstName.message).to.be.equal('Cast to String failed for value "[object Object]" at path "firstName"');
+                        expect(result.error.errors.lastName.value.lastName).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.lastName.message).to.be.equal('Cast to String failed for value "[object Object]" at path "lastName"');
+                        done();
+                    });
+            }); 
+        });
+
     });
 
 };

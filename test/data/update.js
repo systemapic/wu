@@ -42,6 +42,8 @@ module.exports = function () {
                 .end(done);
         });
 
+
+
         // test 2
         it('should respond with status code 400 if fileUuid doesn\'t exist in request body', function (done) {
             token(function (err, access_token) {
@@ -55,18 +57,26 @@ module.exports = function () {
 
 
         // test 3
-        it('should respond with status code 400 and error if file doesn\'t exist', function (done) {
+        it('should respond with status code 404 and error if file doesn\'t exist', function (done) {
             token(function (err, access_token) {
                 api.post(endpoints.data.update)
                     .send({
                         uuid: "invalid file id",
                         access_token: access_token
                     })
-                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.bad_file_uuid.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.NOT_FOUND)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+
+                        expect(result.error.message).to.be.equal(expected.no_such_file.errorMessage);
+                        done();
+                    });
             });
         });
-
 
 
 
@@ -78,8 +88,17 @@ module.exports = function () {
                         uuid: testFile.uuid,
                         access_token: access_token
                     })
-                    .expect(httpStatus.BAD_REQUEST, helpers.createExpectedError(expected.no_access.errorMessage))
-                    .end(done);
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+
+                        expect(result.error.message).to.be.equal(expected.no_access.errorMessage);
+                        done();
+                    });
             });
         });
 
@@ -115,7 +134,7 @@ module.exports = function () {
                 options.access_token = access_token;
                 api.post(endpoints.data.update)
                     .send(options)
-                    .expect(200)
+                    .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) return done(err);
 
@@ -143,6 +162,56 @@ module.exports = function () {
                         expect(result.file.data.postgis.metadata).to.be.equal(options.data.postgis.metadata);
                         expect(result.file.data.raster.file_id).to.be.equal(options.data.raster.file_id);
                         expect(result.file.data.raster.metadata).to.be.equal(options.data.raster.metadata);
+                        done();
+                    });
+            });
+        });
+
+
+        // test 6
+        it('should should respond with status code 400 if some fields have bad type', function (done) {
+
+            var shouldBeAStringButItIsObject = 'should be string, but now it is an object';
+            var shouldBeANumberButItIsObject = 'should be number, but now it is an object';
+
+            helpers.token(function (err, access_token) {
+                var options = {
+                    uuid: testFile.uuid,
+                    name: {name: shouldBeAStringButItIsObject},
+                    description: {description: shouldBeAStringButItIsObject},
+                    keywords: ['new keywords'],
+                    status: {status: shouldBeAStringButItIsObject},
+                    category: {category: shouldBeAStringButItIsObject},
+                    version: {version: shouldBeANumberButItIsObject},
+                    copyright: {copyright: shouldBeAStringButItIsObject},
+                    data: 'testData'
+                };
+
+                options.access_token = access_token;
+                api.post(endpoints.data.update)
+                    .send(options)
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+
+                        expect(result.error.errors.name.value.name).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.name.message).to.be.equal('Cast to String failed for value "[object Object]" at path "name"');
+                        expect(result.error.errors.description.value.description).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.description.message).to.be.equal('Cast to String failed for value "[object Object]" at path "description"');
+                        expect(result.error.errors.status.value.status).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.status.message).to.be.equal('Cast to String failed for value "[object Object]" at path "status"');
+                        expect(result.error.errors.category.value.category).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.category.message).to.be.equal('Cast to String failed for value "[object Object]" at path "category"');
+                        expect(result.error.errors.version.value.version).to.be.equal(shouldBeANumberButItIsObject);
+                        expect(result.error.errors.version.message).to.be.equal('Cast to Number failed for value "[object Object]" at path "version"');
+                        expect(result.error.errors.copyright.value.copyright).to.be.equal(shouldBeAStringButItIsObject);
+                        expect(result.error.errors.copyright.message).to.be.equal('Cast to String failed for value "[object Object]" at path "copyright"');
+                        expect(result.error.errors.data.value).to.be.equal('testData');
+                        expect(result.error.errors.data.message).to.be.equal('Cast to Object failed for value "testData" at path "data"');
                         done();
                     });
             });

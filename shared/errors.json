@@ -114,5 +114,9 @@
     "file_not_found": {
         "errorMessage": "File not found.",
         "code": "404"  
+    },
+    "invalid_fields": {
+        "errorMessage": "Invalid fields.",
+        "code": "400"  
     }
 }

@@ -13,8 +13,8 @@ var projectSchema = mongoose.Schema({
 	createdBy 	: String,
 	createdByName   : String,
 	createdByUsername   : String,
-	name 		: { type: String, default: 'Project name' },
-	slug 		: { type: String, default: 'projectslug' },
+	name : { type: String, default: 'Project name' },
+	slug : { type: String, default: 'projectslug' },
 	description 	: { type: String, default: 'Description' },
 	keywords 	: [{ type: String, default: '' }],
 	categories 	: [String],
@@ -115,7 +115,7 @@ var projectSchema = mongoose.Schema({
 
 	// controls in map
 	controls : {
-		zoom 		: { type: Boolean, default: true  },
+		zoom : { type: Boolean, default: true, },
 		measure 	: { type: Boolean, default: true  },
 		description 	: { type: Boolean, default: true  },
 		mouseposition 	: { type: Boolean, default: true  },
