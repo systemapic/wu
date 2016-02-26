@@ -7,13 +7,10 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
 
-
-// todo: move endpoint to /v2/projects/slug/unique
-
 module.exports = function () {
-    describe('/api/project/unique', function () {
+    describe(endpoints.projects.slug.unique, function () {
         it("should respond with status code 401 when not authenticated", function (done) {
-            api.post('/api/project/unique')
+            api.post(endpoints.projects.slug.unique)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -21,7 +18,7 @@ module.exports = function () {
 
         it('should respond with status code 200', function (done) {
             token(function (err, access_token) {
-                api.post('/api/project/unique')
+                api.post(endpoints.projects.slug.unique)
                     .send({access_token: access_token}) // ?? should send slug?
                     .expect(httpStatus.OK)
                     .end(function (err, res) {

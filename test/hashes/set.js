@@ -247,7 +247,6 @@ module.exports = function () {
 	                        }
 
 	                        var result = helpers.parse(res.text);
-	                        console.log(result);
 	                        expect(result.error).to.be.null;
 	                        expect(result.hash.uuid).to.exist;
 	                        expect(result.hash.position).to.exist;

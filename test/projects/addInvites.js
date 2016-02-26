@@ -7,6 +7,7 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var Project = require('../../models/project');
+var testData = require('../shared/project/addInvites.json');
 
 module.exports = function () {
 
@@ -14,14 +15,7 @@ module.exports = function () {
     	var tmpProject = {};
 
 	    before(function (done) {
-	        helpers.create_project_by_info({
-	            name: 'mocha-test-project-addInvites',
-	            uuid: 'uuid-mocha-test-project-addInvites',
-	            access: {
-	                edit: [helpers.test_user.uuid]
-	            },
-	            createdBy: helpers.test_user.uuid
-	        }, function (err, project) {
+	        helpers.create_project_by_info(testData.projectInfo, function (err, project) {
 	            if (err) {
 	                return done(err);
 	            }
@@ -192,4 +186,4 @@ module.exports = function () {
         });
 
 	});
-}
+};
