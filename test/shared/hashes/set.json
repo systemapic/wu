@@ -36,7 +36,7 @@
     }
   },
   "setHashInfoSaveStateTrue": {
-    "project_id": "some id",
+    "project_id": "current",
     "saveState": true,
     "hash": {
       "position": {
