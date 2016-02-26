@@ -12,7 +12,7 @@
   "relatedLayerInfo": {
     "uuid": "relatedLayerUuid",
     "title": "relatedLayerTitle",
-    "description": 'relatedLayerDescription',
+    "description": "relatedLayerDescription",
     "file": "fileInfoUuid"
   }
 }
