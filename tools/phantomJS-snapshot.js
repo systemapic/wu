@@ -5,7 +5,8 @@ var outPath = args.outPath || '/tmp/screenshot.png';
 var url = args.url;// || 'https://dev.systemapic.com/';
 
 page = WebPage.create();
-page.viewportSize = { width : 1620, height: 1080 };	// set size...
+// page.viewportSize = { width : 1620, height: 1080 };	// set size...
+page.viewportSize = { width : 1920, height: 1080 };	// set size...
 page.open(url, 'get', function (status, why) {
 	
 	// pings from client
