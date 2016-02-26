@@ -193,6 +193,7 @@ module.exports = function () {
 					var setHashInfo = testData.setHashInfoSaveStateTrue;
 
 					setHashInfo.access_token = access_token;
+					setHashInfo.project_id = 'some id',
 	                api.post(endpoints.hashes.set)
 	                    .send(setHashInfo)
 	                    .expect(httpStatus.OK)
@@ -235,6 +236,7 @@ module.exports = function () {
 					var setHashInfo = testData.setHashInfoSaveStateTrue;
 
 					setHashInfo.access_token = access_token;
+					setHashInfo.project_id = tmpProject.uuid,
 
 	                api.post(endpoints.hashes.set)
 	                    .send(setHashInfo)
@@ -245,6 +247,7 @@ module.exports = function () {
 	                        }
 
 	                        var result = helpers.parse(res.text);
+	                        console.log(result);
 	                        expect(result.error).to.be.null;
 	                        expect(result.hash.uuid).to.exist;
 	                        expect(result.hash.position).to.exist;
