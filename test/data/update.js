@@ -8,7 +8,8 @@ var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
 var testFile = helpers.test_file;
-var second_test_user = require('../shared/data/update.json');
+var coreTestData = require('../shared/core.json');
+var second_test_user = coreTestData.secondTestUser;
 
 
 module.exports = function () {
@@ -98,7 +99,7 @@ module.exports = function () {
         // test 5
         it('should respond with status code 200 and update file correctly', function (done) {
             helpers.token(function (err, access_token) {
-                var options = require('../shared/data/update.json');
+                var options = require('../shared/data/update.json').updateData;
 
                 options.uuid =  testFile.uuid;
                 options.access_token = access_token;
