@@ -4,10 +4,8 @@ var projectCreate = require('./create');
 var projectUnique = require('./unique');
 var projectDelete = require('./delete');
 var getPublic = require('./getPublic');
-var projectAddInvites = require('./addInvites');
 var getPrivate = require('./getPrivate');
-var projectHashSet = require('./hash/set');
-var projectHashGet = require('./hash/get');
+var getProjectLayers = require('./getProjectLayers');
 
 describe('Project', function () {
     this.slow(500);
@@ -18,10 +16,8 @@ describe('Project', function () {
     projectCreate();
     projectDelete();
     projectUnique();
-	// projectAddInvites();
+    getProjectLayers();
 	getPublic();
 	getPrivate();
-	// projectHashSet();   // todo: move to /test/hashes/  see https://github.com/systemapic/wu/issues/424 for endpoints
- //    projectHashGet();
-    
+    getProjectLayers();
 });

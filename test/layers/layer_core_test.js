@@ -2,7 +2,6 @@ var helpers = require('../helpers');
 var layersDelete = require('./delete');
 var layerCreate= require('./create');
 var layerUpdate = require('./update');
-var layerGet = require('./get');
 var layerMeta = require('./reloadmeta');
 var layerCarto = require('./carto');
 
@@ -14,7 +13,6 @@ describe('Layer', function () {
 	layersDelete();
 	layerCreate();
 	layerUpdate();
-	layerGet();
 	layerMeta();
 	layerCarto();
 });

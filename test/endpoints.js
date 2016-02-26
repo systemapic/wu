@@ -5,7 +5,7 @@ module.exports = endpoint = {
         layers          : '/v2/data/layers',
         update          : '/v2/data/update',
         share           : '/v2/data/share',
-        download        : '/v2/data/download',
+        download        : '/v2/data/download'
     },
 
     projects : {
@@ -15,6 +15,7 @@ module.exports = endpoint = {
         delete          : '/v2/projects/delete',
         public          : '/v2/projects/public',
         private         : '/v2/projects/private',
+        get             : '/v2/projects/layers' // GET request // todo: move to projects test
     },
 
     layers : {
@@ -22,8 +23,7 @@ module.exports = endpoint = {
     	create          : '/v2/layers/create',
     	update          : '/v2/layers/update',
     	meta            : '/v2/layers/meta',
-    	carto           : '/v2/layers/carto/json',
-        get             : '/v2/projects/layers', // GET request // todo: move to projects test
+    	carto           : '/v2/layers/carto/json'
     },
 
     users : {
