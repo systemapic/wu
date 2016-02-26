@@ -21,7 +21,7 @@ mongoose.connect(config.mongo.url);
 module.exports = util = {
 
     // variables, todo: move to shared file
-    test_user: testData.test_user,
+    test_file: testData.test_file,
 
     test_layer: testData.test_layer,
 
