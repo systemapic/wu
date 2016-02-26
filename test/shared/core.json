@@ -5,5 +5,12 @@
     "lastName": "Ziegler",
     "uuid": "second_test-user-uuid",
     "password": "second_test-user-password"
+  },
+  "fileInfo": {
+    "uuid" : "fileInfoUuid",
+    "files" : [],
+    "name" : "fileInfoName",
+    "originalName" : "fileInfoOriginalName",
+    "description" : "fileInfoDescription"
   }
 }
