@@ -15,7 +15,7 @@ module.exports = endpoint = {
         delete          : '/v2/projects/delete',
         public          : '/v2/projects/public',
         private         : '/v2/projects/private',
-        get             : '/v2/projects/layers' // GET request // todo: move to projects test
+        getLayers       : '/v2/projects/layers'
     },
 
     layers : {

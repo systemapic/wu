@@ -11,8 +11,6 @@ var Project =  require('../../models/project');
 var endpoints = require('../endpoints.js');
 
 module.exports = function () {
-
-
     describe(endpoints.projects.get, function () {
         var projectWithoutLayers = {
             uuid: 'relatedProjectWithoutLayersUuid',

@@ -235,6 +235,8 @@ module.exports = function () {
 					var setHashInfo = testData.setHashInfoSaveStateFalse;
 
 					setHashInfo.access_token = access_token;
+					setHashInfo.project_id = tmpProject.uuid;
+
 	                api.post(endpoints.hashes.set)
 	                    .send(setHashInfo)
 	                    .expect(httpStatus.OK)
