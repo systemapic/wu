@@ -22,5 +22,8 @@ export PGHOST=postgis
 export PGDATABASE=$DATABASE
 
 cat<<EOF | psql
-SELECT ST_AsGeoJSON(ST_Transform(ST_Envelope("$COL"::geometry), 4326)) FROM "$TABLE";
+SELECT
+ST_AsGeoJSON(ST_Extent(ST_Transform(
+  ST_Envelope("$COL"::geometry),
+4326))) FROM "$TABLE";
 EOF
