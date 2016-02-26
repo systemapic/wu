@@ -81,7 +81,7 @@ module.exports = function () {
 						"\n"+
 						"	marker-fill: red;\n"+
 						"\n"+
-						"}"
+						"}";
 
 	                api.post(endpoints.layers.carto)
 	                    .send({
@@ -236,7 +236,7 @@ module.exports = function () {
 						"        [zoom>=18] { marker-width: 12  * 150; }\n"+						
 						// "        marker-width: 150;\n"+
 						"    }\n"+
-						"}"
+						"}";
 
 	                api.post(endpoints.layers.carto)
 	                    .send({
@@ -401,7 +401,7 @@ module.exports = function () {
 						"        polygon-fill: #000000;\n"+
 						"        polygon-opacity: 2;\n"+
 						"    }\n"+
-						"}"
+						"}";
 
 	                api.post(endpoints.layers.carto)
 	                    .send({
