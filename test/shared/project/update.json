@@ -87,6 +87,6 @@
     "pending": [
       "test_pending"
     ],
-    "project_id": "tmpProject.uuid"
+    "project_id": "mocha-test-project-uuid"
   }
 }
