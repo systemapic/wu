@@ -10,34 +10,18 @@ var User   = require('../../models/user');
 var async = require('async');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
-
-
-
+var testData = require('../shared/data/share.json');
+var coreTestData = require('../shared/core.json');
 
 module.exports = function () {
-
 
     describe(endpoints.data.share, function () {
 		this.slow(500);
         
         // local variables, todo: move to central JSON file (for all tests)
         var createdUser = {};
-        var second_test_user = {
-		    email : 'second_mocha_test_user@systemapic.com',
-		    firstName : 'Igor',
-		    lastName : 'Ziegler',
-		    uuid : 'second_test-user-uuid',
-		    password : 'second_test-user-password'  
-		};
-    	var fileInfo = {
-		    uuid : 'fileInfoUuid',
-		    files : [],
-		    name : 'fileInfoName',
-		    originalName : 'fileInfoOriginalName',
-		    description : 'fileInfoDescription'
-    	};
-
-
+        var second_test_user = coreTestData.secondTestUser;
+    	var fileInfo = testData.fileInfo;
 
         // before running tests
     	before(function (done) {
@@ -72,9 +56,6 @@ module.exports = function () {
     		async.waterfall(ops, done);
     	});
 
-
-
-
         // test 1
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post(endpoints.data.share)
@@ -82,8 +63,6 @@ module.exports = function () {
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
         });
-
-
 
         // test 2
         it('should respond with status code 400 if users and dataset don\'t exist in request body', function (done) {
@@ -110,8 +89,6 @@ module.exports = function () {
                     });
             });
         });
-
-
 
         // test 3
 		it('should respond with status 404 if file doesn\'t exist', function (done) {
@@ -141,9 +118,6 @@ module.exports = function () {
             });
 		});
 
-
-
-
         // test 4
 		it('should respond with status 400 if file exist and user have not access', function (done) {
 			token(function (err, access_token) {
@@ -172,9 +146,6 @@ module.exports = function () {
             });
 		});
 
-
-
-
         // test 5
 		it('should respond with status 400 if file exist and users array is empty', function (done) {
  			helpers.users_token(second_test_user, function (err, access_token) {
@@ -200,9 +171,6 @@ module.exports = function () {
                     });
             });
 		});
-
-
-
 
         // test 6
 		it('should respond with status 200 if file exist and users array contain unregistered user', function (done) {
@@ -230,9 +198,6 @@ module.exports = function () {
                     });
             });
 		});
-
-
-
 
         // test 7
 		it('should respond with status 200 if file exist and user have access', function (done) {

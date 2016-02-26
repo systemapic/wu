@@ -12,274 +12,19 @@ var Project = require('../../models/project');
 var Layer = require('../../models/layer');
 var format = require('util').format;
 var endpoints = require('../endpoints.js');
-
-
-// variables : todo, move to shared file
-var second_test_user = {
-    email       : 'second_mocha_test_user@systemapic.com',
-    firstName   : 'Igor',
-    lastName    : 'Ziegler',
-    uuid        : 'second_test-user-uuid',
-    password    : 'second_test-user-password'  
-};
-var newFileWithPostgisType = {
-    uuid            : 'newFileWithPostgisType',
-    family          : 'newFile_family',
-    createdBy       : 'newFile_test-user-uuid',
-    createdByName   : 'newFile_createdByName',
-    files           : ['newFile_files'],
-    folder          : 'newFile_folder',
-    absfolder       : 'newFile_absfolder',
-    name            : 'newFile_name',
-    originalName    : 'newFile_originalName',
-    description     : 'newFile_description',
-    copyright       : 'newFile_copyright',
-    keywords        : 'newFile_keywords',
-    category        : 'newFile_category',
-    version         : 1,
-    status          : 'newFile_status',
-    type            : 'postgis',
-    format          : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            database_name   : 'newFileWithPostgisType',
-            table_name      : 'newFileWithPostgisType',
-            data_type       : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata        : 'new metadata'
-        },
-        raster : {
-            file_id         : 'new file_id',
-            metadata        : 'new metadata'
-        }
-    }
-};
-var newFileWithPostgisTypeAndBadTableName = {
-    uuid            : 'newFileWithPostgisTypeAndBadTableName',
-    family          : 'newFile_family',
-    createdBy       : 'newFile_test-user-uuid',
-    createdByName   : 'newFile_createdByName',
-    files           : ['newFile_files'],
-    folder          : 'newFile_folder',
-    absfolder       : 'newFile_absfolder',
-    name            : 'newFile_name',
-    originalName    : 'newFile_originalName',
-    description     : 'newFile_description',
-    copyright       : 'newFile_copyright',
-    keywords        : 'newFile_keywords',
-    category        : 'newFile_category',
-    version         : 1,
-    status          : 'newFile_status',
-    type            : 'postgis',
-    format          : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            database_name   : 'newFileWithPostgisTypeAndBadTableName',
-            table_name      : 'Bad_name',
-            data_type       : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata        : 'new metadata'
-        },
-        raster : {
-            file_id         : 'new file_id',
-            metadata        : 'new metadata'
-        }
-    }
-};
-var newFileWithPostgisTypeWithoutDatabaseName = {
-    uuid            : 'newFileWithPostgisTypeWithoutDatabaseName',
-    family          : 'newFile_family',
-    createdBy       : 'newFile_test-user-uuid',
-    createdByName   : 'newFile_createdByName',
-    files           : ['newFile_files'],
-    folder          : 'newFile_folder',
-    absfolder       : 'newFile_absfolder',
-    name            : 'newFile_name',
-    originalName    : 'newFile_originalName',
-    description     : 'newFile_description',
-    copyright       : 'newFile_copyright',
-    keywords        : 'newFile_keywords',
-    category        : 'newFile_category',
-    version         : 1,
-    status          : 'newFile_status',
-    type            : 'postgis',
-    format          : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            table_name      : 'newFileWithPostgisTypeWithoutDatabaseName',
-            data_type       : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata        : 'new metadata'
-        },
-        raster : {
-            file_id         : 'newFileWithPostgisTypeWithoutDatabaseName',
-            metadata        : 'new metadata'
-        }
-    }
-};
-var newFileWithPostgisTypeWithoutTableName = {
-    uuid : 'newFileWithPostgisTypeWithoutTableName',
-    family : 'newFile_family',
-    createdBy : 'newFile_test-user-uuid',
-    createdByName : 'newFile_createdByName',
-    files : ['newFile_files'],
-    folder : 'newFile_folder',
-    absfolder : 'newFile_absfolder',
-    name : 'newFile_name',
-    originalName : 'newFile_originalName',
-    description : 'newFile_description',
-    copyright : 'newFile_copyright',
-    category : 'newFile_category',
-    version : 1,
-    status : 'newFile_status',
-    keywords : 'newFile_keywords',
-    type : 'postgis',
-    format : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            database_name : 'newFileWithPostgisTypeWithoutTableName',
-            data_type : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata : 'new metadata'
-        },
-        raster : {
-            file_id : 'newFileWithPostgisTypeWithoutTableName',
-            metadata : 'new metadata'
-        }
-    }
-};
-var newFileWithRasterTypeWithoutFileId = {
-    uuid : 'newFileWithRasterTypeWithoutFileId',
-    family : 'newFile_family',
-    createdBy : 'newFile_test-user-uuid',
-    createdByName : 'newFile_createdByName',
-    files : ['newFile_files'],
-    folder : 'newFile_folder',
-    name : 'newFile_name',
-    absfolder : 'newFile_absfolder',
-    originalName : 'newFile_originalName',
-    description : 'newFile_description',
-    copyright : 'newFile_copyright',
-    category : 'newFile_category',
-    version : 1,
-    status : 'newFile_status',
-    keywords : 'newFile_keywords',
-    type : 'raster',
-    format : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            database_name : 'new database_name',
-            table_name : 'newFileWithRasterTypeWithoutFileId',
-            data_type : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata : 'new metadata'
-        },
-        raster : {
-            metadata : 'new metadata'
-        }
-    }
-};
-var newFileWithRasterType = {
-    uuid : 'newFileWithRasterType',
-    family : 'newFile_family',
-    createdBy : 'newFile_test-user-uuid',
-    createdByName : 'newFile_createdByName',
-    files : ['newFile_files'],
-    folder : 'newFile_folder',
-    name : 'newFile_name',
-    absfolder : 'newFile_absfolder',
-    originalName : 'newFile_originalName',
-    description : 'newFile_description',
-    copyright : 'newFile_copyright',
-    category : 'newFile_category',
-    version : 1,
-    status : 'newFile_status',
-    keywords : 'newFile_keywords',
-    type : 'raster',
-    format : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            database_name : 'new database_name',
-            table_name : 'newFileWithRasterType',
-            data_type : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata : 'new metadata'
-        },
-        raster : {
-            file_id : 'newFileWithRasterType',
-            metadata : 'new metadata'
-        }
-    }
-};
-var newFileNotRasterAndPostgis = {
-    uuid : 'newFileNotRasterAndPostgis',
-    family : 'newFile_family',
-    createdBy : 'newFile_test-user-uuid',
-    createdByName : 'newFile_createdByName',
-    files : ['newFile_files'],
-    folder : 'newFile_folder',
-    name : 'newFile_name',
-    absfolder : 'newFile_absfolder',
-    originalName : 'newFile_originalName',
-    description : 'newFile_description',
-    copyright : 'newFile_copyright',
-    category : 'newFile_category',
-    version : 1,
-    status : 'newFile_status',
-    keywords : 'newFile_keywords',
-    type : 'test',
-    format : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            database_name : 'new database_name',
-            table_name : 'newFileNotRasterAndPostgis',
-            data_type : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata : 'new metadata'
-        },
-        raster : {
-            file_id : 'newFileNotRasterAndPostgis',
-            metadata : 'new metadata'
-        }
-    }
-};
-var newRasterFileWithRealtedUser = {
-    uuid : 'newRasterFileWithRealtedUser',
-    family : 'newFile_family',
-    createdBy : 'second_test-user-uuid',
-    createdByName : 'newFile_createdByName',
-    files : ['newFile_files'],
-    folder : 'newFile_folder',
-    name : 'newFile_name',
-    absfolder : 'newFile_absfolder',
-    originalName : 'newFile_originalName',
-    description : 'newFile_description',
-    copyright : 'newFile_copyright',
-    category : 'newFile_category',
-    version : 1,
-    status : 'newFile_status',
-    keywords : 'newFile_keywords',
-    type : 'raster',
-    format : ['newFile_format'],
-    data: {
-        postgis : {                 // postgis data
-            database_name : 'new database_name',
-            table_name : 'newRasterFileWithRealtedUser',
-            data_type : 'new data_type',         // raster or vector
-            original_format : 'new original_format',   // GeoTIFF, etc.
-            metadata : 'new metadata'
-        },
-        raster : {
-            file_id : 'newRasterFileWithRealtedUser',
-            metadata : 'new metadata'
-        }
-    }
-};
-
-
+var coreTestData = require('../shared/core.json');
+var testData = require('../shared/data/delete.json');
+var second_test_user = coreTestData.secondTestUser;
+var newFileWithPostgisType = testData.newFileWithPostgisType;
+var newFileWithPostgisTypeAndBadTableName = testData.newFileWithPostgisTypeAndBadTableName;
+var newFileWithPostgisTypeWithoutDatabaseName = testData.newFileWithPostgisTypeWithoutDatabaseName;
+var newFileWithPostgisTypeWithoutTableName = testData.newFileWithPostgisTypeWithoutTableName;
+var newFileWithRasterTypeWithoutFileId = testData.newFileWithRasterTypeWithoutFileId;
+var newFileWithRasterType = testData.newFileWithRasterType;
+var newFileNotRasterAndPostgis = testData.newFileNotRasterAndPostgis;
+var newRasterFileWithRealtedUser = testData.newRasterFileWithRealtedUser;
 
 module.exports = function () {
-
 
     describe(endpoints.data.delete, function () {
         this.slow(500);
@@ -394,21 +139,6 @@ module.exports = function () {
             helpers.delete_file_by_id(createdFileWithPostgisTypeAndBadTableName.uuid, done);
         });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // test 1
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post(endpoints.data.delete)
@@ -416,8 +146,6 @@ module.exports = function () {
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
         });
-
-
 
         // test 2
         it('should respond with status code 400 when file_id doesn\'t exist in request body', function (done) {
@@ -436,8 +164,6 @@ module.exports = function () {
                     });
             });
         });
-
-
 
         // test 3
         it('should respond with status code 200 if file type isn\'t postgis and raster', function (done) {
@@ -458,13 +184,8 @@ module.exports = function () {
             });
         });
 
-
-
-
         // vector
         context('vector', function () {
-
-
             // test 4
             it('should respond with status code 404 and error if database_name doesn\'t exist', function (done) {
                 token(function (err, access_token) {
@@ -483,8 +204,6 @@ module.exports = function () {
                         });
                 });
             });
-
-
 
             // test 5
             it('should respond with status code 404 and error if table_name doesn\'t exist', function (done) {
@@ -505,8 +224,6 @@ module.exports = function () {
                 });
             });
 
-
-
             // test 6
             it('should respond with status code 500 if can\'t drop related table', function (done) {
                 token(function (err, access_token) {
@@ -525,8 +242,6 @@ module.exports = function () {
                         });
                 });
             });
-
-
 
             // test 7
             it('should respond with status code 404 if file with table_name id doesn\'t exist', function (done) {
@@ -548,13 +263,8 @@ module.exports = function () {
             });
         });
 
-
-
-
         // raster
         context('raster', function () {
-
-
 
             // test 8
             it('should respond with status code 404 and error if file_id doesn\'t exist in data', function (done) {
@@ -575,8 +285,6 @@ module.exports = function () {
                 });
             });
 
-
-
             // test 9
             it('should respond with status code 200', function (done) {
                 token(function (err, access_token) {
@@ -589,8 +297,6 @@ module.exports = function () {
                         .end(done);
                 });
             });
-
-
 
             // test 10
             it('should respond with status code 200 and update related user\'s files', function (done) {
