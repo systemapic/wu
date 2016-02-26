@@ -1,0 +1,18 @@
+{
+  "relatedProjectInfo": {
+    "uuid": "relatedProjectInfo",
+    "createdBy": "relatedProjectCreatedBy",
+    "createdByName": "relatedProjectCreatedByName",
+    "createdByUsername": "relatedProjectCreatedByUsername",
+    "name": "relatedProjectName",
+    "access": {
+      "read": "helpers.test_user.uuid"
+    }
+  },
+  "relatedLayerInfo": {
+    "uuid": "relatedLayerUuid",
+    "title": "relatedLayerTitle",
+    "description": 'relatedLayerDescription',
+    "file": "fileInfoUuid"
+  }
+}

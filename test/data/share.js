@@ -10,7 +10,6 @@ var User   = require('../../models/user');
 var async = require('async');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
-var testData = require('../shared/data/share.json');
 var coreTestData = require('../shared/core.json');
 
 module.exports = function () {
@@ -21,7 +20,7 @@ module.exports = function () {
         // local variables, todo: move to central JSON file (for all tests)
         var createdUser = {};
         var second_test_user = coreTestData.secondTestUser;
-    	var fileInfo = testData.fileInfo;
+    	var fileInfo = coreTestData.fileInfo;
 
         // before running tests
     	before(function (done) {
