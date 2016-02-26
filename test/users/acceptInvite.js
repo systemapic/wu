@@ -10,14 +10,8 @@ var endpoints = require('../endpoints.js');
 var User = require('../../models/user');
 var Project = require('../../models/project');
 var async = require('async');
-var testProject = {
-    name: 'mocha-test-project',
-    uuid: 'uuid-mocha-test-project',
-    access: {
-        edit: [],
-        read: []
-    }
-};
+var testData = require('../shared/users/acceptInvite.json');
+var testProject = testData.testProject;
 
 module.exports = function () {
 

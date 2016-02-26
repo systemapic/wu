@@ -1,0 +1,50 @@
+{
+  "test_user": {
+    "email": "mocha_test_user@systemapic.com",
+    "firstName": "mocha",
+    "lastName": "test",
+    "uuid": "uuid-mocha-test-project",
+    "password": "test-user-password",
+    "username": "test-user"
+  },
+  "test_file": {
+    "uuid": "test_file_uuid",
+    "family": "test_file_family",
+    "createdBy": "uuid-mocha-test-project",
+    "createdByName": "test_file_createdByName",
+    "files": [
+      "test_file_files"
+    ],
+    "folder": "test_file_folder",
+    "absfolder": [
+      "test_file_absfolder",
+      "test_file_absfolder"
+    ],
+    "name": "test_file_name",
+    "originalName": "test_file_originalName",
+    "description": "test_file_description",
+    "copyright": "test_file_copyright",
+    "keywords": [
+      "test_file_keywords",
+      "test_file_keywords"
+    ],
+    "category": "test_file_category",
+    "version": 1,
+    "status": "test_file_status",
+    "type": "test_file_type",
+    "format": [
+      "test_file_format"
+    ]
+  },
+  "test_layer": {
+    "uuid": "test_layer_uuid",
+    "title": "test_layer_title",
+    "description": "test_layer_description",
+    "file": "test_layer_file",
+    "data": {
+      "postgis": {
+        "table_name": "test_layer_data_postgis_table_name"
+      }
+    }
+  }
+}

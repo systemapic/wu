@@ -7,16 +7,8 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var endpoints = require('../endpoints.js');
-
-
-
-var second_test_user = {
-    email : 'second_mocha_test_user@systemapic.com',
-    firstName : 'Igor',
-    lastName : 'Ziegler',
-    uuid : 'second_test-user-uuid',
-    password : 'second_test-user-password'
-};
+var coreTestData = require('../shared/core.json');
+var second_test_user = coreTestData.secondTestUser;
 
 module.exports = function () {
 

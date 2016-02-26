@@ -8,16 +8,9 @@ var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var Project = require('../../models/project');
 var endpoints = require('../endpoints.js');
-
-
-// todo: move to shared file
-var second_test_user = {
-    email : 'second_mocha_test_user@systemapic.com',
-    firstName : 'Igor',
-    lastName : 'Ziegler',
-    uuid : 'second_test-user-uuid',
-    password : 'second_test-user-password'
-};
+var coreTestData = require('../shared/core.json');
+var testData = require('../shared/users/inviteToProject.json');
+var second_test_user = coreTestData.secondTestUser;
 
 module.exports = function () {
 
@@ -25,15 +18,7 @@ module.exports = function () {
 	    var tmpProject = {};
 
 	    before(function (done) {
-	        helpers.create_project_by_info({
-	            name: 'mocha-test-project',
-	            uuid: 'uuid-mocha-test-project',
-                createdBy: helpers.test_user.uuid,
-	            access: {
-                    read: [],
-                    edit: []
-	            }
-	        }, function (err, project) {
+	        helpers.create_project_by_info(testData.projectInfo, function (err, project) {
 	            if (err) {
 	                return done(err);
 	            }

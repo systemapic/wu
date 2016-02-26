@@ -1,0 +1,10 @@
+{
+  "testProject": {
+    "name": "mocha-test-project",
+    "uuid": "uuid-mocha-test-project",
+    "access": {
+      "edit": [],
+      "read": []
+    }
+  }
+}

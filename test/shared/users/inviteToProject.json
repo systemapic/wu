@@ -1,0 +1,11 @@
+{
+  "projectInfo": {
+    "name": "mocha-test-project",
+    "uuid": "uuid-mocha-test-project",
+    "createdBy": "",
+    "access": {
+      "read": [],
+      "edit": []
+    }
+  }
+}
