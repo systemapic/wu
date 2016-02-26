@@ -9,39 +9,13 @@ var async = require('async');
 var expected = require('../../shared/errors');
 var Project =  require('../../models/project');
 var endpoints = require('../endpoints.js');
-
-
-
-// TODO: move to GET /v2/projects/layers
-
-
+var testData = require('../shared/project/getProjectLayers.json');
 
 module.exports = function () {
-
-
-    describe(endpoints.layers.get, function () {
-        var projectWithoutLayers = {
-            uuid: 'relatedProjectWithoutLayersUuid',
-            createdBy: 'relatedProjectWithoutLayersCreatedBy',
-            createdByName: 'relatedProjectWithoutLayersCreatedByName',
-            createdByUsername: 'relatedProjectWithoutLayersCreatedByUsername',
-            name: 'relatedProjectWithoutLayersName'
-        };
-        var projectWithLayers = {
-            uuid: 'relatedProjectUuidWithLayers',
-            createdBy: 'relatedProjectCreatedByWithLayers',
-            createdByName: 'relatedProjectCreatedByNameWithLayers',
-            createdByUsername: 'relatedProjectCreatedByUsernameWithLayers',
-            name: 'relatedProjectNameWithLayers',
-            access: {
-                read: helpers.test_user.uuid
-            }
-        };
-        var relatedLayer = {
-            uuid: 'relatedLayerUuid', // @igor: it should throw error if trying to update uuid. need a test for this.
-            title: 'relatedLayerTitle',
-            description: 'relatedLayerDescription'
-        };
+    describe(endpoints.projects.get, function () {
+        var projectWithoutLayers = testData.projectWithoutLayers;
+        var projectWithLayers = testData.projectWithLayers;
+        var relatedLayer = testData.relatedLayer;
 
         before(function (done) {
             var ops = [];
@@ -95,7 +69,7 @@ module.exports = function () {
         });
 
         it('should respond with status code 401 when not authenticated', function (done) {
-            api.get(endpoints.layers.get)
+            api.get(endpoints.projects.getLayers)
                 .send({})
                 .expect(httpStatus.UNAUTHORIZED)
                 .end(done);
@@ -107,11 +81,11 @@ module.exports = function () {
                     return done(err);
                 }
 
-                api.get(endpoints.layers.get)
+                api.get(endpoints.projects.getLayers)
                     .query({
                         access_token: access_token
                     })
-                    .expect(400)
+                    .expect(httpStatus.BAD_REQUEST)
                     .end(function (err, res) {
                         if (err) {
                             return done(err);
@@ -133,12 +107,12 @@ module.exports = function () {
                     return done(err);
                 }
 
-                api.get(endpoints.layers.get)
+                api.get(endpoints.projects.getLayers)
                     .query({
                         project: 'Bad project uuid',
                         access_token: access_token
                     })
-                    .expect(404)
+                    .expect(httpStatus.NOT_FOUND)
                     .end(function (err, res) {
                         if (err) {
                             return done(err);
@@ -160,12 +134,12 @@ module.exports = function () {
                         return done(err);
                     }
 
-                    api.get(endpoints.layers.get)
+                    api.get(endpoints.projects.getLayers)
                         .query({
                             project: projectWithoutLayers.uuid,
                             access_token: access_token
                         })
-                        .expect(404)
+                        .expect(httpStatus.NOT_FOUND)
                         .end(function (err, res) {
                             if (err) {
                                 return done(err);
@@ -204,12 +178,12 @@ module.exports = function () {
                         return done(err);
                     }
 
-                    api.get(endpoints.layers.get)
+                    api.get(endpoints.projects.getLayers)
                         .query({
                             project: projectWithoutLayers.uuid,
                             access_token: access_token
                         })
-                        .expect(200)
+                        .expect(httpStatus.OK)
                         .end(function (err, res) {
                             if (err) {
                                 return done(err);
@@ -230,12 +204,12 @@ module.exports = function () {
                         return done(err);
                     }
 
-                    api.get(endpoints.layers.get)
+                    api.get(endpoints.projects.getLayers)
                         .query({
                             project: projectWithLayers.uuid,
                             access_token: access_token
                         })
-                        .expect(200)
+                        .expect(httpStatus.OK)
                         .end(function (err, res) {
                             if (err) {
                                 return done(err);
@@ -251,4 +225,4 @@ module.exports = function () {
         });
 
     });
-}
+};

@@ -14,54 +14,18 @@ var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var endpoints = require('./endpoints.js');
 var apiModule = require('../api/api.js');
+var testData = require('./shared/helpers.json');
 
 mongoose.connect(config.mongo.url); 
 
 module.exports = util = {
 
     // variables, todo: move to shared file
-    test_user : {
-        email : 'mocha_test_user@systemapic.com',
-        firstName : 'mocha',
-        lastName : 'test',
-        uuid : 'uuid-mocha-test-project',
-        password : 'test-user-password',
-        username : 'test-user'
-    },
+    test_file: testData.test_file,
 
-    test_file : {
-        uuid : 'test_file_uuid',
-        family : 'test_file_family',
-        createdBy : 'uuid-mocha-test-project',
-        createdByName : 'test_file_createdByName',
-        files : ['test_file_files'],
-        folder : 'test_file_folder',
-        absfolder : 'test_file_absfolder',
-        name : 'test_file_name',
-        absfolder : 'test_file_absfolder',
-        originalName : 'test_file_originalName',
-        description : 'test_file_description',
-        copyright : 'test_file_copyright',
-        keywords : 'test_file_keywords',
-        category : 'test_file_category',
-        version : 1,
-        status : 'test_file_status',
-        keywords : 'test_file_keywords',
-        type : 'test_file_type',
-        format : ['test_file_format']
-    },
+    test_layer: testData.test_layer,
 
-    test_layer : {
-        uuid: 'test_layer_uuid',
-        title: 'test_layer_title',
-        description: 'test_layer_description',
-        file: 'test_layer_file',
-        data: {
-            postgis : {
-                table_name: 'test_layer_data_postgis_table_name'
-            }
-        }
-    },
+    test_user: testData.test_user,
 
     createExpectedError : function (errorMessage) {
         return {
@@ -360,4 +324,4 @@ module.exports = util = {
             done(null, inviteToken);
         });
     }
-}
+};

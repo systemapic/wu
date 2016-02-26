@@ -1,0 +1,50 @@
+{
+  "projectInfo": {
+    "name": "mocha-test-project",
+    "uuid": "uuid-mocha-test-project-for-hash-set",
+    "access": {
+      "edit": ["test_file_uuid"]
+    },
+    "createdBy": "test_file_uuid",
+    "settings": {
+      "saveState": true
+    },
+    "state": "current"
+  },
+  "setHashInfo": {
+    "project_id": "some project id",
+    "hash": {
+      "position": {
+        "lat" : "1",
+        "lng": "1",
+        "zoom": "1"
+      },
+      "layers": ["some layer"],
+      "id": "some id"
+    }
+  },
+  "setHashInfoSaveStateFalse": {
+    "saveState": false,
+    "hash": {
+      "position": {
+        "lat" : "1",
+        "lng": "1",
+        "zoom" : "1"
+      },
+      "layers": ["some layer"],
+      "id": "some id"
+    }
+  },
+  "setHashInfoSaveStateTrue": {
+    "saveState": true,
+    "hash": {
+      "position": {
+        "lat" : "1",
+        "lng" : "1",
+        "zoom" : "1"
+      },
+      "layers": ["some layer"],
+      "id": "some id"
+    }
+  }
+}

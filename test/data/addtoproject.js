@@ -9,32 +9,13 @@ var httpStatus = require('http-status');
 var async = require('async');
 var Project = require('../../models/project');
 var endpoints = require('../endpoints.js');
+var coreTestData = require('../shared/core.json');
+var testData = require('../shared/data/addtoproject.json');
 
 // variables, todo: move to shared file
-var fileInfo = {
-    uuid : 'fileInfoUuid',
-    files : [],
-    name : 'fileInfoName',
-    originalName : 'fileInfoOriginalName',
-    description : 'fileInfoDescription'
-};
-var relatedProjectInfo = {
-    uuid: 'relatedProjectInfo',
-    createdBy: 'relatedProjectCreatedBy',
-    createdByName: 'relatedProjectCreatedByName',
-    createdByUsername: 'relatedProjectCreatedByUsername',
-    name: 'relatedProjectName',
-    access: {
-        read: helpers.test_user.uuid
-    }
-};
-var relatedLayerInfo = {
-    uuid: 'relatedLayerUuid',
-    title: 'relatedLayerTitle',
-    description: 'relatedLayerDescription',
-    file: 'fileInfoUuid'
-};
-
+var fileInfo = coreTestData.fileInfo;
+var relatedProjectInfo = testData.relatedProjectInfo;
+var relatedLayerInfo = testData.relatedLayerInfo;
 
 module.exports = function () {
     describe(endpoints.projects.data, function () {
@@ -76,9 +57,6 @@ module.exports = function () {
     		async.parallel(ops, done);
     	});
 
-
-
-
         // test 1
         it('should respond with status code 401 when not authenticated', function (done) {
             api.post(endpoints.projects.data)
@@ -91,8 +69,6 @@ module.exports = function () {
                 })
                 .end(done);
         });
-
-
 
         // test 2
         it('should respond with status code 400 and error if file_id doesn\'t exist in request body', function (done) {
@@ -114,8 +90,6 @@ module.exports = function () {
             });
         });
 
-
-
         // test 3
         it('should respond with status code 400 and error if project_id doesn\'t exist in request body', function (done) {
 			token(function (err, access_token) {
@@ -135,8 +109,6 @@ module.exports = function () {
                     });
             });
         });
-
-
 
         // test 4
         it('should respond with status code 404 and error if file with specific id doesn\'t exist', function (done) {
@@ -159,8 +131,6 @@ module.exports = function () {
             });
         });
 
-
-
         // test 5
         it('should respond with status code 404 and error if project with specific id doesn\'t exist', function (done) {
 			token(function (err, access_token) {
@@ -181,8 +151,6 @@ module.exports = function () {
                     });
             });
         });
-
-
 
         // test 6
         it('should respond with status code 200 and add file and layers to the project', function (done) {

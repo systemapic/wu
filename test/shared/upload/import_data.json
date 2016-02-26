@@ -1,0 +1,15 @@
+{
+  "relatedLayer": {
+    "uuid": "relatedLayerUuid",
+    "title": "relatedLayerTitle",
+    "description": "relatedLayerDescription",
+    "file": "relatedLayerFile"
+  },
+  "relatedProject": {
+    "uuid": "relatedProjectUuid",
+    "createdBy": "relatedProjectCreatedBy",
+    "createdByName": "relatedProjectCreatedByName",
+    "createdByUsername": "relatedProjectCreatedByUsername",
+    "name": "relatedProjectName"
+  }
+}

@@ -9,62 +9,15 @@ var Layer = require('../../models/layer');
 var endpoints = require('../endpoints.js');
 var expected = require('../../shared/errors');
 var async = require('async');
+var testData = require('../shared/layers/update.json');
 
 // todo: implement this test!
-
 
 module.exports = function () {
     describe(endpoints.layers.update, function () {
 
-        var newLayerParameters = {
-            uuid: 'new mocha test layer uuid', // @igor: it should throw error if trying to update uuid. need a test for this.
-            title: 'new mocha test layer title',
-            description: 'new mocha test layer description'
-        };
-        var layerUpdates = {
-            layer: 'new mocha test layer uuid',
-            title: 'update mocha test layer title',
-            description: 'update mocha test layer description',
-            satellite_position: 'update mocha test layer satellite_position',
-            copyright: 'update mocha test layer copyright',
-            tooltip: 'update mocha test layer tooltip',
-            style: 'update mocha test layer style',
-            filter: 'update mocha test layer filter',
-            legends: 'update mocha test layer legends',
-            opacity: 'update mocha test layer opacity',
-            zIndex: 4,
-            data: {
-                geojson: 'update mocha test layer geojson',       // file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
-                topojson: 'update mocha test layer topojson',       // file uuid ... // simply request, check auth, serve file.
-
-                cartoid: 'update mocha test layer cartoid',
-                raster: 'update mocha test layer raster',
-
-                rastertile: 'update mocha test layer rastertile',       // server raster path: raster/hubble2/hubble
-                vectortile: 'update mocha test layer vectortile',       // server vector tile: vector/bigassvector/bigvector
-                mapbox: 'update mocha test layer mapbox',       // mapbox id: rawger.geography-class
-                cartodb: 'update mocha test layer cartodb',       // cartodb id:
-                osm: 'update mocha test layer osm',       // osm id?
-                norkart: 'update mocha test layer norkart',
-                google: 'update mocha test layer google',
-
-                postgis: {
-
-                    sql: 'update mocha test layer sql',
-                    cartocss: 'update mocha test layer cartocss',
-                    cartocss_version: 'update mocha test layer cartocss_version',
-                    geom_column: 'update mocha test layer geom_column',
-                    file_id: 'update mocha test layer file_id',
-                    database_name: 'update mocha test layer database_name',
-                    table_name: 'update mocha test layer table_name',
-                    data_type: 'update mocha test layer data_type',
-                    geom_type: 'update mocha test layer geom_type',
-                    raster_band: 4,
-                    layer_id: 'update mocha test layer layer_id',
-                    metadata: 'update mocha test layer metadata'
-                }
-            }
-        };
+        var newLayerParameters = testData.newLayerParameters;
+        var layerUpdates = testData.layerUpdates;
         var shouldBeAStringButItIsObject = 'should be string, but now it is an object';
         var notValidlayerUpdates = {
             title: {title: shouldBeAStringButItIsObject},
@@ -144,6 +97,30 @@ module.exports = function () {
             });
         });
 
+        it ('should respond with status code *** if user try update uuid of layer', function (done) {
+            token(function (err, access_token) {
+                if (err) {
+                    return done(err);
+                }
+
+                api.post(endpoints.layers.update)
+                    .send({
+                        layer: tmpLayer.uuid,
+                        access_token: access_token,
+                        uuid: "new layer uuid"
+                    })
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.uuid_can_not_be_changed.errorMessage);
+                        done();
+                    });
+            });
+        });
 
         it('should respond with status code 200 and update layer correctly', function (done) {
             token(function (err, access_token) {
@@ -233,7 +210,6 @@ module.exports = function () {
                     return done(err);
                 }
 
-                var ops = [];
                 notValidlayerUpdates.access_token = access_token;
                 notValidlayerUpdates.layer = tmpLayer.uuid;
                 api.post(endpoints.layers.update)
@@ -276,4 +252,4 @@ module.exports = function () {
         });
 
     });
-}
+};
