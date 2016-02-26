@@ -232,10 +232,9 @@ module.exports = function () {
 
 	        it('should respond with status code 200 and should change project state', function (done) {
 	            token(function (err, access_token) {
-					var setHashInfo = testData.setHashInfoSaveStateFalse;
+					var setHashInfo = testData.setHashInfoSaveStateTrue;
 
 					setHashInfo.access_token = access_token;
-					setHashInfo.project_id = tmpProject.uuid;
 
 	                api.post(endpoints.hashes.set)
 	                    .send(setHashInfo)
