@@ -24,9 +24,12 @@ export PGHOST=postgis
 RASTERFILE=/tmp/import_raster_$$.tif
 gdalwarp -t_srs EPSG:3857 ${S_SRS} ${INPUTRASTERFILE} ${RASTERFILE} || exit 1
 
+TILESIZE="128x128"
+
 # import raster
 set -o pipefail # needed to get an error if raster2pgsql errors out
 raster2pgsql \
-	-s 3857 -I -C \
+	-s 3857 -I -C -Y \
+	-t ${TILESIZE} \
 	${RASTERFILE} $TABLENAME |
 	psql -q --set ON_ERROR_STOP=1
