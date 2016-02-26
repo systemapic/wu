@@ -7,17 +7,8 @@ var token = helpers.token;
 var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
-
-
-// variables, todo: move to shared file
 var testFile = helpers.test_file;
-var second_test_user = {
-    email : 'second_mocha_test_user@systemapic.com',
-    firstName : 'Igor',
-    lastName : 'Ziegler',
-    uuid : 'second_test-user-uuid',
-    password : 'second_test-user-password'
-};
+var second_test_user = require('../shared/data/update.json');
 
 
 module.exports = function () {
@@ -107,30 +98,9 @@ module.exports = function () {
         // test 5
         it('should respond with status code 200 and update file correctly', function (done) {
             helpers.token(function (err, access_token) {
-                var options = {
-                    uuid: testFile.uuid,
-                    name: 'new name',
-                    description: 'new description',
-                    keywords: ['new keywords'],
-                    status: 'new status',
-                    category: 'new category',
-                    version: 1,
-                    copyright: 'new copyright',
-                    data: {
-                        postgis: {                 // postgis data
-                            database_name: 'new database_name',
-                            table_name: 'new table_name',
-                            data_type: 'new data_type',         // raster or vector
-                            original_format: 'new original_format',   // GeoTIFF, etc.
-                            metadata: 'new metadata'
-                        },
-                        raster: {
-                            file_id: 'new file_id',
-                            metadata: 'new metadata'
-                        }
-                    }
-                };
+                var options = require('../shared/data/update.json');
 
+                options.uuid =  testFile.uuid;
                 options.access_token = access_token;
                 api.post(endpoints.data.update)
                     .send(options)
