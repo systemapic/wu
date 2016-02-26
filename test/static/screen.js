@@ -9,7 +9,7 @@ var async = require('async');
 var expected = require('../../shared/errors');
 var File = require('../../models/file');
 var endpoints = require('../endpoints.js');
-
+var testData = require('../shared/static/screen.json');
 
 module.exports = function () {
     describe(endpoints.static.screen, function () {
@@ -18,17 +18,7 @@ module.exports = function () {
         var tmpProject = {};
 
         before(function (done) {
-            helpers.create_project_by_info({
-                name: 'mocha-test-project',
-                uuid: 'uuid-mocha-test-project-for-static-screen',
-                access: {
-                    edit: [helpers.test_user.uuid]
-                },
-                createdBy: helpers.test_user.uuid,
-                settings: {
-                    saveState: true
-                }
-            }, function (err, project) {
+            helpers.create_project_by_info(testData.projectInfo, function (err, project) {
                 if (err) {
                     return done(err);
                 }

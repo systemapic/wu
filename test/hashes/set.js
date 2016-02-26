@@ -9,6 +9,7 @@ var expected = require('../../shared/errors');
 var Hash 	= require('../../models/hash');
 var Project 	= require('../../models/project');
 var endpoints = require('../endpoints.js');
+var testData = require('../shared/hashes/set.json');
 
 module.exports = function () {
 	describe(endpoints.hashes.set, function () {
@@ -16,18 +17,7 @@ module.exports = function () {
 		var tmpProject = {};
 
 	    before(function (done) {
-	        helpers.create_project_by_info({
-	            name: 'mocha-test-project',
-	            uuid: 'uuid-mocha-test-project-for-hash-set',
-	            access: {
-	                edit: [helpers.test_user.uuid]
-	            },
-	            createdBy: helpers.test_user.uuid,
-	            settings: {
-	            	saveState: true
-	            },
-	            state: 'current'
-	        }, function (err, project) {
+	        helpers.create_project_by_info(testData.projectInfo, function (err, project) {
 	            if (err) {
 	                return done(err);
 	            }
@@ -108,20 +98,11 @@ module.exports = function () {
 
 		    it('should respond with status code 200 and create hash', function (done) {
 		        token(function (err, access_token) {
+					var setHashInfo = testData.setHashInfo;
+
+					setHashInfo.access_token = access_token;
 		            api.post(endpoints.hashes.set)
-		                .send({
-		                    access_token: access_token,
-		                    project_id: 'some project id',
-		                    hash: {
-		                    	position: {
-									lat : '1',
-									lng : '1',
-									zoom : '1'
-		                    	},
-		                    	layers: ['some layer'],
-		                    	id: 'some id'
-		                    }
-		                })
+		                .send(setHashInfo)
 		                .expect(httpStatus.OK)
 		                .end(function (err, res) {
 		                    if (err) {
@@ -156,21 +137,12 @@ module.exports = function () {
 
 	        it('should respond with status code 200 and not change project state', function (done) {
 	            token(function (err, access_token) {
+					var setHashInfo = testData.setHashInfoSaveStateFalse;
+
+					setHashInfo.access_token = access_token;
+					setHashInfo.project_id = tmpProject.uuid;
 	                api.post(endpoints.hashes.set)
-	                    .send({
-	                        access_token: access_token,
-	                        project_id: tmpProject.uuid,
-	                        saveState: false,
-	                        hash: {
-	                        	position: {
-						lat : '1',
-						lng : '1',
-						zoom : '1'
-	                        	},
-	                        	layers: ['some layer'],
-	                        	id: 'some id'
-	                        }
-	                    })
+	                    .send(setHashInfo)
 	                    .expect(httpStatus.OK)
 	                    .end(function (err, res) {
 	                        if (err) {
@@ -189,17 +161,17 @@ module.exports = function () {
 	                        expect(result.hash.id).to.be.equal('some id');
 	                        hash.uuid = result.hash.uuid;
 
-				Project
-				.findOne({uuid : tmpProject.uuid})
-				.exec(function (err, _project) {
-					if (err) {
-						return done(err);
-					}
+							Project
+							.findOne({uuid : tmpProject.uuid})
+							.exec(function (err, _project) {
+								if (err) {
+									return done(err);
+								}
 
-					expect(_project.state).to.be.equal(tmpProject.state);
+								expect(_project.state).to.be.equal(tmpProject.state);
 
-					done();
-				});
+								done();
+							});
 
 	                    });
 	            });
@@ -218,21 +190,12 @@ module.exports = function () {
 
 	        it('should respond with status code 200 and add error that project does not exist', function (done) {
 	            token(function (err, access_token) {
+					var setHashInfo = testData.setHashInfoSaveStateTrue;
+
+					setHashInfo.access_token = access_token;
+					setHashInfo.project_id = 'some id',
 	                api.post(endpoints.hashes.set)
-	                    .send({
-	                        access_token: access_token,
-	                        project_id: 'some id',
-	                        saveState: true,
-	                        hash: {
-	                        	position: {
-									lat : '1',
-									lng : '1',
-									zoom : '1'
-	                        	},
-	                        	layers: ['some layer'],
-	                        	id: 'some id'
-	                        }
-	                    })
+	                    .send(setHashInfo)
 	                    .expect(httpStatus.OK)
 	                    .end(function (err, res) {
 	                        if (err) {
@@ -270,21 +233,13 @@ module.exports = function () {
 
 	        it('should respond with status code 200 and should change project state', function (done) {
 	            token(function (err, access_token) {
+					var setHashInfo = testData.setHashInfoSaveStateTrue;
+
+					setHashInfo.access_token = access_token;
+					setHashInfo.project_id = tmpProject.uuid,
+
 	                api.post(endpoints.hashes.set)
-	                    .send({
-	                        access_token: access_token,
-	                        project_id: tmpProject.uuid,
-	                        saveState: true,
-	                        hash: {
-	                        	position: {
-									lat : '1',
-									lng : '1',
-									zoom : '1'
-	                        	},
-	                        	layers: ['some layer'],
-	                        	id: 'some id'
-	                        }
-	                    })
+	                    .send(setHashInfo)
 	                    .expect(httpStatus.OK)
 	                    .end(function (err, res) {
 	                        if (err) {
@@ -302,17 +257,18 @@ module.exports = function () {
 	                        expect(result.hash.layers).to.include('some layer');
 	                        expect(result.hash.id).to.be.equal('some id');
 	                        hash.uuid = result.hash.uuid;
-				Project
-				.findOne({uuid : tmpProject.uuid})
-				.exec(function (err, _project) {
-					if (err) {
-						return done(err);
-					}
 
-					expect(_project.state).to.be.equal(result.hash.id);
+							Project
+							.findOne({uuid : tmpProject.uuid})
+							.exec(function (err, _project) {
+								if (err) {
+									return done(err);
+								}
 
-					done();
-				});
+								expect(_project.state).to.be.equal(result.hash.id);
+
+								done();
+							});
 
 	                    });
 	            	});

@@ -118,5 +118,9 @@
     "invalid_fields": {
         "errorMessage": "Invalid fields.",
         "code": "400"  
+    },
+    "uuid_can_not_be_changed": {
+        "errorMessage": "Uuid can not be changed.",
+        "code": "400"
     }
 }

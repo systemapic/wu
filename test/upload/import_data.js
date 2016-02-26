@@ -14,13 +14,14 @@ var token = helpers.token;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var httpStatus = require('http-status');
-var path = require('path')
+var path = require('path');
 var chai = require('chai');
 var expect = chai.expect;
 var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
 var tmp = {};
+var testData = require('../shared/upload/import_data.json');
 
 module.exports = function () {
 
@@ -236,19 +237,8 @@ module.exports = function () {
         describe(endpoints.data.delete, function () {
             this.slow(500);
             
-            var relatedLayer = {
-                uuid: 'relatedLayerUuid',
-                title: 'relatedLayerTitle',
-                description: 'relatedLayerDescription',
-                file: 'relatedLayerFile',
-            };
-            var relatedProject = {
-                uuid: 'relatedProjectUuid',
-                createdBy: 'relatedProjectCreatedBy',
-                createdByName: 'relatedProjectCreatedByName',
-                createdByUsername: 'relatedProjectCreatedByUsername',
-                name: 'relatedProjectName'
-            };
+            var relatedLayer = testData.relatedLayer;
+            var relatedProject = testData.relatedProject;
 
             before(function (done) {
                 var ops = [];
@@ -362,4 +352,4 @@ module.exports = function () {
 
     });
 
-}   
+};

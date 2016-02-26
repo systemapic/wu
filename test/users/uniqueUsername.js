@@ -9,7 +9,6 @@ var Layer = require('../../models/layer');
 var expected = require('../../shared/errors');
 var endpoints = require('../endpoints.js');
 
-
 module.exports = function () {
 
     describe(endpoints.users.username.unique, function () {

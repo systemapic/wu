@@ -348,6 +348,13 @@ module.exports = api.layer = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['layer']));
 		}
 
+		if (parameters.uuid) {
+			return next({
+				code: httpStatus.BAD_REQUEST,
+				message: errors.uuid_can_not_be_changed.errorMessage
+			})
+		}
+
 		console.log('update layer!', req.body);
 
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {

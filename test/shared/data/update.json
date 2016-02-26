@@ -1,0 +1,26 @@
+{
+  "updateData": {
+    "name": "new name",
+    "description": "new description",
+    "keywords": [
+      "new keywords"
+    ],
+    "status": "new status",
+    "category": "new category",
+    "version": 1,
+    "copyright": "new copyright",
+    "data": {
+      "postgis": {
+        "database_name": "new database_name",
+        "table_name": "new table_name",
+        "data_type": "new data_type",
+        "original_format": "new original_format",
+        "metadata": "new metadata"
+      },
+      "raster": {
+        "file_id": "new file_id",
+        "metadata": "new metadata"
+      }
+    }
+  }
+}

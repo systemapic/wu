@@ -1,0 +1,13 @@
+{
+  "projectInfo": {
+    "name": "mocha-test-project",
+    "uuid": "uuid-mocha-test-project-for-static-screen",
+    "access": {
+      "edit": ["uuid-mocha-test-project"]
+    },
+    "createdBy": "uuid-mocha-test-project",
+    "settings": {
+      "saveState": true
+    }
+  }
+}

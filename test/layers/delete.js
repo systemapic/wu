@@ -11,32 +11,18 @@ var Project = require('../../models/project');
 var async = require('async');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
-
+var testData = require('../shared/layers/delete.json');
 
 module.exports = function () {
 
     describe(endpoints.layers.delete, function () {
 
-        // variables, todo: move to shared file
-        var layerInfoRelatedWithProjet = {
-            uuid: 'new layer related with projet uuid',
-            title: 'new layer related with projet title',
-            description: 'new layer related with projet description'
-        };
-        var projectInfo = {
-            uuid: 'projectInfoUuid',
-            createdBy: 'projectInfoCreatedBy',
-            createdByName: 'projectInfoCreatedByName',
-            createdByUsername: 'projectInfoCreatedByUsername',
-            name: 'projectInfoName',
-            access: {
-                read: helpers.test_user.uuid
-            }
-        };
-        var layerInfo = {
-            uuid: 'new layer uuid',
-            title: 'new layer title',
-            description: 'new layer description'
+        var layerInfoRelatedWithProjet = testData.layerInfoRelatedWithProjet;
+        var projectInfo = testData.projectInfo;
+        var layerInfo = testData.layerInfo;
+
+        projectInfo.access = {
+            read: helpers.test_user.uuid
         };
 
         before(function (done) {
