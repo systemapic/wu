@@ -1,0 +1,19 @@
+{
+  "layerInfoRelatedWithProjet": {
+    "uuid": "new layer related with projet uuid",
+    "title": "new layer related with projet title",
+    "description": "new layer related with projet description"
+  },
+  "projectInfo": {
+    "uuid": "projectInfoUuid",
+    "createdBy": "projectInfoCreatedBy",
+    "createdByName": "projectInfoCreatedByName",
+    "createdByUsername": "projectInfoCreatedByUsername",
+    "name": "projectInfoName"
+  },
+  "layerInfo": {
+    "uuid": "new layer uuid",
+    "title": "new layer title",
+    "description": "new layer description"
+  }
+}

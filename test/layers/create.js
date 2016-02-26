@@ -8,16 +8,14 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var Layer = require('../../models/layer');
 var endpoints = require('../endpoints.js');
+var testData = require('../shared/layers/create.json');
 
 module.exports = function () {
     describe(endpoints.layers.create, function () {
 
 
         // variables: todo: move to shared fiel
-        var newLayer = {
-            title: 'new mocha test layer title',
-            description: 'new mocha test layer description'   // html
-        };
+        var newLayer = testData.newLayer;
 
 
         // test 1
