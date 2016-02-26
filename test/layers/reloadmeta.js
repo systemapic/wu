@@ -12,19 +12,13 @@ var Project = require('../../models/project');
 var async = require('async');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
-
+var testData = require('../shared/layers/reloadmeta.json');
 
 module.exports = function () {
     describe(endpoints.layers.meta, function () {
 
         // variables, todo: move to share file
-        var newFileInfo = {
-            uuid : 'newFileUuid',
-            files : [],
-            name : 'newFileName',
-            originalName : 'newFileOriginalName',
-            description : 'newFileDescription'
-        }
+        var newFileInfo = testData.newFileInfo;
         before(function (done) {
             helpers.create_file_by_parameters(newFileInfo, done);
         });

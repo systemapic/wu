@@ -254,17 +254,18 @@ module.exports = function () {
 	                        expect(result.hash.layers).to.include('some layer');
 	                        expect(result.hash.id).to.be.equal('some id');
 	                        hash.uuid = result.hash.uuid;
-				Project
-				.findOne({uuid : tmpProject.uuid})
-				.exec(function (err, _project) {
-					if (err) {
-						return done(err);
-					}
 
-					expect(_project.state).to.be.equal(result.hash.id);
+							Project
+							.findOne({uuid : tmpProject.uuid})
+							.exec(function (err, _project) {
+								if (err) {
+									return done(err);
+								}
 
-					done();
-				});
+								expect(_project.state).to.be.equal(result.hash.id);
+
+								done();
+							});
 
 	                    });
 	            	});
