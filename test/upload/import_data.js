@@ -237,7 +237,7 @@ module.exports = function () {
         describe(endpoints.data.delete, function () {
             this.slow(500);
             
-            var relatedLayer = testData.relatedData;
+            var relatedLayer = testData.relatedLayer;
             var relatedProject = testData.relatedProject;
 
             before(function (done) {
