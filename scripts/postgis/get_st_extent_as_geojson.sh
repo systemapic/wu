@@ -2,21 +2,25 @@
 
 . `dirname $0`/run_in_docker.inc
 
-if [ "$1" == "" ]; then
-	echo "Must provide database as first argument,"
-	echo ""
-	exit 1 # missing args
+if [ -z "$2" ]; then
+  # TODO: also take schema and column !
+	echo "Usage: $0 <database> <table> [<column>]"
+	exit 1 
 fi
 
-if [ "$2" == "" ]; then
-	echo "Must provide table as second argument,"
-	echo ""
-	exit 1 # missing args
-fi
-
+DATABASE=$1
+TABLE=$2
+COL=the_geom_4326
+test -n "$3" && COL="$3"
 
 # get config
-source /systemapic/config/env.sh
+source /systemapic/config/env.sh || exit 1
 
-# PGPASSWORD=docker psql -U docker -d $1 -h postgis -c "CREATE TABLE owner_info ( name text, uuid text, created_at integer);"
-PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD psql -U $SYSTEMAPIC_PGSQL_USERNAME -d $1 -h postgis -c "SELECT ST_AsGeoJSON(ST_EXTENT(the_geom_4326)) FROM $2;"
+export PGPASSWORD=$SYSTEMAPIC_PGSQL_PASSWORD
+export PGUSER=$SYSTEMAPIC_PGSQL_USERNAME
+export PGHOST=postgis
+export PGDATABASE=$DATABASE
+
+cat<<EOF | psql
+SELECT ST_AsGeoJSON(ST_EXTENT("$COL"::geometry)) FROM "$TABLE";
+EOF
