@@ -1,0 +1,92 @@
+{
+  "projectInfo": {
+    "name": "mocha-test-project",
+    "uuid": "mocha-test-project-uuid",
+    "access": {
+      "edit": [
+        "uuid-mocha-test-project"
+      ]
+    },
+    "createdBy": "uuid-mocha-test-project"
+  },
+  "projectUpdates": {
+    "name": "mocha-test-updated-name",
+    "slug": "mocha-test-updated-slug",
+    "logo": "mocha-test-updated-logo",
+    "position": {
+      "lat": 44,
+      "lng": 44,
+      "zoom": 4
+    },
+    "bounds": {
+      "northEast": {
+        "lat": 44,
+        "lng": 33
+      },
+      "southWest": {
+        "lat": 55,
+        "lng": 44
+      },
+      "minZoom": 3,
+      "maxZoom": 5
+    },
+    "folders": [
+      {
+        "uuid": "test_folder_uuid",
+        "title": "test_folder_title",
+        "content": "test_folder_content"
+      }
+    ],
+    "controls": {
+      "zoom": false,
+      "measure": false,
+      "description": false,
+      "mouseposition": false,
+      "layermenu": false,
+      "draw": false,
+      "legends": true,
+      "inspect": true,
+      "geolocation": true,
+      "vectorstyle": true,
+      "baselayertoggle": true,
+      "cartocss": true
+    },
+    "description": "mocha-test-updated-description",
+    "keywords": "mocha-test-updated-keywords",
+    "colorTheme": "mocha-test-updated-colorTheme",
+    "connectedAccounts": {
+      "mapbox": [
+        {
+          "username": "test_user_name",
+          "accessToken": "test_access_token"
+        }
+      ],
+      "cartodb": [
+        "test_cartodb"
+      ]
+    },
+    "settings": {
+      "screenshot": false,
+      "socialSharing": false,
+      "documentsPane": false,
+      "dataLibrary": false,
+      "saveState": true,
+      "autoHelp": true,
+      "autoAbout": true,
+      "darkTheme": true,
+      "tooltips": true,
+      "mediaLibrary": true,
+      "mapboxGL": true,
+      "d3popup": true
+    },
+    "categories": [
+      "test_categories"
+    ],
+    "thumbCreated": true,
+    "state": "test_state",
+    "pending": [
+      "test_pending"
+    ],
+    "project_id": "tmpProject.uuid"
+  }
+}

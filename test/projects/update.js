@@ -13,29 +13,15 @@ var token = helpers.token;
 var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
 var endpoints = require('../endpoints.js');
-
-
-// varialbes: todo: move to shared file
-var second_test_user = {
-    email : 'second_mocha_test_user@systemapic.com',
-    firstName : 'Igor',
-    lastName : 'Ziegler',
-    uuid : 'second_test-user-uuid',
-    password : 'second_test-user-password'
-};
+var coreTestData = require('../shared/core.json');
+var testData = require('../shared/project/update.json');
+var second_test_user = coreTestData.secondTestUser;
 
 module.exports = function () {
     var tmpProject ={};
 
     before(function (done) {
-        helpers.create_project_by_info({
-            name: 'mocha-test-project',
-            uuid: 'mocha-test-project-uuid',
-            access: {
-                edit: [helpers.test_user.uuid]
-            },
-            createdBy: helpers.test_user.uuid
-        }, function (err, project) {
+        helpers.create_project_by_info(testData.projectInfo, function (err, project) {
             if (err) return done(err);
             tmpProject = project;
             done();
@@ -159,74 +145,11 @@ module.exports = function () {
         // test 6
         it('should be able to update all fields of project', function (done) {
             token(function (err, access_token) {
+                var projectUpdates = testData.projectUpdates;
+
+                projectUpdates.access_token = access_token;
                 api.post(endpoints.projects.update)
-                    .send({
-                        access_token: access_token,
-                        name: 'mocha-test-updated-name',
-                        slug: 'mocha-test-updated-slug',
-                        logo: 'mocha-test-updated-logo',
-                        position: {lat: 44, lng: 44, zoom: 4},
-                        bounds: {
-                            northEast: {
-                                lat: 44,
-                                lng: 33
-                            },
-                            southWest: {
-                                lat: 55,
-                                lng: 44
-                            },
-                            minZoom: 3,
-                            maxZoom: 5
-                        },
-                        folders: [{
-                            uuid: "test_folder_uuid",
-                            title: "test_folder_title",
-                            content: "test_folder_content"
-                        }],
-                        controls: {
-                            zoom: false,
-                            measure: false,
-                            description: false,
-                            mouseposition: false,
-                            layermenu: false,
-                            draw: false,
-                            legends: true,
-                            inspect: true,
-                            geolocation: true,
-                            vectorstyle: true,
-                            baselayertoggle: true,
-                            cartocss: true
-                        },
-                        description: 'mocha-test-updated-description',
-                        keywords: 'mocha-test-updated-keywords',
-                        colorTheme: 'mocha-test-updated-colorTheme',
-                        connectedAccounts: {
-                            mapbox: [{
-                                username: 'test_user_name',
-                                accessToken: 'test_access_token'
-                            }],
-                            cartodb: ["test_cartodb"]
-                        },
-                        settings: {
-                            screenshot: false,
-                            socialSharing: false,
-                            documentsPane: false,
-                            dataLibrary: false,
-                            saveState: true,
-                            autoHelp: true,
-                            autoAbout: true,
-                            darkTheme: true,
-                            tooltips: true,
-                            mediaLibrary: true,
-                            mapboxGL: true,
-                            d3popup: true
-                        },
-                        categories: ['test_categories'],
-                        thumbCreated: true,
-                        state: 'test_state',
-                        pending: ['test_pending'],
-                        project_id: tmpProject.uuid
-                    })
+                    .send(projectUpdates)
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
                         if (err) return done(err);

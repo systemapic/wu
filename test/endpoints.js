@@ -15,7 +15,10 @@ module.exports = endpoint = {
         delete          : '/v2/projects/delete',
         public          : '/v2/projects/public',
         private         : '/v2/projects/private',
-        getLayers       : '/v2/projects/layers'
+        getLayers       : '/v2/projects/layers',
+        slug            : {
+            unique      : '/v2/projects/slug/unique'
+        }
     },
 
     layers : {
