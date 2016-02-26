@@ -9,31 +9,13 @@ var async = require('async');
 var expected = require('../../shared/errors');
 var Project =  require('../../models/project');
 var endpoints = require('../endpoints.js');
+var testData = require('../shared/project/getProjectLayers.json');
 
 module.exports = function () {
     describe(endpoints.projects.get, function () {
-        var projectWithoutLayers = {
-            uuid: 'relatedProjectWithoutLayersUuid',
-            createdBy: 'relatedProjectWithoutLayersCreatedBy',
-            createdByName: 'relatedProjectWithoutLayersCreatedByName',
-            createdByUsername: 'relatedProjectWithoutLayersCreatedByUsername',
-            name: 'relatedProjectWithoutLayersName'
-        };
-        var projectWithLayers = {
-            uuid: 'relatedProjectUuidWithLayers',
-            createdBy: 'relatedProjectCreatedByWithLayers',
-            createdByName: 'relatedProjectCreatedByNameWithLayers',
-            createdByUsername: 'relatedProjectCreatedByUsernameWithLayers',
-            name: 'relatedProjectNameWithLayers',
-            access: {
-                read: helpers.test_user.uuid
-            }
-        };
-        var relatedLayer = {
-            uuid: 'relatedLayerUuid', // @igor: it should throw error if trying to update uuid. need a test for this.
-            title: 'relatedLayerTitle',
-            description: 'relatedLayerDescription'
-        };
+        var projectWithoutLayers = testData.projectWithoutLayers;
+        var projectWithLayers = testData.projectWithLayers;
+        var relatedLayer = testData.relatedLayer;
 
         before(function (done) {
             var ops = [];

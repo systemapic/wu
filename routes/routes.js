@@ -603,7 +603,7 @@ module.exports = function(app) {
 	app.post('/v2/projects/update', checkAccess, api.project.update, errorHandler);
 
 	/**
-	* @api {post} /api/project/unique Unique project
+	* @api {post} /v2/projects/slug/unique Unique project
 	* @apiName unique
 	* @apiGroup Project
 	* @apiUse token
@@ -622,7 +622,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/api/project/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
+	app.post('/v2/projects/slug/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
 
 
 	// =====================================
