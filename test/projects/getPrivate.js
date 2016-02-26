@@ -25,9 +25,9 @@ module.exports = function () {
 	        it('should respond with status code 400 and specific error message if project_id doesn\'t exist in request body', function (done) {
 	            token(function (err, access_token) {
 	                api.get(endpoints.projects.private)
-			.query({
-				access_token: access_token
-			})
+						.query({
+							access_token: access_token
+						})
                         .send()
                         .expect(httpStatus.BAD_REQUEST)
                         .end(function (err, res) {

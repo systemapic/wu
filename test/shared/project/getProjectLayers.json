@@ -1,0 +1,24 @@
+{
+  "projectWithoutLayers": {
+    "uuid": "relatedProjectWithoutLayersUuid",
+    "createdBy": "relatedProjectWithoutLayersCreatedBy",
+    "createdByName": "relatedProjectWithoutLayersCreatedByName",
+    "createdByUsername": "relatedProjectWithoutLayersCreatedByUsername",
+    "name": "relatedProjectWithoutLayersName"
+  },
+  "projectWithLayers": {
+    "uuid": "relatedProjectUuidWithLayers",
+    "createdBy": "relatedProjectCreatedByWithLayers",
+    "createdByName": "relatedProjectCreatedByNameWithLayers",
+    "createdByUsername": "relatedProjectCreatedByUsernameWithLayers",
+    "name": "relatedProjectNameWithLayers",
+    "access": {
+      "read": "uuid-mocha-test-project"
+    }
+  },
+  "relatedLayer": {
+    "uuid": "relatedLayerUuid",
+    "title": "relatedLayerTitle",
+    "description": "relatedLayerDescription"
+  }
+}

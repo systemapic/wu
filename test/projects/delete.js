@@ -8,16 +8,8 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var endpoints = require('../endpoints.js');
-
-// todo: move to shared file
-var testProject = {
-    name: 'mocha-test-project',
-    uuid: 'uuid-mocha-test-project',
-    access: {
-        edit: [helpers.test_user.uuid]
-    },
-    createdBy: helpers.test_user.uuid
-}
+var testData = require('../shared/project/delete.json');
+var testProject = testData.projectInfo;
 
 module.exports = function () {
     var tmpProject = {};

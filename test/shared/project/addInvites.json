@@ -1,0 +1,10 @@
+{
+  "projectInfo": {
+    "name": "mocha-test-project-addInvites",
+    "uuid": "uuid-mocha-test-project-addInvites",
+    "access": {
+      "edit": ["uuid-mocha-test-project"]
+    },
+    "createdBy": "uuid-mocha-test-project"
+  }
+}
