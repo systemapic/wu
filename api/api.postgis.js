@@ -480,8 +480,7 @@ module.exports = api.postgis = {
 			// get which type of data
 			var geotype = api.postgis._getGeotype(options);
 
-			// if no geotype, something's wrong
-			if (!geotype) return callback('Invalid geotype. Please only provide one dataset per archive.');
+			console.log('api.postgis.import(), geotype:', geotype);
 
 			// send to appropriate api.postgis.import
 			if (geotype == 'shapefile') 	return api.postgis.importShapefile(options, callback);
@@ -489,7 +488,7 @@ module.exports = api.postgis = {
 			if (geotype == 'raster') 	return api.postgis.importRaster(options, callback);
 
 			// not type caught, err
-			callback('Not a valid geotype. Must be Shapefile, GeoJSON or Raster.');
+			callback('Not a valid geotype. Must be Shapefile, GeoJSON or raster.');
 		});
 
 		async.waterfall(ops, done);
@@ -829,23 +828,14 @@ module.exports = api.postgis = {
 
 	
 	importRaster : function (options, done) {
-		var clientName 	= options.clientName,
-		    raster 	= options.files[0],
-		    user_id 	= options.user_id,
-		    file_id 	= options.file_id,
-		    pg_db 	= options.user.postgis_database,
-		    uniqueIdentifier = options.uniqueIdentifier,
-		    original_format = api.postgis._getRasterType(raster);
-
-		var IMPORT_RASTER_SCRIPT_PATH = '../scripts/postgis/import_raster.sh'; // todo: put in config
-		
-		// create database script
-		var cmd = [
-			IMPORT_RASTER_SCRIPT_PATH,
-			raster,
-			file_id,
-			pg_db
-		].join(' ');
+		var clientName 	= options.clientName;
+		var raster 	= options.files[0];
+		var user_id 	= options.user_id;
+		var file_id 	= options.file_id;
+		var pg_db 	= options.user.postgis_database;
+		var uniqueIdentifier = options.uniqueIdentifier;
+		var original_format = api.postgis._getRasterType(raster);
+		var ops = {};
 
 		// ping progress
 		api.socket.processingProgress({
@@ -858,33 +848,80 @@ module.exports = api.postgis = {
 			}
 		});
 
-		// import to postgis
-		var startTime = new Date().getTime();
-		exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
-			var endTime = new Date().getTime();
 
-			// set err on upload status
-			if (err) return api.upload.updateStatus(file_id, {
-				error_code : 2,
-				error_text : err
-			}, function () {
-				// return
-				done(err);
+		// import raster to postgis
+		ops.import = function (callback) {
+
+			// bash script
+			var IMPORT_RASTER_SCRIPT_PATH = '../scripts/postgis/import_raster.sh'; // todo: put in config
+
+			// create database script
+			var cmd = [
+				IMPORT_RASTER_SCRIPT_PATH,
+				raster,
+				file_id,
+				pg_db
+			].join(' ');
+
+			// import to postgis
+			var startTime = new Date().getTime();
+			exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
+				var endTime = new Date().getTime();
+
+				// set err on upload status
+				if (err) return api.upload.updateStatus(file_id, {
+					error_code : 2,
+					error_text : err
+				}, function () {
+					callback(err);
+				});
+
+				// update upload status
+				api.upload.updateStatus(file_id, {
+					data_type : 'raster',
+					original_format : original_format,
+					import_took_ms : endTime - startTime,
+					table_name : file_id,
+					database_name : pg_db
+				}, function () {
+					callback(err, 'Raster imported successfully.');
+				});
+			});
+		} 
+
+
+		// get metadata
+		ops.metadata = function (callback) {
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Getting metadata...',
+					error : null,
+					percent : 50,
+					uniqueIdentifier : uniqueIdentifier,
+				}
 			});
 
+			// get meta
+			api.postgis._getRasterMetadata({
+				file_id : file_id,
+				postgis_db : pg_db
+			}, function (err, metadata) {
+				if (err) return callback(err);
 
-			// set upload status
-			api.upload.updateStatus(file_id, {
-				data_type : 'raster',
-				original_format : original_format,
-				import_took_ms : endTime - startTime,
-				table_name : file_id,
-				database_name : pg_db
-			}, function () {
-				// return
-				done(err, 'Raster imported successfully.');
-			});
-		});
+				var metadataJSON = JSON.stringify(metadata);
+
+				// set upload status
+				api.upload.updateStatus(file_id, {
+					metadata : metadataJSON
+				}, callback);
+			})
+		};
+
+
+		async.series(ops, done);
 
 	},
 
@@ -1096,6 +1133,75 @@ module.exports = api.postgis = {
 
 			});
 		});
+
+		async.series(ops, function (err, results) {
+			done(err, metadata);
+		});
+	},
+
+
+	_getRasterMetadata : function (options, done) {
+		var file_id = options.file_id;
+		var postgis_db = options.postgis_db;
+		var ops = [];
+		var metadata = {};
+
+		// get total area
+		ops.push(function (callback) {
+
+			console.log('api.postgis._getRasterMetadata(), get_extent!');
+
+			var GET_RASTER_EXTENT_SCRIPT_PATH = '../scripts/postgis/get_raster_st_extent_as_geojson.sh';
+
+			// st_extent script 
+			var command = [
+				GET_RASTER_EXTENT_SCRIPT_PATH, 	// script
+				postgis_db, 	// database name
+				file_id,	// table name
+			].join(' ');
+
+
+			// create database in postgis
+			exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+
+				var json = stdout.split('\n')[2];
+				var geojson = JSON.parse(json);
+				var area = geojsonArea.geometry(geojson);
+
+				metadata.extent_geojson = geojson;
+				metadata.total_area = area; // square meters
+				
+				// set geom type (only for vector, so raster is false)
+				metadata.geometry_type = false;
+
+
+				console.log('METADATA ', metadata);
+
+				// callback
+				callback(null);
+			});
+
+		});
+
+		// get size of table in bytes
+		ops.push(function (callback) {
+
+			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));"
+			
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				if (err) return callback();
+
+				var json = results.rows[0];
+				metadata.size_bytes = json.pg_size_pretty;
+
+				callback();
+			});
+		});
+
+	
 
 		async.series(ops, function (err, results) {
 			done(err, metadata);
