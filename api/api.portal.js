@@ -58,36 +58,36 @@ module.exports = api.portal = {
 
 			if (err || !stored_invite) return api.error.missingInformation(req, res);
 
-			// handle already logged in users
-			if (req.isAuthenticated()) {
+			// // handle already logged in users
+			// if (req.isAuthenticated()) {
 				
-				// link invite, and logged in - just add access to user, log in
-				if (stored_invite.type == 'link') {
+			// 	// link invite, and logged in - just add access to user, log in
+			// 	if (stored_invite.type == 'link') {
 
-					// include access and log in
-					return api.portal.includeAccess({
-						res : res,
-						req : req,
-						invite : stored_invite
-					});
+			// 		// include access and log in
+			// 		return api.portal.includeAccess({
+			// 			res : res,
+			// 			req : req,
+			// 			invite : stored_invite
+			// 		});
 					
-				}
+			// 	}
 
-				// logged in + same email as invite -> include access and log in
-				if (stored_invite.type == 'email' && stored_invite.email == req.user.getEmail()) {
+			// 	// logged in + same email as invite -> include access and log in
+			// 	if (stored_invite.type == 'email' && stored_invite.email == req.user.getEmail()) {
 
-					// include access and log in
-					return api.portal.includeAccess({
-						res : res,
-						req : req,
-						invite : stored_invite
-					});
-				} 
+			// 		// include access and log in
+			// 		return api.portal.includeAccess({
+			// 			res : res,
+			// 			req : req,
+			// 			invite : stored_invite
+			// 		});
+			// 	} 
 
-			}
+			// }
 
-			// make sure logged out
-			req.logout();
+			// // make sure logged out
+			// req.logout();
 
 			// render invitation
 			res.render('../../views/invitation.ejs', {
