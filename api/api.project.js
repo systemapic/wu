@@ -236,7 +236,6 @@ module.exports = api.project = {
 	},
 
 	getPrivate : function (req, res, next) {
-		console.log('api.project.getPrivate', req.query);
 		var params = req.query || {};
 		var project_id = params.project_id;
 		var access_token = params.user_access_token || params.access_token;	
@@ -328,7 +327,6 @@ module.exports = api.project = {
 		User
 		.findOne({username : username})
 		.exec(function (err, user) {
-			console.log('err, user', err, user);
 			
 			if (err) {
 				return done(err);
@@ -341,7 +339,6 @@ module.exports = api.project = {
 				});
 			}
 
-			console.log('project_slug', project_slug, user.uuid);
 
 			// find project, check if public
 			Project
@@ -352,7 +349,6 @@ module.exports = api.project = {
 			.populate('files')
 			.populate('layers')
 			.exec(function (err, project) {
-				console.log('err, project', err, project);
 				if (err) {
 					return done(err);
 				}
@@ -751,8 +747,6 @@ module.exports = api.project = {
 		];
 
 		updates = _.pick(options, valid);
-
-		console.log('updates:', updates);
 
 		// TODO: need to check that values are valid - ie String, Object, etc.
 		// 	this will not do like this, must check each field.
