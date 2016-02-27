@@ -48,7 +48,6 @@ module.exports = api.token = {
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
-			console.log('err, user', err, user);
 			if (err) {
 				return next({
 					code: httpStatus.UNAUTHORIZED,
@@ -70,7 +69,6 @@ module.exports = api.token = {
 	authenticate_socket : function (req, done) {
 		var access_token = req.data.access_token;	
 		api.token._authenticate(access_token, function (err, user) {
-			console.log('#102 auth socket:', err, user);
 			if (err) return done(err);
 			if (!user) return done(new Error('Invalid access token.'));
 			done(null, user);
@@ -236,8 +234,6 @@ module.exports = api.token = {
 
 		// got some session, either public or user
 		api.token.check(tokens.access_token, function (err, user) {
-
-			console.log('checked for token..', err, user);
 
 			// no session, return public user
 			if (err) return api.token.getPublicToken(function (err, public_token) {
