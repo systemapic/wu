@@ -1951,6 +1951,13 @@ module.exports = function(app) {
 	}, errorHandler);
 
 	// =====================================
+	// DEBUG =====================
+	// =====================================
+	app.get('/api/debug', function (req, res) {
+		res.render('../../views/debug.ejs', {});
+	}, errorHandler);
+
+	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
 	app.get('*', function (req, res) {
