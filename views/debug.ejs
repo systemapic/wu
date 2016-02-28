@@ -1,0 +1,426 @@
+<html>
+<head>
+    <title>WebGL</title>
+    <meta charset="utf-8">
+    <style>#map { width: 800px; height: 600px; }</style>
+
+    <!-- Mapbox GL -->
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.3/mapbox-gl.css" rel='stylesheet' />
+    <!-- <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.3/mapbox-gl.js"></script> -->
+
+    <script src="/js/lib/debug/mapbox-gl-dev.js"></script>
+
+    <style> 
+
+    #map {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        padding: 0;
+        margin: 0;
+        top: 0;
+        left: 0;
+        background: url("../images/canvas.png") rgb(60, 71, 89);
+    }
+
+    #features {
+        width: 220px;
+        height: auto;
+        top: 10px;
+        left: 10px;
+        padding: 20px;
+        font-family: "Courier New";
+        position: absolute;
+        background: white;
+        font-size: 10px;
+        margin: 10px;
+        max-height: 90%;
+        white-space: pre;
+        overflow: hidden;    
+    }
+    </style>
+
+</head>
+
+<body>
+   
+
+    <div id="map"></div>
+
+    <div id="features"></div>
+
+    <script>
+
+
+    var systemapic_access_token = 'pk.8FhhB90ax6KkQmoK0AMePd0R6IlkxM4VAGewsXw8';
+
+    var systemapic = {
+        "version": 8,
+        "sources": {
+            "vector-tiles": {
+                "type": "vector",
+                "tiles": ["https://dev.systemapic.com/v2/tiles/layer_id-5bff2873-83f3-4aa2-96f5-2e770f76199c/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token],
+            },
+            "akersvatn-vector": {
+                "type": "vector",
+                "tiles": [
+                    "https://tiles-txa.systemapic.com/v2/tiles/layer_id-f37f85aa-acc1-4016-9cbb-22810d20afc1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txb.systemapic.com/v2/tiles/layer_id-f37f85aa-acc1-4016-9cbb-22810d20afc1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txc.systemapic.com/v2/tiles/layer_id-f37f85aa-acc1-4016-9cbb-22810d20afc1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txd.systemapic.com/v2/tiles/layer_id-f37f85aa-acc1-4016-9cbb-22810d20afc1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                ],
+            },
+            "snow-vector": {
+                "type": "vector",
+                "tiles": [
+                    "https://tiles-txa.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txb.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txc.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txd.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                ],
+            },
+            "norkart-tiles" : {
+                "type" : "raster",
+                "tiles" : [
+                    "https://proxy-txa.systemapic.com/v2/tiles/norkart/aerial/{z}/{x}/{y}.jpeg?access_token=" + systemapic_access_token,
+                    "https://proxy-txb.systemapic.com/v2/tiles/norkart/aerial/{z}/{x}/{y}.jpeg?access_token=" + systemapic_access_token,
+                    "https://proxy-txc.systemapic.com/v2/tiles/norkart/aerial/{z}/{x}/{y}.jpeg?access_token=" + systemapic_access_token,
+                    "https://proxy-txd.systemapic.com/v2/tiles/norkart/aerial/{z}/{x}/{y}.jpeg?access_token=" + systemapic_access_token,
+                ],
+                "tileSize" : 256
+            }
+        },
+        "layers": [
+            {
+                "id": "background",
+                "type": "raster",
+                "source": "norkart-tiles",
+                "minzoom": 0,
+                "maxzoom": 22
+            },
+            // {
+            //     "id": "sydney",
+            //     "type": "fill",
+            //     "source": "vector-tiles",
+            //     "source-layer": "layer",
+            //     // "filter": ["==", "$type", "Polygon"],
+            //     "paint": {
+            //         "fill-color": "#3887be"
+            //     },
+            //     "layout": {},
+            //     "interactive" : true
+            // },
+             {
+                "id": "sow",
+                "type": "fill",
+                "source": "snow-vector",
+                "source-layer": "layer",
+                // "filter": ["==", "$type", "Polygon"],
+                "paint": {
+                    "fill-color": "#3887be"
+                },
+                "layout": {},
+                "interactive" : true
+            },
+
+
+            // {
+            //     "id": "akersvatn-red",
+            //     "type": "circle",
+            //     "source": "akersvatn-vector",
+            //     "source-layer": "layer",
+            //     // "filter": ["<", "gid", 0],
+            //     "paint": {
+            //         "circle-radius": 10,
+            //         "circle-color": "red"
+            //     },
+            //     "layout": {},
+            //     "interactive" : true
+            // },
+            // {
+            //     "id": "akersvatn",
+            //     "type": "circle",
+            //     "source": "akersvatn-vector",
+            //     "source-layer": "layer",
+            //     // "filter": [">", "gid", 0],
+            //     "paint": {
+            //         "circle-radius": 4,
+            //         "circle-color": "#007cbf"
+            //     },
+            //     "layout": {},
+            //     "interactive" : true
+            // },
+
+            
+        ]
+    };
+
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        // center : [-209, -34],
+        // center : [ 14.295077563028087,  66.20670811065568], // akersvatn
+        center : [ 8.259963376704036,  61.19727759278061],
+        zoom : 5,
+        style : systemapic
+    });
+
+    var change = {};
+    var features_window = document.getElementById('features');
+
+    map.on('mousemove', function (e) {
+      
+        map.featuresAt(e.point, {
+            radius: 5,
+            layers : ['akersvatn']
+        }, function (err, features) {
+            if (err) return console.log('err', err);
+
+
+            if (features.length) {
+
+                // display feature properties
+                features_window.innerHTML = JSON.stringify(features[0], null, 2);
+
+                // get gid
+                // var gid = features[0].properties.gid;
+                // console.log('gid:', gid);
+
+
+                // set filter, paint
+                // map.setFilter('akersvatn-red', ["==", "gid", gid]);
+                
+                // map.setPaintProperty('akersvatn-red', 'circle-color', "white");
+                // map.setPaintProperty('akersvatn', 'circle-radius', 10);
+                change.cleared = false;
+
+            } else {
+
+                if (change.cleared) return;
+                console.log('clearing');
+
+                // set filter, paint
+                // map.setFilter('akersvatn-red', ["<", "gid", 0]);
+            
+                // map.setPaintProperty('akersvatn-red', 'circle-color', "hotpink");
+
+                change.cleared = true;
+            }
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>
+
+
+<!-- <html>
+<head>
+    <title>WebGL</title>
+    <meta charset="utf-8">
+    <style>#map { width: 800px; height: 600px; }</style>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.3/mapbox-gl.css" rel='stylesheet' />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.3/mapbox-gl.js"></script>
+</head>
+
+<body>
+    <script src="/js/lib/lodash/lodash.min.js"></script>
+    <script src="/js/lib/debug/leaflet-mapbox-gl.js"></script>
+    <script src="/js/src/core/class.js"></script>
+    <script src="/js/src/core/api.js"></script>
+<div id="map"></div>
+   
+<style> 
+
+#map {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    left: 0;
+}
+</style>
+<script>
+
+
+// set api
+var api = new Wu.Api({ url : window.location.origin });
+
+console.log('api: ', api);
+
+api.getTokenFromPassword({
+    email : 'knutole@systemapic.com',
+    password : '***REMOVED***'
+}, function (err, tokens) {
+    console.log('err, tokens', err, tokens);
+    // var access_token = JSON.parse(tokens).access_token;
+});
+
+var systemapic_access_token = 'pk.8FhhB90ax6KkQmoK0AMePd0R6IlkxM4VAGewsXw8';
+
+// var token = location.hash.replace('#', '');
+var token = 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJjaWZ0emwzc2wwMXpzdDBtN2s1dHg4MXBiIn0.5RA5fN9IcK6s8WjJi7z2ww';
+// if (!token) {
+//     token = prompt('Mapbox Access Token');
+// }
+// var map = L.map('map').setView([-33.685, 150.40], 9);
+
+// var simple = {
+//     "version": 8,
+//     "sources": {
+//         "osm": {
+//             "type": "vector",
+//             "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
+//         }
+//     },
+//     "layers": [
+//         {
+//             "id": "background",
+//             "type": "background",
+//             "paint": {
+//                 "background-color": "#41afa5"
+//             }
+//         }, {
+//             "id": "water",
+//             "type": "fill",
+//             "source": "osm",
+//             "source-layer": "water",
+//             "filter": ["==", "$type", "Polygon"],
+//             "paint": {
+//                 "fill-color": "#3887be"
+//             }
+//         }
+//     ]
+// };
+
+
+var systemapic = {
+    "version": 8,
+    "sources": {
+        "raster-tiles": {
+            "type": "raster",
+            "tiles": ["https://dev.systemapic.com/v2/tiles/layer_id-5bff2873-83f3-4aa2-96f5-2e770f76199c/{z}/{x}/{y}.png?access_token=" + systemapic_access_token],
+            "tileSize" : 256
+        },
+        "vector-tiles": {
+            "type": "vector",
+            "tiles": ["https://dev.systemapic.com/v2/tiles/layer_id-5bff2873-83f3-4aa2-96f5-2e770f76199c/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token],
+        },
+        "google-tiles" : {
+            "type" : "raster",
+            "tiles" : ["https://proxy-txa.systemapic.com/v2/tiles/google/aerial/{z}/{x}/{y}.png?access_token=" + systemapic_access_token],
+            "tileSize" : 256
+            
+        },
+        "norkart-tiles" : {
+            "type" : "raster",
+            "tiles" : ["https://proxy-txa.systemapic.com/v2/tiles/norkart/aerial/{z}/{x}/{y}.jpeg?access_token=" + systemapic_access_token],
+            "tileSize" : 256
+            
+        }
+    },
+    "layers": [
+        {
+            "id": "background",
+            "type": "raster",
+            "source": "norkart-tiles",
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+        // {
+        //     "id": "layer",
+        //     "type": "raster",
+        //     "source": "raster-tiles",
+        //     "minzoom": 0,
+        //     "maxzoom": 22
+        // },
+        {
+            "id": "sydney",
+            "type": "fill",
+            "source": "vector-tiles",
+            "source-layer": "layer",
+            // "filter": ["==", "$type", "Polygon"],
+            "paint": {
+                "fill-color": "#3887be"
+            },
+            "interactive" : true
+        }
+        
+    ]
+};
+
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    center : [-209, -34],
+    zoom : 8,
+    style : systemapic
+})
+
+map.addControl(new mapboxgl.Navigation());
+
+var memory = {};
+
+map.on('mousemove', function (e) {
+    map.featuresAt(e.point, {
+        radius: 5,
+        layers : ['sydney']
+    }, function (err, features) {
+        if (err) return console.log(err);
+
+        if (!err && features.length) {
+            // console.log('got features');
+
+            var gid = features[0].properties.gid;
+
+            if (memory.last == gid) return;
+
+            // set filter
+            map.setFilter('sydney', ["==", "gid", features[0].properties.gid]);
+            map.setPaintProperty('sydney', 'fill-outline-color', 'yellow');
+            memory.last = gid;
+
+        } else {
+            // console.log('nothing');
+
+            memory.last = null;
+
+            // set filter
+            map.setFilter('sydney', ["==", "$type", "Polygon"]);
+
+            map.setPaintProperty('sydney', 'fill-outline-color', "#3887be");
+        }
+        // console.log(features);
+
+        // map.setPaintProperty(layer_id, 'fill-color', 'red');
+        // map.setFilter(layer_id, ["==", "name", ""]);
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html> -->
