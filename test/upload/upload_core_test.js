@@ -7,6 +7,7 @@ var rasterEcwZip = require('./raster_ecw_200_zip');
 var geom_zPointsShapeFileZip = require('./geom_z_points_shapefile_200_zip');
 var geom_zPolygonShapefileZip = require('./geom_z_polygon_shapefile_200_zip');
 var parklandPolygonGeojson = require('./parkland_polygon_200_geojson');
+var snowRasterTif = require('./snow_raster_200_tif');
 
 describe.only('Upload data', function () {
 
@@ -21,4 +22,5 @@ describe.only('Upload data', function () {
     geom_zPointsShapeFileZip();
     geom_zPolygonShapefileZip();
     parklandPolygonGeojson();
+    snowRasterTif();
 });
