@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 var async = require('async');
 var fs = require('fs');
 var crypto = require('crypto');
-var request = require('supertest');
 var User = require('../../models/user');
 var Project = require('../../models/project');
 var Layer = require('../../models/layer');
@@ -30,11 +29,11 @@ module.exports = function () {
         // prepare test
         before(function(callback) {
             // create tmp user, project
-            async.series([helpers.create_user, helpers.create_project], callback);
+            async.series([helpers.create_project], callback);
         });
         after(function(callback) {
             // delete tmp user, project
-            async.series([helpers.delete_project, helpers.delete_user], callback);
+            async.series([helpers.delete_project], callback);
         });
 
 
