@@ -21,7 +21,7 @@ var File = require('../../models/file');
 
 module.exports = function () {
 
-    describe('Import points.gz', function () {
+    describe('Import geom_z.points.shapefile.200.zip', function () {
 
         before(function(callback) {
             async.series([helpers.create_project], callback);
@@ -32,61 +32,61 @@ module.exports = function () {
         });
 
         describe(endpoints.import.post, function () {
-	        this.slow(500);
+            this.slow(500);
 
-	        context('shapefile.polygon.zip', function () {
-	            this.timeout(21000);
-	            
-	            it('upload', function (done) {
-	                token(function (err, access_token) {
-	                    api.post(endpoints.import.post)
-		                    .type('form')
-		                    .field('access_token', access_token)
-		                    .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/points.gz')))
-		                    .expect(httpStatus.OK)
-		                    .end(function (err, res) {
-		                    	if (err) {
-		                    		return done(err);
-		                    	}
+            context('geom_z.points.shapefile.200.zip', function () {
+                this.timeout(21000);
 
-		                        var result = helpers.parse(res.text);
+                it('upload', function (done) {
+                    token(function (err, access_token) {
+                        api.post(endpoints.import.post)
+                            .type('form')
+                            .field('access_token', access_token)
+                            .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/geom_z.points.shapefile.200.zip')))
+                            .expect(httpStatus.OK)
+                            .end(function (err, res) {
+                                if (err) {
+                                    return done(err);
+                                }
 
-		                        expect(result.file_id).to.exist;
-		                        expect(result.user_id).to.exist;
-		                        expect(result.upload_success).to.exist;
-		                        expect(result.filename).to.be.equal('points.gz');
-		                        expect(result.status).to.be.equal('Processing');
+                                var result = helpers.parse(res.text);
 
-		                        tmp.file_id = result.file_id;
-		                        done();
-		                    });
-	                });
-	            });
+                                expect(result.file_id).to.exist;
+                                expect(result.user_id).to.exist;
+                                expect(result.upload_success).to.exist;
+                                expect(result.filename).to.be.equal('geom_z.points.shapefile.200.zip');
+                                expect(result.status).to.be.equal('Processing');
 
-	            it('get status', function (done) {
-	                token(function (err, access_token) {
-	                    api.get(endpoints.import.status)
-	                    .query({file_id : tmp.file_id, access_token : access_token})
-	                    .expect(httpStatus.OK)
-	                    .end(function (err, res) {
-	                    	if (err) {
-	                    		return done(err);
-	                    	}
+                                tmp.file_id = result.file_id;
+                                done();
+                            });
+                    });
+                });
 
-	                        var result = helpers.parse(res.text);
-	                        
-	                        expect(result.file_id).to.exist;
-	                        expect(result.user_id).to.exist;
-	                        expect(result.upload_success).to.exist;
-	                        expect(result.filename).to.be.equal('points.gz');
-	                        expect(result.status).to.be.equal('Processing');
-	                        done();
-	                    });
-	                });
-	            });
+                it('get status', function (done) {
+                    token(function (err, access_token) {
+                        api.get(endpoints.import.status)
+                            .query({file_id : tmp.file_id, access_token : access_token})
+                            .expect(httpStatus.OK)
+                            .end(function (err, res) {
+                                if (err) {
+                                    return done(err);
+                                }
 
-        	});
-		});
+                                var result = helpers.parse(res.text);
+                                console.log(result);
+                                expect(result.file_id).to.exist;
+                                expect(result.user_id).to.exist;
+                                expect(result.upload_success).to.exist;
+                                expect(result.filename).to.be.equal('geom_z.points.shapefile.200.zip');
+                                expect(result.status).to.be.equal('Processing');
+                                done();
+                            });
+                    });
+                });
+
+            });
+        });
 
     });
 
@@ -102,19 +102,19 @@ module.exports = function () {
                 process.stdout.write('.');
                 token(function (err, access_token) {
                     api.get(endpoints.import.status)
-                    .query({ file_id : tmp.file_id, access_token : access_token})
-                    .end(function (err, res) {
-                    	if (err) {
-                    		return done(err);
-                    	}
+                        .query({ file_id : tmp.file_id, access_token : access_token})
+                        .end(function (err, res) {
+                            if (err) {
+                                return done(err);
+                            }
 
-                        var status = helpers.parse(res.text);
-                        
-                        if (status.processing_success) {
-                            clearInterval(processingInterval);
-                            done();
-                        }
-                    });
+                            var status = helpers.parse(res.text);
+
+                            if (status.processing_success) {
+                                clearInterval(processingInterval);
+                                done();
+                            }
+                        });
                 });
             }, 500);
 
@@ -123,22 +123,22 @@ module.exports = function () {
         it('should be processed without errors', function (done) {
             token(function (err, access_token) {
                 api.get(endpoints.import.status)
-                .query({file_id : tmp.file_id, access_token : access_token})
-                .expect(httpStatus.OK)
-                .end(function (err, res) {
-                	if (err) {
-                		return done(err);
-                	}
+                    .query({file_id : tmp.file_id, access_token : access_token})
+                    .expect(httpStatus.OK)
+                    .end(function (err, res) {
+                        if (err) {
+                            return done(err);
+                        }
 
-                    var status = helpers.parse(res.text);
+                        var status = helpers.parse(res.text);
 
-                    expect(status.upload_success).to.exist;
-                    expect(status.status).to.be.equal('Done');
-                    expect(status.rows_count).to.be.equal('14874');
-                    expect(status.user_id).to.be.equal(helpers.test_user.uuid);
-                    expect(status.data_type).to.be.equal('vector');
-                    done();
-                });
+                        expect(status.upload_success).to.exist;
+                        expect(status.status).to.be.equal('Done');
+                        expect(status.rows_count).to.be.equal('108');
+                        expect(status.user_id).to.be.equal(helpers.test_user.uuid);
+                        expect(status.data_type).to.be.equal('vector');
+                        done();
+                    });
             })
         });
 
@@ -147,7 +147,7 @@ module.exports = function () {
 
     describe(endpoints.import.download, function () {
         this.slow(500);
-        
+
         it("200 & download as file", function (done) {
             token(function (err, access_token) {
                 if (err) {
@@ -165,8 +165,8 @@ module.exports = function () {
                         var result = helpers.parse(res.text);
 
                         expect(result.file.type).to.be.equal('postgis');
-                        expect(result.file.originalName).to.be.equal('points.gz');
-                        expect(result.file.name).to.be.equal('points');
+                        expect(result.file.originalName).to.be.equal('geom_z.points.shapefile.200.zip');
+                        expect(result.file.name).to.be.equal('geom_z.points.shapefile.200');
                         done();
                     });
             });
@@ -176,7 +176,7 @@ module.exports = function () {
 
     describe(endpoints.data.delete, function () {
         this.slow(500);
-        
+
         var relatedLayer = testData.relatedLayer;
         var relatedProject = testData.relatedProject;
 
@@ -184,7 +184,7 @@ module.exports = function () {
             var ops = [];
 
             ops.push(function (callback) {
-        
+
                 relatedLayer.data = {
                     postgis: {
                         table_name: tmp.file_id
@@ -227,7 +227,7 @@ module.exports = function () {
                 helpers.delete_layer_by_id(relatedLayer.uuid, callback);
             });
 
-            async.waterfall(ops, done);     
+            async.waterfall(ops, done);
         });
 
         it('should be able to delete file correctly', function (done) {
@@ -236,18 +236,18 @@ module.exports = function () {
             ops.push(function (callback) {
                 token(function (err, access_token) {
                     api.post(endpoints.data.delete)
-                    .send({file_id : tmp.file_id, access_token : access_token})
-                    .expect(httpStatus.OK)
-                    .end(function (err, res) {
-                        if (err) {
-                            return callback(err);
-                        }
+                        .send({file_id : tmp.file_id, access_token : access_token})
+                        .expect(httpStatus.OK)
+                        .end(function (err, res) {
+                            if (err) {
+                                return callback(err);
+                            }
 
-                        var result = helpers.parse(res.text);
-                        expect(result.success).to.be.true;
+                            var result = helpers.parse(res.text);
+                            expect(result.success).to.be.true;
 
-                        callback(null, result);
-                    });
+                            callback(null, result);
+                        });
                 });
             });
 
@@ -284,7 +284,7 @@ module.exports = function () {
                     });
             });
 
-            async.waterfall(ops, done); 
+            async.waterfall(ops, done);
 
         });
 
