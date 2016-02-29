@@ -21,7 +21,7 @@ var File = require('../../models/file');
 
 module.exports = function () {
 
-    describe('Import raster.ecw.zip', function () {
+    describe('Import raster.ecw.200.zip', function () {
 
         before(function(callback) {
             async.series([helpers.create_project], callback);
@@ -34,7 +34,7 @@ module.exports = function () {
         describe(endpoints.import.post, function () {
 	        this.slow(500);
 
-	        context('raster.ecw.zip', function () {
+	        context('raster.ecw.200.zip', function () {
 	            this.timeout(21000);
 	            
 	            it('upload', function (done) {
@@ -42,7 +42,7 @@ module.exports = function () {
 	                    api.post(endpoints.import.post)
 		                    .type('form')
 		                    .field('access_token', access_token)
-		                    .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/raster.ecw.zip')))
+		                    .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/raster.ecw.200.zip')))
 		                    .expect(httpStatus.OK)
 		                    .end(function (err, res) {
 		                    	if (err) {
@@ -54,7 +54,7 @@ module.exports = function () {
 		                        expect(result.file_id).to.exist;
 		                        expect(result.user_id).to.exist;
 		                        expect(result.upload_success).to.exist;
-		                        expect(result.filename).to.be.equal('raster.ecw.zip');
+		                        expect(result.filename).to.be.equal('raster.ecw.200.zip');
 		                        expect(result.status).to.be.equal('Processing');
 
 		                        tmp.file_id = result.file_id;
@@ -78,7 +78,7 @@ module.exports = function () {
 	                        expect(result.file_id).to.exist;
 	                        expect(result.user_id).to.exist;
 	                        expect(result.upload_success).to.exist;
-	                        expect(result.filename).to.be.equal('raster.ecw.zip');
+	                        expect(result.filename).to.be.equal('raster.ecw.200.zip');
 	                        expect(result.status).to.be.equal('Processing');
 	                        done();
 	                    });
@@ -134,7 +134,7 @@ module.exports = function () {
 
                     expect(status.upload_success).to.exist;
                     expect(status.status).to.be.equal('Done');
-                    expect(status.filename).to.be.equal('raster.ecw.zip');
+                    expect(status.filename).to.be.equal('raster.ecw.200.zip');
                     expect(status.error_code).to.be.null;
                     expect(status.error_text).to.be.null;
                     done();
@@ -165,8 +165,8 @@ module.exports = function () {
                         var result = helpers.parse(res.text);
 
                         expect(result.file.type).to.be.equal('raster');
-                        expect(result.file.originalName).to.be.equal('raster.ecw.zip');
-                        expect(result.file.name).to.be.equal('raster.ecw');
+                        expect(result.file.originalName).to.be.equal('raster.ecw.200.zip');
+                        expect(result.file.name).to.be.equal('raster.ecw.200');
                         done();
                     });
             });
