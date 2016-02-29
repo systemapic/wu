@@ -9,6 +9,7 @@
     <!-- <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.3/mapbox-gl.js"></script> -->
 
     <script src="/js/lib/debug/mapbox-gl-dev.js"></script>
+    <script src="/js/lib/debug/pbf-dev.js"></script>
 
     <style> 
 
@@ -52,6 +53,7 @@
     <script>
 
 
+
     var systemapic_access_token = 'pk.8FhhB90ax6KkQmoK0AMePd0R6IlkxM4VAGewsXw8';
 
     var systemapic = {
@@ -73,10 +75,19 @@
             "snow-vector": {
                 "type": "vector",
                 "tiles": [
-                    "https://tiles-txa.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
-                    "https://tiles-txb.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
-                    "https://tiles-txc.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
-                    "https://tiles-txd.systemapic.com/v2/tiles/layer_id-8b8a0ce5-8dd5-420f-bdbe-092c41beafb1/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txa.systemapic.com/v2/tiles/layer_id-a4341b27-e424-4c35-a617-70063b705866/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txb.systemapic.com/v2/tiles/layer_id-a4341b27-e424-4c35-a617-70063b705866/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txc.systemapic.com/v2/tiles/layer_id-a4341b27-e424-4c35-a617-70063b705866/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txd.systemapic.com/v2/tiles/layer_id-a4341b27-e424-4c35-a617-70063b705866/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                ],
+            },
+            "deformation-vector": {
+                "type": "vector",
+                "tiles": [
+                    "https://tiles-txa.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txb.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txc.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txd.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
                 ],
             },
             "norkart-tiles" : {
@@ -110,20 +121,42 @@
             //     "layout": {},
             //     "interactive" : true
             // },
-             {
-                "id": "sow",
-                "type": "fill",
-                "source": "snow-vector",
-                "source-layer": "layer",
-                // "filter": ["==", "$type", "Polygon"],
-                "paint": {
-                    "fill-color": "#3887be"
-                },
-                "layout": {},
-                "interactive" : true
-            },
-
-
+            // {
+            //     "id": "sow",
+            //     "type": "fill",
+            //     "source": "snow-vector",
+            //     "source-layer": "layer",
+            //     // "filter": ["==", "$type", "Polygon"],
+            //     "paint": {
+            //         "fill-color": "#3887be"
+            //     },
+            //     "layout": {},
+            //     "interactive" : true
+            // },
+            // {
+            //     "id": "deformation-1",
+            //     "type": "fill",
+            //     "source": "deformation-vector",
+            //     "source-layer": "layer",
+            //     "filter": ["<", "val", 0],
+            //     "paint": {
+            //         "fill-color": "#3887be"
+            //     },
+            //     "layout": {},
+            //     "interactive" : true
+            // },
+            //  {
+            //     "id": "deformation-2",
+            //     "type": "fill",
+            //     "source": "deformation-vector",
+            //     "source-layer": "layer",
+            //     "filter": [">", "val", 0],
+            //     "paint": {
+            //         "fill-color": "hotpink"
+            //     },
+            //     "layout": {},
+            //     "interactive" : true
+            // },
             // {
             //     "id": "akersvatn-red",
             //     "type": "circle",
@@ -150,17 +183,42 @@
             //     "layout": {},
             //     "interactive" : true
             // },
-
-            
         ]
     };
+
+    // create color ramp
+    var range = [-16, 16];
+    var color_ramp = ['#07000F', '#16032C', '#240546', '#2F0461', '#40097E', '#501099', '#5F16B3', '#721FD0', '#8429EB', '#923FF1', '#A259F5', '#B57AF9', '#C697FB', '#D5B1FF', '#E5CFFF', '#F4ECFF'];
+    var layers = [];
+    // 16 steps
+    for (var i = range[0]; i<range[1]; i++) {
+        console.log('i:', i);
+        var color = color_ramp[parseInt((range[1] + i)/2)];
+        systemapic.layers.push({
+            "id": "deformation_" + i,
+            "type": "fill",
+            "source": "deformation-vector",
+            "source-layer": "layer",
+            "filter": ["==", "val", i],
+            "paint": {
+                "fill-color": color
+            },
+            "layout": {},
+            "interactive" : true
+        });
+    }
+
+    console.log('layerS:', layers);
+
+
 
     var map = new mapboxgl.Map({
         container: 'map', // container id
         // center : [-209, -34],
         // center : [ 14.295077563028087,  66.20670811065568], // akersvatn
-        center : [ 8.259963376704036,  61.19727759278061],
-        zoom : 5,
+        // center : [ 8.259963376704036,  61.19727759278061],
+        center : [ 20.426873995740664, 69.31845195098202],
+        zoom : 13,
         style : systemapic
     });
 
@@ -216,6 +274,49 @@
 
 
 
+
+        
+    function read_pbf(url) {
+
+        var url = url || 'https://tiles-txb.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/11/1140/469.pbf?access_token=pk.8FhhB90ax6KkQmoK0AMePd0R6IlkxM4VAGewsXw8';
+        get_http(url, function (err, buffer) {
+
+            var pbf = new Pbf(new Uint8Array(buffer));
+
+            console.log('--- pbf ---');
+            console.log('length:', pbf.length);
+            console.log('string:', pbf.readString());
+        });
+
+    }
+
+
+
+    function get_http(path, done) {
+        var http = new XMLHttpRequest();
+        var url = path;
+
+        // open
+        http.open("GET", url, true);
+
+        // set json header
+        // http.setRequestHeader('Content-type', 'application/json');
+        // http.responseType = "arraybuffer";
+
+        // response
+        http.onreadystatechange = function() {
+            if (http.readyState == 4) {
+                if (http.status == 200) {
+                    done && done(null, http.responseText);
+                } else {
+                    done && done(http.status, http.responseText);
+                }
+            }
+        };
+        
+        // send
+        http.send();
+    };
 
 
     </script>
