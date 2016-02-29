@@ -21,7 +21,7 @@ var File = require('../../models/file');
 
 module.exports = function () {
 
-    describe('Import polygon_egypt.zip', function () {
+    describe('Import egypt.polygon.200.geojson', function () {
 
         before(function(callback) {
             async.series([helpers.create_project], callback);
@@ -34,7 +34,7 @@ module.exports = function () {
         describe(endpoints.import.post, function () {
 	        this.slow(500);
 
-	        context('polygon_egypt.zip', function () {
+	        context('egypt.polygon.200.geojson', function () {
 	            this.timeout(21000);
 	            
 	            it('upload', function (done) {
@@ -42,7 +42,7 @@ module.exports = function () {
 	                    api.post(endpoints.import.post)
 		                    .type('form')
 		                    .field('access_token', access_token)
-		                    .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/polygon_egypt.zip')))
+		                    .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/egypt.polygon.200.geojson')))
 		                    .expect(httpStatus.OK)
 		                    .end(function (err, res) {
 		                    	if (err) {
@@ -54,7 +54,7 @@ module.exports = function () {
 		                        expect(result.file_id).to.exist;
 		                        expect(result.user_id).to.exist;
 		                        expect(result.upload_success).to.exist;
-		                        expect(result.filename).to.be.equal('polygon_egypt.zip');
+		                        expect(result.filename).to.be.equal('egypt.polygon.200.geojson');
 		                        expect(result.status).to.be.equal('Processing');
 
 		                        tmp.file_id = result.file_id;
@@ -78,7 +78,7 @@ module.exports = function () {
 	                        expect(result.file_id).to.exist;
 	                        expect(result.user_id).to.exist;
 	                        expect(result.upload_success).to.exist;
-	                        expect(result.filename).to.be.equal('polygon_egypt.zip');
+	                        expect(result.filename).to.be.equal('egypt.polygon.200.geojson');
 	                        expect(result.status).to.be.equal('Processing');
 	                        done();
 	                    });
@@ -134,7 +134,7 @@ module.exports = function () {
 
                     expect(status.upload_success).to.exist;
                     expect(status.status).to.be.equal('Done');
-                    expect(status.rows_count).to.be.equal('14874');
+                    expect(status.rows_count).to.be.equal('108');
                     expect(status.user_id).to.be.equal(helpers.test_user.uuid);
                     expect(status.data_type).to.be.equal('vector');
                     done();
@@ -165,8 +165,8 @@ module.exports = function () {
                         var result = helpers.parse(res.text);
 
                         expect(result.file.type).to.be.equal('postgis');
-                        expect(result.file.originalName).to.be.equal('polygon_egypt.zip');
-                        expect(result.file.name).to.be.equal('polygon_egypt');
+                        expect(result.file.originalName).to.be.equal('egypt.polygon.200.geojson');
+                        expect(result.file.name).to.be.equal('egypt.polygon.200');
                         done();
                     });
             });
