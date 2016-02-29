@@ -56,7 +56,7 @@ module.exports = function () {
                         api.post(endpoints.import.post)
                         .type('form')
                         .field('access_token', access_token)
-                        .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.polygon.zip')))
+                        .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/shapefile.polygon.zip')))
                         .expect(httpStatus.OK)
                         .end(function (err, res) {
                             assert.ifError(err);
@@ -105,7 +105,7 @@ module.exports = function () {
                         .type('form')
                         .field('userUuid', util.test_user.uuid)
                         .field('access_token', access_token)
-                        .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.missing-prj.zip')))
+                        .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/shapefile.missing-prj.zip')))
                         .expect(httpStatus.OK)
                         .end(function (err, res) {
                             assert.ifError(err);

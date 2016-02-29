@@ -21,7 +21,7 @@ var File = require('../../models/file');
 
 module.exports = function () {
 
-    describe('Import shapefile.missing-prj.zip', function () {
+    describe('Import', function () {
 
         before(function(callback) {
             async.series([helpers.create_project], callback);
@@ -42,7 +42,7 @@ module.exports = function () {
 	                    api.post(endpoints.import.post)
 		                    .type('form')
 		                    .field('access_token', access_token)
-		                    .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.missing-prj.zip')))
+		                    .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/shapefile.missing-prj.zip')))
 		                    .expect(httpStatus.OK)
 		                    .end(function (err, res) {
 		                    	if (err) {
