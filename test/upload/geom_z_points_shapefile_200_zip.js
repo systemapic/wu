@@ -134,7 +134,7 @@ module.exports = function () {
 
                         expect(status.upload_success).to.exist;
                         expect(status.status).to.be.equal('Done');
-                        expect(status.rows_count).to.be.equal('108');
+                        expect(status.rows_count).to.be.equal('3578');
                         expect(status.user_id).to.be.equal(helpers.test_user.uuid);
                         expect(status.data_type).to.be.equal('vector');
                         done();

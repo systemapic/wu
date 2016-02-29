@@ -21,7 +21,7 @@ var File = require('../../models/file');
 
 module.exports = function () {
 
-    describe('Import parkland.polygon.200.geojson', function () {
+    describe('Import snow.raster.200.tif', function () {
 
         before(function(callback) {
             async.series([helpers.create_project], callback);
@@ -34,7 +34,7 @@ module.exports = function () {
         describe(endpoints.import.post, function () {
             this.slow(500);
 
-            context('parkland.polygon.200.geojson', function () {
+            context('snow.raster.200.tif', function () {
                 this.timeout(21000);
 
                 it('upload', function (done) {
@@ -42,7 +42,7 @@ module.exports = function () {
                         api.post(endpoints.import.post)
                             .type('form')
                             .field('access_token', access_token)
-                            .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/parkland.polygon.200.geojson')))
+                            .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/snow.raster.200.tif')))
                             .expect(httpStatus.OK)
                             .end(function (err, res) {
                                 if (err) {
@@ -54,7 +54,7 @@ module.exports = function () {
                                 expect(result.file_id).to.exist;
                                 expect(result.user_id).to.exist;
                                 expect(result.upload_success).to.exist;
-                                expect(result.filename).to.be.equal('parkland.polygon.200.geojson');
+                                expect(result.filename).to.be.equal('snow.raster.200.tif');
                                 expect(result.status).to.be.equal('Processing');
 
                                 tmp.file_id = result.file_id;
@@ -78,7 +78,7 @@ module.exports = function () {
                                 expect(result.file_id).to.exist;
                                 expect(result.user_id).to.exist;
                                 expect(result.upload_success).to.exist;
-                                expect(result.filename).to.be.equal('parkland.polygon.200.geojson');
+                                expect(result.filename).to.be.equal('snow.raster.200.tif');
                                 expect(result.status).to.be.equal('Processing');
                                 done();
                             });
@@ -94,7 +94,7 @@ module.exports = function () {
         this.slow(500);
 
         it('should be processed', function (done) {
-            this.timeout(11000);
+            this.timeout(210000);
             this.slow(5000);
 
             // check for processing status
@@ -134,9 +134,9 @@ module.exports = function () {
 
                         expect(status.upload_success).to.exist;
                         expect(status.status).to.be.equal('Done');
-                        expect(status.rows_count).to.be.equal('635');
-                        expect(status.user_id).to.be.equal(helpers.test_user.uuid);
-                        expect(status.data_type).to.be.equal('vector');
+                        expect(status.filename).to.be.equal('snow.raster.200.tif');
+                        expect(status.error_code).to.be.null;
+                        expect(status.error_text).to.be.null;
                         done();
                     });
             })
@@ -164,9 +164,9 @@ module.exports = function () {
 
                         var result = helpers.parse(res.text);
 
-                        expect(result.file.type).to.be.equal('postgis');
-                        expect(result.file.originalName).to.be.equal('parkland.polygon.200.geojson');
-                        expect(result.file.name).to.be.equal('parkland.polygon.200');
+                        expect(result.file.type).to.be.equal('raster');
+                        expect(result.file.originalName).to.be.equal('snow.raster.200.tif');
+                        expect(result.file.name).to.be.equal('snow.raster.200');
                         done();
                     });
             });
@@ -185,11 +185,7 @@ module.exports = function () {
 
             ops.push(function (callback) {
 
-                relatedLayer.data = {
-                    postgis: {
-                        table_name: tmp.file_id
-                    }
-                };
+                relatedLayer.file = tmp.file_id;
 
                 helpers.create_layer_by_parameters(relatedLayer, function (err, res) {
                     if (err) {
