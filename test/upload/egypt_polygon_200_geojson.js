@@ -74,7 +74,6 @@ module.exports = function () {
 	                    	}
 
 	                        var result = helpers.parse(res.text);
-	                        console.log(result);
 	                        expect(result.file_id).to.exist;
 	                        expect(result.user_id).to.exist;
 	                        expect(result.upload_success).to.exist;
