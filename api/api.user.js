@@ -253,7 +253,6 @@ module.exports = api.user = {
 
 	acceptContactRequest : function (req, res) {
 
-
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var request_token = path[4];
@@ -284,26 +283,49 @@ module.exports = api.user = {
 
 					r_user.contact_list.addToSet(c_user._id);
 					c_user.contact_list.addToSet(r_user._id);
-
-
 					r_user.save(function (err) {
-						console.log('saved r_user', err);
 					});
 					c_user.save(function (err) {
-						console.log('saved c_user', err);
 					});
 
-
-
 				});
-
 			});
-
-
-
 		});
 
-		res.end('ok'); // todo
+		// res.redirect('/');
+		res.end();
+	},
+
+	_addContacts : function (user_a, user_b, done) {
+		User.findOne({uuid : user_a})
+		.exec(function (err, user_a) {
+			if (err) {
+				done && done(err);
+				return;
+			}
+			User.findOne({uuid : user_b})
+			.exec(function (err, user_b) {
+				if (err) {
+					done && done(err);
+					return;
+				}
+				user_a.contact_list.addToSet(user_b._id);
+				user_b.contact_list.addToSet(user_a._id);
+				user_a.save(function (err) {
+					if (err) {
+						done && done(err);
+						return;
+					}
+					user_b.save(function (err) {
+						if (err) {
+							done && done(err);
+							return;
+						}
+						done && done(err);
+					});
+				});
+			});
+		});
 	},
 
 	// from shareable link flow
@@ -834,6 +856,8 @@ module.exports = api.user = {
 
 		options = options || {};
 
+		console.log('_acceptInvite', options);
+
 		// check if valid request
 		if (!options.invite_token) {
 			missing.push('invite_token');
@@ -853,11 +877,23 @@ module.exports = api.user = {
 			api.redis.tokens.get(invite_id, callback);
 		});
 
-		// get projects
+		// add contacts
 		ops.push(function (inviteJSON, callback) {
 			// parse
 			invitation = JSON.parse(inviteJSON);
 			if (!invitation) return callback('Invitation is expired or does not exist.');
+
+			var invited_by = invitation.invited_by;
+
+			api.user._addContacts(invited_by, user.uuid, function (err) {
+				callback(null, invitation);
+			});
+		});
+
+		// get projects
+		ops.push(function (invitation, callback) {
+			
+			console.log('invitation: ', invitation);
 
 			callback(null, {
 				read : invitation.access.read,
@@ -895,6 +931,9 @@ module.exports = api.user = {
 				callback(null, projectAccess);	
 			}
 		});
+
+
+		// todo: add contacts
 
 		// done
 		async.waterfall(ops, function (err, results) {
