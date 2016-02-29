@@ -97,31 +97,6 @@ module.exports = function () {
             });
         });
 
-        it ('should respond with status code *** if user try update uuid of layer', function (done) {
-            token(function (err, access_token) {
-                if (err) {
-                    return done(err);
-                }
-
-                api.post(endpoints.layers.update)
-                    .send({
-                        layer: tmpLayer.uuid,
-                        access_token: access_token,
-                        uuid: "new layer uuid"
-                    })
-                    .expect(httpStatus.BAD_REQUEST)
-                    .end(function (err, res) {
-                        if (err) {
-                            return done(err);
-                        }
-
-                        var result = helpers.parse(res.text);
-                        expect(result.error.message).to.be.equal(expected.uuid_can_not_be_changed.errorMessage);
-                        done();
-                    });
-            });
-        });
-
         it('should respond with status code 200 and update layer correctly', function (done) {
             token(function (err, access_token) {
                 if (err) return done(err);
