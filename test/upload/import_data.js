@@ -157,12 +157,12 @@ module.exports = function () {
 
             it('should be processed', function (done) {       
                 this.timeout(11000);     
-                this.slow(5000);     
+                this.slow(5000);
 
+                token(function (err, access_token) {
                 // check for processing status
-                var processingInterval = setInterval(function () {
+                    var processingInterval = setInterval(function () {
                     process.stdout.write('.');
-                    token(function (err, access_token) {
                         api.get(endpoints.import.status)
                         .query({ file_id : tmp.file_id, access_token : access_token})
                         .end(function (err, res) {
@@ -175,8 +175,8 @@ module.exports = function () {
                                 done();
                             }
                         });
-                    });
-                }, 500);
+                    }, 500);
+                });
 
             });
 

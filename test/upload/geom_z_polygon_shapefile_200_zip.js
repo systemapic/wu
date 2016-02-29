@@ -98,9 +98,9 @@ module.exports = function () {
             this.slow(5000);
 
             // check for processing status
-            var processingInterval = setInterval(function () {
+            token(function (err, access_token) {
+                var processingInterval = setInterval(function () {
                 process.stdout.write('.');
-                token(function (err, access_token) {
                     api.get(endpoints.import.status)
                         .query({ file_id : tmp.file_id, access_token : access_token})
                         .end(function (err, res) {
@@ -115,8 +115,8 @@ module.exports = function () {
                                 done();
                             }
                         });
-                });
-            }, 500);
+                }, 500);
+            });
 
         });
 
