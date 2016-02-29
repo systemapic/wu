@@ -21,7 +21,7 @@ var File = require('../../models/file');
 
 module.exports = function () {
 
-    describe('Import two_zipped_geojson.error.zip', function () {
+    describe('Import', function () {
 
         before(function(callback) {
             async.series([helpers.create_project], callback);

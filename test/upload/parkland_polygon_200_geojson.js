@@ -21,7 +21,7 @@ var File = require('../../models/file');
 
 module.exports = function () {
 
-    describe('Import parkland.polygon.200.geojson', function () {
+    describe('Import', function () {
 
         before(function(callback) {
             async.series([helpers.create_project], callback);
