@@ -77,6 +77,7 @@ module.exports = function () {
 	                        expect(result.file_id).to.exist;
 	                        expect(result.user_id).to.exist;
 	                        expect(result.upload_success).to.exist;
+                            expect(result.upload_success).to.be.true;
 	                        expect(result.filename).to.be.equal('egypt.polygon.200.geojson');
 	                        expect(result.status).to.be.equal('Processing');
 	                        done();

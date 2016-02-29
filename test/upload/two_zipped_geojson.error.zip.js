@@ -111,6 +111,7 @@ module.exports = function () {
                     var status = helpers.parse(res.text);
 
                     expect(status.upload_success).to.exist;
+                    expect(result.upload_success).to.be.false;
                     expect(status.status).to.be.equal('Failed');
                     expect(status.user_id).to.be.equal(helpers.test_user.uuid);
                     done();
