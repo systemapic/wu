@@ -110,6 +110,8 @@ module.exports = api.file = {
 		var userUuid = options.user.uuid,
 		    file_id = options.file._id;
 
+		    console.log('add addNewFileToUser', options);
+
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
@@ -121,6 +123,7 @@ module.exports = api.file = {
 			
 			// save
 			user.save(function (err, doc) {
+				console.log('saved addNewFileToUser', err, doc);
 				done(err);
 			});
 		});
@@ -1269,6 +1272,51 @@ module.exports = api.file = {
 		});
 	},
 
+
+	create : function (req, res) {
+
+		console.log('*********************************** create    r', req.body);
+
+		var ops = {};
+		var options = req.body;
+		var user = req.user;
+		var dataset;
+
+		ops.create = function (callback) {
+			// override important fields
+			options.uuid = 'file_' + api.utils.getRandomChars(20);
+			options.createdBy = user.uuid;
+
+			api.file.createModel(options, function (err, fileModel) {
+				if (err) return callback(err);
+				console.log('created filemodel', fileModel);
+
+				dataset = fileModel;
+				callback(null);
+			});
+		};
+
+		ops.add = function (callback) {
+			api.file.addNewFileToUser({
+				user : user,
+				file : dataset
+			}, callback);
+		}
+
+		async.series(ops, function (err, results) {
+			if (err) return res.send(err);
+			
+
+			res.send(dataset);
+		})
+			// add to user
+						
+		// todo: check valid fields
+		// todo: check if OK with missing .files etc.
+
+		
+	},
+
 	createModel : function (options, callback) {
 
 		var file 		= new File();
@@ -1284,7 +1332,6 @@ module.exports = api.file = {
 		file.dataSize 		= options.dataSize;
 		file.data 		= options.data;
 
-
 		file.save(function (err, doc) {
 			// console.log('file model created:', err, doc);
 			if (err) console.log(err);
@@ -1295,7 +1342,7 @@ module.exports = api.file = {
 	// new: postgis file model
 	_createModel : function (fileModel, callback) {
 		var file = new File();
-		for (f in fileModel) {
+		for (var f in fileModel) {
 			file[f] = fileModel[f];
 			file.markModified(f);
 		}

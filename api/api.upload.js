@@ -449,7 +449,10 @@ module.exports = api.upload = {
 				dataSize : u.size
 			};
 
-			if (u.data_type == 'vector') {
+			console.log('########################### create file model');
+			console.log('u:', u);
+
+			if (u.data_type == 'vector' || u.data_type == 'raster') {
 				fileModel.type = 'postgis';
 				fileModel.data = {
 					postgis : {
@@ -457,13 +460,6 @@ module.exports = api.upload = {
 						table_name 	: u.table_name,
 						data_type 	: u.data_type,
 						original_format : u.original_format
-					}
-				};
-			} else {
-				fileModel.type = 'raster';
-				fileModel.data = {
-					raster : {
-						file_id : file_id
 					}
 				};
 			}
@@ -516,6 +512,23 @@ module.exports = api.upload = {
 			res.send(uploadStatus || { error : 'Upload ID not found or expired.' });
 		});
 	},
+
+	// gets queried from pile.js
+	setUploadStatus : function (req, res) {
+		var uploadStatus = req.body.upload_status;
+		var file_id = uploadStatus.file_id;
+		var file_id_key = 'uploadStatus:' + file_id;
+
+		console.log('_________ SET UPLOAD STATYUS!!', uploadStatus);
+
+		api.redis.layers.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
+			if (err) return api.error.general(req, res, err);
+			console.log('err??', err);
+			res.send(uploadStatus);
+			// res.send(uploadStatus || { error : 'Upload ID not found or expired.' });
+		});
+	},
+
 
 	untar : function (options, done) {
 		var tarfile = options.files.data.path,

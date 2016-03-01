@@ -511,6 +511,9 @@ module.exports = function(app) {
 	// change to /api/import/status
 	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
 	app.get('/v2/data/import/status', checkAccess, api.upload.getUploadStatus, errorHandler);
+	
+
+	app.post('/v2/data/import/status', checkAccess, api.upload.setUploadStatus, errorHandler);
 
 	/**
 	 * @apiIgnore
@@ -983,6 +986,13 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/update
 	app.post('/v2/data/update', checkAccess, api.file.update, errorHandler);
+
+
+	
+	// =====================================
+	// CREATE DATASET ======================
+	// =====================================
+	app.post('/v2/data/create', checkAccess, api.file.create, errorHandler);
 
 	/**
 	* @api {post} /v2/data/layers Get layers

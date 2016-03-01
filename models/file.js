@@ -1,7 +1,7 @@
 // app/models/user.js
 // load the things we need
 var mongoose = require('mongoose');
-var bcrypt   = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt-nodejs');
 var timestamps = require('mongoose-times');
 
 
@@ -23,11 +23,10 @@ var fileSchema = mongoose.Schema({
 	category        :  String,
 	version         :  Number,        
 	status          :  String,        // current, archived, etc...
-   
 	type            :  String,
 	format          : [String],       // .shp, .kml, .zip, .jpg
    
-   	styleTemplates : [String], // array of JSON
+   	styleTemplates  : [String], // array of JSON
 
 	data : {
 
@@ -39,21 +38,14 @@ var fileSchema = mongoose.Schema({
 			metadata : String,
 		}, 	
 
-		raster : {
-			file_id : String,
-			metadata : String
-		},	
-		
+		// deprecated, rasters now in postgis
+		// raster : {
+		// 	file_id : String,
+		// 	metadata : String
+		// },	
+	
 
-
-		// shapefiles : [String],        	// can be several files 	// todo: remove? no need - all geo is geo/topojson
-		// geojson    : String,		// geojson-adlskmdsalkdsmad-saslkdmasldksa.geojson
-		// raster	   : String,
-		// topojson   : String,
-		// document   : String,		// also not needed??
-		// other      : [String],		// also not needed??
-		// cartocss   : String,		// cartocss ID 
-
+		// todo: clean this up!
 		image : {
 			file : String, 
 			dimensions  : {
