@@ -1890,18 +1890,6 @@ module.exports = function(app) {
 	// ===================================== 
 	app.post('/v2/users/password', api.auth.resetPassword, errorHandler);
 
-
-	// todo: remove
-	// =====================================
-	// ZXCVBN DICTIONARY =================
-	// ===================================== 
-	// change to /api/... 
-	app.get('/zxcvbn.js', function (req, res) {
-		fs.readFile('../public/js/lib/zxcvbn/zxcvbn.js', function (err, data) {
-			res.send(data);
-		});
-	}, errorHandler);
-
 	// ===================================== // todo: rename route to /api/config/client.js
 	// SERVER CLIENT CONFIG ================
 	// =====================================
