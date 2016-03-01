@@ -388,7 +388,6 @@ module.exports = function(grunt) {
 					// 'public/js/lib/mapbox.js/mapbox.2.1.4.js',
 					// 'public/js/src/controls/control.spinningmap.js',
 					// 'public/js/src/config/login-config.js',
-					// 'public/js/lib/zxcvbn/zxcvbn-async.js',
 					// 'public/js/src/core/login.js',
 
 					'public/js/src/core/class.js',
@@ -397,7 +396,7 @@ module.exports = function(grunt) {
 				],
 
 				dest : 'public/dist/tmp/login.combined.js'
-			}			
+			}
 
 		},
 

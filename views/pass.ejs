@@ -11,11 +11,6 @@
 		.blue { color: blue;}
 		.green {color: green;}
 	</style>
-
-	<script src='js/lib/zxcvbn/zxcvbn-async.js'></script>
-
-
-	
 </head>
 <body>
 <div class="container">
@@ -40,23 +35,6 @@
 </div>
 
 <script>
-zxcvbn_load_hook = function () {
-	console.log('zxcvbn loaded');
-
-	var p = document.getElementById('password-input');
-	var s = document.getElementById('password-strength');
-	p.onkeydown = function () {
-		console.log(p);
-		var password = p.value;
-		console.log('pass:', password);
-		var score = zxcvbn(password);
-
-		s.innerHTML = 'Password strength: ' + prettyStrength(score.score);
-		console.log(score);
-	}
-
-}
-
 
 function prettyStrength (s) {
 	if (s==0) return '<div class="red">Weak</div>';
