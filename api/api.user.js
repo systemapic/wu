@@ -292,7 +292,7 @@ module.exports = api.user = {
 			});
 		});
 
-		res.render('../../views/addContact.ejs', {
+		res.render('../../views/acceptContact.ejs', {
 			access_token : req.session.access_token || {}
 		});
 	},
