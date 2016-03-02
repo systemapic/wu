@@ -292,8 +292,9 @@ module.exports = api.user = {
 			});
 		});
 
-		// res.redirect('/');
-		res.end();
+		res.render('../../views/addContact.ejs', {
+			access_token : req.session.access_token || {}
+		});
 	},
 
 	_addContacts : function (user_a, user_b, done) {
