@@ -916,6 +916,8 @@ module.exports = api.file = {
 		var account = req.user;
 		var ops = [];
 
+		console.log('req.body', req.body);
+
 		if (!fileUuid) {
 			return api.error.missingInformation(req, res);
 		}

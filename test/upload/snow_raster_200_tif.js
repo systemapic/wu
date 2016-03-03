@@ -164,7 +164,7 @@ module.exports = function () {
 
                         var result = helpers.parse(res.text);
 
-                        expect(result.file.type).to.be.equal('raster');
+                        expect(result.file.type).to.be.equal('postgis');
                         expect(result.file.originalName).to.be.equal('snow.raster.200.tif');
                         expect(result.file.name).to.be.equal('snow.raster.200');
                         done();
