@@ -558,7 +558,7 @@ module.exports = api.file = {
 			User
 			.findOne({uuid : user.uuid})
 			.exec(function (err, u) {
-				u.files.pull(file._id);				
+				u.files.pull(file._id);
 				u.markModified('files');
 				u.save(function (err) {
 
