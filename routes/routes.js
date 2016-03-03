@@ -26,7 +26,7 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errorHandler = require('../middleware/error-handler')();
-var slackNotification = require('../middleware/slack')();
+var slackNotification = require('../middleware/slack-notification')();
 
 // api
 var api = require('../api/api');
