@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 var async = require('async');
 var fs = require('fs');
 var crypto = require('crypto');
-var request = require('supertest');
 var User = require('../../models/user');
 var Project = require('../../models/project');
 var Layer = require('../../models/layer');
@@ -30,11 +29,11 @@ module.exports = function () {
         // prepare test
         before(function(callback) {
             // create tmp user, project
-            async.series([helpers.create_user, helpers.create_project], callback);
+            async.series([helpers.create_project], callback);
         });
         after(function(callback) {
             // delete tmp user, project
-            async.series([helpers.delete_project, helpers.delete_user], callback);
+            async.series([helpers.delete_project], callback);
         });
 
 
@@ -57,7 +56,7 @@ module.exports = function () {
                         api.post(endpoints.import.post)
                         .type('form')
                         .field('access_token', access_token)
-                        .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.polygon.zip')))
+                        .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/shapefile.polygon.zip')))
                         .expect(httpStatus.OK)
                         .end(function (err, res) {
                             assert.ifError(err);
@@ -106,7 +105,7 @@ module.exports = function () {
                         .type('form')
                         .field('userUuid', util.test_user.uuid)
                         .field('access_token', access_token)
-                        .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.missing-prj.zip')))
+                        .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/shapefile.missing-prj.zip')))
                         .expect(httpStatus.OK)
                         .end(function (err, res) {
                             assert.ifError(err);
@@ -158,12 +157,12 @@ module.exports = function () {
 
             it('should be processed', function (done) {       
                 this.timeout(11000);     
-                this.slow(5000);     
+                this.slow(5000);
 
+                token(function (err, access_token) {
                 // check for processing status
-                var processingInterval = setInterval(function () {
+                    var processingInterval = setInterval(function () {
                     process.stdout.write('.');
-                    token(function (err, access_token) {
                         api.get(endpoints.import.status)
                         .query({ file_id : tmp.file_id, access_token : access_token})
                         .end(function (err, res) {
@@ -176,8 +175,8 @@ module.exports = function () {
                                 done();
                             }
                         });
-                    });
-                }, 500);
+                    }, 500);
+                });
 
             });
 
