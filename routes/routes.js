@@ -26,6 +26,7 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errorHandler = require('../middleware/error-handler')();
+var slackNotification = require('../middleware/slack')();
 
 // api
 var api = require('../api/api');
@@ -97,7 +98,7 @@ module.exports = function(app) {
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/v2/projects/create', checkAccess, api.project.create, errorHandler);
+	app.post('/v2/projects/create', checkAccess, api.project.create, slackNotification, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/delete Delete a project
