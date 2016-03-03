@@ -101,18 +101,20 @@ module.exports = api.import = {
 					}
 				});
 
-				// get uploadStatus, get meta, set to file
-				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
+				api.postgis.import(opts, callback);
 
-					if (0 && uploadStatus.data_type == 'raster') {
-						api.geo.handleRaster(opts, callback);
+				// // get uploadStatus, get meta, set to file
+				// api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
-					} else {
-						// postgis import
-						api.postgis.import(opts, callback);
-					}
+				// 	// if (0 && uploadStatus.data_type == 'raster') {
+				// 	// 	api.geo.handleRaster(opts, callback);
 
-				});
+				// 	// } else {
+				// 		// postgis import
+				// 		api.postgis.import(opts, callback);
+				// 	// }
+
+				// });
 
 			});
 		});
@@ -124,14 +126,22 @@ module.exports = api.import = {
 				
 				// get uploadStatus, get meta, set to file
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
-
+					console.log('GOT ----------> uploadStatus', uploadStatus);
 					var meta = uploadStatus.metadata;
+
+					console.log('TYPE OF META', typeof meta);
 
 					// save meta to file
 					if (uploadStatus.data_type == 'vector') {
 						file.data.postgis.metadata = meta;
 					} else {
-						file.data.raster.metadata = JSON.stringify(meta);
+						file.data.postgis.metadata = JSON.stringify(meta);
+					}
+
+					if (_.isObject(meta)) {
+						file.data.postgis.metadata = api.utils.stringify(meta);
+					} else {
+						file.data.postgis.metadata = meta;
 					}
 					
 					// save file

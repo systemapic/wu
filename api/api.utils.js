@@ -65,6 +65,15 @@ module.exports = api.utils = {
 		return object;
 	},
 
+	stringify : function (obj) {
+		try {
+			var str = JSON.stringify(obj);	
+		} catch (e) {
+			var str = false;
+		}
+		return str;
+	},
+
 	updateStatistics : function () {
 
 		// get stats
