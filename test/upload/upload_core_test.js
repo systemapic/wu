@@ -9,18 +9,18 @@ var geom_zPolygonShapefileZip = require('./geom_z_polygon_shapefile_200_zip');
 var parklandPolygonGeojson = require('./parkland_polygon_200_geojson');
 var snowRasterTif = require('./snow_raster_200_tif');
 
-describe('Upload data', function () {
+describe('Import', function () {
 
     before(function(done) { helpers.create_user(done); });
     after(function(done) { helpers.delete_user(done); });
 
     importData();
-    importPolygonEgyptZip();
-    twoZippedShapesZipError();
-    shapefileMissingPrjZip();
-    rasterEcwZip();
-    geom_zPointsShapeFileZip();
-    geom_zPolygonShapefileZip();
-    parklandPolygonGeojson();
-    snowRasterTif();
+    // importPolygonEgyptZip();
+    // twoZippedShapesZipError();
+    // shapefileMissingPrjZip();
+    // rasterEcwZip();
+    // geom_zPointsShapeFileZip();
+    // geom_zPolygonShapefileZip();
+    // parklandPolygonGeojson();
+    // snowRasterTif();
 });
