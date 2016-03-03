@@ -521,7 +521,7 @@ module.exports = api.file = {
 		
 		var file = options.file;
 		var user = options.user;
-		var data = file.data.raster;
+		var data = file.data.postgis;
 		var file_id = data.file_id;
 		var removedObjects = {};
 		var ops = [];
@@ -536,8 +536,8 @@ module.exports = api.file = {
 		// get file model
 		ops.push(function (callback) {
 			File
-				.findOne({uuid : file_id})
-				.exec(callback);
+			.findOne({uuid : file_id})
+			.exec(callback);
 		});
 
 		// check permissions
