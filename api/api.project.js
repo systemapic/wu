@@ -45,7 +45,7 @@ var api = module.parent.exports;
 // exports
 module.exports = api.project = {
 
-	setAccess : function (req, res) {
+	setAccess : function (req, res, next) {
 
 		var user = req.user;
 		var options = req.body;
@@ -390,7 +390,7 @@ module.exports = api.project = {
 	// #########################################
 	// ###  API: Create Project              ###
 	// #########################################
-	// createProject : function (req, res) {
+	// createProject : function (req, res, next) {
 	create : function (req, res, next) {
 		var store = req.body || {};
 		var user = req.user;
@@ -473,7 +473,7 @@ module.exports = api.project = {
 			});
 
 			// return
-			api.project._returnProject(req, res, project);
+			api.project._returnProject(req, res, project, next);
 		});
 	},
 
@@ -879,7 +879,7 @@ module.exports = api.project = {
 		// });
 	},
 
-	_returnProject : function (req, res, project, err) {
+	_returnProject : function (req, res, project, next) {
 		if (!project) return api.error.general(req, res, err);
 
 		Project
@@ -888,10 +888,12 @@ module.exports = api.project = {
 			.populate('layers')
 			.populate('roles')
 			.exec(function (err, project) {
-				res.end(JSON.stringify({
+
+				req.response = {
 					error : err,
 					project: project
-				}));
+				};
+				next();
 			});
 	},
 
