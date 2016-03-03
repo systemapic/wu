@@ -15,12 +15,12 @@ describe('Import', function () {
     after(function(done) { helpers.delete_user(done); });
 
     importData();
-    // importPolygonEgyptZip();
-    // twoZippedShapesZipError();
-    // shapefileMissingPrjZip();
-    // rasterEcwZip();
-    // geom_zPointsShapeFileZip();
-    // geom_zPolygonShapefileZip();
-    // parklandPolygonGeojson();
-    // snowRasterTif();
+    importPolygonEgyptZip();
+    twoZippedShapesZipError();
+    shapefileMissingPrjZip();
+    rasterEcwZip();
+    geom_zPointsShapeFileZip();
+    geom_zPolygonShapefileZip();
+    parklandPolygonGeojson();
+    snowRasterTif();
 });
