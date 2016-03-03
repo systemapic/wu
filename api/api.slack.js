@@ -48,11 +48,10 @@ var slack = new nodeSlack(api.config.slack.webhook);
 module.exports = api.slack = { 
 
 	_send : function (options) {
-		var text = options.text,
-		    attachments = options.attachments,
-		    icon = options.icon,
-		    channel = options.channel;
-
+		var text = options.text;
+		var attachments = options.attachments;
+		var icon = options.icon;
+		var channel = options.channel;
 		var slack_options = {
 			text 		: text,
 			channel 	: channel || api.config.slack.channel,
@@ -60,8 +59,8 @@ module.exports = api.slack = {
 			icon_url 	: api.config.slack.icon,
 			unfurl_links 	: true,
 			link_names 	: 1,
-			attachments 	: attachments,
-		}
+			attachments 	: attachments
+		};
 
 		if (options.icon_emoji) {
 			slack_options.icon_emoji = options.icon_emoji;
@@ -89,8 +88,7 @@ module.exports = api.slack = {
 
 		// send
 		api.slack._send({
-			text : text,
-			// icon_emoji : ":sunglasses:"
+			text : text
 		});
 	},
 
@@ -98,12 +96,12 @@ module.exports = api.slack = {
 
 		console.log('userEvent', options);
 
-		var user = options.user,
-		    event = options.event,
-		    description = options.description,
-		    timestamp = options.timestamp,
-		    custom_options = options.options,
-		    ops = [];
+		var user = options.user;
+		var event = options.event;
+		var description = options.description;
+		var timestamp = options.timestamp;
+		var custom_options = options.options;
+		var ops = [];
 
 
 		// custom options (screenshot)
@@ -145,7 +143,7 @@ module.exports = api.slack = {
 				channel : api.config.slack.monitor,
 				attachments : attachments
 			});
-		})
+		});
 
 		async.series(ops, function (err) {
 		
@@ -159,37 +157,36 @@ module.exports = api.slack = {
 		if (!options.embed_image) return false;
 
 		var attachments = [{
-			image_url : options.embed_image,
+			image_url : options.embed_image
 		}];
 
 		return attachments;
 	},
 
 	createdProject : function (options) {
-		var project = options.project,
-		    user = options.user;
+		var project = options.project;
+		var user = options.user;
 
 		// set vars
-		var baseurl 	= api.config.slack.baseurl,
-		    projectName = project.name,
-		    fullName 	= user.firstName + user.lastName,
-		    url 	= baseurl + project.slug,
-		    text 	= fullName + ' created a project: ' + url;
+		var baseurl 	= api.config.slack.baseurl;
+		var projectName = project.name;
+		var fullName 	= user.firstName + user.lastName;
+		var url 	= baseurl + project.slug;
+		var text 	= fullName + ' created a project: ' + url;
 
 		// send
 		api.slack._send({text : text});
 	},
 
 	deletedProject : function (options) {
-		var project = options.project,
-		    user = options.user;
-
+		var project = options.project;
+		var user = options.user;
 		// set vars
-		var baseurl 	= api.config.slack.baseurl,
-		    projectName = project.name,
-		    fullName 	= user.firstName + user.lastName,
-		    url 	= baseurl + project.slug,
-		    text 	= fullName + ' deleted a project: ' + projectName;
+		var baseurl 	= api.config.slack.baseurl;
+		var projectName = project.name;
+		var fullName 	= user.firstName + user.lastName;
+		var url 	= baseurl + project.slug;
+		var text 	= fullName + ' deleted a project: ' + projectName;
 
 		// send to slack
 		api.slack._send({text: text});
@@ -198,13 +195,13 @@ module.exports = api.slack = {
 
 
 	loggedIn : function (options) {
-		var user = options.user,
-		    fullName = user.firstName + ' ' + user.lastName,
-		    text = fullName + ' logged in to ' + api.config.slack.baseurl;
+		var user = options.user;
+		var fullName = user.firstName + ' ' + user.lastName;
+		var text = fullName + ' logged in to ' + api.config.slack.baseurl;
 
 		// send
 		api.slack._send({ 
-			text : text,
+			text : text
 		});
-	},
+	}
 };
