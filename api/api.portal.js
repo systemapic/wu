@@ -408,7 +408,7 @@ module.exports = api.portal = {
 
 			res.send({
 				status : status
-			});
+			})
 		});
 
 	},

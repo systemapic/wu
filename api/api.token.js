@@ -216,11 +216,12 @@ module.exports = api.token = {
 			}
 
 			res.send(access_token);
+			next();
 		});
 	},
 
 	// route: check if existing session, returns tokens only
-	checkSession : function (req, res) {
+	checkSession : function (req, res, next) {
 
 		var ops = [];
 
@@ -230,6 +231,7 @@ module.exports = api.token = {
 		// no session, return public user
 		if (!tokens) return api.token.getPublicToken(function (err, public_token) {
 			res.send(public_token);
+			next();
 		});
 
 		// got some session, either public or user
@@ -241,7 +243,7 @@ module.exports = api.token = {
 			});
 
 			// return user
-			res.send(tokens);
+			res.send(token);
 		});
 	},
 

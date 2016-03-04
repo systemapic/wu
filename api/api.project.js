@@ -101,16 +101,14 @@ module.exports = api.project = {
 
 					// return if err
 					if (err) {
-						req.response = {
+						return res.send({
 							error : err
-						};
-						return next();
+						});
 					}
 
 					// return project
-					req.response = p;
-					return next();
-				})
+					res.send(p);
+				});
 			});
 
 	},
@@ -163,8 +161,7 @@ module.exports = api.project = {
 				}
 
 				// return updated access
-				req.response = updatedProject.access
-				next();
+				res.send(updatedProject.access);
 			});
 
 		});
@@ -251,8 +248,7 @@ module.exports = api.project = {
 			}
 
 			// public project
-			req.response = public_project;
-			next();
+			res.send(public_project);
 		});
 	},
 
@@ -300,22 +296,18 @@ module.exports = api.project = {
 			var project = results.project;
 
 			if (!project) {
-				req.response = {};
-				return next();
+				return res.send({});
 			}
 
 			var got_access = api.project._checkProjectAccess(user, project);
 
 			// return project
 			if (got_access) {
-
-				req.response = project;
-				return next();
+				return res.send(project);
 			}
 
 			// no access
-			req.response = { error : 'No access.' };
-			next();
+			res.send({ error : 'No access.' });
 		});
 
 	},
@@ -660,10 +652,10 @@ module.exports = api.project = {
 			// });
 
 			// done
-			req.response = {
+			res.send({
 				project : project.uuid,
 				deleted : true
-			};
+			});
 			next();
 		})
 	},
@@ -735,8 +727,7 @@ module.exports = api.project = {
 				return next(err);
 			}
 			// done
-			req.response = result;
-			next();
+			res.send(result);
 		});
 	},
 
@@ -877,10 +868,9 @@ module.exports = api.project = {
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
-		req.response = {
+		res.send({
 			unique : true
-		};
-		return next();
+		});
 		
 		// var value = req.body.value,
 		//     clientUuid = req.body.client,
@@ -917,12 +907,10 @@ module.exports = api.project = {
 			.populate('layers')
 			.populate('roles')
 			.exec(function (err, project) {
-
-				req.response = {
+				res.send({
 					error : err,
 					project: project
-				};
-				next();
+				});
 			});
 	},
 
@@ -959,11 +947,10 @@ module.exports = api.project = {
 					});
 				}
 
-				req.response = {
+				res.send({
 					error: null,
 					hash : doc
-				};
-				next();
+				});
 			});
 	},
 
@@ -1060,11 +1047,10 @@ module.exports = api.project = {
 				return next(results[0]);
 			}
 
-			req.response = {
+			return res.send({
 				error: err || null,
 				hash : results[1]
-			};
-			next();
+			});
 		});
 
 	},
