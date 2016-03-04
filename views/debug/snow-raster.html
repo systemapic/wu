@@ -196,33 +196,7 @@
         ]
     };
 
-    function create_color_ramp(source) {
-
-        // create color ramp
-        var range = [-16, 16];
-        var color_ramp = ['#07000F', '#16032C', '#240546', '#2F0461', '#40097E', '#501099', '#5F16B3', '#721FD0', '#8429EB', '#923FF1', '#A259F5', '#B57AF9', '#C697FB', '#D5B1FF', '#E5CFFF', '#F4ECFF'];
-        var layers = [];
-        // 16 steps
-        for (var i = range[0]; i<range[1]; i++) {
-            console.log('i:', i);
-            var color = color_ramp[parseInt((range[1] + i)/2)];
-            layers.push({
-                "id": "deformation_" + i,
-                "type": "fill",
-                "source": source,
-                "source-layer": "layer",
-                "filter": ["==", "val", i],
-                "paint": {
-                    "fill-color": color
-                },
-                "layout": {},
-                "interactive" : true
-            });
-        }
-
-        return layers;
-
-    }
+   
 
 
 
@@ -256,11 +230,9 @@
 
         var layers = create_color_ramp('deformation-vector');
         console.log('alyer:L', layers);
-        // _.each(layers, map.addLayer);
-        // map.addLayer();
         layers.forEach(function (layer) {
             map.addLayer(layer);
-        })
+        });
 
     });
 
@@ -269,15 +241,27 @@
       
         map.featuresAt(e.point, {
             radius: 5,
-            layers : ['akersvatn']
+            // layers : ['akersvatn']
         }, function (err, features) {
             if (err) return console.log('err', err);
 
 
             if (features.length) {
 
+                var str = [];
+                // console.log('f', features.length);
+                // console.log('feat',features);
+                features.forEach(function (f) {
+                    str.push(JSON.stringify(f, null, 2));
+
+                    if (_.contains(f.layer.id, 'deformation')) {
+
+                        map.setPaintProperty(f.layer.id, 'fill-color', "red");
+                    }
+                });
+
                 // display feature properties
-                features_window.innerHTML = JSON.stringify(features[0], null, 2);
+                features_window.innerHTML = str.join('\n\n');
 
                 // get gid
                 // var gid = features[0].properties.gid;
@@ -307,7 +291,33 @@
     });
 
 
+     function create_color_ramp(source) {
 
+        // create color ramp
+        var range = [-16, 16];
+        var color_ramp = ['#07000F', '#16032C', '#240546', '#2F0461', '#40097E', '#501099', '#5F16B3', '#721FD0', '#8429EB', '#923FF1', '#A259F5', '#B57AF9', '#C697FB', '#D5B1FF', '#E5CFFF', '#F4ECFF'];
+        var layers = [];
+        // 16 steps
+        for (var i = range[0]; i<range[1]; i++) {
+            console.log('i:', i);
+            var color = color_ramp[parseInt((range[1] + i)/2)];
+            layers.push({
+                "id": "deformation_" + i,
+                "type": "fill",
+                "source": source,
+                "source-layer": "layer",
+                "filter": ["==", "val", i],
+                "paint": {
+                    "fill-color": color
+                },
+                "layout": {},
+                "interactive" : true
+            });
+        }
+
+        return layers;
+
+    }
 
 
 
