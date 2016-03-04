@@ -17,12 +17,12 @@ module.exports = function () {
     return function (req, res, next) {
         var slackMessage = req.slackMessage || {};
         var user = req.user || {};
-        var userId = user._id || null;
+        var userId = user._id || 'unauthorized';
 
-        slackMessage.text = util.format("User %s has performed an action %s. request: %s", userId || slackMessage.userId , req.originalUrl || slackMessage.action, JSON.stringify(req.body));
+        slackMessage.text = util.format("User %s has performed an action %s.", userId || slackMessage.userId , req.originalUrl || slackMessage.action);
 
         console.log("SLACKMESSAGE: ", slackMessage.text);
         api.slack._send(slackMessage);
-        res.send(JSON.stringify(req.response));
+        next();
     };
 };
