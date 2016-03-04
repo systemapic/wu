@@ -138,7 +138,7 @@ module.exports = function(app) {
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
-	app.post('/v2/projects/delete', checkAccess, api.project.deleteProject, errorHandler);
+	app.post('/v2/projects/delete', checkAccess, api.project.deleteProject, slackNotification, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/public Get a public project
@@ -200,7 +200,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK THAT PROJECT IS PUBLIC ========
 	// =====================================
-	app.get('/v2/projects/public', checkAccess, api.project.getPublic, errorHandler);
+	app.get('/v2/projects/public', checkAccess, api.project.getPublic, slackNotification, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/private Get private project
@@ -229,7 +229,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK THAT PROJECT IS PRIVATE =======
 	// =====================================
-	app.get('/v2/projects/private', checkAccess, api.project.getPrivate, errorHandler);
+	app.get('/v2/projects/private', checkAccess, api.project.getPrivate, slackNotification, errorHandler);
 
 	/**
 	* @api {get} /v2/status Get portal status
@@ -601,7 +601,7 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/v2/projects/update', checkAccess, api.project.update, errorHandler);
+	app.post('/v2/projects/update', checkAccess, api.project.update, slackNotification, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/slug/unique Unique project
@@ -623,14 +623,14 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/v2/projects/slug/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
+	app.post('/v2/projects/slug/unique', checkAccess, api.project.checkUniqueSlug, slackNotification, errorHandler);
 
 
 	// =====================================
 	// SET ACCESS ==========================
 	// =====================================
 	// app.post('/api/project/setAccess', checkAccess, function (req,res) {
-	app.post('/v2/projects/access', checkAccess, api.project.setAccess, errorHandler);
+	app.post('/v2/projects/access', checkAccess, api.project.setAccess, slackNotification, errorHandler);
 
 	/**
 	* @api {post} /v2/users/invite/project Add invites
@@ -676,7 +676,7 @@ module.exports = function(app) {
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	// change route to /api/project/invite
-	app.post('/v2/users/invite/project', checkAccess, api.project.addInvites, errorHandler);
+	app.post('/v2/users/invite/project', checkAccess, api.project.addInvites, slackNotification, errorHandler);
 
 
 	/**
@@ -728,7 +728,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/setHash
 	// app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
-	app.post('/v2/hashes', checkAccess, api.project.setHash, errorHandler);
+	app.post('/v2/hashes', checkAccess, api.project.setHash, slackNotification, errorHandler);
 
 	/**
 	* @api {get} /v2/hashes Get project hash
@@ -780,7 +780,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/getHash
 	// app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
-	app.get('/v2/hashes', checkAccess, api.project.getHash, errorHandler);
+	app.get('/v2/hashes', checkAccess, api.project.getHash, slackNotification, errorHandler);
 
 
 
