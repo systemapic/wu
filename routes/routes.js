@@ -1952,7 +1952,7 @@ module.exports = function(app) {
 	// DEBUG =====================
 	// =====================================
 	app.get('/api/debug', function (req, res) {
-		res.render('../../views/debug.ejs', {});
+		res.render('../../views/debug/debug.ejs', {});
 	}, errorHandler);
 
 	// =====================================
