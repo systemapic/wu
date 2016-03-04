@@ -16,6 +16,7 @@ module.exports = endpoint = {
         public          : '/v2/projects/public',
         private         : '/v2/projects/private',
         getLayers       : '/v2/projects/layers',
+        setAccess       : '/v2/projects/access',
         slug            : {
             unique      : '/v2/projects/slug/unique'
         }

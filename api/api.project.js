@@ -48,20 +48,35 @@ module.exports = api.project = {
 	setAccess : function (req, res, next) {
 
 		var user = req.user;
-		var options = req.body;
+		var options = req.body || {};
 		var projectAccess = options.access;
 		var projectUuid = options.project;
+		var missingRequiredRequestFields = [];
 
-		if (!projectUuid || !projectAccess) return api.error.missingInformation(req, res);
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project');			
+		}
+
+		if (!projectAccess) {
+			missingRequiredRequestFields.push('access');
+		}
+		
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-
 				// check if access to edit
 				var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
 
-				if (!canEdit) return api.error.general(req, res, 'No access.');
+				if (!canEdit) {
+					return next({
+						message: errors.no_access.errorMessage,
+						code: httpStatus.BAD_REQUEST
+					});
+				}
 
 				var currentAccess = project.access;
 
@@ -85,12 +100,16 @@ module.exports = api.project = {
 				project.save(function (err, p) {
 
 					// return if err
-					if (err) return res.json({
-						error : err
-					});
+					if (err) {
+						req.response = {
+							error : err
+						};
+						return next();
+					}
 
 					// return project
-					res.json(p);
+					req.response = p;
+					return next();
 				})
 			});
 
@@ -144,7 +163,8 @@ module.exports = api.project = {
 				}
 
 				// return updated access
-				res.send(updatedProject.access);
+				req.response = updatedProject.access
+				next();
 			});
 
 		});
@@ -227,11 +247,12 @@ module.exports = api.project = {
 			project_slug : project_slug
 		}, function (err, public_project) {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 
 			// public project
-			res.send(public_project);
+			req.response = public_project;
+			next();
 		});
 	},
 
@@ -279,18 +300,23 @@ module.exports = api.project = {
 			var project = results.project;
 
 			if (!project) {
-				return res.send({});
+				req.response = {};
+				return next();
 			}
 
 			var got_access = api.project._checkProjectAccess(user, project);
 
 			// return project
-			if (got_access) return res.send(project);
+			if (got_access) {
+
+				req.response = project;
+				return next();
+			}
 
 			// no access
-			res.send({ error : 'No access.' });
+			req.response = { error : 'No access.' };
+			next();
 		});
-
 
 	},
 
@@ -467,10 +493,10 @@ module.exports = api.project = {
 			}
 
 			// slack
-			api.slack.createdProject({
-				project : project,
-				user : user
-			});
+			// api.slack.createdProject({
+			// 	project : project,
+			// 	user : user
+			// });
 
 			// return
 			api.project._returnProject(req, res, project, next);
@@ -628,16 +654,17 @@ module.exports = api.project = {
 			}
 
 			// slack
-			api.slack.deletedProject({
-				project : project,
-				user : user
-			});
+			// api.slack.deletedProject({
+			// 	project : project,
+			// 	user : user
+			// });
 
 			// done
-			res.send({
+			req.response = {
 				project : project.uuid,
 				deleted : true
-			});
+			};
+			next();
 		})
 	},
 
@@ -708,7 +735,8 @@ module.exports = api.project = {
 				return next(err);
 			}
 			// done
-			res.send(result);
+			req.response = result;
+			next();
 		});
 	},
 
@@ -849,10 +877,11 @@ module.exports = api.project = {
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
-		return res.send({
+		req.response = {
 			unique : true
-		});
-
+		};
+		return next();
+		
 		// var value = req.body.value,
 		//     clientUuid = req.body.client,
 		//     projectUuid = req.body.project,
@@ -930,10 +959,11 @@ module.exports = api.project = {
 					});
 				}
 
-				res.send({
+				req.response = {
 					error: null,
 					hash : doc
-				});
+				};
+				next();
 			});
 	},
 
@@ -1030,10 +1060,11 @@ module.exports = api.project = {
 				return next(results[0]);
 			}
 
-			res.send({
+			req.response = {
 				error: err || null,
 				hash : results[1]
-			});
+			};
+			next();
 		});
 
 	},
