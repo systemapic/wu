@@ -827,6 +827,8 @@ module.exports = api.postgis = {
 	},
 
 	
+
+	// import raster into postgis
 	importRaster : function (options, done) {
 		var clientName 	= options.clientName;
 		var raster 	= options.files[0];
@@ -884,7 +886,7 @@ module.exports = api.postgis = {
 					table_name : file_id,
 					database_name : pg_db
 				}, function () {
-					callback(err, 'Raster imported successfully.');
+					callback(null, 'Raster imported successfully.');
 				});
 			});
 		} 
@@ -911,7 +913,7 @@ module.exports = api.postgis = {
 			}, function (err, metadata) {
 				if (err) return callback(err);
 
-				var metadataJSON = JSON.stringify(metadata);
+				var metadataJSON = api.utils.stringify(metadata);
 
 				// set upload status
 				api.upload.updateStatus(file_id, {
