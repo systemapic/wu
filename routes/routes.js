@@ -33,7 +33,9 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app) {
 
-
+	/**
+	* @apiSampleRequest https://dev3.systemapic.com
+	*/
 	// define apiDocs tokens
 	/**
 	* @apiDefine token
@@ -627,7 +629,7 @@ module.exports = function(app) {
 	// =====================================
 	app.post('/v2/projects/slug/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
 
-
+	//todo document 
 	// =====================================
 	// SET ACCESS ==========================
 	// =====================================
@@ -962,6 +964,15 @@ module.exports = function(app) {
 	* @apiGroup File
 	* @apiUse token
 	* @apiParam {String} uuid Uuid of file
+	* @apiParam {String} [name] New name file
+	* @apiParam {String} [description] New description
+	* @apiParam {Array} [keywords] Array of keywords
+	* @apiParam {String} [status] New file status
+	* @apiParam {String} [category] New file category
+	* @apiParam {Number} [version] New file version
+	* @apiParam {String} [copyright] New file copyright
+	* @apiParam {Object} [data] New data object
+	* @apiParam {Array} [styleTemplates] New array of styleTemplates object
 	*
 	* @apiSuccess {Array} updated Array of updated fields
 	* @apiSuccess {Object} file Updated file
@@ -970,8 +981,8 @@ module.exports = function(app) {
 	*   "updated": ['name', 'description'],
 	*   "file": {
 	*       lastUpdated: '2016-01-19T12:49:49.076Z',
-    	*       created: '2016-01-19T12:49:48.943Z',
-    	*       ... etc
+	*       created: '2016-01-19T12:49:48.943Z',
+	*       ... etc
 	*   }
 	* }
 	* @apiError File with uuid <code>uuid</code> doesn't exist. (422)
@@ -988,7 +999,32 @@ module.exports = function(app) {
 	app.post('/v2/data/update', checkAccess, api.file.update, errorHandler);
 
 
-	
+	/**
+	* @api {post} /v2/data/create Create file
+	* @apiName create
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} createdBy Uuid of created user
+	* @apiParam {String} createdByName Name of created user
+	* @apiParam {Array} files Array of file ids
+	* @apiParam {Object} access Access object with users, projects and clients arrays
+	* @apiParam {String} name Name of new file
+	* @apiParam {String} description Description of new file
+	* @apiParam {String} type Type of new file
+	* @apiParam {Array} format Array of strings with formats
+	* @apiParam {String} dataSize Data size of new file
+	* @apiParam {Object} data Data of new file
+	*
+	* @apiSuccess {Object} file created file
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "file": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+    *       created: '2016-01-19T12:49:48.943Z',
+    *       ... etc
+	*   }
+	* }
+	*/
 	// =====================================
 	// CREATE DATASET ======================
 	// =====================================
@@ -1212,7 +1248,7 @@ module.exports = function(app) {
 	app.post('/v2/projects/data', checkAccess, api.file.addFileToProject, errorHandler);
 
 	/**
-	* @api {post} /v2/layers/delete Delete data
+	* @api {post} /v2/layers/delete Delete layer
 	* @apiName delete
 	* @apiGroup Layer
 	* @apiUse token
