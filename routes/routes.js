@@ -512,6 +512,8 @@ module.exports = function(app) {
 	// change to /api/import/status
 	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
 	app.get('/v2/data/import/status', checkAccess, slackNotification, api.upload.getUploadStatus, errorHandler);
+	
+	app.post('/v2/data/import/status', checkAccess, slackNotification, api.upload.setUploadStatus, errorHandler);
 
 	/**
 	 * @apiIgnore
@@ -984,6 +986,13 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/update
 	app.post('/v2/data/update', checkAccess, slackNotification, api.file.update, errorHandler);
+
+
+	
+	// =====================================
+	// CREATE DATASET ======================
+	// =====================================
+	app.post('/v2/data/create', checkAccess, api.file.create, errorHandler);
 
 	/**
 	* @api {post} /v2/data/layers Get layers
@@ -1942,8 +1951,13 @@ module.exports = function(app) {
 	// =====================================
 	// DEBUG =====================
 	// =====================================
+<<<<<<< HEAD
 	app.get('/api/debug', slackNotification, function (req, res) {
 		res.render('../../views/debug.ejs', {});
+=======
+	app.get('/api/debug', function (req, res) {
+		res.render('../../views/debug/debug.ejs', {});
+>>>>>>> master
 	}, errorHandler);
 
 	// =====================================

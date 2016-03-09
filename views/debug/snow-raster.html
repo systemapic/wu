@@ -10,6 +10,7 @@
 
     <script src="/js/lib/debug/mapbox-gl-dev.js"></script>
     <script src="/js/lib/debug/pbf-dev.js"></script>
+    <script type="text/javascript" src="/js/lib/lodash/lodash.min.js"></script>
 
     <style> 
 
@@ -99,7 +100,16 @@
                     "https://proxy-txd.systemapic.com/v2/tiles/norkart/aerial/{z}/{x}/{y}.jpeg?access_token=" + systemapic_access_token,
                 ],
                 "tileSize" : 256
-            }
+            },
+            "deformation-vector": {
+                "type": "vector",
+                "tiles": [
+                    "https://tiles-txa.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txb.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txc.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                    "https://tiles-txd.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                ],
+            },
         },
         "layers": [
             {
@@ -186,32 +196,11 @@
         ]
     };
 
-    // create color ramp
-    var range = [-16, 16];
-    var color_ramp = ['#07000F', '#16032C', '#240546', '#2F0461', '#40097E', '#501099', '#5F16B3', '#721FD0', '#8429EB', '#923FF1', '#A259F5', '#B57AF9', '#C697FB', '#D5B1FF', '#E5CFFF', '#F4ECFF'];
-    var layers = [];
-    // 16 steps
-    for (var i = range[0]; i<range[1]; i++) {
-        console.log('i:', i);
-        var color = color_ramp[parseInt((range[1] + i)/2)];
-        systemapic.layers.push({
-            "id": "deformation_" + i,
-            "type": "fill",
-            "source": "deformation-vector",
-            "source-layer": "layer",
-            "filter": ["==", "val", i],
-            "paint": {
-                "fill-color": color
-            },
-            "layout": {},
-            "interactive" : true
-        });
-    }
-
-    console.log('layerS:', layers);
+   
 
 
 
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJjaWZ0emwzc2wwMXpzdDBtN2s1dHg4MXBiIn0.5RA5fN9IcK6s8WjJi7z2ww';
     var map = new mapboxgl.Map({
         container: 'map', // container id
         // center : [-209, -34],
@@ -219,25 +208,60 @@
         // center : [ 8.259963376704036,  61.19727759278061],
         center : [ 20.426873995740664, 69.31845195098202],
         zoom : 13,
-        style : systemapic
+        // style : systemapic
+        style : 'mapbox://styles/systemapic/cil4h24he007mcbj6fx5unjc5'
     });
 
     var change = {};
     var features_window = document.getElementById('features');
 
+
+    map.on('style.load', function (e) {
+        console.log('adding');
+        map.addSource('deformation-vector', {
+            type : 'vector',
+            "tiles": [
+                "https://tiles-txa.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                "https://tiles-txb.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                "https://tiles-txc.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+                "https://tiles-txd.systemapic.com/v2/tiles/layer_id-93aa971e-8fb2-47f4-913c-00157555a2db/{z}/{x}/{y}.pbf?access_token=" + systemapic_access_token,
+            ],
+        });
+
+        var layers = create_color_ramp('deformation-vector');
+        console.log('alyer:L', layers);
+        layers.forEach(function (layer) {
+            map.addLayer(layer);
+        });
+
+    });
+
+
     map.on('mousemove', function (e) {
       
         map.featuresAt(e.point, {
             radius: 5,
-            layers : ['akersvatn']
+            // layers : ['akersvatn']
         }, function (err, features) {
             if (err) return console.log('err', err);
 
 
             if (features.length) {
 
+                var str = [];
+                // console.log('f', features.length);
+                // console.log('feat',features);
+                features.forEach(function (f) {
+                    str.push(JSON.stringify(f, null, 2));
+
+                    if (_.contains(f.layer.id, 'deformation')) {
+
+                        map.setPaintProperty(f.layer.id, 'fill-color', "red");
+                    }
+                });
+
                 // display feature properties
-                features_window.innerHTML = JSON.stringify(features[0], null, 2);
+                features_window.innerHTML = str.join('\n\n');
 
                 // get gid
                 // var gid = features[0].properties.gid;
@@ -267,7 +291,33 @@
     });
 
 
+     function create_color_ramp(source) {
 
+        // create color ramp
+        var range = [-16, 16];
+        var color_ramp = ['#07000F', '#16032C', '#240546', '#2F0461', '#40097E', '#501099', '#5F16B3', '#721FD0', '#8429EB', '#923FF1', '#A259F5', '#B57AF9', '#C697FB', '#D5B1FF', '#E5CFFF', '#F4ECFF'];
+        var layers = [];
+        // 16 steps
+        for (var i = range[0]; i<range[1]; i++) {
+            console.log('i:', i);
+            var color = color_ramp[parseInt((range[1] + i)/2)];
+            layers.push({
+                "id": "deformation_" + i,
+                "type": "fill",
+                "source": source,
+                "source-layer": "layer",
+                "filter": ["==", "val", i],
+                "paint": {
+                    "fill-color": color
+                },
+                "layout": {},
+                "interactive" : true
+            });
+        }
+
+        return layers;
+
+    }
 
 
 
