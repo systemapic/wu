@@ -213,7 +213,7 @@ module.exports = function () {
                             file_id: createdFileWithPostgisTypeWithoutTableName.uuid,
                             access_token: access_token
                         })
-                        .expect(404)
+                        .expect(httpStatus.NOT_FOUND)
                         .end(function (err, res) {
                             if (err) return done(err);
                             var result = helpers.parse(res.text);
@@ -274,7 +274,7 @@ module.exports = function () {
                             file_id: createdFileWithRasterTypeWithoutFileId.uuid,
                             access_token: access_token
                         })
-                        .expect(404)
+                        .expect(httpStatus.NOT_FOUND)
                         .end(function (err, res) {
                             if (err) return done(err);
                             var result = helpers.parse(res.text);
@@ -293,7 +293,7 @@ module.exports = function () {
                             file_id: createdFileWithRasterType.uuid,
                             access_token: access_token
                         })
-                        .expect(200)
+                        .expect(httpStatus.OK)
                         .end(done);
                 });
             });
@@ -308,7 +308,7 @@ module.exports = function () {
                                 file_id: createdRasterFileWithRealtedUser.uuid,
                                 access_token: access_token
                             })
-                            .expect(200)
+                            .expect(httpStatus.OK)
                             .end(callback);
                     });
                 });
