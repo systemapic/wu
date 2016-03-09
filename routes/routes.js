@@ -512,7 +512,7 @@ module.exports = function(app) {
 	// change to /api/import/status
 	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
 	app.get('/v2/data/import/status', checkAccess, slackNotification, api.upload.getUploadStatus, errorHandler);
-	
+
 	app.post('/v2/data/import/status', checkAccess, slackNotification, api.upload.setUploadStatus, errorHandler);
 
 	/**
@@ -1951,13 +1951,8 @@ module.exports = function(app) {
 	// =====================================
 	// DEBUG =====================
 	// =====================================
-<<<<<<< HEAD
 	app.get('/api/debug', slackNotification, function (req, res) {
-		res.render('../../views/debug.ejs', {});
-=======
-	app.get('/api/debug', function (req, res) {
 		res.render('../../views/debug/debug.ejs', {});
->>>>>>> master
 	}, errorHandler);
 
 	// =====================================

@@ -36,6 +36,7 @@ var fileSchema = mongoose.Schema({
 			data_type : String, 		// raster or vector
 			original_format : String, 	// GeoTIFF, etc.
 			metadata : String,
+			file_id : String
 		}, 	
 
 		// deprecated, rasters now in postgis
