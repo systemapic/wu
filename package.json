@@ -15,7 +15,7 @@
     "header": {
       "title": "Systemapic API"
     },
-    "sampleUrl": "https://dev.systemapic.com"
+    "sampleUrl": "https://dev3.systemapic.com"
   },
   "dependencies": {
     "acl": "^0.4.9",
