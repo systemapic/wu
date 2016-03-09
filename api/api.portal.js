@@ -232,7 +232,7 @@ module.exports = api.portal = {
 	logout : function (req, res, next) {
 		req.session.reset();
 		res.redirect("/");
-		nex();
+		next();
 	},
 
 	login : function (req, res) {
@@ -406,7 +406,7 @@ module.exports = api.portal = {
 
 			res.send({
 				status : status
-			});
+			})
 		});
 
 	},
