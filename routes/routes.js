@@ -33,9 +33,6 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app) {
 
-	/**
-	* @apiSampleRequest https://dev3.systemapic.com
-	*/
 	// define apiDocs tokens
 	/**
 	* @apiDefine token
@@ -47,7 +44,12 @@ module.exports = function(app) {
 	*    "error": "Invalid access token."
 	* }
 	*/
-	
+
+	// define apiSampleRequest
+	/**
+	* @apiDefine apiSampleRequest
+	* @apiSampleRequest https://dev3.systemapic.com
+	*/
 
 	// link app
 	api.app = app;
@@ -63,6 +65,7 @@ module.exports = function(app) {
 	
 	/**
 	* @api {get} /v2/portal Get portal store
+	* @apiUse apiSampleRequest
 	* @apiName getPortal
 	* @apiGroup User
 	* @apiUse token
@@ -78,6 +81,7 @@ module.exports = function(app) {
 	
 	/**
 	* @api {post} /v2/projects/create Create a project
+	* @apiUse apiSampleRequest
 	* @apiName create
 	* @apiGroup Project
 	* @apiUse token
@@ -103,6 +107,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/projects/delete Delete a project
+	* @apiUse apiSampleRequest
 	* @apiName delete
 	* @apiGroup Project
 	* @apiUse token
@@ -143,6 +148,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/projects/public Get a public project
+	* @apiUse apiSampleRequest
 	* @apiName get public project
 	* @apiGroup Project
 	* @apiUse token
@@ -205,6 +211,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/projects/private Get private project
+	* @apiUse apiSampleRequest
 	* @apiName get private project
 	* @apiGroup Project
 	* @apiUse token
@@ -234,6 +241,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/status Get portal status
+	* @apiUse apiSampleRequest
 	* @apiName status
 	* @apiGroup Admin
 	* @apiUse token
@@ -260,6 +268,7 @@ module.exports = function(app) {
 		
 	/**
 	* @api {get} /v2/users/token Get access token
+	* @apiUse apiSampleRequest
 	* @apiName access_token
 	* @apiGroup User
 	* @apiParam {String} username Email or username
@@ -311,6 +320,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/token/refresh Refresh access token
+	* @apiUse apiSampleRequest
 	* @apiName refresh_access_token
 	* @apiGroup User
 	* @apiUse token
@@ -330,6 +340,7 @@ module.exports = function(app) {
 	
 	/**
 	* @api {post} /v2/users/token/check Check access token
+	* @apiUse apiSampleRequest
 	* @apiName check_access_token
 	* @apiGroup User
 	* @apiUse token
@@ -345,6 +356,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/users/token/check Check access token
+	* @apiUse apiSampleRequest
 	* @apiName check_access_token
 	* @apiGroup User
 	* @apiUse token
@@ -364,6 +376,7 @@ module.exports = function(app) {
 	
 	/**
 	* @api {get} /v2/users/session Check if already logged in (browser-only)
+	* @apiUse apiSampleRequest
 	* @apiName user_session
 	* @apiGroup User
 	*
@@ -414,6 +427,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/data/import Get upload 
+	* @apiUse apiSampleRequest
 	* @apiName get upload
 	* @apiGroup Upload
 	* @apiUse token
@@ -479,6 +493,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/data/import Import data
+	* @apiUse apiSampleRequest
 	* @apiName import
 	* @apiGroup Data
 	* @apiUse token
@@ -520,6 +535,7 @@ module.exports = function(app) {
 	/**
 	 * @apiIgnore
 	 * @api {get} /api/joinbeta Joinbeta
+	 * @apiUse apiSampleRequest
 	 * @apiName Joinbeta
 	 * @apiGroup Admin
 	 * @apiUse token
@@ -537,6 +553,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/projects/update Update project
+	* @apiUse apiSampleRequest
 	* @apiName update
 	* @apiGroup Project
 	* @apiUse token
@@ -609,6 +626,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/projects/slug/unique Unique project
+	* @apiUse apiSampleRequest
 	* @apiName unique
 	* @apiGroup Project
 	* @apiUse token
@@ -638,6 +656,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/invite/project Add invites
+	* @apiUse apiSampleRequest
 	* @apiName add invites
 	* @apiGroup Project
 	* @apiUse token
@@ -685,6 +704,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/hashes Set project hash
+	* @apiUse apiSampleRequest
 	* @apiName Set hash
 	* @apiGroup Project
 	* @apiUse token
@@ -736,6 +756,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/hashes Get project hash
+	* @apiUse apiSampleRequest
 	* @apiName Get hash
 	* @apiGroup Project
 	* @apiUse token
@@ -792,6 +813,7 @@ module.exports = function(app) {
 	* // this route is deprecated
 	* @apiIgnore 
 	* @api {post} /api/project/uploadlogo Upload project logo
+	* @apiUse apiSampleRequest
 	* @apiName Upload project logo
 	* @apiGroup Project
 	* @apiUse token
@@ -907,6 +929,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/layers/carto/json Return carto css
+	* @apiUse apiSampleRequest
 	* @apiName json2carto
 	* @apiGroup Geo
 	* @apiUse token
@@ -960,6 +983,7 @@ module.exports = function(app) {
 	
 	/**
 	* @api {post} /v2/data/update Update a file
+	* @apiUse apiSampleRequest
 	* @apiName update
 	* @apiGroup File
 	* @apiUse token
@@ -1001,6 +1025,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/data/create Create file
+	* @apiUse apiSampleRequest
 	* @apiName create
 	* @apiGroup File
 	* @apiUse token
@@ -1032,6 +1057,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/data/layers Get layers
+	* @apiUse apiSampleRequest
 	* @apiName getLayers
 	* @apiGroup File
 	* @apiUse token
@@ -1068,6 +1094,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/data/share Share dataset
+	* @apiUse apiSampleRequest
 	* @apiName shareDataset
 	* @apiGroup File
 	* @apiUse token
@@ -1118,6 +1145,7 @@ module.exports = function(app) {
 	
 	/**
 	* @api {post} /v2/data/delete Delete data
+	* @apiUse apiSampleRequest
 	* @apiName delete
 	* @apiGroup File
 	* @apiUse token
@@ -1176,6 +1204,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/projects/data Add file to the project
+	* @apiUse apiSampleRequest
 	* @apiName addToTheProject
 	* @apiGroup File
 	* @apiUse token
@@ -1249,6 +1278,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/layers/delete Delete layer
+	* @apiUse apiSampleRequest
 	* @apiName delete
 	* @apiGroup Layer
 	* @apiUse token
@@ -1299,6 +1329,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/projects/layers Get layers related with project
+	* @apiUse apiSampleRequest
 	* @apiName get layers by project id
 	* @apiGroup Layer
 	* @apiUse token
@@ -1339,6 +1370,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/layers/create Create layer
+	* @apiUse apiSampleRequest
 	* @apiName create
 	* @apiGroup Layer
 	* @apiUse token
@@ -1377,6 +1409,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/layers/update Update layer
+	* @apiUse apiSampleRequest
 	* @apiName update
 	* @apiGroup Layer
 	* @apiUse token
@@ -1486,6 +1519,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/update Update user
+	* @apiUse apiSampleRequest
 	* @apiName update
 	* @apiGroup User
 	* @apiUse token
@@ -1540,6 +1574,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/users/info Get info on authenticated user
+	* @apiUse apiSampleRequest
 	* @apiName info
 	* @apiGroup User
 	* @apiUse token
@@ -1567,6 +1602,7 @@ module.exports = function(app) {
 	// =====================================
 	/**
 	* @api {post} /v2/users/create Create new user
+	* @apiUse apiSampleRequest
 	* @apiName info
 	* @apiGroup User
 	* @apiParam {String} username Unique username
@@ -1598,6 +1634,7 @@ module.exports = function(app) {
 	/**
 	* @apiIgnore
 	* @api {post} /v2/users/email/unique Is unique email
+	* @apiUse apiSampleRequest
 	* @apiName unique email
 	* @apiGroup User
 	* @apiUse token
@@ -1628,6 +1665,7 @@ module.exports = function(app) {
 	/**
 	* @apiIgnore
 	* @api {post} /v2/users/username/unique Is unique email
+	* @apiUse apiSampleRequest
 	* @apiName unique username
 	* @apiGroup User
 	* @apiUse token
@@ -1657,6 +1695,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/invite Send invite mail
+	* @apiUse apiSampleRequest
 	* @apiName Send invite mail
 	* @apiGroup User
 	* @apiUse token
@@ -1690,6 +1729,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/invite/accept Accept invite
+	* @apiUse apiSampleRequest
 	* @apiName Accept invite
 	* @apiGroup User
 	* @apiUse token
@@ -1744,6 +1784,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/contacts/request Request contact
+	* @apiUse apiSampleRequest
 	* @apiName Request contact
 	* @apiGroup User
 	* @apiUse token
@@ -1788,6 +1829,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/invite/projects Invite user to projects
+	* @apiUse apiSampleRequest
 	* @apiName Invite user to projects
 	* @apiGroup User
 	* @apiUse token
@@ -1833,6 +1875,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {get} /v2/users/invite/link Invite user to projects
+	* @apiUse apiSampleRequest
 	* @apiName Invite user to projects
 	* @apiGroup User
 	* @apiUse token
@@ -1865,6 +1908,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/password/reset Send reset password mail
+	* @apiUse apiSampleRequest
 	* @apiName send reset password mail
 	* @apiGroup User
 	* @apiParam {String} email User's email
@@ -1904,6 +1948,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/users/password Reset password
+	* @apiUse apiSampleRequest
 	* @apiName reset password
 	* @apiGroup User
 	* @apiParam {String} password New password
