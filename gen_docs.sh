@@ -1,3 +1,3 @@
 #!/bin/bash
-node create_docs.js
+node ./scripts/create_docs.js
 npm run-script apidocs
