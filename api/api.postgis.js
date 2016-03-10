@@ -144,13 +144,11 @@ module.exports = api.postgis = {
 
 
 	downloadDatasetFromLayer : function (req, res) {
-		var options = req.body,
-		    layer_id = options.layer_id,
-		    format = options.format,
-		    user = req.user,
-		    ops = [],
-		    layername;
-		
+		var options = req.body || {};
+		var layer_id = options.layer_id;
+		var user = req.user;
+		var ops = [];
+		var layername;
 		var download_status_id = api.utils.getRandomChars(8);
 
 
@@ -231,14 +229,12 @@ module.exports = api.postgis = {
 
 
 
-	downloadDatasetFromFile: function (req, res) {
-		var options = req.body,
-		    file_id = options.file_id,
-		    format = options.format,
-		    user = req.user,
-		    ops = [],
-		    filename;
-		
+	downloadDatasetFromFile: function (req, res, next) {
+		var options = req.body || {};
+		var file_id = options.file_id;
+		var user = req.user;
+		var ops = [];
+		var filename;
 		var download_status_id = api.utils.getRandomChars(8);
 
 		// mark, return json

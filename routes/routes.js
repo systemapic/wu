@@ -48,7 +48,7 @@ module.exports = function(app) {
 	// define apiSampleRequest
 	/**
 	* @apiDefine apiSampleRequest
-	* @apiSampleRequest https://dev3.systemapic.com
+	* @apiSampleRequest https://dev3.systemapic.com/
 	*/
 
 	// link app
@@ -339,13 +339,70 @@ module.exports = function(app) {
 	app.post('/v2/users/token/refresh', checkAccess, api.token.refresh, errorHandler);
 	
 	/**
-	* @api {post} /v2/users/token/check Check access token
+	* @api {post} /v2/users/token/check Check access token post
 	* @apiUse apiSampleRequest
-	* @apiName check_access_token
+	* @apiName check_access_token post
 	* @apiGroup User
 	* @apiUse token
 	*
 	* @apiSuccess {json} status Access token JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+    *  "_id": "56b083be8dc7e18c0c8c7059",
+    *  "lastUpdated": "2016-03-10T06:32:10.288Z",
+    *  "created": "2016-02-02T10:23:58.521Z",
+    *  "username": "igorz",
+    *  "createdBy": "user-d526c531-fd78-411c-94c4-f3e8e233ebf9",
+    *  "lastName": "Ziegler",
+    *  "firstName": "Igor",
+    *  "uuid": "user-d526c531-fd78-411c-94c4-f3e8e233ebf9",
+    *  "__v": 63,
+    *  "postgis_database": "wpxpokqmrq",
+    *  "local": {
+    *   "password": "$2a$08$RGx4FyOEO9N4V201Qu/JyOJ17OpQGl31CuOQxhYkZzGXNehrBcP.C",
+    *   "email": "icygler@hwdtech.ru"
+    *  },
+    *  "files": [
+    *   "56c3fdc08ac6ec1c005912d0",
+    *   "56c5674290a3531a6a30bd64",
+    *   "56b470db440658e25d9b812b",
+    *   "56b47121440658e25d9b812f",
+    *   "56b46fc2440658e25d9b8114",
+    *   "56b471df440658e25d9b8134",
+    *   "56b47089440658e25d9b811f",
+    *   "56b46fb1440658e25d9b810f",
+    *   "56b470ab440658e25d9b8129",
+    *   "56b46fcd440658e25d9b8119",
+    *   "56b470a6440658e25d9b8126",
+    *   "56d3fd6848f7b32b69e9c1c3",
+    *   "56d4002348f7b32b69e9c1c4",
+    *   "56d4007b48f7b32b69e9c1c5",
+    *   "56d4008248f7b32b69e9c1c6",
+    *   "56e0372ffde316a0380f89a9",
+    *   "56e03c8b4e57b5d34c44e4f3",
+    *   "56e114ea3eac7a96780a7ee1"
+    *  ],
+    *  "contact_list": [
+    *   "56b37759b5c269bd7edaa02e",
+    *   "56b0ae88355d7faf1fc4712d",
+    *   "56d3de4cdd79f1bb5f83dc17",
+    *   "56d3e1f8dd79f1bb5f83dc18",
+    *   "56d6da007d2bee1c0083fa04",
+    *   "56d6e0177d2bee1c0083fa13"
+    *  ],
+    *  "access": {
+    *   "private_projects": true,
+    *   "remaining_quota": 200000000,
+    *   "storage_quota": 200000000,
+    *   "account_type": "free"
+    *  },
+    *  "state": {
+    *   "lastProject": []
+    *  },
+    *  "status": {
+    *   "contact_requests": []
+    *  }
+	*}
 	*/
 	// ================================
 	// CHECK TOKEN ====================
@@ -355,9 +412,9 @@ module.exports = function(app) {
 	}, errorHandler);
 
 	/**
-	* @api {get} /v2/users/token/check Check access token
+	* @api {get} /v2/users/token/check Check access token get
 	* @apiUse apiSampleRequest
-	* @apiName check_access_token
+	* @apiName check_access_token get
 	* @apiGroup User
 	* @apiUse token
 	*
@@ -647,7 +704,53 @@ module.exports = function(app) {
 	// =====================================
 	app.post('/v2/projects/slug/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
 
-	//todo document 
+	/**
+	* @api {post} /v2/projects/access Set project access object
+	* @apiUse apiSampleRequest
+	* @apiName set access
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project Uuid of project
+	* @apiParam {Object} access Access object
+	* @apiSuccess {json} project Project with updated access
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  _id: '56af0e566f8ca08221ee2ca7',
+	*  lastUpdated: '2016-02-01T07:50:46.730Z',
+	*  created: '2016-02-01T07:50:46.726Z',
+	*  etc...
+  	* }
+	* @apiError Bad_request access or project do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['access', 'project']
+	*		}
+	*	}
+	* }
+	* @apiError Bad_request User doesn't have access to change access rights of project (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "No access.",
+	*		"code": "400"
+	*	}
+	* }
+	* @apiError Not_found If project doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// SET ACCESS ==========================
 	// =====================================
@@ -895,6 +998,36 @@ module.exports = function(app) {
 	// app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
 	app.post('/v2/static/screen', checkAccess, api.pixels.snap, errorHandler);
 
+	/**
+	* @api {post} /v2/legends/create Create legend
+	* @apiUse apiSampleRequest
+	* @apiName Create legend
+	* @apiGroup Legends
+	* @apiUse token
+	* @apiParam {String} fileUuid File uuid
+	* @apiParam {String} cartoid Carto css id
+	* @apiParam {String} layerUuid Layer uuid
+	* @apiSuccess {Array} legends array
+	* @apiSuccessExample {String} Success-Response:
+	* [
+	*  {
+	*	base64: uri,
+	*	key: key,
+	*	value: value,
+	*	id: id,
+	*	fileUuid: fileUuid,
+	*	cartoid: cartoid,
+	*	on: true
+	*  },
+	*  etc...
+	* ]
+	* @apiError Bad_request If fileUuid or cartoid or layerUuid don't not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+    *  "error": "Missing information.4"
+	* }
+	*/
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
@@ -937,13 +1070,13 @@ module.exports = function(app) {
 	* @apiSuccess {String} cartoCss Carto css
 	* @apiSuccessExample {String} Success-Response:
 	* "@polygon_opacity: 1;
-	*#layer {
+	* #layer {
 	*
 	*	polygon-opacity: @polygon_opacity;
 	*
 	*	polygon-fill: red;
 	*
-	*}"
+	* }"
 	* @apiError Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
@@ -964,8 +1097,23 @@ module.exports = function(app) {
 	// app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
 	app.post('/v2/layers/carto/json', checkAccess, api.geo.json2carto, errorHandler);
 
-
-	// todo: document
+	/**
+	* @api {post} /v2/data/download Download dataset from file
+	* @apiUse apiSampleRequest
+	* @apiName Download dataset from file
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} file_id File uuid
+	* @apiSuccess {String} download_status_id Download status id 
+	* @apiSuccess {Boolean} finished True if finished download 
+	* @apiSuccess {String} file_id File uuid
+	* @apiSuccessExample {String} Success-Response:	
+	* {
+	*  "download_status_id": "rwurnixh",
+	*  "finished": false,
+	*  "file_id": "file_agjcpeadohnnxljmblkl"
+	* }
+	*/
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
@@ -973,7 +1121,23 @@ module.exports = function(app) {
 	// app.post('/api/file/downloadDataset', checkAccess, function (req,res) {
 	app.post('/v2/data/download', checkAccess, api.postgis.downloadDatasetFromFile, errorHandler);
 
-	// todo: document
+	/**
+	* @api {post} /v2/layers/download Download dataset from layer
+	* @apiUse apiSampleRequest
+	* @apiName Download dataset from layer
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} layer_id Layer uuid
+	* @apiSuccess {String} download_status_id Download status id 
+	* @apiSuccess {Boolean} finished True if finished download 
+	* @apiSuccess {String} file_id Layer uuid
+	* @apiSuccessExample {String} Success-Response:	
+	* {
+	*  "download_status_id": "rwurnixh",
+	*  "finished": false,
+	*  "file_id": "layer-7aacda14-9115-44d0-b8e2-28854129dce5"
+	* }
+	*/
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
@@ -1381,7 +1545,7 @@ module.exports = function(app) {
 	* @apiParam {String} metadata Metadata of new layer
 	* @apiParam {String} data Data of new layer
 	* @apiParam {String} style Style of new layer
-	* @apiSuccess {JSON} Layer New Layer object
+	* @apiSuccess {JSON} Layer New layer object
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*    __v: 0,
@@ -1400,6 +1564,20 @@ module.exports = function(app) {
 	// change to /api/layer/create 
 	app.post('/v2/layers/create', checkAccess, api.layer.create, errorHandler);
 
+	/**
+	* @api {post} /v2/layers/create/default Create default layer
+	* @apiUse apiSampleRequest
+	* @apiName create default
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiSuccess {String} pile
+	* @apiSuccess {String} wu
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  pile : 'ok', 
+	*  wu : 'ok'
+	* }
+	*/
 	// todo: refactor to /v2/layers/create with default flag
 	// =====================================
 	// CREATE NEW DEFAULT LAYER ============
@@ -1499,18 +1677,100 @@ module.exports = function(app) {
 	// =====================================
 	app.post('/v2/layers/update', checkAccess, api.layer.update, errorHandler);
 
+	/**
+	* @api {post} /v2/layers/meta Reload meta
+	* @apiUse apiSampleRequest
+	* @apiName update
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} file_id File uuid
+	* @apiParam {String} layer_id Layer uuid
+	* @apiSuccess {String} response Update info 
+	* @apiSuccessExample {String} Success-Response:
+	* {
+	*	error : err,
+	*	meta : meta
+	* }
+	* @apiError Bad_request No meta (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": 'No meta.'
+	* }
+	* @apiError Bad_request layer_id or file_id do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['layer_id', 'file_id']
+	*		}
+	*	}
+	* }
+	* @apiError Not_found If file doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such file.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// RELOAD LAYER METADATA ===============
 	// =====================================
 	// change to /api/layer/reloadMeta (camelcase) 
 	app.post('/v2/layers/meta', checkAccess, api.layer.reloadMeta, errorHandler);
-
+	/**
+	* @api {post} /v2/layers/carto/ Set carto css
+	* @apiUse apiSampleRequest
+	* @apiName set carto css
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} fileUuid File uuid
+	* @apiParam {String} css New carto css
+	* @apiParam {String} cartoid Id of mss file
+	* @apiParam {String} layerUuid Layer uuid
+	* @apiSuccess {Boolean} ok 
+	* @apiSuccess {String} cartoid Carto css id
+	* @apiSuccess {Object} error Error object
+	* @apiError Bad_request If mss file doesn't exist(400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": "ENOENT, open '/data/cartocss/test.mss'"
+	* }
+	* @apiError Not_found If layer doesn't exist(400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": "No layer."
+	* }
+	*/
 	// =====================================
 	// SET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/set 
 	app.post('/v2/layers/carto', checkAccess, api.layer.setCartoCSS, errorHandler);
 
+	/**
+	* @api {get} /v2/layers/carto/ Get carto css
+	* @apiUse apiSampleRequest
+	* @apiName get carto css
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} cartoid Id of mss file
+	* @apiSuccess {String} cartocss Carto css string
+	* @apiError Bad_request If mss file doesn't exist(400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": "ENOENT, open '/data/cartocss/test.mss'"
+	* }
+	*/
 	// =====================================
 	// GET CARTOCSS ========================
 	// =====================================
