@@ -26,7 +26,7 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errorHandler = require('../middleware/error-handler')();
-var slackNotification = require('../middleware/slack-notification')();
+var analyticsHandler = require('../middleware/analytics-handler')();
 
 // api
 var api = require('../api/api');
@@ -58,7 +58,7 @@ module.exports = function(app) {
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
-	app.get('/', slackNotification, api.portal.getBase, errorHandler);
+	app.get('/', analyticsHandler, api.portal.getBase, errorHandler);
 	
 	/**
 	* @api {get} /v2/portal Get portal store
@@ -73,7 +73,7 @@ module.exports = function(app) {
 	// =====================================
 	// GET PORTAL  =========================
 	// =====================================
-	app.get('/v2/portal', checkAccess, slackNotification, api.portal.getPortal, errorHandler);
+	app.get('/v2/portal', checkAccess, analyticsHandler, api.portal.getPortal, errorHandler);
 	
 	/**
 	* @api {post} /v2/projects/create Create a project
@@ -98,7 +98,7 @@ module.exports = function(app) {
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/v2/projects/create', checkAccess, slackNotification, api.project.create, errorHandler);
+	app.post('/v2/projects/create', checkAccess, analyticsHandler, api.project.create, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/delete Delete a project
@@ -138,7 +138,7 @@ module.exports = function(app) {
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
-	app.post('/v2/projects/delete', checkAccess, slackNotification, api.project.deleteProject, errorHandler);
+	app.post('/v2/projects/delete', checkAccess, analyticsHandler, api.project.deleteProject, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/public Get a public project
@@ -200,7 +200,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK THAT PROJECT IS PUBLIC ========
 	// =====================================
-	app.get('/v2/projects/public', checkAccess, slackNotification, api.project.getPublic, errorHandler);
+	app.get('/v2/projects/public', checkAccess, analyticsHandler, api.project.getPublic, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/private Get private project
@@ -229,7 +229,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK THAT PROJECT IS PRIVATE =======
 	// =====================================
-	app.get('/v2/projects/private', checkAccess, slackNotification, api.project.getPrivate, errorHandler);
+	app.get('/v2/projects/private', checkAccess, analyticsHandler, api.project.getPrivate, errorHandler);
 
 	/**
 	* @api {get} /v2/status Get portal status
@@ -254,7 +254,7 @@ module.exports = function(app) {
 	// =====================================
 	// GET STATUS   ====================
 	// =====================================
-	app.get('/v2/status', checkAccess, slackNotification, api.portal.status, errorHandler);
+	app.get('/v2/status', checkAccess, analyticsHandler, api.portal.status, errorHandler);
 
 		
 	/**
@@ -306,7 +306,7 @@ module.exports = function(app) {
 	// ================================
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
-	app.get('/v2/users/token', slackNotification, api.token.getTokenFromPassword, errorHandler);
+	app.get('/v2/users/token', analyticsHandler, api.token.getTokenFromPassword, errorHandler);
 
 	/**
 	* @api {post} /v2/users/token/refresh Refresh access token
@@ -325,7 +325,7 @@ module.exports = function(app) {
 	// ================================
 	// REFRESH TOKEN ==================
 	// ================================
-	app.post('/v2/users/token/refresh', checkAccess, slackNotification, api.token.refresh, errorHandler);
+	app.post('/v2/users/token/refresh', checkAccess, analyticsHandler, api.token.refresh, errorHandler);
 	
 	/**
 	* @api {post} /v2/users/token/check Check access token
@@ -338,7 +338,7 @@ module.exports = function(app) {
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.post('/v2/users/token/check', checkAccess, slackNotification, function (req, res, next) {
+	app.post('/v2/users/token/check', checkAccess, analyticsHandler, function (req, res, next) {
 		res.send(req.user);
 	}, errorHandler);
 
@@ -357,7 +357,7 @@ module.exports = function(app) {
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.get('/v2/users/token/check', checkAccess, slackNotification, function (req, res, next) {
+	app.get('/v2/users/token/check', checkAccess, analyticsHandler, function (req, res, next) {
 		res.send({valid : true});
 	}, errorHandler);
 	
@@ -371,35 +371,35 @@ module.exports = function(app) {
 	// ================================
 	// CHECK SESSION ==================
 	// ================================
-	app.get('/v2/users/session', slackNotification, api.token.checkSession, errorHandler);
+	app.get('/v2/users/session', analyticsHandler, api.token.checkSession, errorHandler);
 
 	// todo: document these routes
 	// =====================================
 	// ERROR LOGGING =======================
 	// =====================================
-	app.post('/v2/log/error', checkAccess, slackNotification, api.error.clientLog, errorHandler);
+	app.post('/v2/log/error', checkAccess, analyticsHandler, api.error.clientLog, errorHandler);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.post('/v2/log', checkAccess, slackNotification, api.analytics.set, errorHandler);
+	app.post('/v2/log', checkAccess, analyticsHandler, api.analytics.set, errorHandler);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.get('/v2/log', checkAccess, slackNotification, api.analytics.get, errorHandler);
+	app.get('/v2/log', checkAccess, analyticsHandler, api.analytics.get, errorHandler);
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
 	// app.get('/api/data/upload/chunked', checkAccess, function (req, res) {
-	app.get('/v2/data/import/chunked', checkAccess, slackNotification, api.upload.chunkedCheck, errorHandler);
+	app.get('/v2/data/import/chunked', checkAccess, analyticsHandler, api.upload.chunkedCheck, errorHandler);
 
 	// =====================================
 	// UPLOAD DATA IN CHUNKS (RESUMABLE) === 
 	// =====================================
 	// app.post('/api/data/upload/chunked', checkAccess, api.upload.chunkedUpload);
-	app.post('/v2/data/import/chunked', checkAccess, slackNotification, api.upload.chunkedUpload, errorHandler);
+	app.post('/v2/data/import/chunked', checkAccess, analyticsHandler, api.upload.chunkedUpload, errorHandler);
 
 
 	// // =====================================
@@ -474,7 +474,7 @@ module.exports = function(app) {
 	// GET UPLOAD ==========================
 	// =====================================
 	// app.get('/api/upload/get', checkAccess, api.upload.getUpload, errorHandler);
-	app.get('/v2/data/import', checkAccess, slackNotification, api.upload.getUpload, errorHandler);
+	app.get('/v2/data/import', checkAccess, analyticsHandler, api.upload.getUpload, errorHandler);
 
 	/**
 	* @api {post} /v2/data/import Import data
@@ -502,7 +502,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/import
 	// app.post('/api/import', checkAccess, function (req, res) {
-	app.post('/v2/data/import', checkAccess, slackNotification, api.upload.upload, errorHandler);
+	app.post('/v2/data/import', checkAccess, analyticsHandler, api.upload.upload, errorHandler);
 
 
 	// todo: document
@@ -511,9 +511,9 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/import/status
 	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
-	app.get('/v2/data/import/status', checkAccess, slackNotification, api.upload.getUploadStatus, errorHandler);
+	app.get('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.getUploadStatus, errorHandler);
 
-	app.post('/v2/data/import/status', checkAccess, slackNotification, api.upload.setUploadStatus, errorHandler);
+	app.post('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.setUploadStatus, errorHandler);
 
 	/**
 	 * @apiIgnore
@@ -531,7 +531,7 @@ module.exports = function(app) {
 	// =====================================
 	// JOIN BETA MAIL ======================
 	// =====================================
-	app.get('/api/joinbeta', slackNotification, api.portal.joinBeta, errorHandler, errorHandler);
+	app.get('/api/joinbeta', analyticsHandler, api.portal.joinBeta, errorHandler, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/update Update project
@@ -603,7 +603,7 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/v2/projects/update', checkAccess, slackNotification, api.project.update, errorHandler);
+	app.post('/v2/projects/update', checkAccess, analyticsHandler, api.project.update, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/slug/unique Unique project
@@ -625,14 +625,14 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/v2/projects/slug/unique', checkAccess, slackNotification, api.project.checkUniqueSlug, errorHandler);
+	app.post('/v2/projects/slug/unique', checkAccess, analyticsHandler, api.project.checkUniqueSlug, errorHandler);
 
 
 	// =====================================
 	// SET ACCESS ==========================
 	// =====================================
 	// app.post('/api/project/setAccess', checkAccess, function (req,res) {
-	app.post('/v2/projects/access', checkAccess, slackNotification, api.project.setAccess, errorHandler);
+	app.post('/v2/projects/access', checkAccess, analyticsHandler, api.project.setAccess, errorHandler);
 
 	/**
 	* @api {post} /v2/users/invite/project Add invites
@@ -678,7 +678,7 @@ module.exports = function(app) {
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	// change route to /api/project/invite
-	app.post('/v2/users/invite/project', checkAccess, slackNotification, api.project.addInvites, errorHandler);
+	app.post('/v2/users/invite/project', checkAccess, analyticsHandler, api.project.addInvites, errorHandler);
 
 
 	/**
@@ -730,7 +730,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/setHash
 	// app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
-	app.post('/v2/hashes', checkAccess, slackNotification, api.project.setHash, errorHandler);
+	app.post('/v2/hashes', checkAccess, analyticsHandler, api.project.setHash, errorHandler);
 
 	/**
 	* @api {get} /v2/hashes Get project hash
@@ -782,7 +782,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/getHash
 	// app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
-	app.get('/v2/hashes', checkAccess, slackNotification, api.project.getHash, errorHandler);
+	app.get('/v2/hashes', checkAccess, analyticsHandler, api.project.getHash, errorHandler);
 
 
 
@@ -823,27 +823,27 @@ module.exports = function(app) {
 	// UPLOAD IMAGE ========================
 	// =====================================
 	// change to /api/import/image
-	app.post('/api/upload/image', checkAccess, slackNotification, api.upload.image, errorHandler);
+	app.post('/api/upload/image', checkAccess, analyticsHandler, api.upload.image, errorHandler);
 
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// special route, don't touch for now
-	app.get('/images/*', checkAccess, slackNotification, api.file.sendImage, errorHandler);
+	app.get('/images/*', checkAccess, analyticsHandler, api.file.sendImage, errorHandler);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
 	// special route, don't touch for now
-	app.get('/pixels/fit/*', checkAccess, slackNotification, api.pixels.serveFitPixelPerfection, errorHandler);
+	app.get('/pixels/fit/*', checkAccess, analyticsHandler, api.pixels.serveFitPixelPerfection, errorHandler);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/image/*', checkAccess, slackNotification, api.pixels.serveImagePixelPerfection, errorHandler);
+	app.get('/pixels/image/*', checkAccess, analyticsHandler, api.pixels.serveImagePixelPerfection, errorHandler);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
@@ -855,13 +855,13 @@ module.exports = function(app) {
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/*', checkAccess, slackNotification, api.pixels.servePixelPerfection, errorHandler);
+	app.get('/pixels/*', checkAccess, analyticsHandler, api.pixels.servePixelPerfection, errorHandler);
 
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
 	// =====================================
 	// change to /api/tools/mapbox/get
-	app.post('/api/util/getmapboxaccount', checkAccess, slackNotification, api.provider.mapbox.getAccount, errorHandler);
+	app.post('/api/util/getmapboxaccount', checkAccess, analyticsHandler, api.provider.mapbox.getAccount, errorHandler);
 	
 	// =====================================
 	// CREATE SNAPSHOT =====================
@@ -869,14 +869,14 @@ module.exports = function(app) {
 	// create snapshot of current map
 	// app.post('/api/util/snapshot', checkAccess, function (req, res) {
 	// app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
-	app.post('/v2/static/screen', checkAccess, slackNotification, api.pixels.snap, errorHandler);
+	app.post('/v2/static/screen', checkAccess, analyticsHandler, api.pixels.snap, errorHandler);
 
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
 	// change to /api/layer/legends/create
 	// app.post('/api/layer/createlegends', checkAccess, function (req, res) {
-	app.post('/v2/legends/create', checkAccess, slackNotification, api.legend.create, errorHandler);
+	app.post('/v2/legends/create', checkAccess, analyticsHandler, api.legend.create, errorHandler);
 
 	// todo: remove, deprecated
 	// =====================================
@@ -893,7 +893,7 @@ module.exports = function(app) {
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/data/download
-	app.get('/api/file/download', checkAccess, slackNotification, api.file.download, errorHandler);
+	app.get('/api/file/download', checkAccess, analyticsHandler, api.file.download, errorHandler);
 
 
 	// todo: remove, deprecated (will be removed with new raster import (branch: postgis_raster))
@@ -937,7 +937,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/tools/json2carto
 	// app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
-	app.post('/v2/layers/carto/json', checkAccess, slackNotification, api.geo.json2carto, errorHandler);
+	app.post('/v2/layers/carto/json', checkAccess, analyticsHandler, api.geo.json2carto, errorHandler);
 
 
 	// todo: document
@@ -946,7 +946,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/download (POST/GET routes with same name no problem)
 	// app.post('/api/file/downloadDataset', checkAccess, function (req,res) {
-	app.post('/v2/data/download', checkAccess, slackNotification, api.postgis.downloadDatasetFromFile, errorHandler);
+	app.post('/v2/data/download', checkAccess, analyticsHandler, api.postgis.downloadDatasetFromFile, errorHandler);
 
 	// todo: document
 	// =====================================
@@ -954,7 +954,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/layer/download
 	// app.post('/api/layer/downloadDataset', checkAccess, function (req,res) {
-	app.post('/v2/layers/download', checkAccess, slackNotification, api.postgis.downloadDatasetFromLayer, errorHandler);
+	app.post('/v2/layers/download', checkAccess, analyticsHandler, api.postgis.downloadDatasetFromLayer, errorHandler);
 	
 	/**
 	* @api {post} /v2/data/update Update a file
@@ -985,7 +985,7 @@ module.exports = function(app) {
 	// UPDATE FILE =========================
 	// =====================================
 	// change to /api/data/update
-	app.post('/v2/data/update', checkAccess, slackNotification, api.file.update, errorHandler);
+	app.post('/v2/data/update', checkAccess, analyticsHandler, api.file.update, errorHandler);
 
 
 	
@@ -1028,7 +1028,7 @@ module.exports = function(app) {
 	// GET LAYERS OF FILE ==================
 	// =====================================
 	// change to /api/data/getLayers
-	app.post('/v2/data/layers', checkAccess, slackNotification, api.file.getLayers, errorHandler);
+	app.post('/v2/data/layers', checkAccess, analyticsHandler, api.file.getLayers, errorHandler);
 
 	/**
 	* @api {post} /v2/data/share Share dataset
@@ -1078,7 +1078,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/share
 	// app.post('/api/dataset/share', checkAccess, api.file.shareDataset, errorHandler);
-	app.post('/v2/data/share', checkAccess, slackNotification, api.file.shareDataset, errorHandler);
+	app.post('/v2/data/share', checkAccess, analyticsHandler, api.file.shareDataset, errorHandler);
 	
 	/**
 	* @api {post} /v2/data/delete Delete data
@@ -1136,7 +1136,7 @@ module.exports = function(app) {
 	// DELETE DATA =========================
 	// =====================================
 	// change to /api/data/delete
-	app.post('/v2/data/delete', checkAccess, slackNotification, api.file.deleteFile, errorHandler);
+	app.post('/v2/data/delete', checkAccess, analyticsHandler, api.file.deleteFile, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/data Add file to the project
@@ -1209,7 +1209,7 @@ module.exports = function(app) {
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	// change to /api/project/addData
-	app.post('/v2/projects/data', checkAccess, slackNotification, api.file.addFileToProject, errorHandler);
+	app.post('/v2/projects/data', checkAccess, analyticsHandler, api.file.addFileToProject, errorHandler);
 
 	/**
 	* @api {post} /v2/layers/delete Delete data
@@ -1259,7 +1259,7 @@ module.exports = function(app) {
 	// DELETE LAYER(S) =====================
 	// =====================================
 	// change to /api/layer/delete (layer, not layers)
-	app.post('/v2/layers/delete', checkAccess, slackNotification, api.layer.deleteLayer, errorHandler);
+	app.post('/v2/layers/delete', checkAccess, analyticsHandler, api.layer.deleteLayer, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/layers Get layers related with project
@@ -1297,7 +1297,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/layer/get 
 	// app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
-	app.get('/v2/projects/layers', checkAccess, slackNotification, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
+	app.get('/v2/projects/layers', checkAccess, analyticsHandler, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
 
 	// todo: /v2/projects/layers GET request
 
@@ -1330,14 +1330,14 @@ module.exports = function(app) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	// change to /api/layer/create 
-	app.post('/v2/layers/create', checkAccess, slackNotification, api.layer.create, errorHandler);
+	app.post('/v2/layers/create', checkAccess, analyticsHandler, api.layer.create, errorHandler);
 
 	// todo: refactor to /v2/layers/create with default flag
 	// =====================================
 	// CREATE NEW DEFAULT LAYER ============
 	// =====================================
 	// app.post('/api/layers/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
-	app.post('/v2/layers/create/default', checkAccess, slackNotification, api.layer.createDefaultLayers, errorHandler);
+	app.post('/v2/layers/create/default', checkAccess, analyticsHandler, api.layer.createDefaultLayers, errorHandler);
 
 	/**
 	* @api {post} /v2/layers/update Update layer
@@ -1428,25 +1428,25 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
-	app.post('/v2/layers/update', checkAccess, slackNotification, api.layer.update, errorHandler);
+	app.post('/v2/layers/update', checkAccess, analyticsHandler, api.layer.update, errorHandler);
 
 	// =====================================
 	// RELOAD LAYER METADATA ===============
 	// =====================================
 	// change to /api/layer/reloadMeta (camelcase) 
-	app.post('/v2/layers/meta', checkAccess, slackNotification, api.layer.reloadMeta, errorHandler);
+	app.post('/v2/layers/meta', checkAccess, analyticsHandler, api.layer.reloadMeta, errorHandler);
 
 	// =====================================
 	// SET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/set 
-	app.post('/v2/layers/carto', checkAccess, slackNotification, api.layer.setCartoCSS, errorHandler);
+	app.post('/v2/layers/carto', checkAccess, analyticsHandler, api.layer.setCartoCSS, errorHandler);
 
 	// =====================================
 	// GET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/get 
-	app.get('/v2/layers/carto', checkAccess, slackNotification, api.layer.getCartoCSS, errorHandler);
+	app.get('/v2/layers/carto', checkAccess, analyticsHandler, api.layer.getCartoCSS, errorHandler);
 
 	/**
 	* @api {post} /v2/users/update Update user
@@ -1499,7 +1499,7 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	app.post('/v2/users/update', checkAccess, slackNotification, api.user.update, errorHandler);
+	app.post('/v2/users/update', checkAccess, analyticsHandler, api.user.update, errorHandler);
 
 
 	/**
@@ -1520,10 +1520,10 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	app.get('/v2/users/info', checkAccess, slackNotification, api.user.info, errorHandler);
+	app.get('/v2/users/info', checkAccess, analyticsHandler, api.user.info, errorHandler);
 
 	// old route, keeping for backwards compatibility
-	app.post('/api/user/info', checkAccess, slackNotification, api.user.info, errorHandler);
+	app.post('/api/user/info', checkAccess, analyticsHandler, api.user.info, errorHandler);
 
 
 	// =====================================
@@ -1550,7 +1550,7 @@ module.exports = function(app) {
 	*   }
 	* }
 	*/
-	app.post('/v2/users/create', slackNotification, api.user.create, errorHandler);
+	app.post('/v2/users/create', analyticsHandler, api.user.create, errorHandler);
 
 	// TODO this endpoint does not exist
 	// =====================================
@@ -1587,7 +1587,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/v2/users/email/unique', slackNotification, api.user.checkUniqueEmail, errorHandler);
+	app.post('/v2/users/email/unique', analyticsHandler, api.user.checkUniqueEmail, errorHandler);
 
 	/**
 	* @apiIgnore
@@ -1617,7 +1617,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/v2/users/username/unique', slackNotification, api.user.checkUniqueUsername, errorHandler);
+	app.post('/v2/users/username/unique', analyticsHandler, api.user.checkUniqueUsername, errorHandler);
 
 	/**
 	* @api {post} /v2/users/invite Send invite mail
@@ -1650,7 +1650,7 @@ module.exports = function(app) {
 	// =====================================
 	// rename to /api/user/invite/email
 	// app.post('/api/user/invite', checkAccess, api.user.invite, errorHandler);
-	app.post('/v2/users/invite', checkAccess, slackNotification, api.user.invite, errorHandler);
+	app.post('/v2/users/invite', checkAccess, analyticsHandler, api.user.invite, errorHandler);
 
 	/**
 	* @api {post} /v2/users/invite/accept Accept invite
@@ -1704,7 +1704,7 @@ module.exports = function(app) {
 	// =====================================
 	// rename to /api/user/invite/email
 	// app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
-	app.post('/v2/users/invite/accept', checkAccess, slackNotification, api.user.acceptInvite, errorHandler);
+	app.post('/v2/users/invite/accept', checkAccess, analyticsHandler, api.user.acceptInvite, errorHandler);
 
 	/**
 	* @api {post} /v2/users/contacts/request Request contact
@@ -1742,13 +1742,13 @@ module.exports = function(app) {
 	// =====================================
 	// REQUEST CONTACT =====================
 	// =====================================
-	app.post('/v2/users/contacts/request', checkAccess, slackNotification, api.user.requestContact, errorHandler);
+	app.post('/v2/users/contacts/request', checkAccess, analyticsHandler, api.user.requestContact, errorHandler);
 
 	// =====================================
 	// REQUEST CONTACT =====================
 	// =====================================
 	// change to /api/user/acceptContact/*
-	app.get('/api/user/acceptContactRequest/*', slackNotification, api.user.acceptContactRequest, errorHandler); // todo: POST?
+	app.get('/api/user/acceptContactRequest/*', analyticsHandler, api.user.acceptContactRequest, errorHandler); // todo: POST?
 
 	/**
 	* @api {post} /v2/users/invite/projects Invite user to projects
@@ -1793,7 +1793,7 @@ module.exports = function(app) {
 	// INVITE TO PROJECTS ==================
 	// =====================================
 	// todo: see if this can be removed (replaced by /api/user/invite?)
-	app.post('/v2/users/invite/projects', checkAccess, slackNotification, api.user.inviteToProjects, errorHandler);
+	app.post('/v2/users/invite/projects', checkAccess, analyticsHandler, api.user.inviteToProjects, errorHandler);
 
 	/**
 	* @api {get} /v2/users/invite/link Invite user to projects
@@ -1820,12 +1820,12 @@ module.exports = function(app) {
 	// =====================================
 	// GENERATE ACCESS LINK ================
 	// =====================================
-	app.get('/v2/users/invite/link', checkAccess, slackNotification, api.user.getInviteLink, errorHandler);
+	app.get('/v2/users/invite/link', checkAccess, analyticsHandler, api.user.getInviteLink, errorHandler);
 
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========
 	// =====================================
-	app.post('/reset/checktoken', slackNotification, api.auth.checkResetToken, errorHandler);
+	app.post('/reset/checktoken', analyticsHandler, api.auth.checkResetToken, errorHandler);
 
 	/**
 	* @api {post} /v2/users/password/reset Send reset password mail
@@ -1858,13 +1858,13 @@ module.exports = function(app) {
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
-	app.post('/v2/users/password/reset', slackNotification, api.auth.requestPasswordReset, errorHandler);
+	app.post('/v2/users/password/reset', analyticsHandler, api.auth.requestPasswordReset, errorHandler);
 
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
 	// change to /api/... 
-	app.get('/reset', slackNotification, api.auth.serveResetPage, errorHandler);
+	app.get('/reset', analyticsHandler, api.auth.serveResetPage, errorHandler);
 
 	/**
 	* @api {post} /v2/users/password Reset password
@@ -1898,13 +1898,13 @@ module.exports = function(app) {
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
-	app.post('/v2/users/password', slackNotification, api.auth.resetPassword, errorHandler);
+	app.post('/v2/users/password', analyticsHandler, api.auth.resetPassword, errorHandler);
 
 	// ===================================== // todo: rename route to /api/config/client.js
 	// SERVER CLIENT CONFIG ================
 	// =====================================
 	// change to /api/... 
-	app.get('/clientConfig.js', slackNotification, function (req, res) {
+	app.get('/clientConfig.js', analyticsHandler, function (req, res) {
 		var configString = 'var systemapicConfigOptions = ' + JSON.stringify(api.clientConfig);
 		res.setHeader("content-type", "application/javascript");
 		res.end(configString);
@@ -1921,7 +1921,7 @@ module.exports = function(app) {
 	// PRIVACY POLICY ======================
 	// =====================================
 	// change to /v2/docs/privacy-policy
-	app.get('/privacy-policy', slackNotification, function(req, res) {
+	app.get('/privacy-policy', analyticsHandler, function(req, res) {
 		// api.portal.login(req, res);
 		res.render('../../views/privacy.ejs');
 	}, errorHandler);
@@ -1929,36 +1929,36 @@ module.exports = function(app) {
 	// =====================================
 	// LOGOUT ==============================
 	// =====================================
-	app.get('/logout', slackNotification, api.portal.logout, errorHandler);
+	app.get('/logout', analyticsHandler, api.portal.logout, errorHandler);
 
 	// =====================================
 	// INVITE ==============================
 	// =====================================
-	app.get('/invite/*', slackNotification, api.portal.invite, errorHandler);
+	app.get('/invite/*', analyticsHandler, api.portal.invite, errorHandler);
 
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
-	app.post('/api/forgot', slackNotification, api.auth.forgotPassword, errorHandler);
+	app.post('/api/forgot', analyticsHandler, api.auth.forgotPassword, errorHandler);
 
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
-	app.get('/forgot', slackNotification, function (req, res) {
+	app.get('/forgot', analyticsHandler, function (req, res) {
 		res.render('../../views/forgot.ejs', {});
 	}, errorHandler);
 
 	// =====================================
 	// DEBUG =====================
 	// =====================================
-	app.get('/api/debug', slackNotification, function (req, res) {
+	app.get('/api/debug', analyticsHandler, function (req, res) {
 		res.render('../../views/debug/debug.ejs', {});
 	}, errorHandler);
 
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
-	app.get('*', slackNotification, function (req, res) {
+	app.get('*', analyticsHandler, function (req, res) {
 		api.portal.wildcard(req, res);
 	}, errorHandler);
 
