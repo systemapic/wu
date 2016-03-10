@@ -243,7 +243,7 @@ module.exports = api.token = {
 			});
 
 			// return user
-			res.send(token);
+			res.send(tokens);
 		});
 	},
 
