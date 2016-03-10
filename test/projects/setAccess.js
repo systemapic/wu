@@ -8,6 +8,7 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var endpoints = require('../endpoints.js');
+var Project = require('../../models/project');
 
 
 module.exports = function () {
@@ -109,13 +110,20 @@ module.exports = function () {
 		});
 
 		// test 4
-		it('should respond with status code 400 and specific error message if user can\'t edit project', function (done) {
+		it('should respond with status code 200 and set project access', function (done) {
 			token(function (err, access_token) {
 				api.post(endpoints.projects.setAccess)
 					.send({
 						access_token: access_token,
 						project: tmpProjectCanEdit.uuid,
-						access: {edit: ['test']}
+						access: {
+							edit: ['test'],
+							options: {
+								share 	 : false,
+								download : false,
+								isPublic: false
+							}
+						}
 					})
 					.expect(httpStatus.OK)
 					.end(function (err, res) {
@@ -126,9 +134,22 @@ module.exports = function () {
 						var result = helpers.parse(res.text);
 
 						expect(result.access.edit).to.include('test');
-						done();
+						Project.findOne({
+							uuid: tmpProjectCanEdit.uuid
+						}).exec(function (err, project) {
+							expect(project.access.options.isPublic).to.be.false;
+							expect(project.access.options.share).to.be.false;
+							expect(project.access.options.download).to.be.false;
+							expect(project.access.edit).to.be.an.array;
+							expect(project.access.edit).to.include('test');
+							expect(project.access.read).to.be.an.array;
+							expect(project.access.read).to.be.empty;
+							
+							done();
+						});
 					});
 			});
 		});
+
 	});
 };
