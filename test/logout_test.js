@@ -12,7 +12,6 @@ var cookieParser = require('cookie-parser');
 
 describe.only(endpoints.logout, function () {
     var access_token = '';
-    var session = '';
 
     before(helpers.create_user);    
     after(helpers.delete_file);
@@ -39,15 +38,24 @@ describe.only(endpoints.logout, function () {
     });
 
     it('should respond with status code 200', function (done) {
-        api.post(endpoints.users.token.check)
+        api.get(endpoints.users.session)
             .send()
             .expect(httpStatus.OK)
-            .end(done);
+            .end(function (err, res) {
+                var tokens = util.parse(res.text);
+                
+                access_token = tokens.access_token;
+                expect(access_token).to.be.not.equal('public');
+                api.post(endpoints.users.token.check)
+                    .send({access_token: access_token})
+                    .expect(httpStatus.OK)
+                    .end(done);
+            });
     });
 
-    it('should respond with status code 401', function (done) {
+    it('should respond with status code 302', function (done) {
         api.get(endpoints.logout)
-            .send()
+            .send({access_token: access_token})
             .expect(httpStatus.FOUND)
             .end(function (err, response) {
                 if (err) {
@@ -58,9 +66,14 @@ describe.only(endpoints.logout, function () {
     });
 
     it('should respond with status code 401', function (done) {
-        api.post(endpoints.users.token.check)
+        api.get(endpoints.users.session)
             .send()
-            .expect(httpStatus.UNAUTHORIZED)
-            .end(done);
+            .expect(httpStatus.OK)
+            .end(function (err, res) {
+                var tokens = util.parse(res.text);
+
+                expect(tokens.access_token).to.be.equal('public');
+                done();
+            });
     });
 });
