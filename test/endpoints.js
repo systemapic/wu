@@ -55,7 +55,8 @@ module.exports = endpoint = {
         password : {
             reset       : '/v2/users/password/reset',
             set         : '/v2/users/password'
-        }
+        },
+        session         : '/v2/users/session'
     },
 
     hashes : {
@@ -78,6 +79,7 @@ module.exports = endpoint = {
         
 
     },
+    logout: '/logout',
     static: {
         screen: '/v2/static/screen'
     }
