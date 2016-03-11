@@ -78,6 +78,7 @@ module.exports = endpoint = {
         
 
     },
+    logout: '/logout',
     static: {
         screen: '/v2/static/screen'
     }
