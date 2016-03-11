@@ -417,17 +417,35 @@ module.exports = function(app) {
 	
 	/**
 	* @api {get} /v2/users/session Check if already logged in (browser-only)
-	* @apiName user_session
+	* @apiName user session
 	* @apiGroup User
 	*
-	* @apiSuccess {json} access_token Valid access token (either user or public)
+	* @apiSuccess {json} status Access token JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*	"access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
+	*	"expires_in":"36000",
+	*	"token_type":"Bearer"
+	* }
 	*/
 	// ================================
 	// CHECK SESSION ==================
 	// ================================
 	app.get('/v2/users/session', api.token.checkSession, errorHandler);
 
-	// todo: document these routes
+	/**
+	* @api {post} /v2/log/error Log error
+	* @apiName log error
+	* @apiGroup Log
+	* @apiUse token
+	* @apiParam {String} message Error message
+	* @apiParam {String} file File
+	* @apiParam {String} line Line
+	* @apiParam {String} stack Stack
+	* @apiSuccess {json} empty Empty object
+	* @apiSuccessExample {json} Success-Response:
+	* Error 200: SyntaxError: Unexpected end of input
+	*/
 	// =====================================
 	// ERROR LOGGING =======================
 	// =====================================
@@ -1739,6 +1757,10 @@ module.exports = function(app) {
 	* @apiGroup User
 	* @apiUse token
 	* @apiParam {String} uuid Uuid of user
+	* @apiParam {String} [firstname] First name
+	* @apiParam {String} [lastname] Last name
+	* @apiParam {String} [company] Company
+	* @apiParam {String} [position] Position in company
 	* @apiSuccess {Array} updated Array of updated fields
 	* @apiSuccess {Object} user Updated user
 	* @apiSuccessExample {json} Success-Response:
@@ -1825,7 +1847,7 @@ module.exports = function(app) {
 	* @apiParam {String} [position] Position in company
 	* @apiParam {String} email Email
 	* @apiParam {String} password Password
-	* @apiSuccess {Object} user User
+	* @apiSuccess {json} user User
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*   "user": {
@@ -1833,6 +1855,18 @@ module.exports = function(app) {
 	*       created: '2016-01-19T12:49:48.943Z',
 	*       ... etc
 	*   }
+	* }
+	* @apiError {json} Bad_request username or firstname or lastname or email or password do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ["username", "firstname", "lastname", "email", "password"]
+	*		}
+	*	}
 	* }
 	*/
 	app.post('/v2/users/create', api.user.create, errorHandler);
@@ -2141,7 +2175,7 @@ module.exports = function(app) {
 	* }
 	*/
 	// =====================================
-	// RESET PASSWORD ======================
+	// SEND RESET PASSWORD MAIL ============
 	// =====================================
 	app.post('/v2/users/password/reset', api.auth.requestPasswordReset, errorHandler);
 
