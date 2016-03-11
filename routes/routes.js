@@ -37,7 +37,7 @@ module.exports = function(app) {
 	/**
 	* @apiDefine token
 	* @apiParam {String} access_token A valid access token
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (403)
+	* @apiError {json} Unauthorized The <code>access_token</code> is invalid. (403)
 	* @apiErrorExample {json} Error-Response:
 	* Error 401: Unauthorized
 	* {
@@ -79,7 +79,7 @@ module.exports = function(app) {
 	* @apiUse token
 	* @apiParam {String} name Name of project
 	* @apiSuccess {JSON} Project JSON object of the newly created project
-	* @apiError Bad_request name doesn't exist in request body (400)
+	* @apiError {json} Bad_request name doesn't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -110,7 +110,7 @@ module.exports = function(app) {
 	*    "project": "project-o121l2m-12d12dlk-addasml",
 	*    "deleted": true
 	*  }
-	* @apiError Bad_request project_id doesn't exist in request body (400)
+	* @apiError {json} Bad_request project_id doesn't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -122,7 +122,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If project doesn't exist(404)
+	* @apiError {json} Not_found If project doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -154,7 +154,7 @@ module.exports = function(app) {
 	*  uuid: 'uuid-mocha-test-project_public',
 	*  etc..
 	* }
-	* @apiError Bad_request username or project_slug don't exist in request body (400)
+	* @apiError {json} Bad_request username or project_slug don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -166,7 +166,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If user with specific username doesn't exist(404)
+	* @apiError {json} Not_found If user with specific username doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -175,7 +175,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Not_found If project with specific slug doesn't exist(404)
+	* @apiError {json} Not_found If project with specific slug doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -184,7 +184,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Bad_request If project isn't public(404)
+	* @apiError {json} Bad_request If project isn't public(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -210,7 +210,7 @@ module.exports = function(app) {
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	* }
-	* @apiError Bad_request project_id or user_access_token don't exist in request body (400)
+	* @apiError {json} Bad_request project_id or user_access_token don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -262,12 +262,12 @@ module.exports = function(app) {
 	* @apiParam {String} password Password
 	* @apiParam {Boolean} [refresh=false] Refresh access token
 	*
-	* @apiSuccess {json} status Access token JSON
-	* @apiSuccessExample {json} Success-Response:
+	* @apiSuccess {JSON} status Access token JSON
+	* @apiSuccessExample {JSON} Success-Response:
 	* {
-	*	"access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
-	*	"expires_in":"36000",
-	*	"token_type":"Bearer"
+	*    "access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
+	*    "expires_in":"36000",
+	*    "token_type":"Bearer"
 	* }
 	* @apiError {json} Bad_request username and email or password don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -281,7 +281,7 @@ module.exports = function(app) {
 	*		}
 	*	 }
 	* }
-	* @apiError Not_found If user doesn't exist(404)
+	* @apiError {json} Not_found If user doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -502,7 +502,7 @@ module.exports = function(app) {
 	*  },
 	*  layer: null
 	* }
-	* @apiError Bad_request file_id do not exist in request body (400)
+	* @apiError {json} Bad_request file_id do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -514,7 +514,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If file doesn't upload(404)
+	* @apiError {json} Not_found If file doesn't upload(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -625,7 +625,7 @@ module.exports = function(app) {
 	*	 etc...
   	*   }
 	* }
-	* @apiError Bad_request project_id doesn't not exist in request body (400)
+	* @apiError {json} Bad_request project_id doesn't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -637,7 +637,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If project doesn't exist(404)
+	* @apiError {json} Not_found If project doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -646,7 +646,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Bad_request User haven't access to the project (400)
+	* @apiError {json} Bad_request User haven't access to the project (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -698,7 +698,7 @@ module.exports = function(app) {
 	*  created: '2016-02-01T07:50:46.726Z',
 	*  etc...
   	* }
-	* @apiError Bad_request access or project do not exist in request body (400)
+	* @apiError {json} Bad_request access or project do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -710,7 +710,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Bad_request User doesn't have access to change access rights of project (400)
+	* @apiError {json} Bad_request User doesn't have access to change access rights of project (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -719,7 +719,7 @@ module.exports = function(app) {
 	*		"code": "400"
 	*	}
 	* }
-	* @apiError Not_found If project doesn't exist(404)
+	* @apiError {json} Not_found If project doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -753,7 +753,7 @@ module.exports = function(app) {
 	*    isPublic: false
 	*  }
 	*}
-	* @apiError Bad_request access or project do not exist in request body (400)
+	* @apiError {json} Bad_request access or project do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -765,7 +765,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If project doesn't exist(404)
+	* @apiError {json} Not_found If project doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -813,7 +813,7 @@ module.exports = function(app) {
 	*     }
 	*   }
 	* }
-	* @apiError Bad_request project_id or saveState or hash or hash.position or hash.layers or hash.id don't not exist in request body (400)
+	* @apiError {json} Bad_request project_id or saveState or hash or hash.position or hash.layers or hash.id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -856,7 +856,7 @@ module.exports = function(app) {
 	*     layers: []
 	*   }
 	* }
-	* @apiError Bad_request project_id or project_id or id don't not exist in request body (400)
+	* @apiError {json} Bad_request project_id or project_id or id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -868,7 +868,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If hash doesn't exist(404)
+	* @apiError {json} Not_found If hash doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -900,7 +900,7 @@ module.exports = function(app) {
 	* @apiSuccess {String} image Image uuid 
 	* @apiSuccessExample {json} Success-Response:
 	* '56bdc6fbc7ec6af66dfc92f0'
-	* @apiError Bad_request image_id or resumableIdentifier or id don't not exist in request body (400)
+	* @apiError {json} Bad_request image_id or resumableIdentifier or id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -994,7 +994,7 @@ module.exports = function(app) {
 	*  },
 	*  etc...
 	* ]
-	* @apiError Bad_request If fileUuid or cartoid or layerUuid don't not exist in request body (400)
+	* @apiError {json} Bad_request If fileUuid or cartoid or layerUuid don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1049,7 +1049,7 @@ module.exports = function(app) {
 	*	polygon-fill: red;
 	*
 	* }"
-	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiError {json} Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1142,7 +1142,7 @@ module.exports = function(app) {
 	*       ... etc
 	*   }
 	* }
-	* @apiError File with uuid <code>uuid</code> doesn't exist. (422)
+	* @apiError {json} File with uuid <code>uuid</code> doesn't exist. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: File doesn't exist
 	* {
@@ -1204,13 +1204,13 @@ module.exports = function(app) {
 	*	  ... etc
 	*   }
 	* ]
-	* @apiError Missing required fields. (422)
+	* @apiError {json} Missing required fields. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: Missing type parameter or database_name and table_name for postgis type
 	* {
 	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
 	* }
-	* @apiError Missing required fields. (422)
+	* @apiError {json} Missing required fields. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: Missing file_id for rater type
 	* {
@@ -1244,7 +1244,7 @@ module.exports = function(app) {
 	*  }
 	*  users_shared_with : ['userId']
 	* }
-	* @apiError Bad_request dataset or users do not exist in request body (400)
+	* @apiError {json} Bad_request dataset or users do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1256,7 +1256,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found file does not exist (404)
+	* @apiError {json} Not_found file does not exist (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1285,7 +1285,7 @@ module.exports = function(app) {
 	*   "success": true,
 	*   "err": {}
 	* }
-	* @apiError Bad_request file_id does not exist in request body (400)
+	* @apiError {json} Bad_request file_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1297,7 +1297,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found database_name or table_name does not exist in file.data.postgis or file_id doesn't exist in file.data.raster (404)
+	* @apiError {json} Not_found database_name or table_name does not exist in file.data.postgis or file_id doesn't exist in file.data.raster (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1306,7 +1306,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Internal_server_error Problems with drop table (500)
+	* @apiError {json} Internal_server_error Problems with drop table (500)
 	* @apiErrorExample {json} Error-Response:
 	* Error 500: Internal server error
 	* {
@@ -1315,7 +1315,7 @@ module.exports = function(app) {
 	*		"code": "500"
 	*	}
 	* }
-	* @apiError Not_found If file type is postgis and file with file.data.posgis.table_name id doesn't exist(404)
+	* @apiError {json} Not_found If file type is postgis and file with file.data.posgis.table_name id doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1367,7 +1367,7 @@ module.exports = function(app) {
 	*  name: 'relatedProjectName'
 	* etc...
 	*}
-	* @apiError Bad_request file_id or project_id does not exist in request body (400)
+	* @apiError {json} Bad_request file_id or project_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1379,7 +1379,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found File with specific id not found(404)
+	* @apiError {json} Not_found File with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1388,7 +1388,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Not_found Project with specific id not found(404)
+	* @apiError {json} Not_found Project with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1417,7 +1417,7 @@ module.exports = function(app) {
 	*   "success": true,
 	*   "err": {}
 	* }
-	* @apiError Bad_request layer_id or project_id does not exist in request body (400)
+	* @apiError {json} Bad_request layer_id or project_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1429,7 +1429,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found Layer with specific id not found(404)
+	* @apiError {json} Not_found Layer with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1438,7 +1438,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Not_found Project with specific id not found(404)
+	* @apiError {json} Not_found Project with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1472,7 +1472,7 @@ module.exports = function(app) {
 	*    lastUpdated: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
 	*    _id: 56 a60908fdce40a15eca6773
 	*}, and etc]
-	* @apiError Bad_request project does not exist in request body (400)
+	* @apiError {json} Bad_request project does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1609,7 +1609,7 @@ module.exports = function(app) {
 	*     }
 	*   }
 	* }
-	* @apiError Bad_request layer does not exist in request body (400)
+	* @apiError {json} Bad_request layer does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1621,7 +1621,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If layer doesn't exist(404)
+	* @apiError {json} Not_found If layer doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1649,13 +1649,13 @@ module.exports = function(app) {
 	*	error : err,
 	*	meta : meta
 	* }
-	* @apiError Bad_request No meta (400)
+	* @apiError {json} Bad_request No meta (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
 	*    "error": 'No meta.'
 	* }
-	* @apiError Bad_request layer_id or file_id do not exist in request body (400)
+	* @apiError {json} Bad_request layer_id or file_id do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1667,7 +1667,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If file doesn't exist(404)
+	* @apiError {json} Not_found If file doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1694,13 +1694,13 @@ module.exports = function(app) {
 	* @apiSuccess {Boolean} ok 
 	* @apiSuccess {String} cartoid Carto css id
 	* @apiSuccess {Object} error Error object
-	* @apiError Bad_request If mss file doesn't exist(400)
+	* @apiError {json} Bad_request If mss file doesn't exist(400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
 	*    "error": "ENOENT, open '/data/cartocss/test.mss'"
 	* }
-	* @apiError Not_found If layer doesn't exist(400)
+	* @apiError {json} Not_found If layer doesn't exist(400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1720,7 +1720,7 @@ module.exports = function(app) {
 	* @apiUse token
 	* @apiParam {String} cartoid Id of mss file
 	* @apiSuccess {String} cartocss Carto css string
-	* @apiError Bad_request If mss file doesn't exist(400)
+	* @apiError {json} Bad_request If mss file doesn't exist(400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1750,7 +1750,7 @@ module.exports = function(app) {
 	*       ... etc
 	*   }
 	* }
-	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiError {json} Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1762,7 +1762,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiError {json} Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1771,7 +1771,7 @@ module.exports = function(app) {
 	*		"code": "400"
 	*	}
 	* }
-	* @apiError Not_found If user doesn't exist(404)
+	* @apiError {json} Not_found If user doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1856,7 +1856,7 @@ module.exports = function(app) {
 	* {
 	*   "unique": true
 	* }
-	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiError {json} Bad_request Email does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1886,7 +1886,7 @@ module.exports = function(app) {
 	* {
 	*   "unique": true
 	* }
-	* @apiError Bad_request Username does not exist in request body (400)
+	* @apiError {json} Bad_request Username does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1917,7 +1917,7 @@ module.exports = function(app) {
 	* {
 	*   "error": null
 	* }
-	* @apiError Bad_request Emails or customMessage or access do not exist in request body (400)
+	* @apiError {json} Bad_request Emails or customMessage or access do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1962,7 +1962,7 @@ module.exports = function(app) {
 	*     "timestamp": 1455569798000,
 	*     "type": "link"
 	* }
-	* @apiError Bad_request Invite_token does not exist in request body (400)
+	* @apiError {json} Bad_request Invite_token does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1974,7 +1974,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found Some of project does not exist (404)
+	* @apiError {json} Not_found Some of project does not exist (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -2002,7 +2002,7 @@ module.exports = function(app) {
 	* {
 	*   "error": null
 	* }
-	* @apiError Bad_request Contact does not exist in request body (400)
+	* @apiError {json} Bad_request Contact does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -2014,7 +2014,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Bad_request user does not exist in request body (404)
+	* @apiError {json} Bad_request user does not exist in request body (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -2061,7 +2061,7 @@ module.exports = function(app) {
 	*    }
 	*  }]
 	* }
-	* @apiError Bad_request User, edits and reads do not exist in request body (400)
+	* @apiError {json} Bad_request User, edits and reads do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -2089,7 +2089,7 @@ module.exports = function(app) {
 	* @apiSuccess {String} link Invite link
 	* @apiSuccessExample {json} Success-Response:
 	* https://dev3.systemapic.com/invite/7Tf7Bc8
-	* @apiError Bad_request access does not exist in request body (400)
+	* @apiError {json} Bad_request access does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -2118,7 +2118,7 @@ module.exports = function(app) {
 	* @apiGroup User
 	* @apiParam {String} email User's email
 	* @apiSuccess {String} text Please check your email for password reset link.
-	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiError {json} Bad_request Email does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -2130,7 +2130,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If user with specific email doesn't exist(404)
+	* @apiError {json} Not_found If user with specific email doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: User not found
 	* {
@@ -2158,7 +2158,7 @@ module.exports = function(app) {
 	* @apiParam {String} password New password
 	* @apiParam {String} token Access token
 	* @apiSuccess {String} text Moved Temporarily. Redirecting to /
-	* @apiError Bad_request password or token do not exist in request body (400)
+	* @apiError {json} Bad_request password or token do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -2170,7 +2170,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If file doesn't upload(404)
+	* @apiError {json} Not_found If file doesn't upload(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 401: Invalid token
 	* {
