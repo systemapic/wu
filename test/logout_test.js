@@ -10,7 +10,7 @@ var endpoints = require('./endpoints.js');
 var _ = require('lodash');
 var cookieParser = require('cookie-parser');
 
-describe.only(endpoints.logout, function () {
+describe(endpoints.logout, function () {
     var access_token = '';
 
     before(helpers.create_user);    
