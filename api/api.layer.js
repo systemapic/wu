@@ -235,8 +235,8 @@ module.exports = api.layer = {
 			api.geo._json2carto(defaultStyleJSON, function (err, cartoCSS) {
 
 				console.log('json2carto: ', err, cartoCSS);
-
-
+				
+				callback(err);
 			})
 
 
@@ -681,19 +681,20 @@ module.exports = api.layer = {
 	setCartoCSS : function (req, res) {
 
 		// get params
-		var fileUuid 	= req.body.fileUuid,
-		    css 	= req.body.css,
-		    cartoid 	= req.body.cartoid,
-		    layerUuid 	= req.body.layerUuid,
-		    csspath = api.config.path.cartocss + cartoid + '.mss',
-		    isOSM = (fileUuid == 'osm'),
-		    host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
+		var params = req.body || {};
+		var fileUuid 	= params.fileUuid;
+		var css 	= params.css;
+		var cartoid 	= params.cartoid;
+		var layerUuid 	= params.layerUuid;
+		var csspath = api.config.path.cartocss + cartoid + '.mss';
+		var isOSM = (fileUuid == 'osm');
+		var host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
 
 		var host = api.config.vile.uri;
 
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			if (err) return api.error.general(req, res);
+			if (err) return api.error.general(req, res, err || 'No data.');
 
 			// send to tileserver storage
 			request({

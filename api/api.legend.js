@@ -48,8 +48,7 @@ module.exports = api.legend = {
 
 		var options = {
 			fileUuid : req.body.fileUuid,
-		    	cartoid : req.body.cartoid,
-		    	layerUuid : req.body.layerUuid
+	    	cartoid : req.body.cartoid,
 		}
 
 		api.legend.generate(options, function (err, legends) {
@@ -65,12 +64,10 @@ module.exports = api.legend = {
 
 
 	generate : function (options, done) {
-		var fileUuid = options.fileUuid,
-		    cartoid = options.cartoid,
-		    layerUuid = options.layerUuid,
-		    ops = [];
+		var fileUuid = options.fileUuid;
+		var cartoid = options.cartoid;
+		var ops = [];
 
-		// if (!fileUuid || !cartoid || !layerUuid) return done('Missing information.4');
 		if (!fileUuid || !cartoid) return done('Missing information.4');
 
 		// get layer features/values
