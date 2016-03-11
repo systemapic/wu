@@ -313,11 +313,13 @@ module.exports = api.user = {
 				user_a.contact_list.addToSet(user_b._id);
 				user_b.contact_list.addToSet(user_a._id);
 				user_a.save(function (err) {
+					console.log('user_A saved', err);
 					if (err) {
 						done && done(err);
 						return;
 					}
 					user_b.save(function (err) {
+					console.log('user_B saved', err);
 						if (err) {
 							done && done(err);
 							return;
@@ -526,9 +528,9 @@ module.exports = api.user = {
 		var password = options.password;
 		var invite_token = options.invite;
 		var missing = [];
-		var ops = [];
+		var ops = {};
 
-		console.log('api.user.create');
+		console.log('api.user.create', req.session);
 
 		// check valid fields
 		if (!username) 	missing.push('username');
@@ -536,25 +538,23 @@ module.exports = api.user = {
 		if (!lastname) 	missing.push('lastname');
 		if (!email) 	missing.push('email');
 		if (!password) 	missing.push('password');
-		console.log('missing:');
-		console.log(missing);
 		if (!_.isEmpty(missing)) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing));
 
 
 		// ensure unique username
-		ops.push(function (callback) {
+		ops.check_username = function (callback) {
 			api.user._checkUniqueUsername(username, callback);
-		});
+		};
 
 		// check unique email
-		ops.push(function (callback) {
+		ops.check_email = function (callback) {
 			api.user._checkUniqueEmail(email, callback);
-		});
+		};
 
 		// create user
-		ops.push(function (callback) {
+		ops.create_user = function (callback) {
 			api.user.createUserModel(options, callback);
-		});
+		};
 
 		// run ops
 		async.series(ops, function (err, results) {
@@ -562,8 +562,30 @@ module.exports = api.user = {
 			if (err) return next(err);
 
 			// return user
-			var user = results[2];
+			var user = results.create_user;
 			res.send(user);
+
+			api.user._attemptAddContact(req, user, function (err) {
+				console.log('_attemptAddContact err', err);
+			});
+		});
+
+	},
+
+	_attemptAddContact : function (req, user_a, callback) {
+		if (!req.session) return callback('No req.session');
+		if (!req.session.tokens) return callback('No req.session.tokens');
+		var access_token = req.session.tokens.access_token;
+		if (!access_token) return callback('No req.session.tokens.access_token');
+
+		api.token._authenticate(access_token, function (err, user_b) {
+			if (err) return callback(err);
+
+			console.log('found user:');
+			console.log(user_b);
+
+			console.log('users adding contcts', user_a.uuid, user_b.uuid);
+			api.user._addContacts(user_a.uuid, user_b.uuid, callback);
 		});
 
 	},

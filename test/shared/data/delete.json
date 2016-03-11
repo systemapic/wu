@@ -204,11 +204,8 @@
         "table_name": "newFileWithRasterType",
         "data_type": "new data_type",
         "original_format": "new original_format",
-        "metadata": "new metadata"
-      },
-      "raster": {
-        "file_id": "newFileWithRasterType",
-        "metadata": "new metadata"
+        "metadata": "new metadata",
+        "file_id": "newFileWithRasterType"
       }
     }
   },
@@ -276,9 +273,6 @@
         "table_name": "newRasterFileWithRealtedUser",
         "data_type": "new data_type",
         "original_format": "new original_format",
-        "metadata": "new metadata"
-      },
-      "raster": {
         "file_id": "newRasterFileWithRealtedUser",
         "metadata": "new metadata"
       }
