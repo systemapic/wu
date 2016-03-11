@@ -131,8 +131,6 @@ module.exports = function () {
                         expect(result.file.data.postgis.data_type).to.be.equal(options.data.postgis.data_type);
                         expect(result.file.data.postgis.original_format).to.be.equal(options.data.postgis.original_format);
                         expect(result.file.data.postgis.metadata).to.be.equal(options.data.postgis.metadata);
-                        expect(result.file.data.raster.file_id).to.be.equal(options.data.raster.file_id);
-                        expect(result.file.data.raster.metadata).to.be.equal(options.data.raster.metadata);
                         done();
                     });
             });

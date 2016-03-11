@@ -43,13 +43,13 @@ var mapnikOmnivore = require('mapnik-omnivore');
 var api = module.parent.exports;
 
 // exports
-module.exports = api.analytics = { 
+module.exports = api.analytics = {
 
 
 
 	downloadedDataset : function (options) {
-		var user = options.user,
-		    filename = options.filename;
+		var user = options.user;
+		var filename = options.filename;
 
 		// send to slack
 		api.slack.userEvent({
@@ -62,8 +62,8 @@ module.exports = api.analytics = {
 	},
 
 	downloadedLayer : function (options) {
-		var user = options.user,
-		    filename = options.filename;
+		var user = options.user;
+		var filename = options.filename;
 
 		// send to slack
 		api.slack.userEvent({
@@ -74,15 +74,6 @@ module.exports = api.analytics = {
 
 		// other analytics
 	},
-
-
-
-
-
-
-
-
-
 
 	set : function (req, res) {
 		var options = req.body || {};
@@ -116,11 +107,8 @@ module.exports = api.analytics = {
 		var userHeader  = options.userHeader;
 		var gaEvent 	= options.gaEvent;
 		var gaPageview  = options.gaPageview;
-
-
 		var trackingID = userHeader.trackingID;
 		var clientID   = userHeader.clientID;   // The same as user id
-
 		// Create GA user instance
 		var visitor = ua(trackingID, clientID, {
 		
@@ -164,7 +152,7 @@ module.exports = api.analytics = {
 				// Software version (Session)
 				cd3: gaPageview.version
 
-			}
+			};
 
 			visitor.pageview(pageviewParams, function (err) {
 
@@ -196,7 +184,7 @@ module.exports = api.analytics = {
 				// path (optional)
 				dp: gaEvent.path
 
-			}
+			};
 
 			// Label
 			if ( gaEvent.eventLabel ) eventParams.el = gaEvent.eventLabel;
