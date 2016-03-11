@@ -139,19 +139,17 @@ module.exports = api.error = {
 	},	
 	
 	clientLog : function (req, res) {
-		var options 	= req.body,
-		    message 	= options.message,
-		    file 	= options.file,
-		    line 	= options.line,
-		    stack 	= options.stack,
-		    username 	= options.username,
-		    project 	= options.project,
-		    domain 	= api.config.portalServer.uri.split('//').reverse()[0],
-		    fileLine 	= options.file.split('/').reverse()[0] + ':' + options.line,
-		    find 	= api.config.portalServer.uri,
-		    re 		= new RegExp(find, 'g'),
-		    cleanStack 	= stack ? stack.replace(re, '') : '',
-		    text 	= '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
+		var options = req.body || {};
+		var message	= options.message;
+		var file = options.file;
+		var line = options.line;
+		var stack = options.stack;
+		var domain = api.config.portalServer.uri.split('//').reverse()[0];
+		var fileLine = file.split('/').reverse()[0] + ':' + line;
+		var find = api.config.portalServer.uri;
+		var re = new RegExp(find, 'g');
+		var cleanStack = stack ? stack.replace(re, '') : '';
+		var text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
 
 		// send error to slack
 		api.slack._send({
@@ -159,8 +157,7 @@ module.exports = api.error = {
 			channel : api.config.slack.errorChannel,
 			icon : 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle-error.png'
 		});
-
-		res && res.end(); // no feedback
+		res && res.send(); // no feedback
 	},
 
 	code : {

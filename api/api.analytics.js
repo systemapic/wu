@@ -85,7 +85,7 @@ module.exports = api.analytics = {
 
 
 	set : function (req, res) {
-		var options = req.body;
+		var options = req.body || {};
 
 		if (!options) return api.error.missingInformation(req, res);
 
@@ -266,7 +266,7 @@ module.exports = api.analytics = {
 
 	// NOT IN USE YET
 	get : function (req, res) {
-		var options = req.query;
+		var options = req.query || {};
 		if (!options) return api.error.missingInformation(req, res);
 
 		// return to client
