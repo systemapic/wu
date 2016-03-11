@@ -57,6 +57,7 @@ app.io.use(function(socket, next){
 	var tokens = decoded_cookie.content ? decoded_cookie.content.tokens : false;
 	if (!tokens || !tokens.access_token) return next(new Error('Invalid access token.')); // public will fail here, returns 500...
 	api.token._authenticate(tokens.access_token, function (err, user) {
+				console.log("TEST!!!")
 		if (err) return next(err);
 		socket.session = socket.session || {};
 		socket.session.user_id = user._id;
