@@ -164,7 +164,7 @@ module.exports = function () {
 
                         var result = helpers.parse(res.text);
 
-                        expect(result.file.type).to.be.equal('raster');
+                        expect(result.file.type).to.be.equal('postgis');
                         expect(result.file.originalName).to.be.equal('raster.ecw.200.zip');
                         expect(result.file.name).to.be.equal('raster.ecw.200');
                         done();
@@ -185,7 +185,11 @@ module.exports = function () {
 
             ops.push(function (callback) {
         
-                relatedLayer.file = tmp.file_id;
+                relatedLayer.data = {
+                    postgis: {
+                        table_name: tmp.file_id
+                    }
+                };
 
                 helpers.create_layer_by_parameters(relatedLayer, function (err, res) {
                     if (err) {
