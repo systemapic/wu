@@ -176,7 +176,7 @@ module.exports = function () {
 
     describe(endpoints.data.delete, function () {
         this.slow(500);
-
+        
         var relatedLayer = testData.relatedLayer;
         var relatedProject = testData.relatedProject;
 
@@ -184,8 +184,12 @@ module.exports = function () {
             var ops = [];
 
             ops.push(function (callback) {
-
-                relatedLayer.file = tmp.file_id;
+        
+                relatedLayer.data = {
+                    postgis: {
+                        table_name: tmp.file_id
+                    }
+                };
 
                 helpers.create_layer_by_parameters(relatedLayer, function (err, res) {
                     if (err) {
@@ -223,7 +227,7 @@ module.exports = function () {
                 helpers.delete_layer_by_id(relatedLayer.uuid, callback);
             });
 
-            async.waterfall(ops, done);
+            async.waterfall(ops, done);     
         });
 
         it('should be able to delete file correctly', function (done) {
@@ -232,18 +236,18 @@ module.exports = function () {
             ops.push(function (callback) {
                 token(function (err, access_token) {
                     api.post(endpoints.data.delete)
-                        .send({file_id : tmp.file_id, access_token : access_token})
-                        .expect(httpStatus.OK)
-                        .end(function (err, res) {
-                            if (err) {
-                                return callback(err);
-                            }
+                    .send({file_id : tmp.file_id, access_token : access_token})
+                    .expect(httpStatus.OK)
+                    .end(function (err, res) {
+                        if (err) {
+                            return callback(err);
+                        }
 
-                            var result = helpers.parse(res.text);
-                            expect(result.success).to.be.true;
+                        var result = helpers.parse(res.text);
+                        expect(result.success).to.be.true;
 
-                            callback(null, result);
-                        });
+                        callback(null, result);
+                    });
                 });
             });
 
@@ -280,7 +284,7 @@ module.exports = function () {
                     });
             });
 
-            async.waterfall(ops, done);
+            async.waterfall(ops, done); 
 
         });
 

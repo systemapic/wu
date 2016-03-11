@@ -45,23 +45,38 @@ var api = module.parent.exports;
 // exports
 module.exports = api.project = {
 
-	setAccess : function (req, res) {
+	setAccess : function (req, res, next) {
 
 		var user = req.user;
-		var options = req.body;
+		var options = req.body || {};
 		var projectAccess = options.access;
 		var projectUuid = options.project;
+		var missingRequiredRequestFields = [];
 
-		if (!projectUuid || !projectAccess) return api.error.missingInformation(req, res);
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project');			
+		}
+
+		if (!projectAccess) {
+			missingRequiredRequestFields.push('access');
+		}
+		
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-
 				// check if access to edit
 				var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
 
-				if (!canEdit) return api.error.general(req, res, 'No access.');
+				if (!canEdit) {
+					return next({
+						message: errors.no_access.errorMessage,
+						code: httpStatus.BAD_REQUEST
+					});
+				}
 
 				var currentAccess = project.access;
 
@@ -85,13 +100,15 @@ module.exports = api.project = {
 				project.save(function (err, p) {
 
 					// return if err
-					if (err) return res.json({
-						error : err
-					});
+					if (err) {
+						return res.send({
+							error : err
+						});
+					}
 
 					// return project
-					res.json(p);
-				})
+					res.send(p);
+				});
 			});
 
 	},
@@ -227,7 +244,7 @@ module.exports = api.project = {
 			project_slug : project_slug
 		}, function (err, public_project) {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 
 			// public project
@@ -285,12 +302,13 @@ module.exports = api.project = {
 			var got_access = api.project._checkProjectAccess(user, project);
 
 			// return project
-			if (got_access) return res.send(project);
+			if (got_access) {
+				return res.send(project);
+			}
 
 			// no access
 			res.send({ error : 'No access.' });
 		});
-
 
 	},
 
@@ -390,7 +408,7 @@ module.exports = api.project = {
 	// #########################################
 	// ###  API: Create Project              ###
 	// #########################################
-	// createProject : function (req, res) {
+	// createProject : function (req, res, next) {
 	create : function (req, res, next) {
 		var store = req.body || {};
 		var user = req.user;
@@ -467,13 +485,13 @@ module.exports = api.project = {
 			}
 
 			// slack
-			api.slack.createdProject({
-				project : project,
-				user : user
-			});
+			// api.slack.createdProject({
+			// 	project : project,
+			// 	user : user
+			// });
 
 			// return
-			api.project._returnProject(req, res, project);
+			api.project._returnProject(req, res, project, next);
 		});
 	},
 
@@ -628,16 +646,17 @@ module.exports = api.project = {
 			}
 
 			// slack
-			api.slack.deletedProject({
-				project : project,
-				user : user
-			});
+			// api.slack.deletedProject({
+			// 	project : project,
+			// 	user : user
+			// });
 
 			// done
 			res.send({
 				project : project.uuid,
 				deleted : true
 			});
+			next();
 		})
 	},
 
@@ -849,10 +868,10 @@ module.exports = api.project = {
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
-		return res.send({
+		res.send({
 			unique : true
 		});
-
+		
 		// var value = req.body.value,
 		//     clientUuid = req.body.client,
 		//     projectUuid = req.body.project,
@@ -879,7 +898,7 @@ module.exports = api.project = {
 		// });
 	},
 
-	_returnProject : function (req, res, project, err) {
+	_returnProject : function (req, res, project, next) {
 		if (!project) return api.error.general(req, res, err);
 
 		Project
@@ -888,10 +907,10 @@ module.exports = api.project = {
 			.populate('layers')
 			.populate('roles')
 			.exec(function (err, project) {
-				res.end(JSON.stringify({
+				res.send({
 					error : err,
 					project: project
-				}));
+				});
 			});
 	},
 
@@ -1028,7 +1047,7 @@ module.exports = api.project = {
 				return next(results[0]);
 			}
 
-			res.send({
+			return res.send({
 				error: err || null,
 				hash : results[1]
 			});

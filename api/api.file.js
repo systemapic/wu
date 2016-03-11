@@ -842,15 +842,12 @@ module.exports = api.file = {
 
 	// delete a file
 	deleteFiles : function (req, res) {
-		var _fids  = req.body._fids,
-		    puuid  = req.body.puuid,
-		    userid = req.user.uuid,
-		    uuids = req.body.uuids,
-		    ops = [],
-		    _lids = [];
-
-
-
+		var _fids  = req.body._fids;
+		var puuid  = req.body.puuid;
+		var userid = req.user.uuid;
+		var uuids = req.body.uuids;
+		var ops = [];
+		var _lids = [];
 
 		// validate
 		if (!_fids || !puuid || !userid) return api.error.missingInformation(req, res);

@@ -35,15 +35,6 @@ module.exports = function () {
             // delete tmp user, project
             async.series([helpers.delete_project], callback);
         });
-
-
-
-
-
-
-
-
-
         
         describe('POST ' + endpoints.import.post, function () {
             this.slow(500);
