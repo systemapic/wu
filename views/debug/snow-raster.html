@@ -240,7 +240,7 @@
     map.on('mousemove', function (e) {
       
         map.featuresAt(e.point, {
-            radius: 5,
+            radius: 0,
             // layers : ['akersvatn']
         }, function (err, features) {
             if (err) return console.log('err', err);
@@ -252,11 +252,13 @@
                 // console.log('f', features.length);
                 // console.log('feat',features);
                 features.forEach(function (f) {
-                    str.push(JSON.stringify(f, null, 2));
+                    // str.push(JSON.stringify(f, null, 2));
 
                     if (_.contains(f.layer.id, 'deformation')) {
 
-                        map.setPaintProperty(f.layer.id, 'fill-color', "red");
+                        // map.setPaintProperty(f.layer.id, 'fill-color', "red");
+
+                        str.push(JSON.stringify(f, null, 2));
                     }
                 });
 
@@ -294,8 +296,24 @@
      function create_color_ramp(source) {
 
         // create color ramp
+        var range = [-30, 30];
         var range = [-16, 16];
         var color_ramp = ['#07000F', '#16032C', '#240546', '#2F0461', '#40097E', '#501099', '#5F16B3', '#721FD0', '#8429EB', '#923FF1', '#A259F5', '#B57AF9', '#C697FB', '#D5B1FF', '#E5CFFF', '#F4ECFF'];
+       
+        // var color_ramp = [
+        //     '#8dd3c7',
+        //     '#ffffb3',
+        //     '#bebada',
+        //     '#fb8072',
+        //     '#80b1d3',
+        //     '#fdb462',
+        //     '#b3de69',
+        //     '#fccde5',
+        //     '#d9d9d9',
+        //     '#bc80bd',
+        //     '#ccebc5',
+        //     '#ffed6f'
+        // ];
         var layers = [];
         // 16 steps
         for (var i = range[0]; i<range[1]; i++) {
@@ -314,6 +332,19 @@
                 "interactive" : true
             });
         }
+
+         layers.push({
+                "id": "deformation_min",
+                "type": "fill",
+                "source": source,
+                "source-layer": "layer",
+                "filter": ["<", "val", range[0]],
+                "paint": {
+                    "fill-color": 'black'
+                },
+                "layout": {},
+                "interactive" : true
+            });
 
         return layers;
 

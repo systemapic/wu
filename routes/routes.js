@@ -1533,6 +1533,7 @@ module.exports = function(app) {
 	* @api {post} /v2/users/create Create new user
 	* @apiName info
 	* @apiGroup User
+	* @apiUse token
 	* @apiParam {String} username Unique username
 	* @apiParam {String} firstname First name
 	* @apiParam {String} lastname Last name
@@ -1546,7 +1547,7 @@ module.exports = function(app) {
 	*   "user": {
 	*       lastUpdated: '2016-01-19T12:49:49.076Z',
 	*       created: '2016-01-19T12:49:48.943Z',
-	*       ... etc
+	*       ... etc.
 	*   }
 	* }
 	*/
@@ -1951,9 +1952,9 @@ module.exports = function(app) {
 	// =====================================
 	// DEBUG =====================
 	// =====================================
-	app.get('/api/debug', analyticsHandler, function (req, res) {
-		res.render('../../views/debug/debug.ejs', {});
-	}, errorHandler);
+	// app.get('/api/debug', analyticsHandler, function (req, res) {
+	// 	res.render('../../views/debug/debug.ejs', {});
+	// }, errorHandler);
 
 	// =====================================
 	// WILDCARD PATHS ======================		

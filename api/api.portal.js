@@ -229,10 +229,10 @@ module.exports = api.portal = {
 		
 	},
 
-	logout : function (req, res) {
+	logout : function (req, res, next) {
 		req.session.reset();
-		req.logout();
-		res.redirect('/');
+		res.redirect("/");
+		next();
 	},
 
 	login : function (req, res) {
@@ -241,8 +241,6 @@ module.exports = api.portal = {
 
 	
 	getBase : function (req, res) {
-
-
 		var options = {
 			hotlink : {},
 			access_token : req.session.tokens || {}
