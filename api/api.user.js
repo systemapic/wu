@@ -520,8 +520,8 @@ module.exports = api.user = {
 	create : function (req, res, next) {
 		var options = req.body;
 		var username = options.username;
-		var firstname = options.firstname;
-		var lastname = options.lastname;
+		var firstname = options.firstname || options.firstName;
+		var lastname = options.lastname || options.lastName;
 		var company = options.company;
 		var position = options.position;
 		var email = options.email;
@@ -838,6 +838,33 @@ module.exports = api.user = {
 			done(err);
 		});
 
+
+	},
+
+
+	deleteUser : function (req, res, next) {
+		console.log('api.user.deleteUser', req.body, req.user, typeof req.user);
+		console.log('REQ.USER -->');
+		console.log(req.user);
+		console.log(JSON.parse(req.user));
+		// if (!req.user) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['user']));
+
+		var user_id = req.body.user_id || req.body.uuid;
+
+		// only allow deleting of self
+		if (req.user.uuid != user_id) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['user']));
+
+		User
+	        .findOne({uuid : user_id})
+	        .remove()
+	        .exec(function (err) {
+	        	console.log('removed()', err);
+	        	res.end(JSON.stringify({
+	        		err : err,
+	        		user_id : user_id,
+	        		success : _.isEmpty(err)
+	        	}));
+	        });
 
 	},
 
