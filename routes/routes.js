@@ -2229,7 +2229,7 @@ module.exports = function(app) {
 	app.get('/clientConfig.js', analyticsHandler, function (req, res) {
 		var configString = 'var systemapicConfigOptions = ' + JSON.stringify(api.clientConfig);
 		res.setHeader("content-type", "application/javascript");
-		res.end(configString);
+		res.send(configString);
 	}, errorHandler);
 
 	// =====================================

@@ -253,12 +253,12 @@ module.exports = api.portal = {
 
 	joinBeta : function (req, res, next) {
 		if (!req.query) {
-			return res.end();
+			return res.send();
 		}
 
 		var email = req.query.email;
 
-		if (_.isEmpty(email)) return res.end();
+		if (_.isEmpty(email)) return res.send();
 
 		// add to redis
 		api.redis.stats.lpush('beta_access', email);
@@ -270,7 +270,7 @@ module.exports = api.portal = {
 		api.portal.getBetaMembers();
 
 		// return
-		res.end();
+		res.send();
 	},
 
 	getBetaMembers : function () {
@@ -346,13 +346,16 @@ module.exports = api.portal = {
 
 		// series
 		async.series(a, function (err, result) {
-			if (err || !result) return api.error.general(req, res, err || 'No result.');
+			if (err || !result) {
+				return api.error.general(req, res, err || 'No result.');
+			}
 
 			var gzip = true;
 			if (req.query.gzip === 'false') gzip = false;
 
-			if (!gzip) return res.send(result);
-			
+			if (!gzip) {
+				return res.send(result);
+			}			
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
 			zlib.gzip(JSON.stringify(result), function (err, zipped) {

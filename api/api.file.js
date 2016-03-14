@@ -99,7 +99,7 @@ module.exports = api.file = {
 					if (err) return api.error.general(req, res, err); // if err
 
 					// send zip uuid
-					res.end(uuidFolder);
+					res.send(uuidFolder);
 				});
 			});
 		});
@@ -510,7 +510,7 @@ module.exports = api.file = {
 					return next(error);
 				}
 
-				res.json({
+				res.send({
 					err : error,
 					success : !error
 				});
@@ -814,7 +814,7 @@ module.exports = api.file = {
 		.find({'file' : file_id})
 		.exec(function (err, layers) {
 			if (err) return api.error.general(req, res, err);
-			res.json(layers);
+			res.send(layers);
 		});
 	},
 
@@ -836,7 +836,7 @@ module.exports = api.file = {
 		.find({'data.postgis.table_name' : table_name})
 		.exec(function (err, layers) {
 			if (err) return api.error.general(req, res, err);
-			res.json(layers);
+			res.send(layers);
 		});
 	},
 
@@ -900,9 +900,9 @@ module.exports = api.file = {
 			if (err) console.log('ERR 15'.red, err);
 			if (err) return api.error.general(req, res, err);		
 
-			res.end(JSON.stringify({
+			res.send({
 				error : err
-			}));
+			});
 		});
 	},
 
@@ -954,7 +954,7 @@ module.exports = api.file = {
 				return next(err);
 			}
 
-			res.end(JSON.stringify(result));
+			res.send(result);
 		});
 
 	},
@@ -1267,7 +1267,7 @@ module.exports = api.file = {
 			res.set({'Content-Type': 'text/json'});		// todo: encoding of arabic characters, tc.
 			
 			// return
-			res.end(JSON.stringify(data));
+			res.send(data);
 		});
 	},
 
@@ -1390,7 +1390,7 @@ module.exports = api.file = {
 			if (err) console.log('ERR 11'.red, err);
 
 			var count = stdout;
-			res.end(count);
+			res.send(count);
 		});
 	},
 

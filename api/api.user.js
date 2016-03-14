@@ -258,7 +258,7 @@ module.exports = api.user = {
 		var request_token = path[4];
 
 		// check
-		if (!request_token) return res.end('Nope!');
+		if (!request_token) return res.send('Nope!');
 
 		// save request
 		var invite_key = 'contactRequest:' + request_token;
@@ -859,11 +859,11 @@ module.exports = api.user = {
 	        .remove()
 	        .exec(function (err) {
 	        	console.log('removed()', err);
-	        	res.end(JSON.stringify({
+	        	res.send({
 	        		err : err,
 	        		user_id : user_id,
 	        		success : _.isEmpty(err)
-	        	}));
+	        	});
 	        });
 
 	},
