@@ -656,7 +656,6 @@ module.exports = api.project = {
 				project : project.uuid,
 				deleted : true
 			});
-			next();
 		})
 	},
 
