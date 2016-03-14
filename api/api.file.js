@@ -107,10 +107,12 @@ module.exports = api.file = {
 
 	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
+		if (!options.file || !options.user) retnr done('Wrong args');
+
 		var userUuid = options.user.uuid;
 		var file_id = options.file._id;
 
-		    console.log('add addNewFileToUser', options);
+		console.log('add addNewFileToUser', options);
 
 		User
 		.findOne({uuid : userUuid})
@@ -921,8 +923,8 @@ module.exports = api.file = {
 
 		ops.push(function (callback) {
 			File
-				.findOne({uuid : fileUuid})
-				.exec(callback);
+			.findOne({uuid : fileUuid})
+			.exec(callback);
 		});
 
 		ops.push(function (file, callback) {
@@ -947,7 +949,7 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, result) {
-			if (err) console.log('file update err: '.red + err);
+			if (err) console.log('file update err: '.red, err.message);
 			if (err) console.log('ERR 16'.red, err);
 
 			if (err || !result) {

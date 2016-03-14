@@ -131,12 +131,12 @@ module.exports = api.import = {
 
 					console.log('TYPE OF META', typeof meta);
 
-					// save meta to file
-					if (uploadStatus.data_type == 'vector') {
-						file.data.postgis.metadata = meta;
-					} else {
-						file.data.postgis.metadata = JSON.stringify(meta);
-					}
+					// // save meta to file
+					// if (uploadStatus.data_type == 'vector') {
+					// 	file.data.postgis.metadata = meta;
+					// } else {
+					// 	file.data.postgis.metadata = JSON.stringify(meta);
+					// }
 
 					if (_.isObject(meta)) {
 						file.data.postgis.metadata = api.utils.stringify(meta);
