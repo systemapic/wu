@@ -102,7 +102,7 @@
     "xml2js": "^0.4.15"
   },
   "devDependencies": {
-    "apidoc": "^0.14.0",
+    "apidoc": "^0.15.1",
     "chai": "^3.4.1",
     "documentation": "^3.0.4",
     "grunt": "^0.4.5",
