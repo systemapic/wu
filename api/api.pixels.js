@@ -601,7 +601,7 @@ module.exports = api.pixels = {
 
 		console.log('imageId: ', imageId);
 
-		if (imageId == 'images') return res.end();
+		if (imageId == 'images') return res.send();
 
 		var options = {
 			height: height,
@@ -633,7 +633,7 @@ module.exports = api.pixels = {
 		var path = '/data/images/' + image_id;
 
 		// only allow screenshot to go thru
-		if (path.indexOf('resized_screenshot.jpg') == -1) return res.end(); 
+		if (path.indexOf('resized_screenshot.jpg') == -1) return res.send();
 
 		// return screenshot
 		res.sendfile(path, {maxAge : 10000000});

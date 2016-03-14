@@ -58,7 +58,7 @@ module.exports = api.auth = {
 			api.email.sendPasswordResetEmail(user);
 		});
 
-		res.end();
+		res.send();
 	},
 
 	serveResetPage : function (req, res) {
