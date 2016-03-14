@@ -166,9 +166,9 @@ module.exports = api.auth = {
 		// check token
 		var token = req.body.token;
 		api.redis.temp.get(token, function (err, userUuid) {
-			return res.end(JSON.stringify({
+			return res.send({
 				valid : userUuid ? true : false
-			}));
+			});
 		});
 	},
 

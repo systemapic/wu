@@ -95,10 +95,10 @@ module.exports = api.analytics = {
 	 	if ( _error ) {	 		
 
 			// return to client
-			res.end(JSON.stringify({
+			res.send({
 				result : _error,
 				error : true
-			}));
+			});
 
 			return;	 		
 	 	}
@@ -157,10 +157,10 @@ module.exports = api.analytics = {
 			visitor.pageview(pageviewParams, function (err) {
 
 				// return to client
-				res.end(JSON.stringify({
+				res.send({
 					result : 'GA PAGEVIEW OK',
 					error : false
-				}));
+				});
 
 			});
 
@@ -197,10 +197,10 @@ module.exports = api.analytics = {
 			visitor.event(eventParams, function (err) {
 				
 				// return to client
-				res.end(JSON.stringify({
+				res.send({
 					result : 'GA EVENT OK',
 					error : false
-				}));
+				});
 
 			});
 

@@ -606,10 +606,10 @@ module.exports = api.layer = {
 			api.layer.setMeta(meta, layerUuid, function (err, result) {
 
 				// return meta
-				res.end(JSON.stringify({
+				res.send({
 					error : err,
 					meta : meta
-				}));
+				});
 			});
 		});
 	},
@@ -673,7 +673,7 @@ module.exports = api.layer = {
 		fs.readFile(path, {encoding : 'utf8'}, function (err, data) {
 			if (err || !data) return api.error.general(req, res, err || 'No data.');
 
-			res.end(data);
+			res.send(data);
 		});
 	},
 
@@ -712,17 +712,17 @@ module.exports = api.layer = {
 
 				// custom error handling
 				if (err) {
-					return res.end(JSON.stringify({
+					return res.send({
 		        			ok : false,
 		        			error : err
-		        		}));
+		        		});
 				}
 				// pass syntax errors to client
 		        	if (!body.ok) {
-		        		return res.end(JSON.stringify({
+		        		return res.send({
 		        			ok : false,
 		        			error : body.error
-		        		}));
+		        		});
 		        	}
 
 		        	if (!err && response.statusCode == 200) {
@@ -738,11 +738,11 @@ module.exports = api.layer = {
 						layer.save(function (err, doc) {
 							if (err || !doc) return api.error.general(req, res, err || 'No layer.');
 
-							res.end(JSON.stringify({
+							res.send({
 				        			ok : true,
 				        			cartoid : cartoid,
 				        			error : null			// todo: save err
-				        		}));
+				        		});
 						});
 					});
 

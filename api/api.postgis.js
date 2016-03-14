@@ -138,7 +138,7 @@ module.exports = api.postgis = {
 			if (err) return api.error.general(req, res, err);
 
 			// return status
-			res.json(status);
+			res.send(status);
 		});
 	},
 
@@ -167,7 +167,7 @@ module.exports = api.postgis = {
 			api.postgis._setDownloadProgress(status);
 
 			// return result
-			res.json(status);
+			res.send(status);
 
 			// next
 			callback(null);
@@ -252,7 +252,7 @@ module.exports = api.postgis = {
 			api.postgis._setDownloadProgress(status);
 
 			// return result
-			res.json(status);
+			res.send(status);
 
 			// next
 			callback(null);

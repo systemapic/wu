@@ -346,13 +346,16 @@ module.exports = api.portal = {
 
 		// series
 		async.series(a, function (err, result) {
-			if (err || !result) return api.error.general(req, res, err || 'No result.');
+			if (err || !result) {
+				return api.error.general(req, res, err || 'No result.');
+			}
 
 			var gzip = true;
 			if (req.query.gzip === 'false') gzip = false;
 
-			if (!gzip) return res.send(result);
-			
+			if (!gzip) {
+				return res.send(result);
+			}			
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
 			zlib.gzip(JSON.stringify(result), function (err, zipped) {
