@@ -43,12 +43,12 @@ module.exports = function () {
         error: err
       });
     } else if (type === 'json') {
-      res.json({
+      res.send({
         error: err
       });
     } else {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.end(err.message);
+      res.send(err.message);
     }
   };
 };

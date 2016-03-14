@@ -48,8 +48,8 @@ module.exports = api.legend = {
 
 		var options = {
 			fileUuid : req.body.fileUuid,
-	    	cartoid : req.body.cartoid,
-		}
+	    	cartoid : req.body.cartoid
+		};
 
 		api.legend.generate(options, function (err, legends) {
 			if (err) console.log('api.legend.generate err'.red, err);
@@ -57,7 +57,7 @@ module.exports = api.legend = {
 			if (err) return api.error.general(req, res, err);
 
 			// return legends
-			res.end(JSON.stringify(legends));
+			res.send(legends);
 		});
 
 	},
@@ -95,7 +95,7 @@ module.exports = api.legend = {
 					key : rule.key,
 					value : rule.value,
 					id : 'legend-' + uuid.v4()
-				}
+				};
 
 				
 				api.legend._createStylesheet(options, function (err, result) {
@@ -200,7 +200,7 @@ module.exports = api.legend = {
 					}
 				}
 			]
-		}
+		};
 
 
 		// write geojson template to disk
@@ -225,7 +225,7 @@ module.exports = api.legend = {
 						"type" : "geojson"
 					}
 				}]
-			}
+			};
 
 			try {
 				var cr = new carto.Renderer({});
@@ -238,7 +238,7 @@ module.exports = api.legend = {
 					var result = {
 						stylepath : stylepath,
 						lid : lid
-					}
+					};
 
 					callback(null, result);
 				});
@@ -392,7 +392,7 @@ module.exports = api.legend = {
 					var result = {
 						rules : jah,
 						css : css
-					}
+					};
 
 					return callback(null, result);
 
@@ -400,7 +400,7 @@ module.exports = api.legend = {
 				} catch (e) { callback(e); }
 			});
 		});
-	},
+	}
 
 
-}
+};

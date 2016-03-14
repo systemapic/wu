@@ -617,7 +617,7 @@ module.exports = api.upload = {
 				// rename and move to image folder
 				fs.copy(from, to, function (err) {
 					if (err) return api.error.general(req, res, err);
-					res.end(file);	// file will be saved by client
+					res.send(file);	// file will be saved by client
 				});
 			}
 		});
@@ -643,7 +643,7 @@ module.exports = api.upload = {
 				// rename and move to image folder
 				fs.copy(from, to, function (err) {
 					if (err) return api.error.general(req, res, err);
-					res.end(file);	// file will be saved by client
+					res.send(file);	// file will be saved by client
 				});
 			}
 		});
@@ -672,7 +672,7 @@ module.exports = api.upload = {
 				if (err) console.log('ERR 8'.red, err);
 
 				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
+				res.send(file);	// file will be saved by client
 			});		
 	 	});
 
