@@ -214,11 +214,10 @@ module.exports = api.token = {
 		api.token.reset(req.user, function (err, access_token) {
 			if (err) {
 				err.code = err.code || 401;
-				next(err);
+				return next(err);
 			}
 
 			res.send(access_token);
-			next();
 		});
 	},
 
