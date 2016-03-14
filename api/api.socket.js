@@ -144,7 +144,7 @@ module.exports = api.socket = {
 		});
 
 		// end connection
-		res.end();
+		res.send();
 	},
 
 	grindDone : function (req, res) {
@@ -166,7 +166,7 @@ module.exports = api.socket = {
 		});
 
 		// end connection
-		res.end();
+		res.send();
 	},
 
 	getSocket : function (options) {
