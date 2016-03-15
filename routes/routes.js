@@ -79,6 +79,11 @@ module.exports = function(app) {
 	* @apiGroup Project
 	* @apiUse token
 	* @apiParam {String} name Name of project
+	* @apiParam {Object} [access] Access object
+	* @apiParam {String} [description] Description of project
+	* @apiParam {String} [keywords] Keywords of project
+	* @apiParam {Object} [position] Position of project
+	* 
 	* @apiSuccess {JSON} Project JSON object of the newly created project
 	* @apiError {json} Bad_request name doesn't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -794,7 +799,7 @@ module.exports = function(app) {
 	* }
 	*/
 	// =====================================
-	// CREATE NEW PROJECT  =================
+	// INVITE USERS TO PROJECT =============
 	// =====================================
 	// change route to /api/project/invite
 	app.post('/v2/users/invite/project', checkAccess, analyticsHandler, api.project.addInvites, errorHandler);
