@@ -80,7 +80,7 @@ module.exports = function () {
             });
         });
 
-        // test 2
+        // test 3
         it('should respond with status code 200 if user setup parameters', function (done) {
             token(function (err, access_token) {
                 api.post(endpoints.data.create)
