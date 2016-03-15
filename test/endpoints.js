@@ -1,6 +1,7 @@
 module.exports = endpoint = {
 
     data : {
+        create          : '/v2/data/create',
         delete          : '/v2/data/delete',
         layers          : '/v2/data/layers',
         update          : '/v2/data/update',
