@@ -107,7 +107,7 @@ module.exports = api.file = {
 
 	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
-		if (!options.file || !options.user) retnr done('Wrong args');
+		if (!options.file || !options.user) return done('Wrong args');
 
 		var userUuid = options.user.uuid;
 		var file_id = options.file._id;
