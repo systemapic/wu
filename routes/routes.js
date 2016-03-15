@@ -613,25 +613,25 @@ module.exports = function(app) {
 	* @apiGroup Project
 	* @apiUse token
 	* @apiParam {String} project_id Uuid of project which should be update
-	* @apiParam {String} logo New logo of project
-	* @apiParam {String} header New header of project
-	* @apiParam {Array} baseLayers New baseLayers of project
-	* @apiParam {Object} position New position of project
-	* @apiParam {Object} bounds New bounds of project
-	* @apiParam {Array} layermenu New layermenu of project
-	* @apiParam {Array} folders New folders of project
-	* @apiParam {Object} controls New controls of project
-	* @apiParam {String} description New description of project
-	* @apiParam {Array} keywords New keywords of project
-	* @apiParam {String} colorTheme New colorTheme of project
-	* @apiParam {String} title New title of project
-	* @apiParam {String} slug New slug of project
-	* @apiParam {Object} connectedAccounts New connectedAccounts of project
-	* @apiParam {Object} settings New settings of project
-	* @apiParam {Array} categories New categories of project
-	* @apiParam {Boolean} thumbCreated New thumbCreated of project
-	* @apiParam {String} state New state of project
-	* @apiParam {Array} pending New pending of project
+	* @apiParam {String} [logo] New logo of project
+	* @apiParam {String} [header] New header of project
+	* @apiParam {Array} [baseLayers] New baseLayers of project
+	* @apiParam {Object} [position] New position of project
+	* @apiParam {Object} [bounds] New bounds of project
+	* @apiParam {Array} [layermenu] New layermenu of project
+	* @apiParam {Array} [folders] New folders of project
+	* @apiParam {Object} [controls] New controls of project
+	* @apiParam {String} [description] New description of project
+	* @apiParam {Array} [keywords] New keywords of project
+	* @apiParam {String} [colorTheme] New colorTheme of project
+	* @apiParam {String} [title] New title of project
+	* @apiParam {String} [slug] New slug of project
+	* @apiParam {Object} [connectedAccounts] New connectedAccounts of project
+	* @apiParam {Object} [settings] New settings of project
+	* @apiParam {Array} [categories] New categories of project
+	* @apiParam {Boolean} [thumbCreated] New thumbCreated of project
+	* @apiParam {String} [state] New state of project
+	* @apiParam {Array} [pending] New pending of project
 	* @apiSuccess {json} access Project access object
 	* @apiSuccessExample {json} Success-Response:
 	* {
@@ -1179,16 +1179,16 @@ module.exports = function(app) {
 	* @apiName create
 	* @apiGroup File
 	* @apiUse token
-	* @apiParam {String} createdBy Uuid of created user
-	* @apiParam {String} createdByName Name of created user
-	* @apiParam {Array} files Array of file ids
-	* @apiParam {Object} access Access object with users, projects and clients arrays
-	* @apiParam {String} name Name of new file
-	* @apiParam {String} description Description of new file
-	* @apiParam {String} type Type of new file
-	* @apiParam {Array} format Array of strings with formats
-	* @apiParam {String} dataSize Data size of new file
-	* @apiParam {Object} data Data of new file
+	* @apiParam {String} [createdBy] Uuid of created user
+	* @apiParam {String} [createdByName] Name of created user
+	* @apiParam {Array} [files] Array of file ids
+	* @apiParam {Object} [access] Access object with users, projects and clients arrays
+	* @apiParam {String} [name] Name of new file
+	* @apiParam {String} [description] Description of new file
+	* @apiParam {String} [type] Type of new file
+	* @apiParam {Array} [format] Array of strings with formats
+	* @apiParam {String} [dataSize] Data size of new file
+	* @apiParam {Object} [data] Data of new file
 	*
 	* @apiSuccess {Object} file created file
 	* @apiSuccessExample {json} Success-Response:
@@ -1517,13 +1517,13 @@ module.exports = function(app) {
 	* @apiName create
 	* @apiGroup Layer
 	* @apiUse token
-	* @apiParam {String} title Title of new layer
-	* @apiParam {String} description Description of new layer
-	* @apiParam {String} legend Legend of new legend
-	* @apiParam {String} file File of new layer
-	* @apiParam {String} metadata Metadata of new layer
-	* @apiParam {String} data Data of new layer
-	* @apiParam {String} style Style of new layer
+	* @apiParam {String} [title] Title of new layer
+	* @apiParam {String} [description] Description of new layer
+	* @apiParam {String} [legend] Legend of new legend
+	* @apiParam {String} [file] File of new layer
+	* @apiParam {String} [metadata] Metadata of new layer
+	* @apiParam {String} [data] Data of new layer
+	* @apiParam {String} [style] Style of new layer
 	* @apiSuccess {JSON} Layer New layer object
 	* @apiSuccessExample {json} Success-Response:
 	* {
@@ -1569,17 +1569,17 @@ module.exports = function(app) {
 	* @apiGroup Layer
 	* @apiUse token
 	* @apiParam {String} layer uuid of updated layer
-	* @apiParam {String} title New title of updated layer
-	* @apiParam {String} description New description of updated layer
-	* @apiParam {String} satellite_position New satellite_position of updated layer
-	* @apiParam {String} copyright New copyright of updated layer
-	* @apiParam {String} tooltip New tooltip of updated layer
-	* @apiParam {String} style New style of updated layer
-	* @apiParam {String} filter New filter of updated layer
-	* @apiParam {String} legends New legends of updated layer
-	* @apiParam {String} opacity New opacity of updated layer
-	* @apiParam {Number} zIndex New zIndex of updated layer
-	* @apiParam {Object} data New data of updated layer
+	* @apiParam {String} [title] New title of updated layer
+	* @apiParam {String} [description] New description of updated layer
+	* @apiParam {String} [satellite_position] New satellite_position of updated layer
+	* @apiParam {String} [copyright] New copyright of updated layer
+	* @apiParam {String} [tooltip] New tooltip of updated layer
+	* @apiParam {String} [style] New style of updated layer
+	* @apiParam {String} [filter] New filter of updated layer
+	* @apiParam {String} [legends] New legends of updated layer
+	* @apiParam {String} [opacity] New opacity of updated layer
+	* @apiParam {Number} [zIndex] New zIndex of updated layer
+	* @apiParam {Object} [data] New data of updated layer
 	* @apiSuccess {String} response Update info 
 	* @apiSuccessExample {String} Success-Response:
 	* {
@@ -1656,7 +1656,7 @@ module.exports = function(app) {
 
 	/**
 	* @api {post} /v2/layers/meta Reload meta
-	* @apiName update
+	* @apiName reload meta
 	* @apiGroup Layer
 	* @apiUse token
 	* @apiParam {String} file_id File uuid
@@ -1947,7 +1947,7 @@ module.exports = function(app) {
 	* @apiGroup User
 	* @apiUse token
 	* @apiParam {Array} emails Array of emails
-	* @apiParam {String} customMessage Custom message
+	* @apiParam {String} [customMessage] Custom message
 	* @apiParam {Object} access Access object	
 	* @apiSuccess {Object} error error object
 	* @apiSuccessExample {json} Success-Response:
