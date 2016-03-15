@@ -1,10 +1,29 @@
 var fs = require('fs-extra');
 var domain =  'https://' + process.env.SYSTEMAPIC_DOMAIN;
 var Path = require('path');
-var config = fs.readJsonSync(Path.resolve('./apidoc.json'));
-
-//update the object
-config.sampleUrl = domain;
 
 //update the file with new object
-fs.outputJsonSync('../apidoc.json', config);
+fs.exists('./apidoc.json', function (exist) {
+	var config = {};
+	console.log("TEST: ", exist);
+	if (exist) {
+		config = fs.readJsonSync(Path.resolve('./apidoc.json'));
+		//update the object
+		config.sampleUrl = domain;
+
+		fs.outputJsonSync('./apidoc.json', config);
+	} else {
+		fs.copy('./apidoc.json.template', './apidoc.json', { replace: false }, function (err) {
+		    if (err) {
+		    	console.log("Error with copy apidoc.json.template to apidoc.json:", err);
+		    	return;
+		    }
+
+			config = fs.readJsonSync(Path.resolve('./apidoc.json'));
+			//update the object
+			config.sampleUrl = domain;
+
+			fs.outputJsonSync('./apidoc.json', config);
+		});
+	}
+});
