@@ -2127,7 +2127,7 @@ module.exports = function(app) {
 	* @apiName Invite user to projects
 	* @apiGroup User
 	* @apiUse token
-	* @apiParam {String} access Access parameter
+	* @apiParam {Object} access Access object
 	* @apiSuccess {String} link Invite link
 	* @apiSuccessExample {json} Success-Response:
 	* https://dev3.systemapic.com/invite/7Tf7Bc8
