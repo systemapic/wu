@@ -5,6 +5,7 @@ var dataUpdate = require('./update');
 var dataAddToProject = require('./addtoproject');
 var dataGetLayers = require('./layers');
 var dataDownload = require('./download');
+var dataCreate = require('./create');
 
 describe('Dataset', function () {
     before(helpers.create_user);
@@ -18,4 +19,5 @@ describe('Dataset', function () {
     dataGetLayers();
     dataDownload();
     dataDelete();
+    dataCreate();
 });
