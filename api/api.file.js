@@ -107,8 +107,8 @@ module.exports = api.file = {
 
 	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
-		var userUuid = options.user.uuid,
-		    file_id = options.file._id;
+		var userUuid = options.user.uuid;
+		var file_id = options.file._id;
 
 		    console.log('add addNewFileToUser', options);
 
@@ -1277,7 +1277,7 @@ module.exports = api.file = {
 		console.log('*********************************** create    r', req.body);
 
 		var ops = {};
-		var options = req.body;
+		var options = req.body || {};
 		var user = req.user;
 		var dataset;
 
@@ -1319,6 +1319,7 @@ module.exports = api.file = {
 	createModel : function (options, callback) {
 
 		var file 		= new File();
+
 		file.uuid 		= options.uuid;
 		file.createdBy 		= options.createdBy;
 		file.createdByName    	= options.createdByName;
