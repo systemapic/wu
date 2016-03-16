@@ -107,10 +107,12 @@ module.exports = api.file = {
 
 	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
-		var userUuid = options.user.uuid,
-		    file_id = options.file._id;
+		if (!options.file || !options.user) return done('Wrong args');
 
-		    console.log('add addNewFileToUser', options);
+		var userUuid = options.user.uuid;
+		var file_id = options.file._id;
+
+		console.log('add addNewFileToUser', options);
 
 		User
 		.findOne({uuid : userUuid})
@@ -921,8 +923,8 @@ module.exports = api.file = {
 
 		ops.push(function (callback) {
 			File
-				.findOne({uuid : fileUuid})
-				.exec(callback);
+			.findOne({uuid : fileUuid})
+			.exec(callback);
 		});
 
 		ops.push(function (file, callback) {
@@ -947,7 +949,7 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, result) {
-			if (err) console.log('file update err: '.red + err);
+			if (err) console.log('file update err: '.red, err.message);
 			if (err) console.log('ERR 16'.red, err);
 
 			if (err || !result) {
@@ -1277,7 +1279,7 @@ module.exports = api.file = {
 		console.log('*********************************** create    r', req.body);
 
 		var ops = {};
-		var options = req.body;
+		var options = req.body || {};
 		var user = req.user;
 		var dataset;
 
@@ -1319,6 +1321,7 @@ module.exports = api.file = {
 	createModel : function (options, callback) {
 
 		var file 		= new File();
+
 		file.uuid 		= options.uuid;
 		file.createdBy 		= options.createdBy;
 		file.createdByName    	= options.createdByName;
