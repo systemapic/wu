@@ -293,6 +293,9 @@ module.exports = function(grunt) {
 					// Buttons
 					'public/js/src/ext/buttons.js',
 
+					// Buttons
+					'public/js/src/ext/dropdown.js',
+
 					// Language file
 					'public/js/src/lang/language.english.js',
 
