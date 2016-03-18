@@ -736,7 +736,7 @@ module.exports = api.project = {
 
 		var project = job.project;
 		var options = job.options;
-    		var updates = {};
+		var updates = {};
 		var queries = {};
 		var ops = [];
 		var validationErrors = {};
@@ -1125,8 +1125,8 @@ module.exports = api.project = {
 
 	_getProjectByUserUuidAndCapability : function (userUuid, capability, done) {
 		// get all roles with user as read_project
-		var cap_filter = 'capabilities.' + capability,
-				roleIds = [];
+		var cap_filter = 'capabilities.' + capability;
+		var roleIds = [];
 
 		Role
 			.find({ members : userUuid })

@@ -126,7 +126,7 @@ module.exports = api.legend = {
 								fileUuid  : fileUuid,
 								cartoid   : cartoid,
 								on 	  : true
-							}
+							};
 
 							legends.push(leg);
 
@@ -154,11 +154,11 @@ module.exports = api.legend = {
 
 	
 	_createStylesheet : function (options, callback) {
-		var featureKey = options.key,
-		    featureValue = options.value,
-		    css = options.css,
-		    lid = options.id,
-		    properties = {};
+		var featureKey = options.key;
+		var featureValue = options.value;
+		var css = options.css;
+		var lid = options.id;
+		var properties = {};
 
 		// set key/value
 		properties[featureKey] = featureValue;
@@ -335,7 +335,7 @@ module.exports = api.legend = {
 				try {
 					var output = new carto.Renderer({
 						filename: cartopath,
-						local_data_dir: fspath.dirname(cartopath),
+						local_data_dir: fspath.dirname(cartopath)
 					}).renderMSS(buffer);
 				} catch(err) {
 					console.log('err11'.red, err);

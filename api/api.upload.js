@@ -71,7 +71,6 @@ module.exports = api.upload = {
 
 		var files = req.files;
 		var user = req.user;
-		var response = {};
 		var projectUuid = req.body.projectUuid;
 
 		// set upload status
@@ -131,13 +130,11 @@ module.exports = api.upload = {
 		var fileUuid 		 = options.fileUuid;
 		var fileName 		 = fileUuid + '-' + options.resumableFilename;
 		var outputPath 		 = '/data/tmp/' + fileName;
-		var stream 		 = fs.createWriteStream(outputPath);
-		var resumableChunkNumber = options.resumableChunkNumber;
 		var resumableIdentifier  = options.resumableIdentifier;
 		var resumableTotalChunks = options.resumableTotalChunks;
 		var file_id 		 = null;
 		var access_token 	 = options.access_token;
-	    	var ops 		 = [];
+		var ops 		 = [];
 
 
 	    	// get or create file_id
@@ -179,7 +176,7 @@ module.exports = api.upload = {
 				api.upload._countChunks(options.resumableIdentifier, function (err, chunk_count) {
 
 					// check if all done
-					if (chunk_count != options.resumableTotalChunks) {
+					if (chunk_count != resumableTotalChunks) {
 						return;
 					}
 
@@ -191,7 +188,7 @@ module.exports = api.upload = {
 						body 			: req.body,
 						fileName 		: options.resumableFilename,
 						original_filename 	: filename,
-						resumableTotalChunks 	: options.resumableTotalChunks,
+						resumableTotalChunks 	: resumableTotalChunks,
 						resumableIdentifier 	: options.resumableIdentifier,
 						file_id 		: file_id,
 						redis_id 		: redis_id,
@@ -225,7 +222,6 @@ module.exports = api.upload = {
 		var tmpFolder 		= '/data/tmp/';
 		var body 		= options.body;
 		var ops 		= [];
-		var redis_id 		= redis_id;
 		var access_token 	= options.access_token;
 		var globalUploadStatus;
 

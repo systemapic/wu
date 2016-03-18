@@ -177,7 +177,7 @@ module.exports = api.layer = {
 
 		ops.push(function (doc, callback) {
 			api.layer.addToProject(doc._id, projectUuid, function (err, result) {
-				if (err) return callback(err)
+				if (err) return callback(err);
 				callback(null, doc);
 			});
 		});
@@ -226,7 +226,6 @@ module.exports = api.layer = {
 
 		var ops = [];
 
-
 		ops.push(function (callback) {
 			// default styling
 
@@ -240,8 +239,7 @@ module.exports = api.layer = {
 			})
 
 
-		})
-
+		});
 
 		async.waterfall(ops, function (err, results) {
 
@@ -251,10 +249,7 @@ module.exports = api.layer = {
 				wu : 'ok'
 			});
 
-		})
-
-		
-
+		});
 
 	},
 
@@ -262,12 +257,11 @@ module.exports = api.layer = {
 
 	// create layer from geojson
 	createLayerFromGeoJSON : function (req, res) {
-		var geojson = req.body.geojson,
-		    projectUuid = req.body.project,
-		    filename = uuid.v4() + '.geojson',
-		    outfile = '/tmp/' + filename,
-		    data = JSON.stringify(geojson),
-		    size = data.length;
+		var geojson = req.body.geojson;
+		var filename = uuid.v4() + '.geojson';
+		var outfile = '/tmp/' + filename;
+		var data = JSON.stringify(geojson);
+		var size = data.length;
 
 		fs.writeFile(outfile, data, function (err) {
 			if (err) return api.error.general(req, res, err);
@@ -283,7 +277,7 @@ module.exports = api.layer = {
 
 			req.files = {
 				file : file
-			}
+			};
 
 			// upload.upload(req, res);
 			api.upload.file(req, res);
@@ -311,14 +305,13 @@ module.exports = api.layer = {
 		}
 		// get project
 		Project.findOne({ 'access.read' : user, 'uuid' : project }).exec(function(err, result) {
-			var layerIds = []
 			if (err || !result){
 				err = err || {
 					message: errors.no_such_project.errorMessage,
 					code: httpStatus.NOT_FOUND
 				};
 				return next(err);
-			};
+			}
 			// got project
 			Layer.find({ '_id': { $in: result.layers }}, function(err, docs){
 				if (err || !docs) {
@@ -628,7 +621,7 @@ module.exports = api.layer = {
 			if (!file) {
 				return callback({
 					message: errors.no_such_file.errorMessage,
-					code: httpStatus.NOT_FOUND,
+					code: httpStatus.NOT_FOUND
 				});
 			}
 
@@ -833,7 +826,7 @@ module.exports = api.layer = {
 
 		var layer 		= new Layer();
 		// layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
-		layer.uuid 		= 'layer-' + uuid.v4(), 
+		layer.uuid 		= 'layer-' + uuid.v4();
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';
@@ -873,8 +866,8 @@ module.exports = api.layer = {
 				callback && callback(err);
 			});
 		});
-	},
-}
+	}
+};
 
 // systemapic hack
 carto.Renderer.prototype.getRules = function render(data) {
@@ -889,4 +882,4 @@ carto.Renderer.prototype.getRules = function render(data) {
 	var parser = (carto.Parser(env)).parse(data);
 
 	return parser;
-}
+};
