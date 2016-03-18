@@ -53,7 +53,6 @@ module.exports = api.user = {
 		var account = req.user;
 		var ops = [];
 		var changed_projects = [];
-		var missingRequiredRequestFields = [];
 
 		// check
 		if (!userUuid) {
@@ -522,11 +521,8 @@ module.exports = api.user = {
 		var username = options.username;
 		var firstname = options.firstname || options.firstName;
 		var lastname = options.lastname || options.lastName;
-		var company = options.company;
-		var position = options.position;
 		var email = options.email;
 		var password = options.password;
-		var invite_token = options.invite;
 		var missing = [];
 		var ops = {};
 
@@ -648,10 +644,10 @@ module.exports = api.user = {
 	// called from passport.js (no req.user exists here)
 	register : function (options, done) {
 
-		var ops = [],
-		    created_user,
-		    token_store,
-		    invited_by_user;
+		var ops = [];
+		var created_user;
+		var token_store;
+		var invited_by_user;
 
 		// get token store from redis
 		ops.push(function (callback) {
@@ -807,7 +803,7 @@ module.exports = api.user = {
 
 			permissions.forEach(function (p) {
 				role.capabilities[p] = true;
-			})
+			});
 
 			// members
 			members.forEach(function (m) {
@@ -1046,7 +1042,7 @@ module.exports = api.user = {
 			var project_json = {
 				name : invite_token.project.name,
 				id : invite_token.project.id
-			}
+			};
 			done(null, project_json);
 		});
 
@@ -1112,14 +1108,12 @@ module.exports = api.user = {
 	// update user 	
 	update : function (req, res, next) {
 		var error = api.user._validateUserUpdates(req);
+		var ops = [];
 
 		if (error) {
 			return next(error);
 		}
 
-		var userUuid = req.body.uuid;
-		var account = req.user;
-		var ops = [];
 
 		ops.push(function (callback) {
 			User
@@ -1167,7 +1161,6 @@ module.exports = api.user = {
 		var options = options.options;
 		var ops = [];
 		var updates = {};
-		var queries = {};
 
 		// valid fields
 		var valid = [
@@ -1231,10 +1224,10 @@ module.exports = api.user = {
 	_enqueueUpdate : function (job) {
 		if (!job) return;
 
-		var queries = job.queries,
-		    options = job.options,
-		    field = job.field,
-		    user = job.user;
+		var queries = job.queries;
+		var options = job.options;
+		var field = job.field;
+		var user = job.user;
 
 		// create update op
 		queries[field] = function(callback) {	
@@ -1252,9 +1245,8 @@ module.exports = api.user = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
 		}
 
-		var user = req.user,
-		    email = req.body.email,
-		    unique = false;
+		var email = req.body.email;
+		var unique = false;
 
 		if (!email) {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['email']));
@@ -1402,7 +1394,7 @@ module.exports = api.user = {
 				{createdBy : user.getUuid()}
 			])
 			.exec(callback);
-		})
+		});
 
 		ops.push(function (projects, callback) {
 			projects.forEach(function (p) {
@@ -1464,8 +1456,8 @@ module.exports = api.user = {
 
 	_getRoles : function (options, done) {
 
-		var user = options.user,
-		    uuid = user.uuid;
+		var user = options.user;
+		var uuid = user.uuid;
 
 		Role
 		.find({members : uuid})
@@ -1499,8 +1491,8 @@ module.exports = api.user = {
 		if (!options) return done('No options.');
 
 		// get all role members in all projects that account has edit_user access to
-		var user = options.user,
-		    ops = [];
+		var user = options.user;
+		var ops = [];
 
 		ops.push(function (callback) {
 			// get account's projects
@@ -1547,5 +1539,5 @@ module.exports = api.user = {
 		async.waterfall(ops, function (err, users) {
 			done(err, users);
 		});
-	},
-}
+	}
+};

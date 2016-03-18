@@ -349,16 +349,16 @@ module.exports = api.token = {
 	createPublicUser : function (done) {
 
 		// create the user
-		var public_user            	= new User();
-		public_user.local.email    	= 'info@systemapic.com';
-		public_user.local.password 	= 'systemapic-public';
-		public_user.uuid 		= 'systemapic-public';
-		public_user.username 		= 'public';
-		public_user.company 		= 'Systemapic'
-		public_user.position 		= 'Public'
-		public_user.firstName 		= 'Systemapic'
-		public_user.lastName 		= 'Public';
-		public_user.invitedBy 		= 'self';
+		var public_user	= new User();
+		public_user.local.email = 'info@systemapic.com';
+		public_user.local.password = 'systemapic-public';
+		public_user.uuid = 'systemapic-public';
+		public_user.username = 'public';
+		public_user.company = 'Systemapic';
+		public_user.position = 'Public';
+		public_user.firstName = 'Systemapic';
+		public_user.lastName = 'Public';
+		public_user.invitedBy = 'self';
 
 		// save the user
 		public_user.save(function (err, user) {
