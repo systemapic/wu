@@ -309,7 +309,7 @@ module.exports = function(app) {
 	// ================================
 	// GET TOKEN FROM PASSWORD ========
 	// ================================
-	app.get('/v2/users/token', analyticsHandler, api.token.getTokenFromPassword, errorHandler);
+	app.get('/v2/users/token', api.token.getTokenFromPassword, errorHandler);
 
 	/**
 	* @api {post} /v2/users/token/refresh Refresh access token
@@ -328,7 +328,7 @@ module.exports = function(app) {
 	// ================================
 	// REFRESH TOKEN ==================
 	// ================================
-	app.post('/v2/users/token/refresh', checkAccess, analyticsHandler, api.token.refresh, errorHandler);
+	app.post('/v2/users/token/refresh', checkAccess, api.token.refresh, errorHandler);
 	
 	/**
 	* @api {post} /v2/users/token/check Check access token post
@@ -398,7 +398,7 @@ module.exports = function(app) {
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.post('/v2/users/token/check', checkAccess, analyticsHandler, function (req, res, next) {
+	app.post('/v2/users/token/check', checkAccess, function (req, res, next) {
 		res.send(req.user);
 	}, errorHandler);
 
@@ -417,7 +417,7 @@ module.exports = function(app) {
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.get('/v2/users/token/check', checkAccess, analyticsHandler, function (req, res, next) {
+	app.get('/v2/users/token/check', checkAccess, function (req, res, next) {
 		res.send({valid : true});
 	}, errorHandler);
 	
