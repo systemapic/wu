@@ -534,7 +534,7 @@ module.exports = api.portal = {
 	clearTemporaryFolder : function () {
 		var path = api.config.path.temp;
 		fs.emptyDir(path, function () {});
-	},
+	}
 
 };
 

@@ -50,7 +50,6 @@ module.exports = api.slack = {
 	_send : function (options) {
 		var text = options.text;
 		var attachments = options.attachments;
-		var icon = options.icon;
 		var channel = options.channel;
 		var slack_options = {
 			text 		: text,
@@ -99,7 +98,6 @@ module.exports = api.slack = {
 		var user = options.user;
 		var event = options.event;
 		var description = options.description;
-		var timestamp = options.timestamp;
 		var custom_options = options.options;
 		var ops = [];
 

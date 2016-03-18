@@ -49,7 +49,7 @@ module.exports = api.debug = {
 			p.data.thensome.ok = 'lolsl';
 		})
 
-	},
+	}
 
 	// #########################################
 	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###

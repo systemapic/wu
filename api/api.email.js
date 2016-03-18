@@ -213,7 +213,6 @@ module.exports = api.email = {
 		// todo: SSL
 		var name = newUser.firstName + ' ' + newUser.lastName;
 		var email = newUser.local.email;
-		var domain = api.config.portalServer.uri.split('/')[2];
 		var token = api.auth.setNewLoginToken(newUser);
 		var link = api.config.portalServer.uri + 'login?token=' + token;
 		var fullname = account.firstName  + ' ' + account.lastName;
@@ -336,10 +335,9 @@ module.exports = api.email = {
 
 	sendInvitedEmail : function (options) {
 
-		var email = options.email,
-		    name = options.name,
-		    project_name = options.project_name, 
-		    customMessage = options.customMessage;
+		var email = options.email;
+		var name = options.name;
+		var project_name = options.project_name;
 
 		if (!email) return;
 
@@ -481,11 +479,10 @@ module.exports = api.email = {
 	// from access_v2
 	sendInviteEmail : function (options) {
 
-		var email = options.email,
-		    customMessage = options.customMessage,
-		    numProjects = options.numProjects,
-		    invite_link = options.invite_link,
-		    invited_by = options.invited_by;
+		var email = options.email;
+		var customMessage = options.customMessage;
+		var invite_link = options.invite_link;
+		var invited_by = options.invited_by;
 
 		if (!email) return;
 
@@ -898,7 +895,7 @@ module.exports = api.email = {
 			html    : body
 		});
 
-	},
+	}
 
 
-}
+};

@@ -95,24 +95,11 @@ module.exports = api.postgis = {
 
 
 	_cleanSQLQuery : function (sql) {
-		var sql = sql;
-		var a = sql.replace('(', '');
-		var b = a.replace(') as sub', '');
-		var c = b.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var cleanSQL = '"' + c + '"';
-		return cleanSQL;
+		var sql = sql.replace('(', '')
+				.replace(') as sub', '')
+				.replace(/\n/g, " ");
+
+		return '"' + sql + '"';
 	},
 
 	_setDownloadProgress : function (options, callback) {
@@ -161,7 +148,7 @@ module.exports = api.postgis = {
 				finished : false,
 				time_start : Date().now,
 				file_id : layer_id
-			}
+			};
 
 			// set download status
 			api.postgis._setDownloadProgress(status);
@@ -193,7 +180,7 @@ module.exports = api.postgis = {
 				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
 				name 		: layername,
 				user 		: req.user
-			}
+			};
 
 			// get dataset
 			api.postgis.downloadDataset(opts, callback);
@@ -207,7 +194,7 @@ module.exports = api.postgis = {
 				finished : true,
 				filepath : filepath,
 				file_id : layer_id
-			}
+			};
 
 			// set download status
 			api.postgis._setDownloadProgress(status);
@@ -246,7 +233,7 @@ module.exports = api.postgis = {
 				finished : false,
 				time_start : Date().now,
 				file_id : file_id
-			}
+			};
 
 			// set download status
 			api.postgis._setDownloadProgress(status);
@@ -280,7 +267,7 @@ module.exports = api.postgis = {
 				query 		: '"SELECT * FROM ' + table_name + '"',
 				name 		: filename,
 				user 		: req.user
-			}
+			};
 
 			// get dataset
 			api.postgis.downloadDataset(options, callback);
@@ -294,7 +281,7 @@ module.exports = api.postgis = {
 				finished : true,
 				filepath : filepath,
 				file_id : file_id
-			}
+			};
 
 			// set download status
 			api.postgis._setDownloadProgress(status);
@@ -314,23 +301,21 @@ module.exports = api.postgis = {
 	},
 
 	downloadDataset : function (options, done) {
-		var database_name = options.database_name,
-		    table_name = options.table_name,
-		    data_type = options.data_type,
-		    query = options.query,
-		    name = options.name,
-		    user = options.user,
-		    ops = [];
+		var database_name = options.database_name;
+		var table_name = options.table_name;
+		var query = options.query;
+		var name = options.name;
+		var ops = [];
 
 		ops.push(function (callback) {
 
 			// where to put file
-			var filePath = database_name + '/' + table_name + '/' +  api.utils.getRandomChars(5) + '/',
-			    folder = api.config.path.temp + filePath,
-			    filename = sanitize(name),
-			    output = folder + filename,
-			    returnOutput = filePath + filename,
-			    DOWNLOAD_TABLE_SCRIPT = '../scripts/postgis/download_table.sh';
+			var filePath = database_name + '/' + table_name + '/' +  api.utils.getRandomChars(5) + '/';
+			var folder = api.config.path.temp + filePath;
+			var filename = sanitize(name);
+			var output = folder + filename;
+			var returnOutput = filePath + filename;
+			var DOWNLOAD_TABLE_SCRIPT = '../scripts/postgis/download_table.sh';
 
 
 			// create folder
@@ -355,7 +340,7 @@ module.exports = api.postgis = {
 						zipfolder : folder,
 						zipfile : folder + filename,
 						returnOutput : returnOutput
-					}
+					};
 					
 					callback(null, options);
 
@@ -365,11 +350,10 @@ module.exports = api.postgis = {
 
 
 		ops.push(function (options, callback) {
-			var zipfolder = options.zipfolder,
-			    tarfile = options.zipfile + '.tar',
-			    zipfile = tarfile + '.gz',
-			    returnOutput = options.returnOutput + '.tar.gz';
-
+			var zipfolder = options.zipfolder;
+			var tarfile = options.zipfile + '.tar';
+			var zipfile = tarfile + '.gz';
+			var returnOutput = options.returnOutput + '.tar.gz';
 			var cmd = [
 				'tar',
 				'cvf',
@@ -513,8 +497,8 @@ module.exports = api.postgis = {
 		var url = 'http://prj2epsg.org/search.json?mode=wkt&terms=' + terms;
 		var options = {
 			url: url,
-			method: 'GET',
-		}
+			method: 'GET'
+		};
 
 		// Start the request
 		request(options, function (error, response, body) {
@@ -529,15 +513,14 @@ module.exports = api.postgis = {
 
 
 	importShapefile : function (options, done) {
-		var files 	= options.files,
-		    shape 	= api.geo.getTheShape(files)[0],
-		    prjfile 	= api.geo.getTheProjection(files)[0],
-		    file_id 	= options.file_id,
-		    pg_db 	= options.user.postgis_database,
-		    user_id 	= options.user_id,
-		    uniqueIdentifier = options.uniqueIdentifier,
-		    encoding 	= options.encoding || '',
-		    ops 	= [];
+		var files = options.files;
+		var prjfile = api.geo.getTheProjection(files)[0];
+		var file_id = options.file_id;
+		var pg_db = options.user.postgis_database;
+		var user_id = options.user_id;
+		var uniqueIdentifier = options.uniqueIdentifier;
+		var encoding = options.encoding || '';
+		var ops	= [];
 
 
 		if (!prjfile) return done('Please provide a projection file.');
@@ -578,14 +561,14 @@ module.exports = api.postgis = {
 					text : 'Creating geometries...',
 					error : null,
 					percent : 40,
-					uniqueIdentifier : uniqueIdentifier,
+					uniqueIdentifier : uniqueIdentifier
 				}
 			});
 
 			// prime tables
 			api.postgis._primeTableWithGeometries({
 				file_id : file_id,
-				postgis_db : pg_db,
+				postgis_db : pg_db
 			}, callback);
 		});
 
@@ -599,7 +582,7 @@ module.exports = api.postgis = {
 					text : 'Getting metadata...',
 					error : null,
 					percent : 70,
-					uniqueIdentifier : uniqueIdentifier,
+					uniqueIdentifier : uniqueIdentifier
 				}
 			});
 
@@ -631,7 +614,7 @@ module.exports = api.postgis = {
 					text : 'Almost done...',
 					error : null,
 					percent : 90,
-					uniqueIdentifier : uniqueIdentifier,
+					uniqueIdentifier : uniqueIdentifier
 				}
 			});
 			
@@ -655,18 +638,17 @@ module.exports = api.postgis = {
 
 
 	_importShapefileToPostgis : function (options, done) {
-		var files 	= options.files,
-		    shape 	= api.geo.getTheShape(files)[0],
-		    prjfile 	= api.geo.getTheProjection(files)[0],
-		    file_id 	= options.file_id,
-		    pg_db 	= options.user.postgis_database,
-		    user_id 	= options.user_id,
-		    uniqueIdentifier = options.uniqueIdentifier,
-		    encoding 	= options.encoding || '',
-		    ops 	= [],
-		    attempts 	= 0,
-		    srid 	= options.srid;
-
+		var files = options.files;
+	    var shape = api.geo.getTheShape(files)[0];
+		var prjfile = api.geo.getTheProjection(files)[0];
+		var file_id = options.file_id;
+		var pg_db 	= options.user.postgis_database;
+		var user_id 	= options.user_id;
+		var uniqueIdentifier = options.uniqueIdentifier;
+		var encoding 	= options.encoding || '';
+		var ops 	= [];
+		var attempts 	= 0;
+		var srid 	= options.srid;
 		var srid_converted = srid;
 		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; 
 
@@ -679,7 +661,7 @@ module.exports = api.postgis = {
 			file_id,
 			pg_db,
 			srid_converted,
-			encoding,
+			encoding
 			// "> /dev/null 2>&1"
 		].join(' ');
 
@@ -693,7 +675,7 @@ module.exports = api.postgis = {
 				text : 'Importing...',
 				error : null,
 				percent : 20,
-				uniqueIdentifier : uniqueIdentifier,
+				uniqueIdentifier : uniqueIdentifier
 			}
 		});
 
@@ -756,12 +738,12 @@ module.exports = api.postgis = {
 	importGeojson : function (options, done) {
 
 		// need to convert to ESRI shapefile (ouch!) first..
-		var geojsonPath = options.files[0],
-		    geojsonBasename = api.postgis._getBasefile(geojsonPath),
-		    shapefileFolder = '/data/tmp/' + api.utils.getRandom(5) + '/',
-		    shapefileBasename = geojsonBasename + '.shp',
-		    shapefilePath = shapefileFolder + shapefileBasename,
-		    ops = [];
+		var geojsonPath = options.files[0];
+		var geojsonBasename = api.postgis._getBasefile(geojsonPath);
+		var shapefileFolder = '/data/tmp/' + api.utils.getRandom(5) + '/';
+		var shapefileBasename = geojsonBasename + '.shp';
+		var shapefilePath = shapefileFolder + shapefileBasename;
+		var ops = [];
 
 		console.log('importGeojson options: ', options);
 		var file_id = options.file_id;
@@ -809,7 +791,7 @@ module.exports = api.postgis = {
 
 				// set upload status
 				api.upload.updateStatus(file_id, {
-					original_format : 'GeoJSON',
+					original_format : 'GeoJSON'
 				}, function () {
 					// return
 					callback(err, results);
@@ -842,7 +824,7 @@ module.exports = api.postgis = {
 				text : 'Importing raster...',
 				error : null,
 				percent : 20,
-				uniqueIdentifier : uniqueIdentifier,
+				uniqueIdentifier : uniqueIdentifier
 			}
 		});
 
@@ -885,7 +867,7 @@ module.exports = api.postgis = {
 					callback(null, 'Raster imported successfully.');
 				});
 			});
-		} 
+		};
 
 
 		// get metadata
@@ -898,7 +880,7 @@ module.exports = api.postgis = {
 					text : 'Getting metadata...',
 					error : null,
 					percent : 50,
-					uniqueIdentifier : uniqueIdentifier,
+					uniqueIdentifier : uniqueIdentifier
 				}
 			});
 
@@ -925,10 +907,10 @@ module.exports = api.postgis = {
 
 
 	_getMetadata : function (options, done) {
-		var file_id = options.file_id, 
-		    postgis_db = options.postgis_db,
-		    ops = [],
-		    metadata = {};
+		var file_id = options.file_id;
+		var postgis_db = options.postgis_db;
+		var ops = [];
+		var metadata = {};
 
 		// get extent
 		ops.push(function (callback) {
@@ -1039,7 +1021,7 @@ module.exports = api.postgis = {
 			var command = [
 				GET_EXTENT_SCRIPT_PATH, 	// script
 				postgis_db, 	// database name
-				file_id,	// table name
+				file_id	// table name
 			].join(' ');
 
 
@@ -1081,7 +1063,7 @@ module.exports = api.postgis = {
 		// get size of table in bytes
 		ops.push(function (callback) {
 
-			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));"
+			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));";
 			
 			api.postgis.query({
 				postgis_db : postgis_db,
@@ -1107,7 +1089,7 @@ module.exports = api.postgis = {
 			var command = [
 				GET_GEOMETRY_TYPE_SCRIPT, // script
 				postgis_db, 	// database name
-				file_id,	// table
+				file_id	// table
 			].join(' ');
 
 
@@ -1155,7 +1137,7 @@ module.exports = api.postgis = {
 			var command = [
 				GET_RASTER_EXTENT_SCRIPT_PATH, 	// script
 				postgis_db, 	// database name
-				file_id,	// table name
+				file_id	// table name
 			].join(' ');
 
 
@@ -1184,7 +1166,7 @@ module.exports = api.postgis = {
 		// get size of table in bytes
 		ops.push(function (callback) {
 
-			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));"
+			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));";
 			
 			api.postgis.query({
 				postgis_db : postgis_db,
@@ -1208,11 +1190,11 @@ module.exports = api.postgis = {
 
 	fetchHistogram : function (options, done) {
 
-		var table_name = options.table_name,
-		    database_name = options.database_name,
-		    num_buckets = options.num_buckets || 50, // todo: move to config
-		    column = options.column,
-		    ops = [];
+		var table_name = options.table_name;
+		var database_name = options.database_name;
+		var num_buckets = options.num_buckets || 50; // todo: move to config
+		var column = options.column;
+		var ops = [];
 
 
 		ops.push(function (callback) {
@@ -1241,7 +1223,7 @@ module.exports = api.postgis = {
 					try {
 						var item = JSON.parse(arrr);
 						result.push(item);
-					} catch (e) {};
+					} catch (e) {}
 				});
 
 				callback(null, result);
@@ -1256,9 +1238,9 @@ module.exports = api.postgis = {
 
 	_primeTableWithGeometries : function (options, done) {
 
-		var file_id = options.file_id,
-		    postgis_db = options.postgis_db,
-		    ops = [];
+		var file_id = options.file_id;
+		var postgis_db = options.postgis_db;
+		var ops = [];
 
 		// get geometry type
 		ops.push(function (callback) {
@@ -1307,7 +1289,7 @@ module.exports = api.postgis = {
 
 		// populate geometry
 		ops.push(function (geometry_type, callback) {
-			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_3857 TYPE Geometry(' + geometry_type + ', 3857) USING ST_Transform(geom, 3857)'
+			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_3857 TYPE Geometry(' + geometry_type + ', 3857) USING ST_Transform(geom, 3857)';
 
    			api.postgis.query({
 				postgis_db : postgis_db,
@@ -1320,7 +1302,7 @@ module.exports = api.postgis = {
 
 		// populate geometry
 		ops.push(function (geometry_type, callback) {
-			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_4326 TYPE Geometry(' + geometry_type + ', 4326) USING ST_Transform(geom, 4326)'
+			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_4326 TYPE Geometry(' + geometry_type + ', 4326) USING ST_Transform(geom, 4326)';
 
    			api.postgis.query({
 				postgis_db : postgis_db,
@@ -1335,7 +1317,7 @@ module.exports = api.postgis = {
 		// create index for 3857
 		ops.push(function (callback) {
 			var idx = file_id + '_the_geom_4326_idx';
-			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_4326)'
+			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_4326)';
 
 			api.postgis.query({
 				postgis_db : postgis_db,
@@ -1349,7 +1331,7 @@ module.exports = api.postgis = {
 		// create index for 4326
 		ops.push(function (callback) {
 			var idx = file_id + '_the_geom_3857_idx';
-			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_3857)'
+			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_3857)';
 
 			api.postgis.query({
 				postgis_db : postgis_db,
@@ -1374,9 +1356,9 @@ module.exports = api.postgis = {
 
 
 	query : function (options, callback) {
-		var postgis_db = options.postgis_db,
-		    variables = options.variables,
-		    query = options.query;
+		var postgis_db = options.postgis_db;
+		var variables = options.variables;
+		var query = options.query;
 
 		// count rows and add to uploadStatus
 		var conString = 'postgres://systemapic:docker@postgis/' + postgis_db; // todo: put in config
@@ -1465,6 +1447,6 @@ module.exports = api.postgis = {
 		if (extension == 'jp2') 			return 'JPEG-2000';
 
 		return 'Unknown';
-	},
+	}
 
-}
+};
