@@ -95,24 +95,11 @@ module.exports = api.postgis = {
 
 
 	_cleanSQLQuery : function (sql) {
-		var sql = sql;
-		var a = sql.replace('(', '');
-		var b = a.replace(') as sub', '');
-		var c = b.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var c = c.replace('\n', ' ');
-		var cleanSQL = '"' + c + '"';
-		return cleanSQL;
+		var sql = sql.replace('(', '')
+				.replace(') as sub', '')
+				.replace(/\n/g, " ");
+
+		return '"' + sql + '"';
 	},
 
 	_setDownloadProgress : function (options, callback) {
