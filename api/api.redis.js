@@ -27,4 +27,4 @@ module.exports = api.redis = {
 	tokens : redisLayers, // todo: create own instance for this?
 	stats : redisStats,
 	temp : redisTemp
-}
+};
