@@ -589,7 +589,6 @@ module.exports = api.pixels = {
 		var width      = req.query.width;
 		var height     = req.query.height;
 		var quality    = req.query.quality;
-		var raw        = req.query.raw;
 		var imageId    = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
 		var cropX      = req.query.cropx;	
 		var cropY      = req.query.cropy;
@@ -814,7 +813,7 @@ module.exports = api.pixels = {
 		File
 		.findOne({uuid : fileUuid})
 		.exec(function (err, file) {
-			if (err || !file) return api.error.general(req, res, err || 'No file.')
+			if (err || !file) return api.error.general(req, res, err || 'No file.');
 
 			// return raw file
 			var imageFile = file.data.image;
