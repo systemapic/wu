@@ -9,7 +9,10 @@ var User = require('../models/user');
 var File = require('../models/file');
 var Layer = require('../models/layer');
 var Project = require('../models/project');
-var config = require('../../config/wu-config.js').serverConfig;
+var config = require(
+  process.env.WU_CONFIG_PATH ||
+  '../../config/wu-config.js'
+).serverConfig;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var endpoints = require('./endpoints.js');

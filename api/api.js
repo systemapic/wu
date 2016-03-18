@@ -5,7 +5,10 @@ var api = {};
 api.version = '1.4.0';
 
 // config
-var config = require('../../config/wu-config.js');
+var config = require(
+  process.env.WU_CONFIG_PATH ||
+  '../../config/wu-config.js'
+);
 api.config = config.serverConfig;
 api.clientConfig = config.clientConfig;
 
