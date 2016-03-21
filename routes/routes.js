@@ -1527,7 +1527,7 @@ module.exports = function(app) {
 	* @apiParam {String} [legend] Legend of new legend
 	* @apiParam {String} [file] File of new layer
 	* @apiParam {String} [metadata] Metadata of new layer
-	* @apiParam {String} [data] Data of new layer
+	* @apiParam {Object} [data] Data of new layer
 	* @apiParam {String} [style] Style of new layer
 	* @apiSuccess {JSON} Layer New layer object
 	* @apiSuccessExample {json} Success-Response:
