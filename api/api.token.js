@@ -112,6 +112,7 @@ module.exports = api.token = {
 		var password = options.password;
 		var missingRequiredFields = [];
 
+
 		if (!username) {
 			missingRequiredFields.push('username or email');
 		}
@@ -124,6 +125,8 @@ module.exports = api.token = {
 		if (!_.isEmpty(missingRequiredFields)) {
 			return done(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
 		}
+
+		username = username.toLowerCase();
 
 		// find user from email or username
 		ops.push(function (callback) {
