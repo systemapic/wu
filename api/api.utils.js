@@ -703,6 +703,8 @@ module.exports = api.utils = {
 	},
 
 	preRenderLogos : function () {
+
+		// logo
 		if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.clientLogo && api.clientConfig.logos.clientLogo.backgroundImage && _.isString(api.clientConfig.logos.clientLogo.backgroundImage)) {
 			var base64Data = api.clientConfig.logos.clientLogo.backgroundImage.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
 			fs.writeFile(path.resolve(__dirname, '../public/images/portal-logo.png'), base64Data, 'base64', function (err) {
@@ -712,5 +714,17 @@ module.exports = api.utils = {
 
 			});
 		}
+
+		// favicon
+		if (api && api.clientConfig && api.clientConfig.logos && api.clientConfig.logos.favicon && _.isString(api.clientConfig.logos.favicon)) {
+			var base64Data = api.clientConfig.logos.favicon.replace(/^url\(\'data:image\/png;base64,/, "").replace(/\'\)/, "");
+			fs.writeFile(path.resolve(__dirname, '../public/images/favicon.ico'), base64Data, 'base64', function (err) {
+				if (err) {
+					console.log("Error creating favicon.ico!");
+				}
+
+			});
+		}
 	}
 };
+
