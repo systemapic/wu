@@ -126,7 +126,9 @@ module.exports = api.token = {
 			return done(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
 		}
 
-		username = username.toLowerCase();
+		if (_.isString(username)) {
+			username = username.toLowerCase();
+		}
 
 		// find user from email or username
 		ops.push(function (callback) {
