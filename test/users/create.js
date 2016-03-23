@@ -20,6 +20,30 @@ module.exports = function () {
             helpers.delete_user_by_id(test_user.uuid, done);
         });
 
+        afterEach(function (done) {
+            User.findOne({username : "testUser"})
+                .remove()
+                .exec(done);
+        });
+
+        afterEach(function (done) {
+            User.findOne({username : "userWithCamelCaseUserName"})
+                .remove()
+                .exec(done);
+        });
+
+        afterEach(function (done) {
+            User.findOne({username : "some_other_username"})
+                .remove()
+                .exec(done);
+        });
+        
+        afterEach(function (done) {
+            User.findOne({username : test_user.username.toLowerCase()})
+                .remove()
+                .exec(done);
+        });
+
         it('should create user correctly with lowercase email', function (done) {
             test_user = test_user_data;
             api.post(endpoints.users.create)
@@ -88,7 +112,7 @@ module.exports = function () {
                     test_user.uuid = result.uuid;
 
                     test_user.email = test_user.email.toLowerCase();
-                    test_user.username = 'some_other_username';
+                    test_user.username = 'other_username';
                     api.post(endpoints.users.create)
                         .send(test_user)
                         .expect(httpStatus.BAD_REQUEST)
@@ -109,11 +133,103 @@ module.exports = function () {
                     result = helpers.parse(result.text);
                     test_user.uuid = result.uuid;
 
-                    test_user.email = "some_other_username@email.com";
-                    test_user.username = 'some_other_username';
+                    test_user.email = "other_user@email.com";
+                    test_user.username = test_user.username.toLowerCase();
                     api.post(endpoints.users.create)
                         .send(test_user)
                         .expect(httpStatus.BAD_REQUEST)
+                        .end(done);
+                });
+        });
+
+        it('should return correctly access token when email has camelCase register', function (done) {
+            test_user = test_user_data;
+            api.post(endpoints.users.create)
+                .send(test_user)
+                .expect(httpStatus.OK)
+                .end(function (err, result) {
+                    if (err) {
+                        return done(err);
+                    }
+
+                    result = helpers.parse(result.text);
+                    test_user.uuid = result.uuid;
+                
+                    api.get(endpoints.users.token)
+                        .send({
+                            email: test_user.email,
+                            password: test_user.password
+                        })
+                        .expect(httpStatus.OK)
+                        .end(done);
+                });
+        });
+
+        it('should return correctly access token when email has lowerCase register', function (done) {
+            test_user = test_user_data;
+            api.post(endpoints.users.create)
+                .send(test_user)
+                .expect(httpStatus.OK)
+                .end(function (err, result) {
+                    if (err) {
+                        return done(err);
+                    }
+
+                    result = helpers.parse(result.text);
+                    test_user.uuid = result.uuid;
+                
+                    api.get(endpoints.users.token)
+                        .send({
+                            email: test_user.email.toLowerCase(),
+                            password: test_user.password
+                        })
+                        .expect(httpStatus.OK)
+                        .end(done);
+                });
+        });
+
+        it('should return correctly access token when username has camelCase register', function (done) {
+            test_user = test_user_data;
+            api.post(endpoints.users.create)
+                .send(test_user)
+                .expect(httpStatus.OK)
+                .end(function (err, result) {
+                    if (err) {
+                        return done(err);
+                    }
+
+                    result = helpers.parse(result.text);
+                    test_user.uuid = result.uuid;
+                
+                    api.get(endpoints.users.token)
+                        .send({
+                            username: test_user.username,
+                            password: test_user.password
+                        })
+                        .expect(httpStatus.OK)
+                        .end(done);
+                });
+        });
+
+        it('should return correctly access token when username has lowerCase register', function (done) {
+            test_user = test_user_data;
+            api.post(endpoints.users.create)
+                .send(test_user)
+                .expect(httpStatus.OK)
+                .end(function (err, result) {
+                    if (err) {
+                        return done(err);
+                    }
+
+                    result = helpers.parse(result.text);
+                    test_user.uuid = result.uuid;
+                
+                    api.get(endpoints.users.token)
+                        .send({
+                            username: test_user.username.toLowerCase(),
+                            password: test_user.password
+                        })
+                        .expect(httpStatus.OK)
                         .end(done);
                 });
         });
