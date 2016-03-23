@@ -1,0 +1,10 @@
+{
+  "testUserWithCamelCaseEmail": {
+    "email": "secondMochaTestUser@Systemapic.com",
+    "firstName": "Igor",
+    "lastName": "Ziegler",
+    "uuid": "testUserWithCamelCaseEmail-uuid",
+    "password": "second_test-user-password",
+    "username": "testuserwithcamelcaseemail"
+  }
+}
