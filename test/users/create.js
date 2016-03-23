@@ -14,34 +14,10 @@ var test_user = {};
 
 module.exports = function () {
 
-    describe.only(endpoints.users.create, function () {
+    describe(endpoints.users.create, function () {
 
         afterEach(function (done) {
             helpers.delete_user_by_id(test_user.uuid, done);
-        });
-
-        afterEach(function (done) {
-            User.findOne({username : "testUser"})
-                .remove()
-                .exec(done);
-        });
-
-        afterEach(function (done) {
-            User.findOne({username : "userWithCamelCaseUserName"})
-                .remove()
-                .exec(done);
-        });
-
-        afterEach(function (done) {
-            User.findOne({username : "some_other_username"})
-                .remove()
-                .exec(done);
-        });
-        
-        afterEach(function (done) {
-            User.findOne({username : test_user.username.toLowerCase()})
-                .remove()
-                .exec(done);
         });
 
         it('should create user correctly with lowercase email', function (done) {
