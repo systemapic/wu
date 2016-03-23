@@ -586,15 +586,17 @@ module.exports = api.user = {
 
 	},
 	createUserModel : function (options, done) {
+		options = options || {};
+		
 		var user            	= new User();
 		user.uuid 		= 'user-' + uuid.v4();
-		user.local.email    	= _.isString(email) ? options.email.toLowerCase() : options.email;
+		user.local.email    	= _.isString(options.email) ? options.email.toLowerCase() : options.email;
 		user.local.password 	= user.generateHash(options.password);
 		user.firstName 		= options.firstname;
 		user.lastName 		= options.lastname;
 		user.company 		= options.company;
 		user.position 		= options.position;
-		user.username 		= _.isString(username) ? options.username.toLowerCase() : options.username;
+		user.username 		= _.isString(options.username) ? options.username.toLowerCase() : options.username;
 		user.save(function (err, user) {
 			done(err, user);
 		});
