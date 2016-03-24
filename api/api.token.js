@@ -112,6 +112,7 @@ module.exports = api.token = {
 		var password = options.password;
 		var missingRequiredFields = [];
 
+
 		if (!username) {
 			missingRequiredFields.push('username or email');
 		}
@@ -123,6 +124,10 @@ module.exports = api.token = {
 		// throw if no credentials
 		if (!_.isEmpty(missingRequiredFields)) {
 			return done(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
+		}
+
+		if (_.isString(username)) {
+			username = username.toLowerCase();
 		}
 
 		// find user from email or username

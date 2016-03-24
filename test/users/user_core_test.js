@@ -12,6 +12,7 @@ var userTokenCheck = require('./tokenCheck');
 var userTokenRefresh = require('./tokenRefresh');
 var userAcceptInvite = require('./acceptInvite');
 var helpers = require('../helpers');
+var createUser = require('./create');
 
 describe('User', function () {
     beforeEach(function(done) { helpers.create_user(done); });
@@ -31,4 +32,5 @@ describe('User', function () {
     userTokenRefresh();
     userTokenCheck();
     userAcceptInvite();
+    createUser();
 });
