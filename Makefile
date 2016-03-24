@@ -7,4 +7,4 @@ install: ## Install dependencies
 	npm install
 
 check: ## Run all tests
-	npm test
+	grunt test

@@ -7,7 +7,10 @@ var User = require('../../models/user');
 var Project = require('../../models/project');
 var Layer = require('../../models/layer');
 var File = require('../../models/file');
-var config = require('../../../config/wu-config.js').serverConfig;
+var config = require(
+  process.env.WU_CONFIG_PATH ||
+  '../../../config/wu-config.js'
+).serverConfig;
 var helpers = require('../helpers');
 var token = helpers.token;
 var supertest = require('supertest');
