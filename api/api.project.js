@@ -436,6 +436,24 @@ module.exports = api.project = {
 			});
 		});
 
+		ops.push(function (callback) {
+			Project.findOne({name : store.name})
+				.exec(function (err, project) {
+					if (err) {
+						return callback(err);
+					}
+
+					if (project) {
+						return callback ({
+							message: errors.project_with_such_name_already_exist.errorMessage,
+							code: httpStatus.BAD_REQUEST
+						});
+					}
+
+					callback();
+				});
+		});
+
 		// create project
 		ops.push(function (callback) {
 			api.project._create({
