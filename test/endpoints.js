@@ -57,7 +57,8 @@ module.exports = endpoint = {
             reset       : '/v2/users/password/reset',
             set         : '/v2/users/password'
         },
-        session         : '/v2/users/session'
+        session         : '/v2/users/session',
+        create          : '/v2/users/create'
     },
 
     hashes : {

@@ -585,17 +585,18 @@ module.exports = api.user = {
 		});
 
 	},
-
 	createUserModel : function (options, done) {
+		options = options || {};
+		
 		var user            	= new User();
 		user.uuid 		= 'user-' + uuid.v4();
-		user.local.email    	= options.email;	
+		user.local.email    	= _.isString(options.email) ? options.email.toLowerCase() : options.email;
 		user.local.password 	= user.generateHash(options.password);
 		user.firstName 		= options.firstname;
 		user.lastName 		= options.lastname;
 		user.company 		= options.company;
 		user.position 		= options.position;
-		user.username 		= options.username;
+		user.username 		= _.isString(options.username) ? options.username.toLowerCase() : options.username;
 		user.save(function (err, user) {
 			done(err, user);
 		});
@@ -630,6 +631,9 @@ module.exports = api.user = {
 
 
 	_checkUniqueEmail : function (email, done) {
+		if (_.isString(email)) {
+			email = email.toLowerCase();
+		}
 		User
 		.findOne({'local.email' : email})
 		.exec(function (err, user) {
@@ -1251,8 +1255,10 @@ module.exports = api.user = {
 		if (!email) {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['email']));
 		}
-	
 
+		if (_.isString(email)) {
+			email = email.toLowerCase();
+		}
 		User.findOne({'local.email' : email}, function (err, result) {
 			if (err) {
 				err.message = errors.checkingEmailError.errorMessage;
@@ -1298,6 +1304,10 @@ module.exports = api.user = {
 	},
 
 	_checkUniqueUsername : function (username, done) {
+		if (_.isString(username)) {
+			username = username.toLowerCase();
+		}
+
 		User
 		.findOne({username : username}) 
 		.exec(function (err, user) {
