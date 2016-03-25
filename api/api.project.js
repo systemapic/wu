@@ -849,12 +849,12 @@ module.exports = api.project = {
 
 		ops.push(function (params, callback) {
 			Project
-			.findOne({uuid: options.project_id})
+			.findOne({uuid: options.uuid})
 			.exec(function (err, res) {
 				if (err) {
 					return callback(err);
 				}
-
+				console.log('TEST: ', res);
 				params.project = res;
 				callback(null, params);
 			});
