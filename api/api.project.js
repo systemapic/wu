@@ -436,6 +436,27 @@ module.exports = api.project = {
 			});
 		});
 
+		ops.push(function (callback) {
+			Project.findOne({
+				name : store.name,
+				createdBy : user.uuid
+			})
+				.exec(function (err, project) {
+					if (err) {
+						return callback(err);
+					}
+
+					if (project) {
+						return callback ({
+							message: errors.project_with_such_name_already_exist.errorMessage,
+							code: httpStatus.BAD_REQUEST
+						});
+					}
+
+					callback();
+				});
+		});
+
 		// create project
 		ops.push(function (callback) {
 			api.project._create({
@@ -714,6 +735,28 @@ module.exports = api.project = {
 				code: httpStatus.BAD_REQUEST
 			});
 		});
+		if (req.body.name) {
+			ops.push(function (project, callback) {
+				Project.findOne({
+					name : req.body.name,
+					createdBy : user.uuid
+				}).exec(function (err, _project) {
+					if (err) {
+						return callback(err);
+					}
+
+					if (_project && _project.name !== project.name) {
+						return callback ({
+							message: errors.project_with_such_name_already_exist.errorMessage,
+							code: httpStatus.BAD_REQUEST
+						});
+					}
+
+					callback(null, project);
+				});
+			});
+		}
+
 		ops.push(function (project, callback) {
 			api.project._update({
 				project : project,
@@ -806,12 +849,12 @@ module.exports = api.project = {
 
 		ops.push(function (params, callback) {
 			Project
-			.findOne({uuid: options.project_id})
+			.findOne({uuid: options.uuid})
 			.exec(function (err, res) {
 				if (err) {
 					return callback(err);
 				}
-
+				console.log('TEST: ', res);
 				params.project = res;
 				callback(null, params);
 			});
