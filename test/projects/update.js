@@ -16,20 +16,46 @@ var endpoints = require('../endpoints.js');
 var coreTestData = require('../shared/core.json');
 var testData = require('../shared/project/update.json');
 var second_test_user = coreTestData.secondTestUser;
+var async = require('async');
 
 module.exports = function () {
     var tmpProject ={};
+    var tmpSecondProject ={};
 
     before(function (done) {
-        helpers.create_project_by_info(testData.projectInfo, function (err, project) {
-            if (err) return done(err);
-            tmpProject = project;
-            done();
+        var ops = [];
+
+        ops.push(function (callback) {
+            helpers.create_project_by_info(testData.projectInfo, function (err, project) {
+                if (err) return callback(err);
+                tmpProject = project;
+                callback();
+            });
         });
+
+        ops.push(function (callback) {
+            helpers.create_project_by_info(testData.secondProjectInfo, function (err, project) {
+                if (err) return callback(err);
+                tmpSecondProject = project;
+                callback();
+            });
+        });
+
+        async.parallel(ops, done);
     });
 
     after(function (done) {
-        helpers.delete_project_by_id(tmpProject.uuid, done);
+        var ops = [];
+
+        ops.push(function (callback) {
+            helpers.delete_project_by_id(tmpProject.uuid, callback);
+        });
+        
+        ops.push(function (callback) {
+            helpers.delete_project_by_id(tmpSecondProject.uuid, callback);
+        });
+
+        async.parallel(ops, done);
     });
 
     describe(endpoints.projects.update, function () {
@@ -68,8 +94,6 @@ module.exports = function () {
             });
         });
 
-
-
         // test 3
         it('should respond with status code 400 and specific error if no field to update', function (done) {
             token(function (err, access_token) {
@@ -88,7 +112,6 @@ module.exports = function () {
                     });
             });
         });
-
 
         before(function (done) {
             helpers.create_user_by_parameters(second_test_user, done);
@@ -314,9 +337,25 @@ module.exports = function () {
             });
         });
 
-        // it("", function () {
-
-        // });
+        // test 8
+        it('should respond with status code 400 and specific error message if project with specific name already exist', function (done) {
+            token(function (err, access_token) {
+                api.post(endpoints.projects.update)
+                    .send({
+                        project_id: tmpProject.uuid,
+                        name: 'second-mocha-test-project',
+                        access_token: access_token
+                    })
+                    .expect(httpStatus.BAD_REQUEST)
+                    .end(function (err, res) {
+                        if (err) return done(err);
+                        var result = helpers.parse(res.text);
+                        expect(result.error.message).to.be.equal(expected.project_with_such_name_already_exist.errorMessage);
+                        expect(result.error.code).to.be.equal(httpStatus.BAD_REQUEST);
+                        done();
+                    });
+            });
+        });
 
     });
 };
