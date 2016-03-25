@@ -122,5 +122,9 @@
     "uuid_can_not_be_changed": {
         "errorMessage": "Uuid can not be changed.",
         "code": "400"
+    },
+    "project_with_such_name_already_exist": {
+        "errorMessage": "Project with such name already exist.",
+        "code": "400"
     }
 }
