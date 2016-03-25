@@ -7,18 +7,23 @@ var token = helpers.token;
 var httpStatus = require('http-status');
 var expected = require('../../shared/errors');
 var endpoints = require('../endpoints.js');
+var Project = require('../../models/project');
+var _ = require('lodash');
 
 module.exports = function () {
     describe(endpoints.projects.create, function () {
+        var tmpProject = '';
 
-
+        after(function (done) {
+            helpers.delete_project_by_id(tmpProject, done);
+        });
         // test 1
         it('should be able to create empty project and get valid project in response', function (done) {
             token(function (err, access_token) {
                 api.post(endpoints.projects.create)
                     .send({
                         access_token: access_token,
-                        name: 'mocha-test-project'             
+                        name: 'empty-mocha-test-project'             
                     })
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
@@ -26,7 +31,8 @@ module.exports = function () {
                         var project = helpers.parse(res.text).project;
                         expect(project).to.exist;
                         expect(project.uuid).to.exist;
-                        expect(project.name).to.be.equal('mocha-test-project');
+                        expect(project.name).to.be.equal('empty-mocha-test-project');
+                        tmpProject = project.uuid;
                         done();
                     });
             });
