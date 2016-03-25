@@ -747,7 +747,7 @@ module.exports = api.project = {
 							});
 						}
 
-						callback();
+						callback(null, project);
 					});
 			});
 		}

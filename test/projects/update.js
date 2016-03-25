@@ -217,7 +217,6 @@ module.exports = function () {
                 api.post(endpoints.projects.update)
                     .send({
                         access_token: access_token,
-                        name: {name: shouldBeAStringButItIsObject},
                         slug: {slug: shouldBeAStringButItIsObject},
                         logo: {logo: shouldBeAStringButItIsObject},
                         position: {
@@ -264,8 +263,6 @@ module.exports = function () {
                         expect(result.error.message).to.be.equal(expected.invalid_fields.errorMessage);
                         expect(result.error.errors).to.be.an.array;
                         expect(result.error.errors).to.be.not.empty;
-                        expect(result.error.errors.name.value.name).to.be.equal(shouldBeAStringButItIsObject);
-                        expect(result.error.errors.name.message).to.be.equal('Cast to String failed for value "[object Object]" at path "name"');
                         expect(result.error.errors.slug.value.slug).to.be.equal(shouldBeAStringButItIsObject);
                         expect(result.error.errors.slug.message).to.be.equal('Cast to String failed for value "[object Object]" at path "slug"');
                         expect(result.error.errors.logo.value.logo).to.be.equal(shouldBeAStringButItIsObject);
@@ -316,5 +313,10 @@ module.exports = function () {
                     });
             });
         });
+
+        // it("", function () {
+
+        // });
+
     });
 };
