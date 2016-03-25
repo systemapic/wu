@@ -437,7 +437,10 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (callback) {
-			Project.findOne({name : store.name})
+			Project.findOne({
+				name : store.name,
+				createdBy : user.uuid
+			})
 				.exec(function (err, project) {
 					if (err) {
 						return callback(err);
@@ -734,21 +737,23 @@ module.exports = api.project = {
 		});
 		if (req.body.name) {
 			ops.push(function (project, callback) {
-				Project.findOne({name : req.body.name})
-					.exec(function (err, _project) {
-						if (err) {
-							return callback(err);
-						}
+				Project.findOne({
+					name : req.body.name,
+					createdBy : user.uuid
+				}).exec(function (err, _project) {
+					if (err) {
+						return callback(err);
+					}
 
-						if (_project && _project.name !== project.name) {
-							return callback ({
-								message: errors.project_with_such_name_already_exist.errorMessage,
-								code: httpStatus.BAD_REQUEST
-							});
-						}
+					if (_project && _project.name !== project.name) {
+						return callback ({
+							message: errors.project_with_such_name_already_exist.errorMessage,
+							code: httpStatus.BAD_REQUEST
+						});
+					}
 
-						callback(null, project);
-					});
+					callback(null, project);
+				});
 			});
 		}
 
