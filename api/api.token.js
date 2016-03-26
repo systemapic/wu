@@ -62,7 +62,6 @@ module.exports = api.token = {
 			}
 			req.user = user;
 
-			console.log('SERIALIZED USER', req.user);
 			next();
 		});
 	},
