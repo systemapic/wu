@@ -21,7 +21,7 @@ module.exports = function () {
 
         slackMessage.text = util.format("User %s has performed an action %s.", userId || slackMessage.userId , req.originalUrl || slackMessage.action);
 
-        console.log("SLACKMESSAGE: ", slackMessage.text);
+        // console.log("SLACKMESSAGE: ", slackMessage.text);
         api.slack._send(slackMessage);
         next();
     };
