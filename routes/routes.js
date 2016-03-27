@@ -411,14 +411,20 @@ module.exports = function(app) {
 	* @apiSuccess {json} status Valid status
 	* @apiSuccessExample {json} Success-Response:
 	* {
-	*	"valid" : true
+	*	"valid" : true,
+	* 	"user_id" : "user-random-uuid",
+	* 	"username" : "username"
 	* }
 	*/
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
 	app.get('/v2/users/token/check', checkAccess, function (req, res, next) {
-		res.send({valid : true});
+		res.send({
+			valid : true,
+			user_id : req.user.uuid,
+			username : req.user.username
+		});
 	}, errorHandler);
 	
 	/**
