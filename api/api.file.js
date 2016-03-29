@@ -1657,5 +1657,50 @@ module.exports = api.file = {
 			});
 		});
 
-	}
+	},
+
+	// fn for fetching arbitrary data
+	getCustomData : function (req, res) {
+
+		var options = req.query;
+
+		if (options.name == 'allYears') {
+
+			var filepath = fspath.join(__dirname, '../shared/globesar.allYears.js');
+
+			// read data
+			return fs.readJson(filepath, function (err, data) {
+				
+				// return data to client
+				res.send(data);
+			});
+
+		}
+
+		// return false
+		res.send({data : false});
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 };
