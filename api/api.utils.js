@@ -65,6 +65,15 @@ module.exports = api.utils = {
 		return object;
 	},
 
+	stringify : function (obj) {
+		try {
+			var str = JSON.stringify(obj);	
+		} catch (e) {
+			var str = false;
+		}
+		return str;
+	},
+
 	updateStatistics : function () {
 
 		// get stats
@@ -105,7 +114,7 @@ module.exports = api.utils = {
 	createNameSlug : function (name) {
 		// strip everything but letters, numbers, !, ? and remove accents
 		var slug = api.utils.stripAccents(name.replace(/[^\w\s!?]/g,'').toLowerCase());
-		slug = slug.replace(/\s/g, '')
+		slug = slug.replace(/\s/g, '');
 		console.log('slug: ', slug);
 		return slug;
 	},
@@ -704,4 +713,4 @@ module.exports = api.utils = {
 			});
 		}
 	}
-}
+};

@@ -1,6 +1,7 @@
 module.exports = endpoint = {
 
     data : {
+        create          : '/v2/data/create',
         delete          : '/v2/data/delete',
         layers          : '/v2/data/layers',
         update          : '/v2/data/update',
@@ -16,6 +17,7 @@ module.exports = endpoint = {
         public          : '/v2/projects/public',
         private         : '/v2/projects/private',
         getLayers       : '/v2/projects/layers',
+        setAccess       : '/v2/projects/access',
         slug            : {
             unique      : '/v2/projects/slug/unique'
         }
@@ -54,7 +56,9 @@ module.exports = endpoint = {
         password : {
             reset       : '/v2/users/password/reset',
             set         : '/v2/users/password'
-        }
+        },
+        session         : '/v2/users/session',
+        create          : '/v2/users/create'
     },
 
     hashes : {
@@ -77,6 +81,7 @@ module.exports = endpoint = {
         
 
     },
+    logout: '/logout',
     static: {
         screen: '/v2/static/screen'
     }

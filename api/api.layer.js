@@ -177,7 +177,7 @@ module.exports = api.layer = {
 
 		ops.push(function (doc, callback) {
 			api.layer.addToProject(doc._id, projectUuid, function (err, result) {
-				if (err) return callback(err)
+				if (err) return callback(err);
 				callback(null, doc);
 			});
 		});
@@ -226,7 +226,6 @@ module.exports = api.layer = {
 
 		var ops = [];
 
-
 		ops.push(function (callback) {
 			// default styling
 
@@ -235,13 +234,12 @@ module.exports = api.layer = {
 			api.geo._json2carto(defaultStyleJSON, function (err, cartoCSS) {
 
 				console.log('json2carto: ', err, cartoCSS);
-
-
+				
+				callback(err);
 			})
 
 
-		})
-
+		});
 
 		async.waterfall(ops, function (err, results) {
 
@@ -251,10 +249,7 @@ module.exports = api.layer = {
 				wu : 'ok'
 			});
 
-		})
-
-		
-
+		});
 
 	},
 
@@ -262,12 +257,11 @@ module.exports = api.layer = {
 
 	// create layer from geojson
 	createLayerFromGeoJSON : function (req, res) {
-		var geojson = req.body.geojson,
-		    projectUuid = req.body.project,
-		    filename = uuid.v4() + '.geojson',
-		    outfile = '/tmp/' + filename,
-		    data = JSON.stringify(geojson),
-		    size = data.length;
+		var geojson = req.body.geojson;
+		var filename = uuid.v4() + '.geojson';
+		var outfile = '/tmp/' + filename;
+		var data = JSON.stringify(geojson);
+		var size = data.length;
 
 		fs.writeFile(outfile, data, function (err) {
 			if (err) return api.error.general(req, res, err);
@@ -283,7 +277,7 @@ module.exports = api.layer = {
 
 			req.files = {
 				file : file
-			}
+			};
 
 			// upload.upload(req, res);
 			api.upload.file(req, res);
@@ -311,14 +305,13 @@ module.exports = api.layer = {
 		}
 		// get project
 		Project.findOne({ 'access.read' : user, 'uuid' : project }).exec(function(err, result) {
-			var layerIds = []
 			if (err || !result){
 				err = err || {
 					message: errors.no_such_project.errorMessage,
 					code: httpStatus.NOT_FOUND
 				};
 				return next(err);
-			};
+			}
 			// got project
 			Layer.find({ '_id': { $in: result.layers }}, function(err, docs){
 				if (err || !docs) {
@@ -341,26 +334,13 @@ module.exports = api.layer = {
 		var layerUuid 	= parameters.layer;
 		var user 	= req.user;
 
-		console.log('layerUuid', layerUuid, user.username, req.body);
-
 		// error if no project or user
 		if (!layerUuid) {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['layer']));
 		}
 
-		if (parameters.uuid) {
-			return next({
-				code: httpStatus.BAD_REQUEST,
-				message: errors.uuid_can_not_be_changed.errorMessage
-			})
-		}
-
-		console.log('update layer!', req.body);
-
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
-			if (err) {
-				return next(err);
-			}
+			if (err) return next(err);
 
 			if (!layer) {
 				return next({
@@ -619,10 +599,10 @@ module.exports = api.layer = {
 			api.layer.setMeta(meta, layerUuid, function (err, result) {
 
 				// return meta
-				res.end(JSON.stringify({
+				res.send({
 					error : err,
 					meta : meta
-				}));
+				});
 			});
 		});
 	},
@@ -641,7 +621,7 @@ module.exports = api.layer = {
 			if (!file) {
 				return callback({
 					message: errors.no_such_file.errorMessage,
-					code: httpStatus.NOT_FOUND,
+					code: httpStatus.NOT_FOUND
 				});
 			}
 
@@ -686,7 +666,7 @@ module.exports = api.layer = {
 		fs.readFile(path, {encoding : 'utf8'}, function (err, data) {
 			if (err || !data) return api.error.general(req, res, err || 'No data.');
 
-			res.end(data);
+			res.send(data);
 		});
 	},
 
@@ -694,19 +674,20 @@ module.exports = api.layer = {
 	setCartoCSS : function (req, res) {
 
 		// get params
-		var fileUuid 	= req.body.fileUuid,
-		    css 	= req.body.css,
-		    cartoid 	= req.body.cartoid,
-		    layerUuid 	= req.body.layerUuid,
-		    csspath = api.config.path.cartocss + cartoid + '.mss',
-		    isOSM = (fileUuid == 'osm'),
-		    host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
+		var params = req.body || {};
+		var fileUuid 	= params.fileUuid;
+		var css 	= params.css;
+		var cartoid 	= params.cartoid;
+		var layerUuid 	= params.layerUuid;
+		var csspath = api.config.path.cartocss + cartoid + '.mss';
+		var isOSM = (fileUuid == 'osm');
+		var host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
 
 		var host = api.config.vile.uri;
 
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			if (err) return api.error.general(req, res);
+			if (err) return api.error.general(req, res, err || 'No data.');
 
 			// send to tileserver storage
 			request({
@@ -724,17 +705,17 @@ module.exports = api.layer = {
 
 				// custom error handling
 				if (err) {
-					return res.end(JSON.stringify({
+					return res.send({
 		        			ok : false,
 		        			error : err
-		        		}));
+		        		});
 				}
 				// pass syntax errors to client
 		        	if (!body.ok) {
-		        		return res.end(JSON.stringify({
+		        		return res.send({
 		        			ok : false,
 		        			error : body.error
-		        		}));
+		        		});
 		        	}
 
 		        	if (!err && response.statusCode == 200) {
@@ -750,11 +731,11 @@ module.exports = api.layer = {
 						layer.save(function (err, doc) {
 							if (err || !doc) return api.error.general(req, res, err || 'No layer.');
 
-							res.end(JSON.stringify({
+							res.send({
 				        			ok : true,
 				        			cartoid : cartoid,
 				        			error : null			// todo: save err
-				        		}));
+				        		});
 						});
 					});
 
@@ -845,7 +826,7 @@ module.exports = api.layer = {
 
 		var layer 		= new Layer();
 		// layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
-		layer.uuid 		= 'layer-' + uuid.v4(), 
+		layer.uuid 		= 'layer-' + uuid.v4();
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';
@@ -885,8 +866,8 @@ module.exports = api.layer = {
 				callback && callback(err);
 			});
 		});
-	},
-}
+	}
+};
 
 // systemapic hack
 carto.Renderer.prototype.getRules = function render(data) {
@@ -901,4 +882,4 @@ carto.Renderer.prototype.getRules = function render(data) {
 	var parser = (carto.Parser(env)).parse(data);
 
 	return parser;
-}
+};

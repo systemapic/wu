@@ -11,7 +11,7 @@ describe('Error handler', function () {
   before(function () {
     var server = express()
       .get('/', function (req, res) {
-        res.json({
+        res.send({
           status: 'Ok'
         });
       })

@@ -51,7 +51,7 @@ module.exports = api.provider = {
 			// create simple google layer
 			var layer 		= new Layer();
 			layer.uuid 		= 'layer-' + uuid.v4(); // unique uuid
-			layer.title 		= 'Google Aerial'
+			layer.title 		= 'Google Aerial';
 			layer.description 	= '';
 			layer.legend		= '';
 			layer.maxZoom 		= 0;
@@ -63,7 +63,7 @@ module.exports = api.provider = {
 
 			// save
 			layer.save(function (err, saved_layer) {
-				project.layers.addToSet(saved_layer._id)
+				project.layers.addToSet(saved_layer._id);
 
 				// save project
 				project.markModified('layers');
@@ -72,7 +72,7 @@ module.exports = api.provider = {
 				});
 			});
 
-		},
+		}
 
 	},
 
@@ -104,7 +104,7 @@ module.exports = api.provider = {
 
 				api.provider.norkart.setDefault(options, callback);
 
-			})
+			});
 
 			// vector
 			ops.push(function (project, callback) {
@@ -141,7 +141,7 @@ module.exports = api.provider = {
 
 			// save
 			layer.save(function (err, saved_layer) {
-				project.layers.addToSet(saved_layer._id)
+				project.layers.addToSet(saved_layer._id);
 
 				// save project
 				project.markModified('layers');
@@ -150,7 +150,7 @@ module.exports = api.provider = {
 				});
 			});
 
-		},
+		}
 
 	},
 
@@ -160,10 +160,10 @@ module.exports = api.provider = {
 
 			if (!options) return done('No options provided.');
 
-			var project = options.project,
-			    username = api.config.defaultMapboxAccount.username,
-			    accessToken = api.config.defaultMapboxAccount.accessToken,
-			    ops = [];
+			var project = options.project;
+			var username = api.config.defaultMapboxAccount.username;
+			var accessToken = api.config.defaultMapboxAccount.accessToken;
+			var ops = [];
 
 			if (!project) return done('No project.');
 
@@ -218,10 +218,10 @@ module.exports = api.provider = {
 
 			if (!options) return callback('No options.');
 
-			var project = options.project,
-			    layers = options.layers,
-			    username = options.username,
-			    accessToken = options.accessToken;
+			var project = options.project;
+			var layers = options.layers;
+			var username = options.username;
+			var accessToken = options.accessToken;
 
 			if (!project) return callback('No project.');
 
@@ -234,7 +234,7 @@ module.exports = api.provider = {
 			var account = {
 				username : username,
 				accessToken : accessToken
-			}
+			};
 			options.project.connectedAccounts.mapbox.push(account);
 
 			// return to async ops
@@ -246,10 +246,8 @@ module.exports = api.provider = {
 		requestAccount : function (options, callback) {
 			if (!options) return callback('No options.');
 
-			var project = options.project,
-			    username = options.username,
-			    accessToken = options.accessToken,
-			    err;
+			var username = options.username;
+			var accessToken = options.accessToken;
 
 			// mapbox url
 			var url = 'https://api.tiles.mapbox.com/v3/' + username + '/maps.json?secure=1&access_token=' + accessToken; 
@@ -272,11 +270,11 @@ module.exports = api.provider = {
 		createLayers : function (options, callback) {
 			if (!options) return callback('No options.');
 
-			var project = options.project,
-			    mapboxLayers = options.mapboxLayers,
-			    accessToken = options.accessToken,
-			    layers = [],
-			    ops = [];
+			var project = options.project;
+			var mapboxLayers = options.mapboxLayers;
+			var accessToken = options.accessToken;
+			var layers = [];
+			var ops = [];
 
 			// create Layer in dB and save to Project
 			mapboxLayers.forEach(function (ml) {
@@ -323,11 +321,10 @@ module.exports = api.provider = {
 		// import mapbox account from username, create Layer Objects of all layers, return Layers to client
 		// called from routes /api/util/getmapboxaccount
 		getAccount : function (req, res) {
-			var username 	= req.body.username,
-			    projectUuid = req.body.projectId,
-			    accessToken = req.body.accessToken,
-			    userUuid 	= req.user.uuid,
-			    ops = [];
+			var username 	= req.body.username;
+			var projectUuid = req.body.projectId;
+			var accessToken = req.body.accessToken;
+			var ops = [];
 
 			ops.push(function (callback) {
 				Project
@@ -424,9 +421,9 @@ module.exports = api.provider = {
 				done(null, options);
 			});
 
-		},
+		}
 
 
 	}
 
-}
+};

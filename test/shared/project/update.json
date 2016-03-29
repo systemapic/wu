@@ -9,6 +9,18 @@
     },
     "createdBy": "uuid-mocha-test-project"
   },
+
+  "secondProjectInfo": {
+    "name": "second-mocha-test-project",
+    "uuid": "second-mocha-test-project-uuid",
+    "access": {
+      "edit": [
+        "uuid-mocha-test-project"
+      ]
+    },
+    "createdBy": "uuid-mocha-test-project"
+  },
+
   "projectUpdates": {
     "name": "mocha-test-updated-name",
     "slug": "mocha-test-updated-slug",

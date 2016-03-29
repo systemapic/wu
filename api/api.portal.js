@@ -58,36 +58,36 @@ module.exports = api.portal = {
 
 			if (err || !stored_invite) return api.error.missingInformation(req, res);
 
-			// handle already logged in users
-			if (req.isAuthenticated()) {
+			// // handle already logged in users
+			// if (req.isAuthenticated()) {
 				
-				// link invite, and logged in - just add access to user, log in
-				if (stored_invite.type == 'link') {
+			// 	// link invite, and logged in - just add access to user, log in
+			// 	if (stored_invite.type == 'link') {
 
-					// include access and log in
-					return api.portal.includeAccess({
-						res : res,
-						req : req,
-						invite : stored_invite
-					});
+			// 		// include access and log in
+			// 		return api.portal.includeAccess({
+			// 			res : res,
+			// 			req : req,
+			// 			invite : stored_invite
+			// 		});
 					
-				}
+			// 	}
 
-				// logged in + same email as invite -> include access and log in
-				if (stored_invite.type == 'email' && stored_invite.email == req.user.getEmail()) {
+			// 	// logged in + same email as invite -> include access and log in
+			// 	if (stored_invite.type == 'email' && stored_invite.email == req.user.getEmail()) {
 
-					// include access and log in
-					return api.portal.includeAccess({
-						res : res,
-						req : req,
-						invite : stored_invite
-					});
-				} 
+			// 		// include access and log in
+			// 		return api.portal.includeAccess({
+			// 			res : res,
+			// 			req : req,
+			// 			invite : stored_invite
+			// 		});
+			// 	} 
 
-			}
+			// }
 
-			// make sure logged out
-			req.logout();
+			// // make sure logged out
+			// req.logout();
 
 			// render invitation
 			res.render('../../views/invitation.ejs', {
@@ -229,10 +229,10 @@ module.exports = api.portal = {
 		
 	},
 
-	logout : function (req, res) {
+	logout : function (req, res, next) {
 		req.session.reset();
-		req.logout();
-		res.redirect('/');
+		res.redirect("/");
+		next();
 	},
 
 	login : function (req, res) {
@@ -241,8 +241,6 @@ module.exports = api.portal = {
 
 	
 	getBase : function (req, res) {
-
-
 		var options = {
 			hotlink : {},
 			access_token : req.session.tokens || {}
@@ -255,12 +253,12 @@ module.exports = api.portal = {
 
 	joinBeta : function (req, res, next) {
 		if (!req.query) {
-			return res.end();
+			return res.send();
 		}
 
 		var email = req.query.email;
 
-		if (_.isEmpty(email)) return res.end();
+		if (_.isEmpty(email)) return res.send();
 
 		// add to redis
 		api.redis.stats.lpush('beta_access', email);
@@ -272,7 +270,7 @@ module.exports = api.portal = {
 		api.portal.getBetaMembers();
 
 		// return
-		res.end();
+		res.send();
 	},
 
 	getBetaMembers : function () {
@@ -348,13 +346,16 @@ module.exports = api.portal = {
 
 		// series
 		async.series(a, function (err, result) {
-			if (err || !result) return api.error.general(req, res, err || 'No result.');
+			if (err || !result) {
+				return api.error.general(req, res, err || 'No result.');
+			}
 
 			var gzip = true;
 			if (req.query.gzip === 'false') gzip = false;
 
-			if (!gzip) return res.send(result);
-			
+			if (!gzip) {
+				return res.send(result);
+			}			
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
 			zlib.gzip(JSON.stringify(result), function (err, zipped) {
@@ -408,7 +409,7 @@ module.exports = api.portal = {
 
 			res.send({
 				status : status
-			});
+			})
 		});
 
 	},
@@ -533,7 +534,7 @@ module.exports = api.portal = {
 	clearTemporaryFolder : function () {
 		var path = api.config.path.temp;
 		fs.emptyDir(path, function () {});
-	},
+	}
 
 };
 

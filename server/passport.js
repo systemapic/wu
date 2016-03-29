@@ -12,6 +12,7 @@ var crypto = require('crypto'); // crypto
 var api = require('../api/api'); // api
 var redis = require('redis'); 
 var config = api.config;
+var _ = require('lodash');
 
 // token redis
 // var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
@@ -57,6 +58,9 @@ module.exports = function(passport) {
 
 			// find a user whose email is the same as the forms email
 			// we are checking to see if the user trying to login already exists
+			if (_.isString(email)) {
+				email = email.toLowerCase();
+			}
 			User.findOne({ 'local.email' :  email }, function(err, user) {
 
 				// if there are any errors, return the error
@@ -91,6 +95,9 @@ module.exports = function(passport) {
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
 		// todo: check username also, so can login w username OR email
+		if (_.isString(email)) {
+			email = email.toLowerCase();
+		}
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 
 			// if there are any errors, return the error before anything else

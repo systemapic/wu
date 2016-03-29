@@ -71,7 +71,6 @@ module.exports = api.upload = {
 
 		var files = req.files;
 		var user = req.user;
-		var response = {};
 		var projectUuid = req.body.projectUuid;
 
 		// set upload status
@@ -131,13 +130,11 @@ module.exports = api.upload = {
 		var fileUuid 		 = options.fileUuid;
 		var fileName 		 = fileUuid + '-' + options.resumableFilename;
 		var outputPath 		 = '/data/tmp/' + fileName;
-		var stream 		 = fs.createWriteStream(outputPath);
-		var resumableChunkNumber = options.resumableChunkNumber;
 		var resumableIdentifier  = options.resumableIdentifier;
 		var resumableTotalChunks = options.resumableTotalChunks;
 		var file_id 		 = null;
 		var access_token 	 = options.access_token;
-	    	var ops 		 = [];
+		var ops 		 = [];
 
 
 	    	// get or create file_id
@@ -179,7 +176,7 @@ module.exports = api.upload = {
 				api.upload._countChunks(options.resumableIdentifier, function (err, chunk_count) {
 
 					// check if all done
-					if (chunk_count != options.resumableTotalChunks) {
+					if (chunk_count != resumableTotalChunks) {
 						return;
 					}
 
@@ -191,7 +188,7 @@ module.exports = api.upload = {
 						body 			: req.body,
 						fileName 		: options.resumableFilename,
 						original_filename 	: filename,
-						resumableTotalChunks 	: options.resumableTotalChunks,
+						resumableTotalChunks 	: resumableTotalChunks,
 						resumableIdentifier 	: options.resumableIdentifier,
 						file_id 		: file_id,
 						redis_id 		: redis_id,
@@ -225,7 +222,6 @@ module.exports = api.upload = {
 		var tmpFolder 		= '/data/tmp/';
 		var body 		= options.body;
 		var ops 		= [];
-		var redis_id 		= redis_id;
 		var access_token 	= options.access_token;
 		var globalUploadStatus;
 
@@ -449,7 +445,10 @@ module.exports = api.upload = {
 				dataSize : u.size
 			};
 
-			if (u.data_type == 'vector') {
+			console.log('########################### create file model');
+			console.log('u:', u);
+
+			if (u.data_type == 'vector' || u.data_type == 'raster') {
 				fileModel.type = 'postgis';
 				fileModel.data = {
 					postgis : {
@@ -457,13 +456,6 @@ module.exports = api.upload = {
 						table_name 	: u.table_name,
 						data_type 	: u.data_type,
 						original_format : u.original_format
-					}
-				};
-			} else {
-				fileModel.type = 'raster';
-				fileModel.data = {
-					raster : {
-						file_id : file_id
 					}
 				};
 			}
@@ -512,10 +504,28 @@ module.exports = api.upload = {
 		    file_id_key = 'uploadStatus:' + file_id;
 
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
+			console.log('looking or upload_status', file_id_key, 'got err?', err, 'status:', uploadStatus);
 			if (err) return api.error.general(req, res, err);
 			res.send(uploadStatus || { error : 'Upload ID not found or expired.' });
 		});
 	},
+
+	// gets queried from pile.js
+	setUploadStatus : function (req, res) {
+		var uploadStatus = req.body.upload_status;
+		var file_id = uploadStatus.file_id;
+		var file_id_key = 'uploadStatus:' + file_id;
+
+		console.log('_________ SET UPLOAD STATYUS!!', uploadStatus);
+
+		api.redis.layers.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
+			if (err) return api.error.general(req, res, err);
+			console.log('err??', err);
+			res.send(uploadStatus);
+			// res.send(uploadStatus || { error : 'Upload ID not found or expired.' });
+		});
+	},
+
 
 	untar : function (options, done) {
 		var tarfile = options.files.data.path,
@@ -604,7 +614,7 @@ module.exports = api.upload = {
 				// rename and move to image folder
 				fs.copy(from, to, function (err) {
 					if (err) return api.error.general(req, res, err);
-					res.end(file);	// file will be saved by client
+					res.send(file);	// file will be saved by client
 				});
 			}
 		});
@@ -630,7 +640,7 @@ module.exports = api.upload = {
 				// rename and move to image folder
 				fs.copy(from, to, function (err) {
 					if (err) return api.error.general(req, res, err);
-					res.end(file);	// file will be saved by client
+					res.send(file);	// file will be saved by client
 				});
 			}
 		});
@@ -659,7 +669,7 @@ module.exports = api.upload = {
 				if (err) console.log('ERR 8'.red, err);
 
 				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
+				res.send(file);	// file will be saved by client
 			});		
 	 	});
 
