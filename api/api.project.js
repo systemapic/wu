@@ -45,23 +45,38 @@ var api = module.parent.exports;
 // exports
 module.exports = api.project = {
 
-	setAccess : function (req, res) {
+	setAccess : function (req, res, next) {
 
 		var user = req.user;
-		var options = req.body;
+		var options = req.body || {};
 		var projectAccess = options.access;
 		var projectUuid = options.project;
+		var missingRequiredRequestFields = [];
 
-		if (!projectUuid || !projectAccess) return api.error.missingInformation(req, res);
+		if (!projectUuid) {
+			missingRequiredRequestFields.push('project');			
+		}
+
+		if (!projectAccess) {
+			missingRequiredRequestFields.push('access');
+		}
+		
+		if (!_.isEmpty(missingRequiredRequestFields)) {
+			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredRequestFields));
+		}
 
 		Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-
 				// check if access to edit
 				var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
 
-				if (!canEdit) return api.error.general(req, res, 'No access.');
+				if (!canEdit) {
+					return next({
+						message: errors.no_access.errorMessage,
+						code: httpStatus.BAD_REQUEST
+					});
+				}
 
 				var currentAccess = project.access;
 
@@ -85,13 +100,15 @@ module.exports = api.project = {
 				project.save(function (err, p) {
 
 					// return if err
-					if (err) return res.json({
-						error : err
-					});
+					if (err) {
+						return res.send({
+							error : err
+						});
+					}
 
 					// return project
-					res.json(p);
-				})
+					res.send(p);
+				});
 			});
 
 	},
@@ -227,7 +244,7 @@ module.exports = api.project = {
 			project_slug : project_slug
 		}, function (err, public_project) {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 
 			// public project
@@ -236,7 +253,6 @@ module.exports = api.project = {
 	},
 
 	getPrivate : function (req, res, next) {
-		console.log('api.project.getPrivate', req.query);
 		var params = req.query || {};
 		var project_id = params.project_id;
 		var access_token = params.user_access_token || params.access_token;	
@@ -286,12 +302,13 @@ module.exports = api.project = {
 			var got_access = api.project._checkProjectAccess(user, project);
 
 			// return project
-			if (got_access) return res.send(project);
+			if (got_access) {
+				return res.send(project);
+			}
 
 			// no access
 			res.send({ error : 'No access.' });
 		});
-
 
 	},
 
@@ -328,7 +345,6 @@ module.exports = api.project = {
 		User
 		.findOne({username : username})
 		.exec(function (err, user) {
-			console.log('err, user', err, user);
 			
 			if (err) {
 				return done(err);
@@ -341,7 +357,6 @@ module.exports = api.project = {
 				});
 			}
 
-			console.log('project_slug', project_slug, user.uuid);
 
 			// find project, check if public
 			Project
@@ -352,7 +367,6 @@ module.exports = api.project = {
 			.populate('files')
 			.populate('layers')
 			.exec(function (err, project) {
-				console.log('err, project', err, project);
 				if (err) {
 					return done(err);
 				}
@@ -394,7 +408,7 @@ module.exports = api.project = {
 	// #########################################
 	// ###  API: Create Project              ###
 	// #########################################
-	// createProject : function (req, res) {
+	// createProject : function (req, res, next) {
 	create : function (req, res, next) {
 		var store = req.body || {};
 		var user = req.user;
@@ -420,6 +434,27 @@ module.exports = api.project = {
 				message: errors.no_access.errorMessage,
 				code: httpStatus.BAD_REQUEST
 			});
+		});
+
+		ops.push(function (callback) {
+			Project.findOne({
+				name : store.name,
+				createdBy : user.uuid
+			})
+				.exec(function (err, project) {
+					if (err) {
+						return callback(err);
+					}
+
+					if (project) {
+						return callback ({
+							message: errors.project_with_such_name_already_exist.errorMessage,
+							code: httpStatus.BAD_REQUEST
+						});
+					}
+
+					callback();
+				});
 		});
 
 		// create project
@@ -471,13 +506,13 @@ module.exports = api.project = {
 			}
 
 			// slack
-			api.slack.createdProject({
-				project : project,
-				user : user
-			});
+			// api.slack.createdProject({
+			// 	project : project,
+			// 	user : user
+			// });
 
 			// return
-			api.project._returnProject(req, res, project);
+			api.project._returnProject(req, res, project, next);
 		});
 	},
 
@@ -632,10 +667,10 @@ module.exports = api.project = {
 			}
 
 			// slack
-			api.slack.deletedProject({
-				project : project,
-				user : user
-			});
+			// api.slack.deletedProject({
+			// 	project : project,
+			// 	user : user
+			// });
 
 			// done
 			res.send({
@@ -700,6 +735,28 @@ module.exports = api.project = {
 				code: httpStatus.BAD_REQUEST
 			});
 		});
+		if (req.body.name) {
+			ops.push(function (project, callback) {
+				Project.findOne({
+					name : req.body.name,
+					createdBy : user.uuid
+				}).exec(function (err, _project) {
+					if (err) {
+						return callback(err);
+					}
+
+					if (_project && _project.name !== project.name) {
+						return callback ({
+							message: errors.project_with_such_name_already_exist.errorMessage,
+							code: httpStatus.BAD_REQUEST
+						});
+					}
+
+					callback(null, project);
+				});
+			});
+		}
+
 		ops.push(function (project, callback) {
 			api.project._update({
 				project : project,
@@ -722,7 +779,7 @@ module.exports = api.project = {
 
 		var project = job.project;
 		var options = job.options;
-    		var updates = {};
+		var updates = {};
 		var queries = {};
 		var ops = [];
 		var validationErrors = {};
@@ -751,8 +808,6 @@ module.exports = api.project = {
 		];
 
 		updates = _.pick(options, valid);
-
-		console.log('updates:', updates);
 
 		// TODO: need to check that values are valid - ie String, Object, etc.
 		// 	this will not do like this, must check each field.
@@ -794,12 +849,12 @@ module.exports = api.project = {
 
 		ops.push(function (params, callback) {
 			Project
-			.findOne({uuid: options.project_id})
+			.findOne({uuid: options.uuid})
 			.exec(function (err, res) {
 				if (err) {
 					return callback(err);
 				}
-
+				console.log('TEST: ', res);
 				params.project = res;
 				callback(null, params);
 			});
@@ -855,10 +910,10 @@ module.exports = api.project = {
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
-		return res.send({
+		res.send({
 			unique : true
 		});
-
+		
 		// var value = req.body.value,
 		//     clientUuid = req.body.client,
 		//     projectUuid = req.body.project,
@@ -885,7 +940,7 @@ module.exports = api.project = {
 		// });
 	},
 
-	_returnProject : function (req, res, project, err) {
+	_returnProject : function (req, res, project, next) {
 		if (!project) return api.error.general(req, res, err);
 
 		Project
@@ -894,10 +949,10 @@ module.exports = api.project = {
 			.populate('layers')
 			.populate('roles')
 			.exec(function (err, project) {
-				res.end(JSON.stringify({
+				res.send({
 					error : err,
 					project: project
-				}));
+				});
 			});
 	},
 
@@ -1034,7 +1089,7 @@ module.exports = api.project = {
 				return next(results[0]);
 			}
 
-			res.send({
+			return res.send({
 				error: err || null,
 				hash : results[1]
 			});
@@ -1113,8 +1168,8 @@ module.exports = api.project = {
 
 	_getProjectByUserUuidAndCapability : function (userUuid, capability, done) {
 		// get all roles with user as read_project
-		var cap_filter = 'capabilities.' + capability,
-				roleIds = [];
+		var cap_filter = 'capabilities.' + capability;
+		var roleIds = [];
 
 		Role
 			.find({ members : userUuid })

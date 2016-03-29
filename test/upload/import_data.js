@@ -3,12 +3,14 @@ var mongoose = require('mongoose');
 var async = require('async');
 var fs = require('fs');
 var crypto = require('crypto');
-var request = require('supertest');
 var User = require('../../models/user');
 var Project = require('../../models/project');
 var Layer = require('../../models/layer');
 var File = require('../../models/file');
-var config = require('../../../config/wu-config.js').serverConfig;
+var config = require(
+  process.env.WU_CONFIG_PATH ||
+  '../../../config/wu-config.js'
+).serverConfig;
 var helpers = require('../helpers');
 var token = helpers.token;
 var supertest = require('supertest');
@@ -25,39 +27,30 @@ var testData = require('../shared/upload/import_data.json');
 
 module.exports = function () {
 
-    describe('Import', function () {
+    describe('Shapefile', function () {
        
         // prepare test
         before(function(callback) {
             // create tmp user, project
-            async.series([helpers.create_user, helpers.create_project], callback);
+            async.series([helpers.create_project], callback);
         });
         after(function(callback) {
             // delete tmp user, project
-            async.series([helpers.delete_project, helpers.delete_user], callback);
+            async.series([helpers.delete_project], callback);
         });
-
-
-
-
-
-
-
-
-
         
-        describe(endpoints.import.post, function () {
+        describe('POST ' + endpoints.import.post, function () {
             this.slow(500);
 
-            context('shapefile.polygon.zip', function () {
+            // context('shapefile.polygon.zip', function () {
                 this.timeout(21000);
                 
-                it('upload', function (done) {
+                it('upload shapefile.polygon.zip', function (done) {
                     token(function (err, access_token) {
                         api.post(endpoints.import.post)
                         .type('form')
                         .field('access_token', access_token)
-                        .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.polygon.zip')))
+                        .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/shapefile.polygon.zip')))
                         .expect(httpStatus.OK)
                         .end(function (err, res) {
                             assert.ifError(err);
@@ -96,74 +89,74 @@ module.exports = function () {
                     })
                 });
 
-            });
+            // });
 
-            context.skip('shapefile.missing-prj.zip', function () {
+        //     context.skip('shapefile.missing-prj.zip', function () {
 
-                it('upload', function (done) {
-                    token(function (err, access_token) {
-                        api.post(endpoints.import.post)
-                        .type('form')
-                        .field('userUuid', util.test_user.uuid)
-                        .field('access_token', access_token)
-                        .field('data', fs.createReadStream(path.resolve(__dirname, '../resources/shapefile.missing-prj.zip')))
-                        .expect(httpStatus.OK)
-                        .end(function (err, res) {
-                            assert.ifError(err);
-                            var result = helpers.parse(res.text);
-                            assert.ok(result.file_id);
-                            assert.ok(result.user_id);
-                            assert.ok(result.upload_success);
-                            assert.equal(result.filename, 'shapefile.missing-prj.zip');
-                            assert.equal(result.status, 'Processing');
-                            assert.ifError(result.error_code);
-                            assert.ifError(result.error_text);
+        //         it('upload shapefile.missing-prj.zip', function (done) {
+        //             token(function (err, access_token) {
+        //                 api.post(endpoints.import.post)
+        //                 .type('form')
+        //                 .field('userUuid', util.test_user.uuid)
+        //                 .field('access_token', access_token)
+        //                 .field('data', fs.createReadStream(path.resolve(__dirname, '../open-data/shapefile.missing-prj.zip')))
+        //                 .expect(httpStatus.OK)
+        //                 .end(function (err, res) {
+        //                     assert.ifError(err);
+        //                     var result = helpers.parse(res.text);
+        //                     assert.ok(result.file_id);
+        //                     assert.ok(result.user_id);
+        //                     assert.ok(result.upload_success);
+        //                     assert.equal(result.filename, 'shapefile.missing-prj.zip');
+        //                     assert.equal(result.status, 'Processing');
+        //                     assert.ifError(result.error_code);
+        //                     assert.ifError(result.error_text);
 
-                            tmp.file_id = result.file_id;
-                            done();
-                        });
-                    });
-                });
+        //                     tmp.file_id = result.file_id;
+        //                     done();
+        //                 });
+        //             });
+        //         });
 
-                it('get status', function (done) {
-                    token(function (err, access_token) {
-                        api.get(endpoints.import.status)
-                        .query({ file_id : tmp.file_id, access_token : access_token})
-                        .expect(httpStatus.OK)
-                        .end(function (err, res) {
-                            assert.ifError(err);
-                            var result = helpers.parse(res.text);
-                            assert.ok(result.file_id);
-                            assert.ok(result.user_id);
-                            assert.ok(result.upload_success);
-                            assert.equal(result.filename, 'shapefile.missing-prj.zip');
-                            assert.equal(result.status, 'Processing');
-                            assert.ifError(result.error_code);
-                            assert.ifError(result.error_text);
-                            done();
-                        });
-                    })
-                });
-            });
+        //         it('get status', function (done) {
+        //             token(function (err, access_token) {
+        //                 api.get(endpoints.import.status)
+        //                 .query({ file_id : tmp.file_id, access_token : access_token})
+        //                 .expect(httpStatus.OK)
+        //                 .end(function (err, res) {
+        //                     assert.ifError(err);
+        //                     var result = helpers.parse(res.text);
+        //                     assert.ok(result.file_id);
+        //                     assert.ok(result.user_id);
+        //                     assert.ok(result.upload_success);
+        //                     assert.equal(result.filename, 'shapefile.missing-prj.zip');
+        //                     assert.equal(result.status, 'Processing');
+        //                     assert.ifError(result.error_code);
+        //                     assert.ifError(result.error_text);
+        //                     done();
+        //                 });
+        //             })
+        //         });
+        //     });
 
-        });
-
-
+        // // });
 
 
 
 
-        describe('Process', function () {
+
+
+        // describe('Process', function () {
             this.slow(500);
 
             it('should be processed', function (done) {       
                 this.timeout(11000);     
-                this.slow(5000);     
+                this.slow(5000);
 
+                token(function (err, access_token) {
                 // check for processing status
-                var processingInterval = setInterval(function () {
+                    var processingInterval = setInterval(function () {
                     process.stdout.write('.');
-                    token(function (err, access_token) {
                         api.get(endpoints.import.status)
                         .query({ file_id : tmp.file_id, access_token : access_token})
                         .end(function (err, res) {
@@ -176,8 +169,8 @@ module.exports = function () {
                                 done();
                             }
                         });
-                    });
-                }, 500);
+                    }, 500);
+                });
 
             });
 
@@ -203,9 +196,12 @@ module.exports = function () {
                 })
             });
 
+        // });
+
         });
 
-        describe(endpoints.import.download, function () {
+
+        describe('GET ' + endpoints.import.download, function () {
             this.slow(500);
             
             it("200 & download as file", function (done) {
@@ -234,7 +230,7 @@ module.exports = function () {
 
         });
 
-        describe(endpoints.data.delete, function () {
+        describe('POST ' + endpoints.data.delete, function () {
             this.slow(500);
             
             var relatedLayer = testData.relatedLayer;

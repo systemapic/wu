@@ -43,13 +43,13 @@ var mapnikOmnivore = require('mapnik-omnivore');
 var api = module.parent.exports;
 
 // exports
-module.exports = api.analytics = { 
+module.exports = api.analytics = {
 
 
 
 	downloadedDataset : function (options) {
-		var user = options.user,
-		    filename = options.filename;
+		var user = options.user;
+		var filename = options.filename;
 
 		// send to slack
 		api.slack.userEvent({
@@ -62,8 +62,8 @@ module.exports = api.analytics = {
 	},
 
 	downloadedLayer : function (options) {
-		var user = options.user,
-		    filename = options.filename;
+		var user = options.user;
+		var filename = options.filename;
 
 		// send to slack
 		api.slack.userEvent({
@@ -75,17 +75,8 @@ module.exports = api.analytics = {
 		// other analytics
 	},
 
-
-
-
-
-
-
-
-
-
 	set : function (req, res) {
-		var options = req.body;
+		var options = req.body || {};
 
 		if (!options) return api.error.missingInformation(req, res);
 
@@ -104,10 +95,10 @@ module.exports = api.analytics = {
 	 	if ( _error ) {	 		
 
 			// return to client
-			res.end(JSON.stringify({
+			res.send({
 				result : _error,
 				error : true
-			}));
+			});
 
 			return;	 		
 	 	}
@@ -116,11 +107,8 @@ module.exports = api.analytics = {
 		var userHeader  = options.userHeader;
 		var gaEvent 	= options.gaEvent;
 		var gaPageview  = options.gaPageview;
-
-
 		var trackingID = userHeader.trackingID;
 		var clientID   = userHeader.clientID;   // The same as user id
-
 		// Create GA user instance
 		var visitor = ua(trackingID, clientID, {
 		
@@ -164,15 +152,15 @@ module.exports = api.analytics = {
 				// Software version (Session)
 				cd3: gaPageview.version
 
-			}
+			};
 
 			visitor.pageview(pageviewParams, function (err) {
 
 				// return to client
-				res.end(JSON.stringify({
+				res.send({
 					result : 'GA PAGEVIEW OK',
 					error : false
-				}));
+				});
 
 			});
 
@@ -196,7 +184,7 @@ module.exports = api.analytics = {
 				// path (optional)
 				dp: gaEvent.path
 
-			}
+			};
 
 			// Label
 			if ( gaEvent.eventLabel ) eventParams.el = gaEvent.eventLabel;
@@ -209,10 +197,10 @@ module.exports = api.analytics = {
 			visitor.event(eventParams, function (err) {
 				
 				// return to client
-				res.end(JSON.stringify({
+				res.send({
 					result : 'GA EVENT OK',
 					error : false
-				}));
+				});
 
 			});
 
@@ -266,7 +254,7 @@ module.exports = api.analytics = {
 
 	// NOT IN USE YET
 	get : function (req, res) {
-		var options = req.query;
+		var options = req.query || {};
 		if (!options) return api.error.missingInformation(req, res);
 
 		// return to client

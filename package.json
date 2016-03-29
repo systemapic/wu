@@ -14,8 +14,7 @@
     "url": "",
     "header": {
       "title": "Systemapic API"
-    },
-    "sampleUrl": "https://dev.systemapic.com"
+    }
   },
   "dependencies": {
     "acl": "^0.4.9",
@@ -103,9 +102,10 @@
     "xml2js": "^0.4.15"
   },
   "devDependencies": {
-    "apidoc": "^0.14.0",
+    "apidoc": "^0.15.1",
     "chai": "^3.4.1",
     "documentation": "^3.0.4",
+    "gdal": "0.4.3",
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-cssmin": "^0.12.2",

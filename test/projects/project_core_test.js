@@ -6,6 +6,7 @@ var projectDelete = require('./delete');
 var getPublic = require('./getPublic');
 var getPrivate = require('./getPrivate');
 var getProjectLayers = require('./getProjectLayers');
+var setAccess = require('./setAccess');
 
 describe('Project', function () {
     this.slow(500);
@@ -20,4 +21,5 @@ describe('Project', function () {
 	getPublic();
 	getPrivate();
     getProjectLayers();
+    setAccess();
 });

@@ -74,6 +74,7 @@ app.use(cors());
 // static files
 var staticPath = '../public';
 app.use(express.static(path.join(__dirname, staticPath)));
+app.use(express.static(process.cwd() + '../views/debug'));
 
 // catch route errors
 app.use(function(err, req, res, next){ 

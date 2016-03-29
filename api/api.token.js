@@ -48,7 +48,6 @@ module.exports = api.token = {
 	authenticate : function (req, res, next) {
 		var access_token = req.body.access_token || req.query.access_token;
 		api.token._authenticate(access_token, function (err, user) {
-			console.log('err, user', err, user);
 			if (err) {
 				return next({
 					code: httpStatus.UNAUTHORIZED,
@@ -62,6 +61,7 @@ module.exports = api.token = {
 				});
 			}
 			req.user = user;
+
 			next();
 		});
 	},
@@ -70,7 +70,6 @@ module.exports = api.token = {
 	authenticate_socket : function (req, done) {
 		var access_token = req.data.access_token;	
 		api.token._authenticate(access_token, function (err, user) {
-			console.log('#102 auth socket:', err, user);
 			if (err) return done(err);
 			if (!user) return done(new Error('Invalid access token.'));
 			done(null, user);
@@ -112,6 +111,7 @@ module.exports = api.token = {
 		var password = options.password;
 		var missingRequiredFields = [];
 
+
 		if (!username) {
 			missingRequiredFields.push('username or email');
 		}
@@ -123,6 +123,10 @@ module.exports = api.token = {
 		// throw if no credentials
 		if (!_.isEmpty(missingRequiredFields)) {
 			return done(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
+		}
+
+		if (_.isString(username)) {
+			username = username.toLowerCase();
 		}
 
 		// find user from email or username
@@ -214,7 +218,7 @@ module.exports = api.token = {
 		api.token.reset(req.user, function (err, access_token) {
 			if (err) {
 				err.code = err.code || 401;
-				next(err);
+				return next(err);
 			}
 
 			res.send(access_token);
@@ -222,7 +226,7 @@ module.exports = api.token = {
 	},
 
 	// route: check if existing session, returns tokens only
-	checkSession : function (req, res) {
+	checkSession : function (req, res, next) {
 
 		var ops = [];
 
@@ -232,12 +236,11 @@ module.exports = api.token = {
 		// no session, return public user
 		if (!tokens) return api.token.getPublicToken(function (err, public_token) {
 			res.send(public_token);
+			next();
 		});
 
 		// got some session, either public or user
 		api.token.check(tokens.access_token, function (err, user) {
-
-			console.log('checked for token..', err, user);
 
 			// no session, return public user
 			if (err) return api.token.getPublicToken(function (err, public_token) {
@@ -350,16 +353,16 @@ module.exports = api.token = {
 	createPublicUser : function (done) {
 
 		// create the user
-		var public_user            	= new User();
-		public_user.local.email    	= 'info@systemapic.com';
-		public_user.local.password 	= 'systemapic-public';
-		public_user.uuid 		= 'systemapic-public';
-		public_user.username 		= 'public';
-		public_user.company 		= 'Systemapic'
-		public_user.position 		= 'Public'
-		public_user.firstName 		= 'Systemapic'
-		public_user.lastName 		= 'Public';
-		public_user.invitedBy 		= 'self';
+		var public_user	= new User();
+		public_user.local.email = 'info@systemapic.com';
+		public_user.local.password = 'systemapic-public';
+		public_user.uuid = 'systemapic-public';
+		public_user.username = 'public';
+		public_user.company = 'Systemapic';
+		public_user.position = 'Public';
+		public_user.firstName = 'Systemapic';
+		public_user.lastName = 'Public';
+		public_user.invitedBy = 'self';
 
 		// save the user
 		public_user.save(function (err, user) {

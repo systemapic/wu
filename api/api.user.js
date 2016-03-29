@@ -53,7 +53,6 @@ module.exports = api.user = {
 		var account = req.user;
 		var ops = [];
 		var changed_projects = [];
-		var missingRequiredRequestFields = [];
 
 		// check
 		if (!userUuid) {
@@ -253,13 +252,12 @@ module.exports = api.user = {
 
 	acceptContactRequest : function (req, res) {
 
-
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var request_token = path[4];
 
 		// check
-		if (!request_token) return res.end('Nope!');
+		if (!request_token) return res.send('Nope!');
 
 		// save request
 		var invite_key = 'contactRequest:' + request_token;
@@ -284,26 +282,52 @@ module.exports = api.user = {
 
 					r_user.contact_list.addToSet(c_user._id);
 					c_user.contact_list.addToSet(r_user._id);
-
-
 					r_user.save(function (err) {
-						console.log('saved r_user', err);
 					});
 					c_user.save(function (err) {
-						console.log('saved c_user', err);
 					});
 
-
-
 				});
-
 			});
-
-
-
 		});
 
-		res.end('ok'); // todo
+		res.render('../../views/acceptContact.ejs', {
+			access_token : req.session.access_token || {}
+		});
+	},
+
+	_addContacts : function (user_a, user_b, done) {
+		User.findOne({uuid : user_a})
+		.exec(function (err, user_a) {
+			if (err) {
+				done && done(err);
+				return;
+			}
+			User.findOne({uuid : user_b})
+			.exec(function (err, user_b) {
+				if (err) {
+					done && done(err);
+					return;
+				}
+				user_a.contact_list.addToSet(user_b._id);
+				user_b.contact_list.addToSet(user_a._id);
+				user_a.save(function (err) {
+					console.log('user_A saved', err);
+					if (err) {
+						done && done(err);
+						return;
+					}
+					user_b.save(function (err) {
+					console.log('user_B saved', err);
+						if (err) {
+							done && done(err);
+							return;
+						}
+						done && done(err);
+					});
+				});
+			});
+		});
 	},
 
 	// from shareable link flow
@@ -495,17 +519,14 @@ module.exports = api.user = {
 	create : function (req, res, next) {
 		var options = req.body;
 		var username = options.username;
-		var firstname = options.firstname;
-		var lastname = options.lastname;
-		var company = options.company;
-		var position = options.position;
+		var firstname = options.firstname || options.firstName;
+		var lastname = options.lastname || options.lastName;
 		var email = options.email;
 		var password = options.password;
-		var invite_token = options.invite;
 		var missing = [];
-		var ops = [];
+		var ops = {};
 
-		console.log('api.user.create');
+		console.log('api.user.create', req.session);
 
 		// check valid fields
 		if (!username) 	missing.push('username');
@@ -513,25 +534,23 @@ module.exports = api.user = {
 		if (!lastname) 	missing.push('lastname');
 		if (!email) 	missing.push('email');
 		if (!password) 	missing.push('password');
-		console.log('missing:');
-		console.log(missing);
 		if (!_.isEmpty(missing)) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missing));
 
 
 		// ensure unique username
-		ops.push(function (callback) {
+		ops.check_username = function (callback) {
 			api.user._checkUniqueUsername(username, callback);
-		});
+		};
 
 		// check unique email
-		ops.push(function (callback) {
+		ops.check_email = function (callback) {
 			api.user._checkUniqueEmail(email, callback);
-		});
+		};
 
 		// create user
-		ops.push(function (callback) {
+		ops.create_user = function (callback) {
 			api.user.createUserModel(options, callback);
-		});
+		};
 
 		// run ops
 		async.series(ops, function (err, results) {
@@ -539,22 +558,45 @@ module.exports = api.user = {
 			if (err) return next(err);
 
 			// return user
-			var user = results[2];
+			var user = results.create_user;
 			res.send(user);
+
+			api.user._attemptAddContact(req, user, function (err) {
+				console.log('_attemptAddContact err', err);
+			});
 		});
 
 	},
 
+	_attemptAddContact : function (req, user_a, callback) {
+		if (!req.session) return callback('No req.session');
+		if (!req.session.tokens) return callback('No req.session.tokens');
+		var access_token = req.session.tokens.access_token;
+		if (!access_token) return callback('No req.session.tokens.access_token');
+
+		api.token._authenticate(access_token, function (err, user_b) {
+			if (err) return callback(err);
+
+			console.log('found user:');
+			console.log(user_b);
+
+			console.log('users adding contcts', user_a.uuid, user_b.uuid);
+			api.user._addContacts(user_a.uuid, user_b.uuid, callback);
+		});
+
+	},
 	createUserModel : function (options, done) {
+		options = options || {};
+		
 		var user            	= new User();
 		user.uuid 		= 'user-' + uuid.v4();
-		user.local.email    	= options.email;	
+		user.local.email    	= _.isString(options.email) ? options.email.toLowerCase() : options.email;
 		user.local.password 	= user.generateHash(options.password);
 		user.firstName 		= options.firstname;
 		user.lastName 		= options.lastname;
 		user.company 		= options.company;
 		user.position 		= options.position;
-		user.username 		= options.username;
+		user.username 		= _.isString(options.username) ? options.username.toLowerCase() : options.username;
 		user.save(function (err, user) {
 			done(err, user);
 		});
@@ -589,6 +631,9 @@ module.exports = api.user = {
 
 
 	_checkUniqueEmail : function (email, done) {
+		if (_.isString(email)) {
+			email = email.toLowerCase();
+		}
 		User
 		.findOne({'local.email' : email})
 		.exec(function (err, user) {
@@ -603,10 +648,10 @@ module.exports = api.user = {
 	// called from passport.js (no req.user exists here)
 	register : function (options, done) {
 
-		var ops = [],
-		    created_user,
-		    token_store,
-		    invited_by_user;
+		var ops = [];
+		var created_user;
+		var token_store;
+		var invited_by_user;
 
 		// get token store from redis
 		ops.push(function (callback) {
@@ -762,7 +807,7 @@ module.exports = api.user = {
 
 			permissions.forEach(function (p) {
 				role.capabilities[p] = true;
-			})
+			});
 
 			// members
 			members.forEach(function (m) {
@@ -793,6 +838,33 @@ module.exports = api.user = {
 			done(err);
 		});
 
+
+	},
+
+
+	deleteUser : function (req, res, next) {
+		console.log('api.user.deleteUser', req.body, req.user, typeof req.user);
+		console.log('REQ.USER -->');
+		console.log(req.user);
+		console.log(JSON.parse(req.user));
+		// if (!req.user) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['user']));
+
+		var user_id = req.body.user_id || req.body.uuid;
+
+		// only allow deleting of self
+		if (req.user.uuid != user_id) return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['user']));
+
+		User
+	        .findOne({uuid : user_id})
+	        .remove()
+	        .exec(function (err) {
+	        	console.log('removed()', err);
+	        	res.send({
+	        		err : err,
+	        		user_id : user_id,
+	        		success : _.isEmpty(err)
+	        	});
+	        });
 
 	},
 
@@ -834,6 +906,8 @@ module.exports = api.user = {
 
 		options = options || {};
 
+		console.log('_acceptInvite', options);
+
 		// check if valid request
 		if (!options.invite_token) {
 			missing.push('invite_token');
@@ -853,11 +927,23 @@ module.exports = api.user = {
 			api.redis.tokens.get(invite_id, callback);
 		});
 
-		// get projects
+		// add contacts
 		ops.push(function (inviteJSON, callback) {
 			// parse
 			invitation = JSON.parse(inviteJSON);
 			if (!invitation) return callback('Invitation is expired or does not exist.');
+
+			var invited_by = invitation.invited_by;
+
+			api.user._addContacts(invited_by, user.uuid, function (err) {
+				callback(null, invitation);
+			});
+		});
+
+		// get projects
+		ops.push(function (invitation, callback) {
+			
+			console.log('invitation: ', invitation);
 
 			callback(null, {
 				read : invitation.access.read,
@@ -895,6 +981,9 @@ module.exports = api.user = {
 				callback(null, projectAccess);	
 			}
 		});
+
+
+		// todo: add contacts
 
 		// done
 		async.waterfall(ops, function (err, results) {
@@ -957,7 +1046,7 @@ module.exports = api.user = {
 			var project_json = {
 				name : invite_token.project.name,
 				id : invite_token.project.id
-			}
+			};
 			done(null, project_json);
 		});
 
@@ -1023,14 +1112,12 @@ module.exports = api.user = {
 	// update user 	
 	update : function (req, res, next) {
 		var error = api.user._validateUserUpdates(req);
+		var ops = [];
 
 		if (error) {
 			return next(error);
 		}
 
-		var userUuid = req.body.uuid;
-		var account = req.user;
-		var ops = [];
 
 		ops.push(function (callback) {
 			User
@@ -1078,7 +1165,6 @@ module.exports = api.user = {
 		var options = options.options;
 		var ops = [];
 		var updates = {};
-		var queries = {};
 
 		// valid fields
 		var valid = [
@@ -1142,10 +1228,10 @@ module.exports = api.user = {
 	_enqueueUpdate : function (job) {
 		if (!job) return;
 
-		var queries = job.queries,
-		    options = job.options,
-		    field = job.field,
-		    user = job.user;
+		var queries = job.queries;
+		var options = job.options;
+		var field = job.field;
+		var user = job.user;
 
 		// create update op
 		queries[field] = function(callback) {	
@@ -1163,15 +1249,16 @@ module.exports = api.user = {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['body']));
 		}
 
-		var user = req.user,
-		    email = req.body.email,
-		    unique = false;
+		var email = req.body.email;
+		var unique = false;
 
 		if (!email) {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['email']));
 		}
-	
 
+		if (_.isString(email)) {
+			email = email.toLowerCase();
+		}
 		User.findOne({'local.email' : email}, function (err, result) {
 			if (err) {
 				err.message = errors.checkingEmailError.errorMessage;
@@ -1217,6 +1304,10 @@ module.exports = api.user = {
 	},
 
 	_checkUniqueUsername : function (username, done) {
+		if (_.isString(username)) {
+			username = username.toLowerCase();
+		}
+
 		User
 		.findOne({username : username}) 
 		.exec(function (err, user) {
@@ -1313,7 +1404,7 @@ module.exports = api.user = {
 				{createdBy : user.getUuid()}
 			])
 			.exec(callback);
-		})
+		});
 
 		ops.push(function (projects, callback) {
 			projects.forEach(function (p) {
@@ -1375,8 +1466,8 @@ module.exports = api.user = {
 
 	_getRoles : function (options, done) {
 
-		var user = options.user,
-		    uuid = user.uuid;
+		var user = options.user;
+		var uuid = user.uuid;
 
 		Role
 		.find({members : uuid})
@@ -1410,8 +1501,8 @@ module.exports = api.user = {
 		if (!options) return done('No options.');
 
 		// get all role members in all projects that account has edit_user access to
-		var user = options.user,
-		    ops = [];
+		var user = options.user;
+		var ops = [];
 
 		ops.push(function (callback) {
 			// get account's projects
@@ -1458,5 +1549,5 @@ module.exports = api.user = {
 		async.waterfall(ops, function (err, users) {
 			done(err, users);
 		});
-	},
-}
+	}
+};

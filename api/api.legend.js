@@ -48,9 +48,8 @@ module.exports = api.legend = {
 
 		var options = {
 			fileUuid : req.body.fileUuid,
-		    	cartoid : req.body.cartoid,
-		    	layerUuid : req.body.layerUuid
-		}
+	    	cartoid : req.body.cartoid
+		};
 
 		api.legend.generate(options, function (err, legends) {
 			if (err) console.log('api.legend.generate err'.red, err);
@@ -58,19 +57,17 @@ module.exports = api.legend = {
 			if (err) return api.error.general(req, res, err);
 
 			// return legends
-			res.end(JSON.stringify(legends));
+			res.send(legends);
 		});
 
 	},
 
 
 	generate : function (options, done) {
-		var fileUuid = options.fileUuid,
-		    cartoid = options.cartoid,
-		    layerUuid = options.layerUuid,
-		    ops = [];
+		var fileUuid = options.fileUuid;
+		var cartoid = options.cartoid;
+		var ops = [];
 
-		// if (!fileUuid || !cartoid || !layerUuid) return done('Missing information.4');
 		if (!fileUuid || !cartoid) return done('Missing information.4');
 
 		// get layer features/values
@@ -98,7 +95,7 @@ module.exports = api.legend = {
 					key : rule.key,
 					value : rule.value,
 					id : 'legend-' + uuid.v4()
-				}
+				};
 
 				
 				api.legend._createStylesheet(options, function (err, result) {
@@ -129,7 +126,7 @@ module.exports = api.legend = {
 								fileUuid  : fileUuid,
 								cartoid   : cartoid,
 								on 	  : true
-							}
+							};
 
 							legends.push(leg);
 
@@ -157,11 +154,11 @@ module.exports = api.legend = {
 
 	
 	_createStylesheet : function (options, callback) {
-		var featureKey = options.key,
-		    featureValue = options.value,
-		    css = options.css,
-		    lid = options.id,
-		    properties = {};
+		var featureKey = options.key;
+		var featureValue = options.value;
+		var css = options.css;
+		var lid = options.id;
+		var properties = {};
 
 		// set key/value
 		properties[featureKey] = featureValue;
@@ -203,7 +200,7 @@ module.exports = api.legend = {
 					}
 				}
 			]
-		}
+		};
 
 
 		// write geojson template to disk
@@ -228,7 +225,7 @@ module.exports = api.legend = {
 						"type" : "geojson"
 					}
 				}]
-			}
+			};
 
 			try {
 				var cr = new carto.Renderer({});
@@ -241,7 +238,7 @@ module.exports = api.legend = {
 					var result = {
 						stylepath : stylepath,
 						lid : lid
-					}
+					};
 
 					callback(null, result);
 				});
@@ -338,7 +335,7 @@ module.exports = api.legend = {
 				try {
 					var output = new carto.Renderer({
 						filename: cartopath,
-						local_data_dir: fspath.dirname(cartopath),
+						local_data_dir: fspath.dirname(cartopath)
 					}).renderMSS(buffer);
 				} catch(err) {
 					console.log('err11'.red, err);
@@ -395,7 +392,7 @@ module.exports = api.legend = {
 					var result = {
 						rules : jah,
 						css : css
-					}
+					};
 
 					return callback(null, result);
 
@@ -403,7 +400,7 @@ module.exports = api.legend = {
 				} catch (e) { callback(e); }
 			});
 		});
-	},
+	}
 
 
-}
+};

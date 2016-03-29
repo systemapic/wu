@@ -113,9 +113,8 @@ module.exports = api.socket = {
 
 	processingDone : function (options) {
 
-		var file_id = options.file_id,
-		    user_id = options.user_id;
-
+		var file_id = options.file_id;
+		var user_id = options.user_id;
 		var sock = api.socket._getSocket(user_id);
 
 		// send to user
@@ -127,13 +126,13 @@ module.exports = api.socket = {
 
 	grindRasterDone : function (req, res) {
 
-		var fileUuid = req.body.fileUuid,
-		    process = api.socket._getProcessing(fileUuid),
-		    timeDiff = new Date().getTime() - process._timestamp,
-		    userId = process.userId,
-		    sock = api.socket._getSocket(userId),
-		    error = req.body.error,
-		    uniqueIdentifier = req.body.uniqueIdentifier;
+		var fileUuid = req.body.fileUuid;
+		var process = api.socket._getProcessing(fileUuid);
+		var timeDiff = new Date().getTime() - process._timestamp;
+		var userId = process.userId;
+		var sock = api.socket._getSocket(userId);
+		var error = req.body.error;
+		var uniqueIdentifier = req.body.uniqueIdentifier;
 
 		// send to user
 		sock && sock.emit('processingDone', {
@@ -145,17 +144,17 @@ module.exports = api.socket = {
 		});
 
 		// end connection
-		res.end();
+		res.send();
 	},
 
 	grindDone : function (req, res) {
-		var fileUuid = req.body.fileUuid,
-		    process = api.socket._getProcessing(fileUuid),
-		    timeDiff = new Date().getTime() - process._timestamp,
-		    userId = process.userId,
-		    sock = api.socket._getSocket(userId),
-		    error = req.body.error,
-		    uniqueIdentifier = req.body.uniqueIdentifier;
+		var fileUuid = req.body.fileUuid;
+		var process = api.socket._getProcessing(fileUuid);
+		var timeDiff = new Date().getTime() - process._timestamp;
+		var userId = process.userId;
+		var sock = api.socket._getSocket(userId);
+		var error = req.body.error;
+		var uniqueIdentifier = req.body.uniqueIdentifier;
 
 		// send to user
 		sock && sock.emit('processingDone', {
@@ -167,12 +166,13 @@ module.exports = api.socket = {
 		});
 
 		// end connection
-		res.end();
+		res.send();
 	},
 
 	getSocket : function (options) {
 		var userId = api.socket._getUserId(options);
 		var sock = api.socket._getSocket(userId);
+
 		return sock;
 	},
 

@@ -99,7 +99,7 @@ module.exports = api.file = {
 					if (err) return api.error.general(req, res, err); // if err
 
 					// send zip uuid
-					res.end(uuidFolder);
+					res.send(uuidFolder);
 				});
 			});
 		});
@@ -107,8 +107,12 @@ module.exports = api.file = {
 
 	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
-		var userUuid = options.user.uuid,
-		    file_id = options.file._id;
+		if (!options.file || !options.user) return done('Wrong args');
+
+		var userUuid = options.user.uuid;
+		var file_id = options.file._id;
+
+		console.log('add addNewFileToUser', options);
 
 		User
 		.findOne({uuid : userUuid})
@@ -121,6 +125,7 @@ module.exports = api.file = {
 			
 			// save
 			user.save(function (err, doc) {
+				console.log('saved addNewFileToUser', err, doc);
 				done(err);
 			});
 		});
@@ -128,12 +133,11 @@ module.exports = api.file = {
 	},
 
 	addFileToProject : function (req, res, next) {
-		var options = req.body,
-		    fileUuid = options.file_id,
-		    projectUuid = options.project_id,
-		    ops = [],
-		    theproject,
-		    missingRequiredFields = [];
+		var options = req.body;
+		var fileUuid = options.file_id;
+		var projectUuid = options.project_id;
+		var ops = [];
+		var missingRequiredFields = [];
 
 		if (!fileUuid) {
 			missingRequiredFields.push('file_id');
@@ -193,7 +197,7 @@ module.exports = api.file = {
 						code: httpStatus.NOT_FOUND
 					});
 				}
-				params.project = project
+				params.project = project;
 				callback(err, params);
 			});
 		});
@@ -224,9 +228,9 @@ module.exports = api.file = {
 
 	// handle file downloads
 	downloadPDF : function (req, res, next) {
-		var fileUuid = req.query.file,
-		    account = req.user,
-		    ops = [];
+		var fileUuid = req.query.file;
+		var account = req.user;
+		var ops = [];
 
 		if (!fileUuid) {
 			return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, ['file']));
@@ -255,8 +259,6 @@ module.exports = api.file = {
 
 		ops.push(function (options, callback) {
 			var record = options.file;
-			var name = record.name.replace(/\s+/g, '');
-
 			var folder = api.config.path.file + fileUuid;
 
 			fs.readdir(folder, function (err, files) {
@@ -293,9 +295,9 @@ module.exports = api.file = {
 
 	// handle file downloads
 	downloadFile : function (req, res) {
-		var fileUuid = req.query.file,
-		    account = req.user,
-		    ops = [];
+		var fileUuid = req.query.file;
+		var account = req.user;
+		var ops = [];
 
 		if (!fileUuid) return api.error.missingInformation(req, res);
 		
@@ -380,8 +382,7 @@ module.exports = api.file = {
 	downloadZip : function (req, res, next) {
 		var folder = api.config.path.temp + req.query.file;
 		var found;
-		var ops = [];
-	
+
 		// todo: this is #$SD. not even dealing with a file object here, just paths.. 
 		// 	not solid! FIX!
 		
@@ -507,7 +508,7 @@ module.exports = api.file = {
 					return next(error);
 				}
 
-				res.json({
+				res.send({
 					err : error,
 					success : !error
 				});
@@ -521,7 +522,7 @@ module.exports = api.file = {
 		
 		var file = options.file;
 		var user = options.user;
-		var data = file.data.raster;
+		var data = file.data.postgis;
 		var file_id = data.file_id;
 		var removedObjects = {};
 		var ops = [];
@@ -536,8 +537,8 @@ module.exports = api.file = {
 		// get file model
 		ops.push(function (callback) {
 			File
-				.findOne({uuid : file_id})
-				.exec(callback);
+			.findOne({uuid : file_id})
+			.exec(callback);
 		});
 
 		// check permissions
@@ -558,7 +559,7 @@ module.exports = api.file = {
 			User
 			.findOne({uuid : user.uuid})
 			.exec(function (err, u) {
-				u.files.pull(file._id);				
+				u.files.pull(file._id);
 				u.markModified('files');
 				u.save(function (err) {
 
@@ -631,7 +632,6 @@ module.exports = api.file = {
 		var database_name = data.database_name;
 		var table_name = data.table_name;
 		var fileUuid = table_name;
-		var data_type = data.data_type;
 		var ops = [];
 		var removedObjects = {};
 
@@ -651,7 +651,7 @@ module.exports = api.file = {
 
 		// check permissions
 		ops.push(function (file, callback) {
-			console.log('TODO! permission to delete file!')
+			console.log('TODO! permission to delete file!');
 			// api.access.to.delete_file({
 			// 	file : file,
 			// 	user : account
@@ -811,20 +811,16 @@ module.exports = api.file = {
 		.find({'file' : file_id})
 		.exec(function (err, layers) {
 			if (err) return api.error.general(req, res, err);
-			res.json(layers);
+			res.send(layers);
 		});
 	},
 
 	_getPostGISLayers : function (req, res) {
 
-		var options = req.body,
-		    data = options.data || {},
-		    database_name = data.database_name,
-		    table_name = data.table_name,
-		    fileUuid = table_name,
-		    data_type = data.data_type,
-		    user = req.user,
-		    ops = [];
+		var options = req.body;
+		var data = options.data || {};
+		var database_name = data.database_name;
+		var table_name = data.table_name;
 
 		if (!database_name || !table_name) return api.error.missingInformation(req, res);
 
@@ -833,21 +829,18 @@ module.exports = api.file = {
 		.find({'data.postgis.table_name' : table_name})
 		.exec(function (err, layers) {
 			if (err) return api.error.general(req, res, err);
-			res.json(layers);
+			res.send(layers);
 		});
 	},
 
 	// delete a file
 	deleteFiles : function (req, res) {
-		var _fids  = req.body._fids,
-		    puuid  = req.body.puuid,
-		    userid = req.user.uuid,
-		    uuids = req.body.uuids,
-		    ops = [],
-		    _lids = [];
-
-
-
+		var _fids  = req.body._fids;
+		var puuid  = req.body.puuid;
+		var userid = req.user.uuid;
+		var uuids = req.body.uuids;
+		var ops = [];
+		var _lids = [];
 
 		// validate
 		if (!_fids || !puuid || !userid) return api.error.missingInformation(req, res);
@@ -900,9 +893,9 @@ module.exports = api.file = {
 			if (err) console.log('ERR 15'.red, err);
 			if (err) return api.error.general(req, res, err);		
 
-			res.end(JSON.stringify({
+			res.send({
 				error : err
-			}));
+			});
 		});
 	},
 
@@ -913,14 +906,16 @@ module.exports = api.file = {
 		var account = req.user;
 		var ops = [];
 
+		console.log('req.body', req.body);
+
 		if (!fileUuid) {
 			return api.error.missingInformation(req, res);
 		}
 
 		ops.push(function (callback) {
 			File
-				.findOne({uuid : fileUuid})
-				.exec(callback);
+			.findOne({uuid : fileUuid})
+			.exec(callback);
 		});
 
 		ops.push(function (file, callback) {
@@ -945,14 +940,14 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, result) {
-			if (err) console.log('file update err: '.red + err);
+			if (err) console.log('file update err: '.red, err.message);
 			if (err) console.log('ERR 16'.red, err);
 
 			if (err || !result) {
 				return next(err);
 			}
 
-			res.end(JSON.stringify(result));
+			res.send(result);
 		});
 
 	},
@@ -1069,9 +1064,9 @@ module.exports = api.file = {
 	// #########################################
 	// handleZip : function (inn, fileUuid, callback) {
 	handleZip : function (options, callback) {
-		var inn = options.inn,
-		    fileUuid = options.fileUuid,
-		    out = api.config.path.file + fileUuid + options.out;
+		var inn = options.inn;
+		var fileUuid = options.fileUuid;
+		var out = api.config.path.file + fileUuid + options.out;
 
 		fs.ensureDir(out, function (err) {
 			if (err) console.log('handlezip 903 err: '.red + err);
@@ -1182,7 +1177,7 @@ module.exports = api.file = {
 				db.data = {
 					geojson : name,
 					cartoid : 'default'
-				}
+				};
 				db.title = name;
 
 				callback(err, db);
@@ -1249,9 +1244,9 @@ module.exports = api.file = {
 		if (!record) return api.error.missingInformation(req, res);
 
 		// get geosjon
-		var geojson = record.data.geojson,
-		    uuid = record.uuid,
-		    path = api.config.path.file + uuid + '/' + geojson;
+		var geojson = record.data.geojson;
+		var uuid = record.uuid;
+		var path = api.config.path.file + uuid + '/' + geojson;
 
 		// return if nothing
 		if (!geojson) return api.error.missingInformation(req, res);
@@ -1265,13 +1260,59 @@ module.exports = api.file = {
 			res.set({'Content-Type': 'text/json'});		// todo: encoding of arabic characters, tc.
 			
 			// return
-			res.end(JSON.stringify(data));
+			res.send(data);
 		});
+	},
+
+
+	create : function (req, res) {
+
+		console.log('*********************************** create    r', req.body);
+
+		var ops = {};
+		var options = req.body || {};
+		var user = req.user;
+		var dataset;
+
+		ops.create = function (callback) {
+			// override important fields
+			options.uuid = 'file_' + api.utils.getRandomChars(20);
+			options.createdBy = user.uuid;
+
+			api.file.createModel(options, function (err, fileModel) {
+				if (err) return callback(err);
+				console.log('created filemodel', fileModel);
+
+				dataset = fileModel;
+				callback(null);
+			});
+		};
+
+		ops.add = function (callback) {
+			api.file.addNewFileToUser({
+				user : user,
+				file : dataset
+			}, callback);
+		};
+
+		async.series(ops, function (err, results) {
+			if (err) return res.send(err);
+			
+
+			res.send(dataset);
+		});
+			// add to user
+						
+		// todo: check valid fields
+		// todo: check if OK with missing .files etc.
+
+		
 	},
 
 	createModel : function (options, callback) {
 
 		var file 		= new File();
+
 		file.uuid 		= options.uuid;
 		file.createdBy 		= options.createdBy;
 		file.createdByName    	= options.createdByName;
@@ -1284,7 +1325,6 @@ module.exports = api.file = {
 		file.dataSize 		= options.dataSize;
 		file.data 		= options.data;
 
-
 		file.save(function (err, doc) {
 			// console.log('file model created:', err, doc);
 			if (err) console.log(err);
@@ -1295,7 +1335,7 @@ module.exports = api.file = {
 	// new: postgis file model
 	_createModel : function (fileModel, callback) {
 		var file = new File();
-		for (f in fileModel) {
+		for (var f in fileModel) {
 			file[f] = fileModel[f];
 			file.markModified(f);
 		}
@@ -1325,8 +1365,8 @@ module.exports = api.file = {
 	},
 
 	sendImage : function (req, res) {
-		var file = req.params[0],
-		    path = api.config.path.image + file;
+		var file = req.params[0];
+		var path = api.config.path.image + file;
 		
 		// send
 		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
@@ -1334,26 +1374,24 @@ module.exports = api.file = {
 
 	
 	tileCount : function (req, res) {
-		var fileUuid = req.body.fileUuid,
-		    path = '/data/raster_tiles/' + fileUuid,
-		    cmd = 'find raster/ -type f | wc -l',
-		    exec = require('child_process').exec;				
+		var fileUuid = req.body.fileUuid;
+		var path = '/data/raster_tiles/' + fileUuid;
+		var cmd = 'find raster/ -type f | wc -l';
+		var exec = require('child_process').exec;
 					
 		// run command
 		exec(cmd, { cwd : path }, function (err, stdout, stdin) {
 			if (err) console.log('ERR 11'.red, err);
 
 			var count = stdout;
-			res.end(count);
+			res.send(count);
 		});
 	},
 
 	_sendToProcessing : function (options, done) {
-		var pack = options.pack,
-		    user = options.user,
-		    layers = pack.layers,
-		    size = options.size,
-		    ops = [];
+		var pack = options.pack;
+		var layers = pack.layers;
+		var ops = [];
 
 		// can be several layers in each upload
 		layers.forEach(function (layer) {
@@ -1371,19 +1409,12 @@ module.exports = api.file = {
 	},
 
 	_sendToProcessingRaster : function (layer, options, done) {
-		var pack = options.pack,
-		    user = options.user,
-		    layers = pack.layers,
-		    size = options.size,
-		    ops = [],
-		    fileUuid = layer.file,
-		    localFile = layer.data.raster,
-		    localFolder = api.config.path.file + fileUuid + '/',
-		    remoteFolder = '/data/grind/raster/' + fileUuid + '/',
-		    uniqueIdentifier = options.uniqueIdentifier,
-		    remoteSSH = 'px_vile_grind',
-		    remoteUrl = api.config.vile_grind.remote_url;
-
+		var pack = options.pack;
+		var user = options.user;
+		var size = options.size;
+		var ops = [];
+		var fileUuid = layer.file;
+		var uniqueIdentifier = options.uniqueIdentifier;
 		var remoteUrl = 'http://grind:3004/';
 		
 		var sendOptions = {
@@ -1392,8 +1423,8 @@ module.exports = api.file = {
 			uniqueIdentifier : uniqueIdentifier,
 			sender_ssh : api.config.vile_grind.sender_ssh,
 			sender_url : api.config.vile_grind.sender_url,
-			api_hook : 'grind/raster/done',
-		}
+			api_hook : 'grind/raster/done'
+		};
 
 
 		// notify remote of file
@@ -1440,18 +1471,16 @@ module.exports = api.file = {
 	},
 
 	_sendToProcessingGeojson : function (layer, options, done) {
-		var pack = options.pack,
-		    user = options.user,
-		    layers = pack.layers,
-		    size = options.size,
-		    ops = [],
-		    fileUuid = layer.file,
-		    localFile = fileUuid + '.geojson',
-		    localFolder = api.config.path.geojson,
-		    remoteFolder = '/data/grind/geojson/',
-		    uniqueIdentifier = options.uniqueIdentifier,
-		    remoteSSH = 'px_vile_grind',
-		    remoteUrl = api.config.vile_grind.remote_url;
+		var pack = options.pack;
+		var user = options.user;
+		var size = options.size;
+		var fileUuid = layer.file;
+		var localFile = fileUuid + '.geojson';
+		var localFolder = api.config.path.geojson;
+		var remoteFolder = '/data/grind/geojson/';
+		var uniqueIdentifier = options.uniqueIdentifier;
+		var remoteSSH = 'px_vile_grind';
+		var remoteUrl = api.config.vile_grind.remote_url;
 
 		// debug
 
@@ -1463,34 +1492,34 @@ module.exports = api.file = {
 			sender_ssh : api.config.vile_grind.sender_ssh,
 			sender_url : api.config.vile_grind.sender_url,
 			api_hook : 'grind/done'
-		}
+		};
 
 		// send file over ssh
 		// exec(cmd, function (err, stdout, stdin) {
 			// if (err) console.log('err'.red, err);
 
-			var remoteUrl = 'http://grind:3004/';
+		var remoteUrl = 'http://grind:3004/';
 
-			// ping tileserver storage to notify of file transfer
-			request({
-				method : 'POST',
-				uri : remoteUrl + 'grind/job',
-				json : sendOptions
-			}, 
+		// ping tileserver storage to notify of file transfer
+		request({
+			method : 'POST',
+			uri : remoteUrl + 'grind/job',
+			json : sendOptions
+		},
 
-			// callback
-			function (err, response, body) {
+		// callback
+		function (err, response, body) {
 
-				api.socket.setProcessing({
-					userId : user._id,
-					fileUuid : fileUuid,
-					uniqueIdentifier : uniqueIdentifier,
-					pack : pack,
-					size : size
-				});
-
-				done(null, 'All done!');
+			api.socket.setProcessing({
+				userId : user._id,
+				fileUuid : fileUuid,
+				uniqueIdentifier : uniqueIdentifier,
+				pack : pack,
+				size : size
 			});
+
+			done(null, 'All done!');
+		});
 		// });
 
 	},
@@ -1628,5 +1657,5 @@ module.exports = api.file = {
 			});
 		});
 
-	},
-}
+	}
+};

@@ -203,7 +203,7 @@ module.exports = api.geo = {
 			
 			// create reference point
 			return api.geo.buildReferencePoint(extras.referencepoint);
-		};
+		}
 
 		return '';
 	},
@@ -232,7 +232,7 @@ module.exports = api.geo = {
 		var css = {
 			headers : '',
 			style : ''
-		}
+		};
 
 		var targets = options.style.polygon.targets;
 		if (!targets || !targets.length) return css;
@@ -264,7 +264,7 @@ module.exports = api.geo = {
 		var css = {
 			headers : '',
 			style : ''
-		}
+		};
 
 		var targets = options.style.point.targets;
 		if (!targets || !targets.length) return css;
@@ -317,7 +317,7 @@ module.exports = api.geo = {
 		var css = {
 			headers : '',
 			style : ''
-		}
+		};
 
 		var targets = options.style.line.targets;
 
@@ -364,7 +364,7 @@ module.exports = api.geo = {
 		var css = {
 			headers : '',
 			style   : ''
-		}
+		};
 
 		// create @variables
 		if (opacity.column) {
@@ -398,7 +398,7 @@ module.exports = api.geo = {
 		var css = {
 			headers : '',
 			style   : ''
-		}
+		};
 
 
 		if ( opacity.column ) {
@@ -433,7 +433,7 @@ module.exports = api.geo = {
 		var css = {
 			headers : '',
 			style   : ''
-		}
+		};
 
 
 		// calc vars
@@ -474,7 +474,7 @@ module.exports = api.geo = {
 		var cartObj = {
 			headers : '',
 			style   : ''
-		}		
+		};
 
 
 
@@ -742,7 +742,7 @@ module.exports = api.geo = {
 			// COLORS VALUES
 			colorArray.forEach(function(c, i) {	
 				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
-			})
+			});
 
 			cartObj.headers += '\n';
 			
@@ -751,7 +751,7 @@ module.exports = api.geo = {
 			
 			colorArray.forEach(function(c, i) {	
 				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
-			})
+			});
 
 
 			cartObj.headers += '\n';
@@ -809,7 +809,7 @@ module.exports = api.geo = {
 		var cartObj = {
 			headers : '',
 			style   : ''
-		}
+		};
 
 		if ( color.column ) {
 
@@ -896,7 +896,7 @@ module.exports = api.geo = {
 			
 			colorArray.forEach(function(c, i) {	
 				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
-			})
+			});
 
 
 			cartObj.headers += '\n';
@@ -1005,7 +1005,7 @@ module.exports = api.geo = {
 		var cartObj = {
 			headers : '',
 			style   : ''
-		}
+		};
 
 		if ( lineWidth.column ) {
 

@@ -1,5 +1,7 @@
 var _ = require('lodash');
 var httpStatus = require('http-status');
+var api = require('../api/api');
+var util =require('util');
 /**
  * @returns error handler middleware
  */
@@ -22,6 +24,7 @@ module.exports = function () {
    */
   return function (err, req, res, next) {
     var type = err.type || 'json';
+    var slackMessage = req.slackMessage || {};
 
     //pick required fields
     err = _.pick(err, fields);
@@ -31,17 +34,21 @@ module.exports = function () {
 
     console.log('Error: ', err);
 
+    slackMessage.text = util.format("Error in request: %s with body %s", req.originalUrl || slackMessage.action, JSON.stringify(req.body));
+    console.log("SLACKMESSAGE: ", slackMessage.text);
+    api.slack._send(slackMessage);
+
     if (type === 'html') {
       res.render('error', {
         error: err
       });
     } else if (type === 'json') {
-      res.json({
+      res.send({
         error: err
       });
     } else {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.end(err.message);
+      res.send(err.message);
     }
   };
 };

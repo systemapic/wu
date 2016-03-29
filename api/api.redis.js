@@ -2,7 +2,10 @@
 var api = module.parent.exports;
 
 // config
-var config = require('../../config/wu-config.js').serverConfig;
+var config = require(
+  process.env.WU_CONFIG_PATH ||
+  '../../config/wu-config.js'
+).serverConfig;
 // todo: config must be defined like this, because of redis is used in test/helpers.js
 // this is kinda fubar. fix!
 
@@ -27,4 +30,4 @@ module.exports = api.redis = {
 	tokens : redisLayers, // todo: create own instance for this?
 	stats : redisStats,
 	temp : redisTemp
-}
+};

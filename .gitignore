@@ -23,3 +23,5 @@ server.sh
 public/dist/*
 public/local/*
 public/images/portal-logo.png
+test/open-data/*
+apidoc.json

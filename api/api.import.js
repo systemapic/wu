@@ -53,7 +53,6 @@ module.exports = api.import = {
 		var user = options.user;
 		var uploadStatus = options.uploadStatus;
 		var body = options.body;
-		var access_token = options.access_token;
 		var file_id = uploadStatus.file_id;
 		var import_start_time = new Date().getTime();
 		var use_sockets = options.use_sockets;
@@ -70,7 +69,7 @@ module.exports = api.import = {
 				options : body,
 				user : user,
 				timestamp : uploadStatus.timestamp
-			}
+			};
 
 			// ping progress
 			use_sockets && api.socket.processingProgress({
@@ -79,7 +78,7 @@ module.exports = api.import = {
 					text : 'Preparing import...',
 					error : null,
 					percent : 10,
-					uniqueIdentifier : uploadStatus.uniqueIdentifier,
+					uniqueIdentifier : uploadStatus.uniqueIdentifier
 				}
 			});
 
@@ -97,22 +96,24 @@ module.exports = api.import = {
 						text : 'Importing...',
 						error : null,
 						percent : 20,
-						uniqueIdentifier : uploadStatus.uniqueIdentifier,
+						uniqueIdentifier : uploadStatus.uniqueIdentifier
 					}
 				});
 
-				// get uploadStatus, get meta, set to file
-				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
+				api.postgis.import(opts, callback);
 
-					if (0 && uploadStatus.data_type == 'raster') {
-						api.geo.handleRaster(opts, callback);
+				// // get uploadStatus, get meta, set to file
+				// api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
-					} else {
-						// postgis import
-						api.postgis.import(opts, callback);
-					}
+				// 	// if (0 && uploadStatus.data_type == 'raster') {
+				// 	// 	api.geo.handleRaster(opts, callback);
 
-				});
+				// 	// } else {
+				// 		// postgis import
+				// 		api.postgis.import(opts, callback);
+				// 	// }
+
+				// });
 
 			});
 		});
@@ -124,14 +125,22 @@ module.exports = api.import = {
 				
 				// get uploadStatus, get meta, set to file
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
-
+					console.log('GOT ----------> uploadStatus', uploadStatus);
 					var meta = uploadStatus.metadata;
 
-					// save meta to file
-					if (uploadStatus.data_type == 'vector') {
-						file.data.postgis.metadata = meta;
+					console.log('TYPE OF META', typeof meta);
+
+					// // save meta to file
+					// if (uploadStatus.data_type == 'vector') {
+					// 	file.data.postgis.metadata = meta;
+					// } else {
+					// 	file.data.postgis.metadata = JSON.stringify(meta);
+					// }
+
+					if (_.isObject(meta)) {
+						file.data.postgis.metadata = api.utils.stringify(meta);
 					} else {
-						file.data.raster.metadata = JSON.stringify(meta);
+						file.data.postgis.metadata = meta;
 					}
 					
 					// save file
@@ -154,7 +163,7 @@ module.exports = api.import = {
 			// set upload status, expire in one day
 			api.upload.updateStatus(file_id, {
 				processing_success : true,
-				status : 'Done', 
+				status : 'Done'
 			}, callback);
 		});
 
@@ -173,14 +182,14 @@ module.exports = api.import = {
 					processing_success : false,
 					status : 'Failed',
 					error : true,
-					error_debug : 'api.import.import',
+					error_debug : 'api.import.import'
 				}, function (err2) {
 
 					// send error message on socket
 					use_sockets && api.socket.sendError(user._id, {
 						title : 'Upload failed.',
 						description : err,
-						uniqueIdentifier : uploadStatus.uniqueIdentifier,
+						uniqueIdentifier : uploadStatus.uniqueIdentifier
 					});
 				});
 
@@ -207,7 +216,7 @@ module.exports = api.import = {
 					text : 'Processing done!',
 					error : null,
 					percent : 100,
-					uniqueIdentifier : uploadStatus.uniqueIdentifier,
+					uniqueIdentifier : uploadStatus.uniqueIdentifier
 				}
 			});
 
@@ -237,10 +246,10 @@ module.exports = api.import = {
 	 */
 	prepareImport : function (options, done) {
 
-		var files = options.files, // get files object
-		    temporaryPath = files.data.path, // get path
-		    ext = temporaryPath.split('.').reverse()[0].trim(), // get file extension
-		    ops = [];
+		var files = options.files; // get files object
+		var temporaryPath = files.data.path; // get path
+		var ext = temporaryPath.split('.').reverse()[0].trim(); // get file extension
+		var ops = [];
 
 		// set original filename + size
 		options.size = files.data.size;
@@ -297,24 +306,10 @@ module.exports = api.import = {
 
 	},
 
-
 	organizeImport : function (options, done) { 	// todo: remove perhaps
 
 		// import to postgis
 		api.postgis.import(options, done);
-	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
+	}
+};
 

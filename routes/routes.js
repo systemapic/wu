@@ -26,6 +26,7 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var errorHandler = require('../middleware/error-handler')();
+var analyticsHandler = require('../middleware/analytics-handler')();
 
 // api
 var api = require('../api/api');
@@ -33,19 +34,17 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app) {
 
-
 	// define apiDocs tokens
 	/**
 	* @apiDefine token
 	* @apiParam {String} access_token A valid access token
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (403)
+	* @apiError {json} Unauthorized The <code>access_token</code> is invalid. (403)
 	* @apiErrorExample {json} Error-Response:
 	* Error 401: Unauthorized
 	* {
 	*    "error": "Invalid access token."
 	* }
 	*/
-	
 
 	// link app
 	api.app = app;
@@ -57,7 +56,7 @@ module.exports = function(app) {
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
-	app.get('/', api.portal.getBase, errorHandler);
+	app.get('/', analyticsHandler, api.portal.getBase, errorHandler);
 	
 	/**
 	* @api {get} /v2/portal Get portal store
@@ -72,7 +71,7 @@ module.exports = function(app) {
 	// =====================================
 	// GET PORTAL  =========================
 	// =====================================
-	app.get('/v2/portal', checkAccess, api.portal.getPortal, errorHandler);
+	app.get('/v2/portal', checkAccess, analyticsHandler, api.portal.getPortal, errorHandler);
 	
 	/**
 	* @api {post} /v2/projects/create Create a project
@@ -80,8 +79,13 @@ module.exports = function(app) {
 	* @apiGroup Project
 	* @apiUse token
 	* @apiParam {String} name Name of project
+	* @apiParam {Object} [access] Access object
+	* @apiParam {String} [description] Description of project
+	* @apiParam {String} [keywords] Keywords of project
+	* @apiParam {Object} [position] Position of project
+	* 
 	* @apiSuccess {JSON} Project JSON object of the newly created project
-	* @apiError Bad_request name doesn't exist in request body (400)
+	* @apiError {json} Bad_request name doesn't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -97,7 +101,7 @@ module.exports = function(app) {
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/v2/projects/create', checkAccess, api.project.create, errorHandler);
+	app.post('/v2/projects/create', checkAccess, analyticsHandler, api.project.create, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/delete Delete a project
@@ -112,7 +116,7 @@ module.exports = function(app) {
 	*    "project": "project-o121l2m-12d12dlk-addasml",
 	*    "deleted": true
 	*  }
-	* @apiError Bad_request project_id doesn't exist in request body (400)
+	* @apiError {json} Bad_request project_id doesn't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -124,7 +128,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If project doesn't exist(404)
+	* @apiError {json} Not_found If project doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -137,7 +141,7 @@ module.exports = function(app) {
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
-	app.post('/v2/projects/delete', checkAccess, api.project.deleteProject, errorHandler);
+	app.post('/v2/projects/delete', checkAccess, analyticsHandler, api.project.deleteProject, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/public Get a public project
@@ -156,7 +160,7 @@ module.exports = function(app) {
 	*  uuid: 'uuid-mocha-test-project_public',
 	*  etc..
 	* }
-	* @apiError Bad_request username or project_slug don't exist in request body (400)
+	* @apiError {json} Bad_request username or project_slug don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -168,7 +172,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If user with specific username doesn't exist(404)
+	* @apiError {json} Not_found If user with specific username doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -177,7 +181,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Not_found If project with specific slug doesn't exist(404)
+	* @apiError {json} Not_found If project with specific slug doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -186,7 +190,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Bad_request If project isn't public(404)
+	* @apiError {json} Bad_request If project isn't public(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -199,7 +203,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK THAT PROJECT IS PUBLIC ========
 	// =====================================
-	app.get('/v2/projects/public', checkAccess, api.project.getPublic, errorHandler);
+	app.get('/v2/projects/public', checkAccess, analyticsHandler, api.project.getPublic, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/private Get private project
@@ -212,7 +216,7 @@ module.exports = function(app) {
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	* }
-	* @apiError Bad_request project_id or user_access_token don't exist in request body (400)
+	* @apiError {json} Bad_request project_id or user_access_token don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -228,7 +232,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK THAT PROJECT IS PRIVATE =======
 	// =====================================
-	app.get('/v2/projects/private', checkAccess, api.project.getPrivate, errorHandler);
+	app.get('/v2/projects/private', checkAccess, analyticsHandler, api.project.getPrivate, errorHandler);
 
 	/**
 	* @api {get} /v2/status Get portal status
@@ -253,7 +257,7 @@ module.exports = function(app) {
 	// =====================================
 	// GET STATUS   ====================
 	// =====================================
-	app.get('/v2/status', checkAccess, api.portal.status, errorHandler);
+	app.get('/v2/status', checkAccess, analyticsHandler, api.portal.status, errorHandler);
 
 		
 	/**
@@ -264,12 +268,12 @@ module.exports = function(app) {
 	* @apiParam {String} password Password
 	* @apiParam {Boolean} [refresh=false] Refresh access token
 	*
-	* @apiSuccess {json} status Access token JSON
-	* @apiSuccessExample {json} Success-Response:
+	* @apiSuccess {JSON} status Access token JSON
+	* @apiSuccessExample {JSON} Success-Response:
 	* {
-	*	"access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
-	*	"expires_in":"36000",
-	*	"token_type":"Bearer"
+	*    "access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
+	*    "expires_in":"36000",
+	*    "token_type":"Bearer"
 	* }
 	* @apiError {json} Bad_request username and email or password don't exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
@@ -283,7 +287,7 @@ module.exports = function(app) {
 	*		}
 	*	 }
 	* }
-	* @apiError Not_found If user doesn't exist(404)
+	* @apiError {json} Not_found If user doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -327,23 +331,80 @@ module.exports = function(app) {
 	app.post('/v2/users/token/refresh', checkAccess, api.token.refresh, errorHandler);
 	
 	/**
-	* @api {post} /v2/users/token/check Check access token
-	* @apiName check_access_token
+	* @api {post} /v2/users/token/check Check access token post
+	* @apiName check_access_token post
 	* @apiGroup User
 	* @apiUse token
 	*
 	* @apiSuccess {json} status Access token JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+    *  "_id": "56b083be8dc7e18c0c8c7059",
+    *  "lastUpdated": "2016-03-10T06:32:10.288Z",
+    *  "created": "2016-02-02T10:23:58.521Z",
+    *  "username": "igorz",
+    *  "createdBy": "user-d526c531-fd78-411c-94c4-f3e8e233ebf9",
+    *  "lastName": "Ziegler",
+    *  "firstName": "Igor",
+    *  "uuid": "user-d526c531-fd78-411c-94c4-f3e8e233ebf9",
+    *  "__v": 63,
+    *  "postgis_database": "wpxpokqmrq",
+    *  "local": {
+    *   "password": "$2a$08$RGx4FyOEO9N4V201Qu/JyOJ17OpQGl31CuOQxhYkZzGXNehrBcP.C",
+    *   "email": "icygler@hwdtech.ru"
+    *  },
+    *  "files": [
+    *   "56c3fdc08ac6ec1c005912d0",
+    *   "56c5674290a3531a6a30bd64",
+    *   "56b470db440658e25d9b812b",
+    *   "56b47121440658e25d9b812f",
+    *   "56b46fc2440658e25d9b8114",
+    *   "56b471df440658e25d9b8134",
+    *   "56b47089440658e25d9b811f",
+    *   "56b46fb1440658e25d9b810f",
+    *   "56b470ab440658e25d9b8129",
+    *   "56b46fcd440658e25d9b8119",
+    *   "56b470a6440658e25d9b8126",
+    *   "56d3fd6848f7b32b69e9c1c3",
+    *   "56d4002348f7b32b69e9c1c4",
+    *   "56d4007b48f7b32b69e9c1c5",
+    *   "56d4008248f7b32b69e9c1c6",
+    *   "56e0372ffde316a0380f89a9",
+    *   "56e03c8b4e57b5d34c44e4f3",
+    *   "56e114ea3eac7a96780a7ee1"
+    *  ],
+    *  "contact_list": [
+    *   "56b37759b5c269bd7edaa02e",
+    *   "56b0ae88355d7faf1fc4712d",
+    *   "56d3de4cdd79f1bb5f83dc17",
+    *   "56d3e1f8dd79f1bb5f83dc18",
+    *   "56d6da007d2bee1c0083fa04",
+    *   "56d6e0177d2bee1c0083fa13"
+    *  ],
+    *  "access": {
+    *   "private_projects": true,
+    *   "remaining_quota": 200000000,
+    *   "storage_quota": 200000000,
+    *   "account_type": "free"
+    *  },
+    *  "state": {
+    *   "lastProject": []
+    *  },
+    *  "status": {
+    *   "contact_requests": []
+    *  }
+	*}
 	*/
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.post('/v2/users/token/check', checkAccess, function (req, res) {
-		res.send(req.user); 	// todo: create endpoint in api.users.js for this
+	app.post('/v2/users/token/check', checkAccess, function (req, res, next) {
+		res.send(req.user);
 	}, errorHandler);
 
 	/**
-	* @api {get} /v2/users/token/check Check access token
-	* @apiName check_access_token
+	* @api {get} /v2/users/token/check Check access token get
+	* @apiName check_access_token get
 	* @apiGroup User
 	* @apiUse token
 	*
@@ -356,49 +417,67 @@ module.exports = function(app) {
 	// ================================
 	// CHECK TOKEN ====================
 	// ================================
-	app.get('/v2/users/token/check', checkAccess, function (req, res) {
-		res.send({valid : true}); // todo: create endpoint in api.users.js for this
+	app.get('/v2/users/token/check', checkAccess, function (req, res, next) {
+		res.send({valid : true});
 	}, errorHandler);
 	
 	/**
 	* @api {get} /v2/users/session Check if already logged in (browser-only)
-	* @apiName user_session
+	* @apiName user session
 	* @apiGroup User
 	*
-	* @apiSuccess {json} access_token Valid access token (either user or public)
+	* @apiSuccess {json} status Access token JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*	"access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
+	*	"expires_in":"36000",
+	*	"token_type":"Bearer"
+	* }
 	*/
 	// ================================
 	// CHECK SESSION ==================
 	// ================================
-	app.get('/v2/users/session', api.token.checkSession, errorHandler);
+	app.get('/v2/users/session', analyticsHandler, api.token.checkSession, errorHandler);
 
-	// todo: document these routes
+	/**
+	* @api {post} /v2/log/error Log error
+	* @apiName log error
+	* @apiGroup Log
+	* @apiUse token
+	* @apiParam {String} message Error message
+	* @apiParam {String} file File
+	* @apiParam {String} line Line
+	* @apiParam {String} stack Stack
+	* @apiSuccess {json} empty Empty object
+	* @apiSuccessExample {json} Success-Response:
+	* Error 200: SyntaxError: Unexpected end of input
+	*/
 	// =====================================
 	// ERROR LOGGING =======================
 	// =====================================
-	app.post('/v2/log/error', checkAccess, api.error.clientLog, errorHandler);
+	app.post('/v2/log/error', checkAccess, analyticsHandler, api.error.clientLog, errorHandler);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.post('/v2/log', checkAccess, api.analytics.set, errorHandler);
+	app.post('/v2/log', checkAccess, analyticsHandler, api.analytics.set, errorHandler);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.get('/v2/log', checkAccess, api.analytics.get, errorHandler);
+	app.get('/v2/log', checkAccess, analyticsHandler, api.analytics.get, errorHandler);
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
 	// app.get('/api/data/upload/chunked', checkAccess, function (req, res) {
-	app.get('/v2/data/import/chunked', checkAccess, api.upload.chunkedCheck, errorHandler);
+	app.get('/v2/data/import/chunked', checkAccess, analyticsHandler, api.upload.chunkedCheck, errorHandler);
 
 	// =====================================
 	// UPLOAD DATA IN CHUNKS (RESUMABLE) === 
 	// =====================================
 	// app.post('/api/data/upload/chunked', checkAccess, api.upload.chunkedUpload);
-	app.post('/v2/data/import/chunked', checkAccess, api.upload.chunkedUpload, errorHandler);
+	app.post('/v2/data/import/chunked', checkAccess, analyticsHandler, api.upload.chunkedUpload, errorHandler);
 
 
 	// // =====================================
@@ -447,7 +526,7 @@ module.exports = function(app) {
 	*  },
 	*  layer: null
 	* }
-	* @apiError Bad_request file_id do not exist in request body (400)
+	* @apiError {json} Bad_request file_id do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -459,7 +538,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If file doesn't upload(404)
+	* @apiError {json} Not_found If file doesn't upload(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -473,7 +552,7 @@ module.exports = function(app) {
 	// GET UPLOAD ==========================
 	// =====================================
 	// app.get('/api/upload/get', checkAccess, api.upload.getUpload, errorHandler);
-	app.get('/v2/data/import', checkAccess, api.upload.getUpload, errorHandler);
+	app.get('/v2/data/import', checkAccess, analyticsHandler, api.upload.getUpload, errorHandler);
 
 	/**
 	* @api {post} /v2/data/import Import data
@@ -501,7 +580,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/import
 	// app.post('/api/import', checkAccess, function (req, res) {
-	app.post('/v2/data/import', checkAccess, api.upload.upload, errorHandler);
+	app.post('/v2/data/import', checkAccess, analyticsHandler, api.upload.upload, errorHandler);
 
 
 	// todo: document
@@ -510,11 +589,14 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/import/status
 	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
-	app.get('/v2/data/import/status', checkAccess, api.upload.getUploadStatus, errorHandler);
+	app.get('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.getUploadStatus, errorHandler);
+
+	app.post('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.setUploadStatus, errorHandler);
 
 	/**
 	 * @apiIgnore
 	 * @api {get} /api/joinbeta Joinbeta
+	 * @apiUse apiSampleRequest
 	 * @apiName Joinbeta
 	 * @apiGroup Admin
 	 * @apiUse token
@@ -528,7 +610,7 @@ module.exports = function(app) {
 	// =====================================
 	// JOIN BETA MAIL ======================
 	// =====================================
-	app.get('/api/joinbeta', api.portal.joinBeta, errorHandler, errorHandler);
+	app.get('/api/joinbeta', analyticsHandler, api.portal.joinBeta, errorHandler, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/update Update project
@@ -536,25 +618,25 @@ module.exports = function(app) {
 	* @apiGroup Project
 	* @apiUse token
 	* @apiParam {String} project_id Uuid of project which should be update
-	* @apiParam {String} logo New logo of project
-	* @apiParam {String} header New header of project
-	* @apiParam {Array} baseLayers New baseLayers of project
-	* @apiParam {Object} position New position of project
-	* @apiParam {Object} bounds New bounds of project
-	* @apiParam {Array} layermenu New layermenu of project
-	* @apiParam {Array} folders New folders of project
-	* @apiParam {Object} controls New controls of project
-	* @apiParam {String} description New description of project
-	* @apiParam {Array} keywords New keywords of project
-	* @apiParam {String} colorTheme New colorTheme of project
-	* @apiParam {String} title New title of project
-	* @apiParam {String} slug New slug of project
-	* @apiParam {Object} connectedAccounts New connectedAccounts of project
-	* @apiParam {Object} settings New settings of project
-	* @apiParam {Array} categories New categories of project
-	* @apiParam {Boolean} thumbCreated New thumbCreated of project
-	* @apiParam {String} state New state of project
-	* @apiParam {Array} pending New pending of project
+	* @apiParam {String} [logo] New logo of project
+	* @apiParam {String} [header] New header of project
+	* @apiParam {Array} [baseLayers] New baseLayers of project
+	* @apiParam {Object} [position] New position of project
+	* @apiParam {Object} [bounds] New bounds of project
+	* @apiParam {Array} [layermenu] New layermenu of project
+	* @apiParam {Array} [folders] New folders of project
+	* @apiParam {Object} [controls] New controls of project
+	* @apiParam {String} [description] New description of project
+	* @apiParam {Array} [keywords] New keywords of project
+	* @apiParam {String} [colorTheme] New colorTheme of project
+	* @apiParam {String} [title] New title of project
+	* @apiParam {String} [slug] New slug of project
+	* @apiParam {Object} [connectedAccounts] New connectedAccounts of project
+	* @apiParam {Object} [settings] New settings of project
+	* @apiParam {Array} [categories] New categories of project
+	* @apiParam {Boolean} [thumbCreated] New thumbCreated of project
+	* @apiParam {String} [state] New state of project
+	* @apiParam {Array} [pending] New pending of project
 	* @apiSuccess {json} access Project access object
 	* @apiSuccessExample {json} Success-Response:
 	* {
@@ -566,7 +648,7 @@ module.exports = function(app) {
 	*	 etc...
   	*   }
 	* }
-	* @apiError Bad_request project_id doesn't not exist in request body (400)
+	* @apiError {json} Bad_request project_id doesn't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -578,7 +660,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If project doesn't exist(404)
+	* @apiError {json} Not_found If project doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -587,7 +669,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Bad_request User haven't access to the project (400)
+	* @apiError {json} Bad_request User haven't access to the project (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -600,7 +682,7 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	app.post('/v2/projects/update', checkAccess, api.project.update, errorHandler);
+	app.post('/v2/projects/update', checkAccess, analyticsHandler, api.project.update, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/slug/unique Unique project
@@ -622,14 +704,59 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	app.post('/v2/projects/slug/unique', checkAccess, api.project.checkUniqueSlug, errorHandler);
+	app.post('/v2/projects/slug/unique', checkAccess, analyticsHandler, api.project.checkUniqueSlug, errorHandler);
 
-
+	/**
+	* @api {post} /v2/projects/access Set project access object
+	* @apiName set access
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} project Uuid of project
+	* @apiParam {Object} access Access object
+	* @apiSuccess {json} project Project with updated access
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  _id: '56af0e566f8ca08221ee2ca7',
+	*  lastUpdated: '2016-02-01T07:50:46.730Z',
+	*  created: '2016-02-01T07:50:46.726Z',
+	*  etc...
+  	* }
+	* @apiError {json} Bad_request access or project do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['access', 'project']
+	*		}
+	*	}
+	* }
+	* @apiError {json} Bad_request User doesn't have access to change access rights of project (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "No access.",
+	*		"code": "400"
+	*	}
+	* }
+	* @apiError {json} Not_found If project doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such project.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// SET ACCESS ==========================
 	// =====================================
 	// app.post('/api/project/setAccess', checkAccess, function (req,res) {
-	app.post('/v2/projects/access', checkAccess, api.project.setAccess, errorHandler);
+	app.post('/v2/projects/access', checkAccess, analyticsHandler, api.project.setAccess, errorHandler);
 
 	/**
 	* @api {post} /v2/users/invite/project Add invites
@@ -649,7 +776,7 @@ module.exports = function(app) {
 	*    isPublic: false
 	*  }
 	*}
-	* @apiError Bad_request access or project do not exist in request body (400)
+	* @apiError {json} Bad_request access or project do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -661,7 +788,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If project doesn't exist(404)
+	* @apiError {json} Not_found If project doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -672,10 +799,10 @@ module.exports = function(app) {
 	* }
 	*/
 	// =====================================
-	// CREATE NEW PROJECT  =================
+	// INVITE USERS TO PROJECT =============
 	// =====================================
 	// change route to /api/project/invite
-	app.post('/v2/users/invite/project', checkAccess, api.project.addInvites, errorHandler);
+	app.post('/v2/users/invite/project', checkAccess, analyticsHandler, api.project.addInvites, errorHandler);
 
 
 	/**
@@ -709,7 +836,7 @@ module.exports = function(app) {
 	*     }
 	*   }
 	* }
-	* @apiError Bad_request project_id or saveState or hash or hash.position or hash.layers or hash.id don't not exist in request body (400)
+	* @apiError {json} Bad_request project_id or saveState or hash or hash.position or hash.layers or hash.id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -727,7 +854,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/setHash
 	// app.post('/api/project/hash/set', checkAccess, api.project.setHash, errorHandler);
-	app.post('/v2/hashes', checkAccess, api.project.setHash, errorHandler);
+	app.post('/v2/hashes', checkAccess, analyticsHandler, api.project.setHash, errorHandler);
 
 	/**
 	* @api {get} /v2/hashes Get project hash
@@ -752,7 +879,7 @@ module.exports = function(app) {
 	*     layers: []
 	*   }
 	* }
-	* @apiError Bad_request project_id or project_id or id don't not exist in request body (400)
+	* @apiError {json} Bad_request project_id or project_id or id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -764,7 +891,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If hash doesn't exist(404)
+	* @apiError {json} Not_found If hash doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -779,7 +906,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/project/getHash
 	// app.post('/api/project/hash/get', checkAccess, api.project.getHash, errorHandler);
-	app.get('/v2/hashes', checkAccess, api.project.getHash, errorHandler);
+	app.get('/v2/hashes', checkAccess, analyticsHandler, api.project.getHash, errorHandler);
 
 
 
@@ -796,7 +923,7 @@ module.exports = function(app) {
 	* @apiSuccess {String} image Image uuid 
 	* @apiSuccessExample {json} Success-Response:
 	* '56bdc6fbc7ec6af66dfc92f0'
-	* @apiError Bad_request image_id or resumableIdentifier or id don't not exist in request body (400)
+	* @apiError {json} Bad_request image_id or resumableIdentifier or id don't not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -820,27 +947,27 @@ module.exports = function(app) {
 	// UPLOAD IMAGE ========================
 	// =====================================
 	// change to /api/import/image
-	app.post('/api/upload/image', checkAccess, api.upload.image, errorHandler);
+	app.post('/api/upload/image', checkAccess, analyticsHandler, api.upload.image, errorHandler);
 
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// special route, don't touch for now
-	app.get('/images/*', checkAccess, api.file.sendImage, errorHandler);
+	app.get('/images/*', checkAccess, analyticsHandler, api.file.sendImage, errorHandler);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
 	// special route, don't touch for now
-	app.get('/pixels/fit/*', checkAccess, api.pixels.serveFitPixelPerfection, errorHandler);
+	app.get('/pixels/fit/*', checkAccess, analyticsHandler, api.pixels.serveFitPixelPerfection, errorHandler);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/image/*', checkAccess, api.pixels.serveImagePixelPerfection, errorHandler);
+	app.get('/pixels/image/*', checkAccess, analyticsHandler, api.pixels.serveImagePixelPerfection, errorHandler);
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
@@ -852,13 +979,13 @@ module.exports = function(app) {
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// change to /api/... 
-	app.get('/pixels/*', checkAccess, api.pixels.servePixelPerfection, errorHandler);
+	app.get('/pixels/*', checkAccess, analyticsHandler, api.pixels.servePixelPerfection, errorHandler);
 
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
 	// =====================================
 	// change to /api/tools/mapbox/get
-	app.post('/api/util/getmapboxaccount', checkAccess, api.provider.mapbox.getAccount, errorHandler);
+	app.post('/api/util/getmapboxaccount', checkAccess, analyticsHandler, api.provider.mapbox.getAccount, errorHandler);
 	
 	// =====================================
 	// CREATE SNAPSHOT =====================
@@ -866,14 +993,43 @@ module.exports = function(app) {
 	// create snapshot of current map
 	// app.post('/api/util/snapshot', checkAccess, function (req, res) {
 	// app.post('/v2/static/screen', checkAccess, api.pixels.createSnapshot);
-	app.post('/v2/static/screen', checkAccess, api.pixels.snap, errorHandler);
+	app.post('/v2/static/screen', checkAccess, analyticsHandler, api.pixels.snap, errorHandler);
 
+	/**
+	* @api {post} /v2/legends/create Create legend
+	* @apiName Create legend
+	* @apiGroup Legends
+	* @apiUse token
+	* @apiParam {String} fileUuid File uuid
+	* @apiParam {String} cartoid Carto css id
+	* @apiParam {String} layerUuid Layer uuid
+	* @apiSuccess {Array} legends array
+	* @apiSuccessExample {String} Success-Response:
+	* [
+	*  {
+	*	base64: uri,
+	*	key: key,
+	*	value: value,
+	*	id: id,
+	*	fileUuid: fileUuid,
+	*	cartoid: cartoid,
+	*	on: true
+	*  },
+	*  etc...
+	* ]
+	* @apiError {json} Bad_request If fileUuid or cartoid or layerUuid don't not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+    *  "error": "Missing information.4"
+	* }
+	*/
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
 	// change to /api/layer/legends/create
 	// app.post('/api/layer/createlegends', checkAccess, function (req, res) {
-	app.post('/v2/legends/create', checkAccess, api.legend.create, errorHandler);
+	app.post('/v2/legends/create', checkAccess, analyticsHandler, api.legend.create, errorHandler);
 
 	// todo: remove, deprecated
 	// =====================================
@@ -890,7 +1046,7 @@ module.exports = function(app) {
 	// GET FILE DOWNLOAD ===================
 	// =====================================
 	// change to /api/data/download
-	app.get('/api/file/download', checkAccess, api.file.download, errorHandler);
+	app.get('/api/file/download', checkAccess, analyticsHandler, api.file.download, errorHandler);
 
 
 	// todo: remove, deprecated (will be removed with new raster import (branch: postgis_raster))
@@ -909,14 +1065,14 @@ module.exports = function(app) {
 	* @apiSuccess {String} cartoCss Carto css
 	* @apiSuccessExample {String} Success-Response:
 	* "@polygon_opacity: 1;
-	*#layer {
+	* #layer {
 	*
 	*	polygon-opacity: @polygon_opacity;
 	*
 	*	polygon-fill: red;
 	*
-	*}"
-	* @apiError Bad_request uuid does not exist in request body (400)
+	* }"
+	* @apiError {json} Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -934,24 +1090,53 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/tools/json2carto
 	// app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
-	app.post('/v2/layers/carto/json', checkAccess, api.geo.json2carto, errorHandler);
+	app.post('/v2/layers/carto/json', checkAccess, analyticsHandler, api.geo.json2carto, errorHandler);
 
-
-	// todo: document
+	/**
+	* @api {post} /v2/data/download Download dataset from file
+	* @apiName Download dataset from file
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} file_id File uuid
+	* @apiSuccess {String} download_status_id Download status id 
+	* @apiSuccess {Boolean} finished True if finished download 
+	* @apiSuccess {String} file_id File uuid
+	* @apiSuccessExample {String} Success-Response:	
+	* {
+	*  "download_status_id": "rwurnixh",
+	*  "finished": false,
+	*  "file_id": "file_agjcpeadohnnxljmblkl"
+	* }
+	*/
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/data/download (POST/GET routes with same name no problem)
 	// app.post('/api/file/downloadDataset', checkAccess, function (req,res) {
-	app.post('/v2/data/download', checkAccess, api.postgis.downloadDatasetFromFile, errorHandler);
+	app.post('/v2/data/download', checkAccess, analyticsHandler, api.postgis.downloadDatasetFromFile, errorHandler);
 
-	// todo: document
+	/**
+	* @api {post} /v2/layers/download Download dataset from layer
+	* @apiName Download dataset from layer
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} layer_id Layer uuid
+	* @apiSuccess {String} download_status_id Download status id 
+	* @apiSuccess {Boolean} finished True if finished download 
+	* @apiSuccess {String} file_id Layer uuid
+	* @apiSuccessExample {String} Success-Response:	
+	* {
+	*  "download_status_id": "rwurnixh",
+	*  "finished": false,
+	*  "file_id": "layer-7aacda14-9115-44d0-b8e2-28854129dce5"
+	* }
+	*/
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
 	// change to /api/layer/download
 	// app.post('/api/layer/downloadDataset', checkAccess, function (req,res) {
-	app.post('/v2/layers/download', checkAccess, api.postgis.downloadDatasetFromLayer, errorHandler);
+	app.post('/v2/layers/download', checkAccess, analyticsHandler, api.postgis.downloadDatasetFromLayer, errorHandler);
 	
 	/**
 	* @api {post} /v2/data/update Update a file
@@ -959,6 +1144,15 @@ module.exports = function(app) {
 	* @apiGroup File
 	* @apiUse token
 	* @apiParam {String} uuid Uuid of file
+	* @apiParam {String} [name] New name file
+	* @apiParam {String} [description] New description
+	* @apiParam {Array} [keywords] Array of keywords
+	* @apiParam {String} [status] New file status
+	* @apiParam {String} [category] New file category
+	* @apiParam {Number} [version] New file version
+	* @apiParam {String} [copyright] New file copyright
+	* @apiParam {Object} [data] New data object
+	* @apiParam {Array} [styleTemplates] New array of styleTemplates object
 	*
 	* @apiSuccess {Array} updated Array of updated fields
 	* @apiSuccess {Object} file Updated file
@@ -967,11 +1161,11 @@ module.exports = function(app) {
 	*   "updated": ['name', 'description'],
 	*   "file": {
 	*       lastUpdated: '2016-01-19T12:49:49.076Z',
-    	*       created: '2016-01-19T12:49:48.943Z',
-    	*       ... etc
+	*       created: '2016-01-19T12:49:48.943Z',
+	*       ... etc
 	*   }
 	* }
-	* @apiError File with uuid <code>uuid</code> doesn't exist. (422)
+	* @apiError {json} File with uuid <code>uuid</code> doesn't exist. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: File doesn't exist
 	* {
@@ -982,7 +1176,39 @@ module.exports = function(app) {
 	// UPDATE FILE =========================
 	// =====================================
 	// change to /api/data/update
-	app.post('/v2/data/update', checkAccess, api.file.update, errorHandler);
+	app.post('/v2/data/update', checkAccess, analyticsHandler, api.file.update, errorHandler);
+
+
+	/**
+	* @api {post} /v2/data/create Create file
+	* @apiName create
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} [createdBy] Uuid of created user
+	* @apiParam {String} [createdByName] Name of created user
+	* @apiParam {Array} [files] Array of file ids
+	* @apiParam {Object} [access] Access object with users, projects and clients arrays
+	* @apiParam {String} [name] Name of new file
+	* @apiParam {String} [description] Description of new file
+	* @apiParam {String} [type] Type of new file
+	* @apiParam {Array} [format] Array of strings with formats
+	* @apiParam {String} [dataSize] Data size of new file
+	* @apiParam {Object} [data] Data of new file
+	*
+	* @apiSuccess {Object} file created file
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "file": {
+	*       lastUpdated: '2016-01-19T12:49:49.076Z',
+    *       created: '2016-01-19T12:49:48.943Z',
+    *       ... etc
+	*   }
+	* }
+	*/
+	// =====================================
+	// CREATE DATASET ======================
+	// =====================================
+	app.post('/v2/data/create', checkAccess, api.file.create, errorHandler);
 
 	/**
 	* @api {post} /v2/data/layers Get layers
@@ -1001,13 +1227,13 @@ module.exports = function(app) {
 	*	  ... etc
 	*   }
 	* ]
-	* @apiError Missing required fields. (422)
+	* @apiError {json} Missing required fields. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: Missing type parameter or database_name and table_name for postgis type
 	* {
 	*    "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
 	* }
-	* @apiError Missing required fields. (422)
+	* @apiError {json} Missing required fields. (422)
 	* @apiErrorExample {json} Error-Response:
 	* Error 422: Missing file_id for rater type
 	* {
@@ -1018,7 +1244,7 @@ module.exports = function(app) {
 	// GET LAYERS OF FILE ==================
 	// =====================================
 	// change to /api/data/getLayers
-	app.post('/v2/data/layers', checkAccess, api.file.getLayers, errorHandler);
+	app.post('/v2/data/layers', checkAccess, analyticsHandler, api.file.getLayers, errorHandler);
 
 	/**
 	* @api {post} /v2/data/share Share dataset
@@ -1041,7 +1267,7 @@ module.exports = function(app) {
 	*  }
 	*  users_shared_with : ['userId']
 	* }
-	* @apiError Bad_request dataset or users do not exist in request body (400)
+	* @apiError {json} Bad_request dataset or users do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1053,7 +1279,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found file does not exist (404)
+	* @apiError {json} Not_found file does not exist (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1068,7 +1294,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/share
 	// app.post('/api/dataset/share', checkAccess, api.file.shareDataset, errorHandler);
-	app.post('/v2/data/share', checkAccess, api.file.shareDataset, errorHandler);
+	app.post('/v2/data/share', checkAccess, analyticsHandler, api.file.shareDataset, errorHandler);
 	
 	/**
 	* @api {post} /v2/data/delete Delete data
@@ -1082,7 +1308,7 @@ module.exports = function(app) {
 	*   "success": true,
 	*   "err": {}
 	* }
-	* @apiError Bad_request file_id does not exist in request body (400)
+	* @apiError {json} Bad_request file_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1094,7 +1320,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found database_name or table_name does not exist in file.data.postgis or file_id doesn't exist in file.data.raster (404)
+	* @apiError {json} Not_found database_name or table_name does not exist in file.data.postgis or file_id doesn't exist in file.data.raster (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1103,7 +1329,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Internal_server_error Problems with drop table (500)
+	* @apiError {json} Internal_server_error Problems with drop table (500)
 	* @apiErrorExample {json} Error-Response:
 	* Error 500: Internal server error
 	* {
@@ -1112,7 +1338,7 @@ module.exports = function(app) {
 	*		"code": "500"
 	*	}
 	* }
-	* @apiError Not_found If file type is postgis and file with file.data.posgis.table_name id doesn't exist(404)
+	* @apiError {json} Not_found If file type is postgis and file with file.data.posgis.table_name id doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1126,7 +1352,7 @@ module.exports = function(app) {
 	// DELETE DATA =========================
 	// =====================================
 	// change to /api/data/delete
-	app.post('/v2/data/delete', checkAccess, api.file.deleteFile, errorHandler);
+	app.post('/v2/data/delete', checkAccess, analyticsHandler, api.file.deleteFile, errorHandler);
 
 	/**
 	* @api {post} /v2/projects/data Add file to the project
@@ -1164,7 +1390,7 @@ module.exports = function(app) {
 	*  name: 'relatedProjectName'
 	* etc...
 	*}
-	* @apiError Bad_request file_id or project_id does not exist in request body (400)
+	* @apiError {json} Bad_request file_id or project_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1176,7 +1402,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found File with specific id not found(404)
+	* @apiError {json} Not_found File with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1185,7 +1411,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Not_found Project with specific id not found(404)
+	* @apiError {json} Not_found Project with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1199,10 +1425,10 @@ module.exports = function(app) {
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	// change to /api/project/addData
-	app.post('/v2/projects/data', checkAccess, api.file.addFileToProject, errorHandler);
+	app.post('/v2/projects/data', checkAccess, analyticsHandler, api.file.addFileToProject, errorHandler);
 
 	/**
-	* @api {post} /v2/layers/delete Delete data
+	* @api {post} /v2/layers/delete Delete layer
 	* @apiName delete
 	* @apiGroup Layer
 	* @apiUse token
@@ -1214,7 +1440,7 @@ module.exports = function(app) {
 	*   "success": true,
 	*   "err": {}
 	* }
-	* @apiError Bad_request layer_id or project_id does not exist in request body (400)
+	* @apiError {json} Bad_request layer_id or project_id does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1226,7 +1452,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found Layer with specific id not found(404)
+	* @apiError {json} Not_found Layer with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1235,7 +1461,7 @@ module.exports = function(app) {
 	*		"code": "404"
 	*	}
 	* }
-	* @apiError Not_found Project with specific id not found(404)
+	* @apiError {json} Not_found Project with specific id not found(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1249,7 +1475,7 @@ module.exports = function(app) {
 	// DELETE LAYER(S) =====================
 	// =====================================
 	// change to /api/layer/delete (layer, not layers)
-	app.post('/v2/layers/delete', checkAccess, api.layer.deleteLayer, errorHandler);
+	app.post('/v2/layers/delete', checkAccess, analyticsHandler, api.layer.deleteLayer, errorHandler);
 
 	/**
 	* @api {get} /v2/projects/layers Get layers related with project
@@ -1269,7 +1495,7 @@ module.exports = function(app) {
 	*    lastUpdated: Mon Jan 25 2016 11: 37: 44 GMT + 0000(UTC),
 	*    _id: 56 a60908fdce40a15eca6773
 	*}, and etc]
-	* @apiError Bad_request project does not exist in request body (400)
+	* @apiError {json} Bad_request project does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1287,7 +1513,7 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/layer/get 
 	// app.post('/api/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
-	app.get('/v2/projects/layers', checkAccess, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
+	app.get('/v2/projects/layers', checkAccess, analyticsHandler, api.layer.get, errorHandler); // todo: layer/layers !! make all same...
 
 	// todo: /v2/projects/layers GET request
 
@@ -1296,14 +1522,14 @@ module.exports = function(app) {
 	* @apiName create
 	* @apiGroup Layer
 	* @apiUse token
-	* @apiParam {String} title Title of new layer
-	* @apiParam {String} description Description of new layer
-	* @apiParam {String} legend Legend of new legend
-	* @apiParam {String} file File of new layer
-	* @apiParam {String} metadata Metadata of new layer
-	* @apiParam {String} data Data of new layer
-	* @apiParam {String} style Style of new layer
-	* @apiSuccess {JSON} Layer New Layer object
+	* @apiParam {String} [title] Title of new layer
+	* @apiParam {String} [description] Description of new layer
+	* @apiParam {String} [legend] Legend of new legend
+	* @apiParam {String} [file] File of new layer
+	* @apiParam {String} [metadata] Metadata of new layer
+	* @apiParam {Object} [data] Data of new layer
+	* @apiParam {String} [style] Style of new layer
+	* @apiSuccess {JSON} Layer New layer object
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*    __v: 0,
@@ -1320,14 +1546,27 @@ module.exports = function(app) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	// change to /api/layer/create 
-	app.post('/v2/layers/create', checkAccess, api.layer.create, errorHandler);
+	app.post('/v2/layers/create', checkAccess, analyticsHandler, api.layer.create, errorHandler);
 
+	/**
+	* @api {post} /v2/layers/create/default Create default layer
+	* @apiName create default
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiSuccess {String} pile
+	* @apiSuccess {String} wu
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*  pile : 'ok', 
+	*  wu : 'ok'
+	* }
+	*/
 	// todo: refactor to /v2/layers/create with default flag
 	// =====================================
 	// CREATE NEW DEFAULT LAYER ============
 	// =====================================
 	// app.post('/api/layers/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
-	app.post('/v2/layers/create/default', checkAccess, api.layer.createDefaultLayers, errorHandler);
+	app.post('/v2/layers/create/default', checkAccess, analyticsHandler, api.layer.createDefaultLayers, errorHandler);
 
 	/**
 	* @api {post} /v2/layers/update Update layer
@@ -1335,17 +1574,17 @@ module.exports = function(app) {
 	* @apiGroup Layer
 	* @apiUse token
 	* @apiParam {String} layer uuid of updated layer
-	* @apiParam {String} title New title of updated layer
-	* @apiParam {String} description New description of updated layer
-	* @apiParam {String} satellite_position New satellite_position of updated layer
-	* @apiParam {String} copyright New copyright of updated layer
-	* @apiParam {String} tooltip New tooltip of updated layer
-	* @apiParam {String} style New style of updated layer
-	* @apiParam {String} filter New filter of updated layer
-	* @apiParam {String} legends New legends of updated layer
-	* @apiParam {String} opacity New opacity of updated layer
-	* @apiParam {Number} zIndex New zIndex of updated layer
-	* @apiParam {Object} data New data of updated layer
+	* @apiParam {String} [title] New title of updated layer
+	* @apiParam {String} [description] New description of updated layer
+	* @apiParam {String} [satellite_position] New satellite_position of updated layer
+	* @apiParam {String} [copyright] New copyright of updated layer
+	* @apiParam {String} [tooltip] New tooltip of updated layer
+	* @apiParam {String} [style] New style of updated layer
+	* @apiParam {String} [filter] New filter of updated layer
+	* @apiParam {String} [legends] New legends of updated layer
+	* @apiParam {String} [opacity] New opacity of updated layer
+	* @apiParam {Number} [zIndex] New zIndex of updated layer
+	* @apiParam {Object} [data] New data of updated layer
 	* @apiSuccess {String} response Update info 
 	* @apiSuccessExample {String} Success-Response:
 	* {
@@ -1393,7 +1632,7 @@ module.exports = function(app) {
 	*     }
 	*   }
 	* }
-	* @apiError Bad_request layer does not exist in request body (400)
+	* @apiError {json} Bad_request layer does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1405,7 +1644,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If layer doesn't exist(404)
+	* @apiError {json} Not_found If layer doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1418,25 +1657,106 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
-	app.post('/v2/layers/update', checkAccess, api.layer.update, errorHandler);
+	app.post('/v2/layers/update', checkAccess, analyticsHandler, api.layer.update, errorHandler);
 
+	/**
+	* @api {post} /v2/layers/meta Reload meta
+	* @apiName reload meta
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} file_id File uuid
+	* @apiParam {String} layer_id Layer uuid
+	* @apiSuccess {String} response Update info 
+	* @apiSuccessExample {String} Success-Response:
+	* {
+	*	error : err,
+	*	meta : meta
+	* }
+	* @apiError {json} Bad_request No meta (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": 'No meta.'
+	* }
+	* @apiError {json} Bad_request layer_id or file_id do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ['layer_id', 'file_id']
+	*		}
+	*	}
+	* }
+	* @apiError {json} Not_found If file doesn't exist(404)
+	* @apiErrorExample {json} Error-Response:
+	* Error 404: Not found
+	* {
+	*    "error": {
+	*		"message": "No such file.",
+	*		"code": "404"
+	*	}
+	* }
+	*/
 	// =====================================
 	// RELOAD LAYER METADATA ===============
 	// =====================================
 	// change to /api/layer/reloadMeta (camelcase) 
-	app.post('/v2/layers/meta', checkAccess, api.layer.reloadMeta, errorHandler);
 
+	app.post('/v2/layers/meta', checkAccess, analyticsHandler, api.layer.reloadMeta, errorHandler);
+	/**
+	* @api {post} /v2/layers/carto/ Set carto css
+	* @apiName set carto css
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} fileUuid File uuid
+	* @apiParam {String} css New carto css
+	* @apiParam {String} cartoid Id of mss file
+	* @apiParam {String} layerUuid Layer uuid
+	* @apiSuccess {Boolean} ok 
+	* @apiSuccess {String} cartoid Carto css id
+	* @apiSuccess {Object} error Error object
+	* @apiError {json} Bad_request If mss file doesn't exist(400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": "ENOENT, open '/data/cartocss/test.mss'"
+	* }
+	* @apiError {json} Not_found If layer doesn't exist(400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": "No layer."
+	* }
+	*/
+	
 	// =====================================
 	// SET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/set 
-	app.post('/v2/layers/carto', checkAccess, api.layer.setCartoCSS, errorHandler);
+	app.post('/v2/layers/carto', checkAccess, analyticsHandler, api.layer.setCartoCSS, errorHandler);
 
+	/**
+	* @api {get} /v2/layers/carto/ Get carto css
+	* @apiName get carto css
+	* @apiGroup Layer
+	* @apiUse token
+	* @apiParam {String} cartoid Id of mss file
+	* @apiSuccess {String} cartocss Carto css string
+	* @apiError {json} Bad_request If mss file doesn't exist(400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": "ENOENT, open '/data/cartocss/test.mss'"
+	* }
+	*/
 	// =====================================
 	// GET CARTOCSS ========================
 	// =====================================
 	// change to /api/layer/carto/get 
-	app.get('/v2/layers/carto', checkAccess, api.layer.getCartoCSS, errorHandler);
+	app.get('/v2/layers/carto', checkAccess, analyticsHandler, api.layer.getCartoCSS, errorHandler);
 
 	/**
 	* @api {post} /v2/users/update Update user
@@ -1444,6 +1764,10 @@ module.exports = function(app) {
 	* @apiGroup User
 	* @apiUse token
 	* @apiParam {String} uuid Uuid of user
+	* @apiParam {String} [firstname] First name
+	* @apiParam {String} [lastname] Last name
+	* @apiParam {String} [company] Company
+	* @apiParam {String} [position] Position in company
 	* @apiSuccess {Array} updated Array of updated fields
 	* @apiSuccess {Object} user Updated user
 	* @apiSuccessExample {json} Success-Response:
@@ -1455,7 +1779,7 @@ module.exports = function(app) {
 	*       ... etc
 	*   }
 	* }
-	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiError {json} Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1467,7 +1791,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Bad_request uuid does not exist in request body (400)
+	* @apiError {json} Bad_request uuid does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1476,7 +1800,7 @@ module.exports = function(app) {
 	*		"code": "400"
 	*	}
 	* }
-	* @apiError Not_found If user doesn't exist(404)
+	* @apiError {json} Not_found If user doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1489,7 +1813,7 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	app.post('/v2/users/update', checkAccess, api.user.update, errorHandler);
+	app.post('/v2/users/update', checkAccess, analyticsHandler, api.user.update, errorHandler);
 
 
 	/**
@@ -1510,10 +1834,10 @@ module.exports = function(app) {
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	app.get('/v2/users/info', checkAccess, api.user.info, errorHandler);
+	app.get('/v2/users/info', checkAccess, analyticsHandler, api.user.info, errorHandler);
 
 	// old route, keeping for backwards compatibility
-	app.post('/api/user/info', checkAccess, api.user.info, errorHandler);
+	app.post('/api/user/info', checkAccess, analyticsHandler, api.user.info, errorHandler);
 
 
 	// =====================================
@@ -1523,6 +1847,7 @@ module.exports = function(app) {
 	* @api {post} /v2/users/create Create new user
 	* @apiName info
 	* @apiGroup User
+	* @apiUse token
 	* @apiParam {String} username Unique username
 	* @apiParam {String} firstname First name
 	* @apiParam {String} lastname Last name
@@ -1530,23 +1855,35 @@ module.exports = function(app) {
 	* @apiParam {String} [position] Position in company
 	* @apiParam {String} email Email
 	* @apiParam {String} password Password
-	* @apiSuccess {Object} user User
+	* @apiSuccess {json} user User
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*   "user": {
 	*       lastUpdated: '2016-01-19T12:49:49.076Z',
 	*       created: '2016-01-19T12:49:48.943Z',
-	*       ... etc
+	*       ... etc.
 	*   }
 	* }
+	* @apiError {json} Bad_request username or firstname or lastname or email or password do not exist in request body (400)
+	* @apiErrorExample {json} Error-Response:
+	* Error 400: Bad request
+	* {
+	*    "error": {
+	*		"message": "Missing information. Check out https://docs.systemapic.com/ for details on the API.",
+	*		"code": "400",
+	*		"errors": {
+	*			"missingRequiredFields": ["username", "firstname", "lastname", "email", "password"]
+	*		}
+	*	}
+	* }
 	*/
-	app.post('/v2/users/create', api.user.create, errorHandler);
+	app.post('/v2/users/create', analyticsHandler, api.user.create, errorHandler);
 
 	// TODO this endpoint does not exist
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
-	// app.post('/v2/users/delete', checkAccess, api.user.deleteUser);
+	app.post('/v2/users/delete', checkAccess, api.user.deleteUser, errorHandler);
 
 	
 	/**
@@ -1561,7 +1898,7 @@ module.exports = function(app) {
 	* {
 	*   "unique": true
 	* }
-	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiError {json} Bad_request Email does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1577,7 +1914,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/v2/users/email/unique', api.user.checkUniqueEmail, errorHandler);
+	app.post('/v2/users/email/unique', analyticsHandler, api.user.checkUniqueEmail, errorHandler);
 
 	/**
 	* @apiIgnore
@@ -1591,7 +1928,7 @@ module.exports = function(app) {
 	* {
 	*   "unique": true
 	* }
-	* @apiError Bad_request Username does not exist in request body (400)
+	* @apiError {json} Bad_request Username does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1607,7 +1944,7 @@ module.exports = function(app) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	app.post('/v2/users/username/unique', api.user.checkUniqueUsername, errorHandler);
+	app.post('/v2/users/username/unique', analyticsHandler, api.user.checkUniqueUsername, errorHandler);
 
 	/**
 	* @api {post} /v2/users/invite Send invite mail
@@ -1615,14 +1952,14 @@ module.exports = function(app) {
 	* @apiGroup User
 	* @apiUse token
 	* @apiParam {Array} emails Array of emails
-	* @apiParam {String} customMessage Custom message
+	* @apiParam {String} [customMessage] Custom message
 	* @apiParam {Object} access Access object	
 	* @apiSuccess {Object} error error object
 	* @apiSuccessExample {json} Success-Response:
 	* {
 	*   "error": null
 	* }
-	* @apiError Bad_request Emails or customMessage or access do not exist in request body (400)
+	* @apiError {json} Bad_request Emails or customMessage or access do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1640,7 +1977,7 @@ module.exports = function(app) {
 	// =====================================
 	// rename to /api/user/invite/email
 	// app.post('/api/user/invite', checkAccess, api.user.invite, errorHandler);
-	app.post('/v2/users/invite', checkAccess, api.user.invite, errorHandler);
+	app.post('/v2/users/invite', checkAccess, analyticsHandler, api.user.invite, errorHandler);
 
 	/**
 	* @api {post} /v2/users/invite/accept Accept invite
@@ -1667,7 +2004,7 @@ module.exports = function(app) {
 	*     "timestamp": 1455569798000,
 	*     "type": "link"
 	* }
-	* @apiError Bad_request Invite_token does not exist in request body (400)
+	* @apiError {json} Bad_request Invite_token does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1679,7 +2016,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found Some of project does not exist (404)
+	* @apiError {json} Not_found Some of project does not exist (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1694,7 +2031,7 @@ module.exports = function(app) {
 	// =====================================
 	// rename to /api/user/invite/email
 	// app.post('/api/user/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
-	app.post('/v2/users/invite/accept', checkAccess, api.user.acceptInvite, errorHandler);
+	app.post('/v2/users/invite/accept', checkAccess, analyticsHandler, api.user.acceptInvite, errorHandler);
 
 	/**
 	* @api {post} /v2/users/contacts/request Request contact
@@ -1707,7 +2044,7 @@ module.exports = function(app) {
 	* {
 	*   "error": null
 	* }
-	* @apiError Bad_request Contact does not exist in request body (400)
+	* @apiError {json} Bad_request Contact does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1719,7 +2056,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Bad_request user does not exist in request body (404)
+	* @apiError {json} Bad_request user does not exist in request body (404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: Not found
 	* {
@@ -1732,13 +2069,13 @@ module.exports = function(app) {
 	// =====================================
 	// REQUEST CONTACT =====================
 	// =====================================
-	app.post('/v2/users/contacts/request', checkAccess, api.user.requestContact, errorHandler);
+	app.post('/v2/users/contacts/request', checkAccess, analyticsHandler, api.user.requestContact, errorHandler);
 
 	// =====================================
 	// REQUEST CONTACT =====================
 	// =====================================
 	// change to /api/user/acceptContact/*
-	app.get('/api/user/acceptContactRequest/*', api.user.acceptContactRequest, errorHandler); // todo: POST?
+	app.get('/api/user/acceptContactRequest/*', analyticsHandler, api.user.acceptContactRequest, errorHandler); // todo: POST?
 
 	/**
 	* @api {post} /v2/users/invite/projects Invite user to projects
@@ -1766,7 +2103,7 @@ module.exports = function(app) {
 	*    }
 	*  }]
 	* }
-	* @apiError Bad_request User, edits and reads do not exist in request body (400)
+	* @apiError {json} Bad_request User, edits and reads do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1783,18 +2120,18 @@ module.exports = function(app) {
 	// INVITE TO PROJECTS ==================
 	// =====================================
 	// todo: see if this can be removed (replaced by /api/user/invite?)
-	app.post('/v2/users/invite/projects', checkAccess, api.user.inviteToProjects, errorHandler);
+	app.post('/v2/users/invite/projects', checkAccess, analyticsHandler, api.user.inviteToProjects, errorHandler);
 
 	/**
 	* @api {get} /v2/users/invite/link Invite user to projects
 	* @apiName Invite user to projects
 	* @apiGroup User
 	* @apiUse token
-	* @apiParam {String} access Access parameter
-	* @apiSuccess {Stringy} link Invite link
+	* @apiParam {Object} access Access object
+	* @apiSuccess {String} link Invite link
 	* @apiSuccessExample {json} Success-Response:
 	* https://dev3.systemapic.com/invite/7Tf7Bc8
-	* @apiError Bad_request access does not exist in request body (400)
+	* @apiError {json} Bad_request access does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1810,12 +2147,12 @@ module.exports = function(app) {
 	// =====================================
 	// GENERATE ACCESS LINK ================
 	// =====================================
-	app.get('/v2/users/invite/link', checkAccess, api.user.getInviteLink, errorHandler);
+	app.get('/v2/users/invite/link', checkAccess, analyticsHandler, api.user.getInviteLink, errorHandler);
 
 	// =====================================
 	// CHECK RESET PASSWORD TOKEN ==========
 	// =====================================
-	app.post('/reset/checktoken', api.auth.checkResetToken, errorHandler);
+	app.post('/reset/checktoken', analyticsHandler, api.auth.checkResetToken, errorHandler);
 
 	/**
 	* @api {post} /v2/users/password/reset Send reset password mail
@@ -1823,7 +2160,7 @@ module.exports = function(app) {
 	* @apiGroup User
 	* @apiParam {String} email User's email
 	* @apiSuccess {String} text Please check your email for password reset link.
-	* @apiError Bad_request Email does not exist in request body (400)
+	* @apiError {json} Bad_request Email does not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1835,7 +2172,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If user with specific email doesn't exist(404)
+	* @apiError {json} Not_found If user with specific email doesn't exist(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 404: User not found
 	* {
@@ -1846,15 +2183,15 @@ module.exports = function(app) {
 	* }
 	*/
 	// =====================================
-	// RESET PASSWORD ======================
+	// SEND RESET PASSWORD MAIL ============
 	// =====================================
-	app.post('/v2/users/password/reset', api.auth.requestPasswordReset, errorHandler);
+	app.post('/v2/users/password/reset', analyticsHandler, api.auth.requestPasswordReset, errorHandler);
 
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
 	// change to /api/... 
-	app.get('/reset', api.auth.serveResetPage, errorHandler);
+	app.get('/reset', analyticsHandler, api.auth.serveResetPage, errorHandler);
 
 	/**
 	* @api {post} /v2/users/password Reset password
@@ -1863,7 +2200,7 @@ module.exports = function(app) {
 	* @apiParam {String} password New password
 	* @apiParam {String} token Access token
 	* @apiSuccess {String} text Moved Temporarily. Redirecting to /
-	* @apiError Bad_request password or token do not exist in request body (400)
+	* @apiError {json} Bad_request password or token do not exist in request body (400)
 	* @apiErrorExample {json} Error-Response:
 	* Error 400: Bad request
 	* {
@@ -1875,7 +2212,7 @@ module.exports = function(app) {
 	*		}
 	*	}
 	* }
-	* @apiError Not_found If file doesn't upload(404)
+	* @apiError {json} Not_found If file doesn't upload(404)
 	* @apiErrorExample {json} Error-Response:
 	* Error 401: Invalid token
 	* {
@@ -1888,28 +2225,16 @@ module.exports = function(app) {
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
-	app.post('/v2/users/password', api.auth.resetPassword, errorHandler);
-
-
-	// todo: remove
-	// =====================================
-	// ZXCVBN DICTIONARY =================
-	// ===================================== 
-	// change to /api/... 
-	app.get('/zxcvbn.js', function (req, res) {
-		fs.readFile('../public/js/lib/zxcvbn/zxcvbn.js', function (err, data) {
-			res.send(data);
-		});
-	}, errorHandler);
+	app.post('/v2/users/password', analyticsHandler, api.auth.resetPassword, errorHandler);
 
 	// ===================================== // todo: rename route to /api/config/client.js
 	// SERVER CLIENT CONFIG ================
 	// =====================================
 	// change to /api/... 
-	app.get('/clientConfig.js', function (req, res) {
+	app.get('/clientConfig.js', analyticsHandler, function (req, res) {
 		var configString = 'var systemapicConfigOptions = ' + JSON.stringify(api.clientConfig);
 		res.setHeader("content-type", "application/javascript");
-		res.end(configString);
+		res.send(configString);
 	}, errorHandler);
 
 	// =====================================
@@ -1923,7 +2248,7 @@ module.exports = function(app) {
 	// PRIVACY POLICY ======================
 	// =====================================
 	// change to /v2/docs/privacy-policy
-	app.get('/privacy-policy', function(req, res) {
+	app.get('/privacy-policy', analyticsHandler, function(req, res) {
 		// api.portal.login(req, res);
 		res.render('../../views/privacy.ejs');
 	}, errorHandler);
@@ -1931,29 +2256,36 @@ module.exports = function(app) {
 	// =====================================
 	// LOGOUT ==============================
 	// =====================================
-	app.get('/logout', api.portal.logout, errorHandler);
+	app.get('/logout', analyticsHandler, api.portal.logout, errorHandler);
 
 	// =====================================
 	// INVITE ==============================
 	// =====================================
-	app.get('/invite/*', api.portal.invite, errorHandler);
+	app.get('/invite/*', analyticsHandler, api.portal.invite, errorHandler);
 
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
-	app.post('/api/forgot', api.auth.forgotPassword, errorHandler);
+	app.post('/api/forgot', analyticsHandler, api.auth.forgotPassword, errorHandler);
 
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
-	app.get('/forgot', function (req, res) {
+	app.get('/forgot', analyticsHandler, function (req, res) {
 		res.render('../../views/forgot.ejs', {});
 	}, errorHandler);
 
 	// =====================================
+	// DEBUG =====================
+	// =====================================
+	// app.get('/api/debug', analyticsHandler, function (req, res) {
+	// 	res.render('../../views/debug/debug.ejs', {});
+	// }, errorHandler);
+
+	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
-	app.get('*', function (req, res) {
+	app.get('*', analyticsHandler, function (req, res) {
 		api.portal.wildcard(req, res);
 	}, errorHandler);
 

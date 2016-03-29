@@ -13,12 +13,8 @@
       "postgis": {
         "database_name": "new database_name",
         "table_name": "new table_name",
-        "data_type": "new data_type",
+        "data_type": "raster",
         "original_format": "new original_format",
-        "metadata": "new metadata"
-      },
-      "raster": {
-        "file_id": "new file_id",
         "metadata": "new metadata"
       }
     }

@@ -33,9 +33,9 @@ var winston_logger = new (winston.Logger)({
 			prettyPrint : true,
 			json : true,
 			maxsize : 10000000 // 10MB
-		}),
+		})
 
-	],
+	]
 });
 
 
@@ -63,4 +63,4 @@ var winston_logger = new (winston.Logger)({
 // exports
 module.exports = api.log = { 
 	winston : winston_logger
-}
+};

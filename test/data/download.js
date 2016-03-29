@@ -8,7 +8,10 @@ var expected = require('../../shared/errors');
 var httpStatus = require('http-status');
 var async = require('async');
 var Project = require('../../models/project');
-var config = require('../../../config/wu-config.js').serverConfig;
+var config = require(
+  process.env.WU_CONFIG_PATH ||
+  '../../../config/wu-config.js'
+).serverConfig;
 var fs = require('fs');
 var endpoints = require('../endpoints.js');
 
