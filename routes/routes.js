@@ -2233,6 +2233,13 @@ module.exports = function(app) {
 	// ===================================== 
 	app.post('/v2/users/password', analyticsHandler, api.auth.resetPassword, errorHandler);
 
+
+	// =====================================
+	// ANALYTICS ===================
+	// =====================================
+	app.get('/v2/static/getCustomData', checkAccess, analyticsHandler, api.file.getCustomData, errorHandler);
+
+
 	// ===================================== // todo: rename route to /api/config/client.js
 	// SERVER CLIENT CONFIG ================
 	// =====================================
