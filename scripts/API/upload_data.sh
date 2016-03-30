@@ -4,18 +4,18 @@
 # ------------------------------------------
 
 # access details
-USERNAME=email@address.com
-PASSWORD=mysecretpassword
+USERNAME=knutole@systemapic.com
+PASSWORD=***REMOVED***
 
 # file
-FILEPATH=/home/tsx_tiny.tar.gz
+FILEPATH=/home/rasters/SCF_MOD_2014_008.tif
 
 
 # no need to change anything below this line
 # ------------------------------------------
 
 # API 
-API_SERVER="https://maps.globesar.com"
+API_SERVER="https://dev.systemapic.com"
 API_IMPORT="v2/data/import"
 API_TOKEN="v2/users/token"
 API_USERINFO="v2/users/info"

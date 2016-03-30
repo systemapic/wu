@@ -52,7 +52,9 @@ var layerSchema = mongoose.Schema({
 			raster_band : Number,
 			layer_id : String,
 			metadata : String,
-		}
+		},
+
+		cube : String,
 
 	}, 
 
