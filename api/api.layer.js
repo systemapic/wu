@@ -819,6 +819,8 @@ module.exports = api.layer = {
 
 	createModel : function (options, callback) {
 
+		console.log('createModel :::::: ', options);
+
 		// metadata sometimes come as object... todo: check why!
 		if (_.isObject(options.metadata)) {
 			options.metadata = JSON.stringify(options.metadata);
@@ -832,8 +834,14 @@ module.exports = api.layer = {
 		layer.legend 		= options.legend || '';
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
-		layer.data 		= options.data;
 		layer.style 		= options.style;
+
+		if (_.has(layer.data, 'cube')) {
+			layer.data = { cube : JSON.stringify(options.data.cube) };
+		} else {
+			layer.data = options.data;
+		}
+		
 
 		layer.save(function (err, savedLayer) {
 			if (err) return callback(err);
