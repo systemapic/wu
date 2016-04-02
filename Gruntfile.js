@@ -253,6 +253,7 @@ module.exports = function(grunt) {
 					'public/js/src/chrome/settings/styler.point.js',
 					'public/js/src/chrome/settings/styler.line.js',
 					'public/js/src/chrome/settings/styler.legend.js',
+					'public/js/src/chrome/settings/styler.raster.js',
 					'public/js/src/chrome/settings/chrome.settings.layers.js',
 					'public/js/src/chrome/settings/chrome.settings.extras.js',
 
