@@ -836,7 +836,7 @@ module.exports = api.layer = {
 		layer.metadata 		= options.metadata;
 		layer.style 		= options.style;
 
-		if (_.has(layer.data, 'cube')) {
+		if (_.has(options.data, 'cube')) {
 			layer.data = { cube : JSON.stringify(options.data.cube) };
 		} else {
 			layer.data = options.data;
