@@ -161,14 +161,10 @@ module.exports = function(grunt) {
 					'public/js/lib/dropzone.js/dropzone.min.js',
 					'public/js/lib/list.js/list.min.js',
 					'public/js/lib/sortable.js/Sortable.js',
+					'public/js/lib/html.sortable.js/html.sortable.js',
 
 					// resumable
 					'public/js/lib/resumable/resumable.js',
-
-					// // grande
-					// 'public/js/lib/grande/js/grande.class.js',
-					// 'public/js/lib/grande/js/grande.js',
-					// 'public/js/lib/grande/js/grande.attachments.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
