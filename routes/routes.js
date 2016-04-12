@@ -595,9 +595,9 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/import/status
 	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
-	app.get('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.getUploadStatus, errorHandler);
+	app.get('/v2/data/import/status', checkAccess, api.upload.getUploadStatus, errorHandler);
 
-	app.post('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.setUploadStatus, errorHandler);
+	app.post('/v2/data/import/status', checkAccess, api.upload.setUploadStatus, errorHandler);
 
 	/**
 	 * @apiIgnore
