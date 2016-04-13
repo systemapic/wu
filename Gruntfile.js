@@ -188,6 +188,7 @@ module.exports = function(grunt) {
 					'public/js/lib/cryptojs/sha3.js',
 					'public/js/lib/nouislider/nouislider.js',
 					'public/js/lib/jscookie/js.cookie.js'
+					'public/js/lib/pikaday/js.pikaday.js'
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
