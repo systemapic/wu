@@ -237,12 +237,11 @@
 .layer-list-container .file-popup-trigger {
     width: 20px;
     opacity: 1;
-    border-radius: 10px;
     color: #C8c8c8;    
-    border: 1px solid;
     line-height: 1;    
     top: 3px;
     text-align: center;
+    font-size: 17px;
     }
 
 .layer-list-container .data-list-line:hover .file-popup-trigger {
@@ -253,9 +252,6 @@
     opacity: 1;
     }    
 
-.layer-list-container .file-popup-trigger:before {
-    content: '...';
-    }
 
 /*.file-list-container-file-list .data-list-line:hover .file-popup-trigger,*/
 /*.file-list-container-file-list .data-list-line.file-selected .file-popup-trigger,*/
@@ -282,7 +278,7 @@
 
 .file-popup {
     color: #3F4652;
-    top: 37px;
+    top: 23px;
     right: -5px;
     }
 
