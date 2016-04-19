@@ -196,6 +196,7 @@ module.exports = function(grunt) {
 					'public/js/src/core/evented.js',
 					'public/js/src/ext/resumable.js',
 					'public/js/src/ext/phantom.js',
+					'public/js/src/ext/d3list.js',
 					
 					// Panes
 					'public/js/src/panes/pane.js',
@@ -261,12 +262,14 @@ module.exports = function(grunt) {
 
 					// Models 
 					'public/js/src/models/model.js',
-					'public/js/src/models/model.projects.js',
-					'public/js/src/models/model.clients.js',
-					'public/js/src/models/model.users.js',
-					'public/js/src/models/model.layers.js',
-					'public/js/src/models/model.files.js',
-					'public/js/src/models/model.D3List.js',
+					'public/js/src/models/model.project.js',
+					'public/js/src/models/model.user.js',
+					'public/js/src/models/model.layer.js',
+					'public/js/src/models/model.layer.cube.js',
+					'public/js/src/models/model.layer.vector.js',
+					'public/js/src/models/model.layer.raster.js',
+					'public/js/src/models/model.layer.providers.js',
+					'public/js/src/models/model.file.js',
 
 					// Analytics
 					'public/js/src/ext/analytics.js',
