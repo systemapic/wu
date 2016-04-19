@@ -1616,11 +1616,13 @@ input.chrome-field-input {
     background: white;
     right: 3px;
     padding: 13px 20px 13px 19px;
-    box-shadow: 0 0 2px 1px rgba(0,0,0,0.4);
+    box-shadow: 0 0 1px 1px rgba(220, 220, 220, 0.2);
     z-index: 400;
     top: 27px;
     width: 142px;
     cursor: default;
+    border-radius: 4px;
+    border: 1px solid rgba(220, 220, 220, 0.91);
     }
 
 

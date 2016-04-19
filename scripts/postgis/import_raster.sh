@@ -31,5 +31,6 @@ set -o pipefail # needed to get an error if raster2pgsql errors out
 raster2pgsql \
 	-s 3857 -I -C -Y \
 	-t ${TILESIZE} \
+    -l 2,4,8,16,32,64,128 \
 	${RASTERFILE} $TABLENAME |
 	psql -q --set ON_ERROR_STOP=1
