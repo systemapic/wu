@@ -19,15 +19,15 @@ module.exports = function(grunt) {
 		watch:{
 			// If change to any of the SASS files,
 			// compile new CSS file
-			cssLogin : {
-				files:[  'public/css/login.css' ],
-				tasks:[  'concat:cssLogin', 'cssmin:cssLogin' ]
-			},
+			// cssLogin : {
+			// 	files:[  'public/css/login.css' ],
+			// 	tasks:[  'concat:cssLogin', 'cssmin:cssLogin' ]
+			// },
 
-			jsLogin : {
-				files: [ 'public/js/src/controls/spinningmap.control.js', 'public/js/src/core/login.js' ],
-				tasks:[  'concat:jsLogin', 'uglify:jsLogin' ]
-			},
+			// jsLogin : {
+			// 	files: [ 'public/js/src/controls/spinningmap.control.js', 'public/js/src/core/login.js' ],
+			// 	tasks:[  'concat:jsLogin', 'uglify:jsLogin' ]
+			// },
 
 			css : {
 				files:[  'scss/*', 'public/css/**/*.css' ],
@@ -40,10 +40,10 @@ module.exports = function(grunt) {
 				tasks:[ 'concat:jsPortal', 'uglify:jsPortal' ]
 			},
 
-			jsDependencies : {
-				files:['public/js/lib/**/*.js'],				
-				tasks:[  'concat:jsDependencies', 'uglify:jsDependencies' ]
-			}			
+			// jsDependencies : {
+			// 	files:['public/js/lib/**/*.js'],				
+			// 	tasks:[  'concat:jsDependencies', 'uglify:jsDependencies' ]
+			// }			
 		},
 
 
@@ -108,22 +108,6 @@ module.exports = function(grunt) {
 					dest : 'public/dist/fonts.css'
 			}
 
-			// mobilestyle : {
-				 
-			// 		src : 'public/css/mobilestyle.css',
-			// 		dest : 'public/dist/css/mobilestyle.css'
-			// },
-
-			// mobilestyleLogin : {
-				 
-			// 		src : 'public/css/mobilestyle-login.css',
-			// 		dest : 'public/dist/css/mobilestyle-login.css'
-			// },
-			// padstyle : {
-				 
-			// 		src : 'public/css/padstyle.css',
-			// 		dest : 'public/dist/css/padstyle.css'
-			// },	
 		},
 
 		// TASK: Merge JS files
@@ -153,7 +137,7 @@ module.exports = function(grunt) {
 					'public/js/lib/async/async.js',
 					
 					// leaflet + mapbox
-					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
+					'public/js/lib/leaflet.js/leaflet-src.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
 					'public/js/lib/leaflet.js/plugins/leaflet-draw/leaflet.draw-src.js',
 
@@ -187,7 +171,8 @@ module.exports = function(grunt) {
 					'public/js/lib/sniffer/sniffer.module.js',
 					'public/js/lib/cryptojs/sha3.js',
 					'public/js/lib/nouislider/nouislider.js',
-					'public/js/lib/jscookie/js.cookie.js'
+					'public/js/lib/jscookie/js.cookie.js',
+					'public/js/lib/pikaday/js.pikaday.js'
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
@@ -321,11 +306,7 @@ module.exports = function(grunt) {
 				src : [  
 
 					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
-
-					// 'public/js/lib/grande/css/menu.css',                    
-					// 'public/js/lib/grande/css/editor.css',
 					'public/css/bootstrap.min.css',
-					// 'public/css/font-awesome-4.4.0/css/font-awesome.min.css',
 					'public/css/mapbox.css',        
 					'public/js/lib/leaflet.js/leaflet.css',
 					'public/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css',
@@ -373,10 +354,6 @@ module.exports = function(grunt) {
 			cssLogin : {
 				
 				src : [
-					// 'public/css/mapbox.css',
-					// 'public/css/login.css'
-
-					// 'public/css/font-awesome-4.4.0/css/font-awesome.min.css',
 					'public/css/invitation.css'				
 				],
 
@@ -387,11 +364,6 @@ module.exports = function(grunt) {
 			jsLogin : {
 				
 				src : [
-					// 'public/js/lib/mapbox.js/mapbox.2.1.4.js',
-					// 'public/js/src/controls/control.spinningmap.js',
-					// 'public/js/src/config/login-config.js',
-					// 'public/js/src/core/login.js',
-
 					'public/js/src/core/class.js',
 					'public/js/src/core/invitation.js'
 
@@ -473,10 +445,6 @@ module.exports = function(grunt) {
 				dest : 'views/tmp/app.temp.ejs'
 			},
 
-			// login : {
-			// 	src : 'views/login.ejs',
-			// 	dest : 'views/login.serve.ejs'
-			// }
 		},
 
 
@@ -491,14 +459,7 @@ module.exports = function(grunt) {
 				}
 			},
 
-		// jshint: {
-		// 	ignore_warning: {
-		// 		options: {
-		// 			'-W015': true,
-		// 		},
-		// 		src: ['dist/tmp/systemapic.combined.js'],
-		// 	},
-		// },
+		
 		},
 
 		mochaTest: {
@@ -570,9 +531,6 @@ module.exports = function(grunt) {
 			'cssmin:cssPortal',
 			'cssmin:phantomJSthumb',
 			'cssmin:phantomJS',
-			// 'cssmin:mobilestyle',
-			// 'cssmin:mobilestyleLogin',
-			// 'cssmin:padstyle',
 			'concat:jsDependencies',
 			'uglify:jsDependencies',
 			'concat:jsPortal',
@@ -580,7 +538,6 @@ module.exports = function(grunt) {
 			'env:prod', 
 			'preprocess:prod',
 			'login',
-			// 'preprocess:login',
 			'htmlmin'
 
 
@@ -595,7 +552,6 @@ module.exports = function(grunt) {
 			'env:dev', 
 			'preprocess:dev',
 			'login',
-			// 'preprocess:login'
 	])});
 
 	grunt.registerTask('test', function () { grunt.task.run([
