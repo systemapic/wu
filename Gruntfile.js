@@ -172,7 +172,8 @@ module.exports = function(grunt) {
 					'public/js/lib/cryptojs/sha3.js',
 					'public/js/lib/nouislider/nouislider.js',
 					'public/js/lib/jscookie/js.cookie.js',
-					'public/js/lib/pikaday/js.pikaday.js'
+					'public/js/lib/pikaday/js.pikaday.js',
+					'public/js/lib/pagination.js/pagination.min.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
@@ -321,7 +322,8 @@ module.exports = function(grunt) {
 					'public/js/lib/nouislider/nouislider.min.css',
 					'public/css/opentip.css',
 					'public/js/lib/c3/c3.css',
-					'public/js/lib/dc.js/dc.css'
+					'public/js/lib/dc.js/dc.css',
+					'public/js/lib/pagination.js/pagination.css',
 				],
 				
 				dest : 'public/dist/tmp/css.dependencies.css'
