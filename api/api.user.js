@@ -1485,6 +1485,7 @@ module.exports = api.user = {
 
 		User
 		.findOne({uuid : userUuid})
+		.lean()
 		.populate('files')
 		.populate('contact_list')
 		.exec(done);
@@ -1493,6 +1494,7 @@ module.exports = api.user = {
 	_getAll : function (options, done) {
 		User
 		.find()
+		.lean()
 		.populate('files')
 		.exec(done);
 	},
@@ -1537,6 +1539,7 @@ module.exports = api.user = {
 		ops.push(function (users, callback) {
 			User
 			.find()
+			.lean()
 			.populate('files')
 			.or([
 				{ uuid : { $in : users }}, 		// roles

@@ -291,6 +291,7 @@ module.exports = api.portal = {
 	// served at initalization of Portal
 	getPortal : function (req, res) {
 
+
 		// print debug
 		api.portal.printDebug(req);
 
@@ -336,13 +337,6 @@ module.exports = api.portal = {
 				user : account
 			}, callback);
 		};
-
-		// // portal access
-		// a.access = function (callback) {
-		// 	api.access.getAll({
-		// 		user : account
-		// 	}, callback);
-		// };
 
 		// series
 		async.series(a, function (err, result) {
