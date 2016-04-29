@@ -1298,10 +1298,25 @@ module.exports = function(app) {
 	// =====================================
 	// SHARE DATASET =======================
 	// =====================================
-	// change to /api/data/share
-	// app.post('/api/dataset/share', checkAccess, api.file.shareDataset, errorHandler);
 	app.post('/v2/data/share', checkAccess, analyticsHandler, api.file.shareDataset, errorHandler);
 	
+
+	/**
+	* @api {get} /v2/data/geojson Get vector dataset as GeoJSON
+	* @apiName get dataset as geojson
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} dataset_id Dataset/file id
+	* @apiSuccess {String} geojson GeoJSON representation of dataset
+	*/
+	// =====================================
+	// GET GEOJSON OF DATASET ==============
+	// =====================================
+	app.get('/v2/data/geojson', checkAccess, analyticsHandler, api.file.getGeojson, errorHandler); 
+
+
+
+
 	/**
 	* @api {post} /v2/data/delete Delete data
 	* @apiName delete
@@ -1359,6 +1374,14 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/delete
 	app.post('/v2/data/delete', checkAccess, analyticsHandler, api.file.deleteFile, errorHandler);
+
+
+
+
+
+
+
+
 
 	/**
 	* @api {post} /v2/projects/data Add file to the project
