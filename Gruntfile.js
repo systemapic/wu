@@ -172,8 +172,9 @@ module.exports = function(grunt) {
 					'public/js/lib/cryptojs/sha3.js',
 					'public/js/lib/nouislider/nouislider.js',
 					'public/js/lib/jscookie/js.cookie.js',
-					'public/js/lib/pikaday/pikaday.js'
-					'public/js/lib/infinite/infinite.js'
+					'public/js/lib/pikaday/pikaday.js',
+					'public/js/lib/infinite/infinite.js',
+					'public/js/lib/topojson/topojson.v1.min.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'

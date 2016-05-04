@@ -1316,6 +1316,21 @@ module.exports = function(app) {
 
 
 
+	/**
+	* @api {post} /v2/data/several Get vector dataset as GeoJSON
+	* @apiName get info on several datasets
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {Array} dataset_ids Dataset/file id
+	* @apiSuccess {Array} datasets Representations of dataset
+	*/
+	// =====================================
+	// GET GEOJSON OF DATASET ==============
+	// =====================================
+	app.post('/v2/data/several', checkAccess, analyticsHandler, api.file.getSeveral, errorHandler); 
+
+
+
 
 	/**
 	* @api {post} /v2/data/delete Delete data
