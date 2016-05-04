@@ -226,6 +226,28 @@ module.exports = api.file = {
 	},
 
 
+	getSeveral : function (req, res) {
+
+		var options = req.body;
+		var datasets = options.datasets;
+		var statuses = [];
+
+		async.eachSeries(datasets, function (d, callback) {
+			var file_id_key = 'uploadStatus:' + d.id;
+			api.redis.layers.get(file_id_key, function (err, uploadStatus) {
+				var status = api.utils.parse(uploadStatus);
+				statuses.push(status);
+				callback(err);
+			});
+
+		}, function (err) {
+			if (err) return res.status(400).send(err);
+			res.send(statuses);
+		});
+
+	},
+
+
 	// handle file downloads
 	downloadPDF : function (req, res, next) {
 		var fileUuid = req.query.file;
