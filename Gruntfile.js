@@ -175,6 +175,7 @@ module.exports = function(grunt) {
 					'public/js/lib/pikaday/pikaday.js',
 					'public/js/lib/infinite/infinite.js',
 					'public/js/lib/topojson/topojson.v1.min.js',
+					'public/js/lib/chartist.js/chartist.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
@@ -323,7 +324,8 @@ module.exports = function(grunt) {
 					'public/js/lib/nouislider/nouislider.min.css',
 					'public/css/opentip.css',
 					'public/js/lib/c3/c3.css',
-					'public/js/lib/dc.js/dc.css'
+					'public/js/lib/dc.js/dc.css',
+					'public/js/lib/chartist.js/chartist.css'
 				],
 				
 				dest : 'public/dist/tmp/css.dependencies.css'
