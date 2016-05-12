@@ -1795,17 +1795,36 @@ module.exports = api.file = {
 
 		var options = req.query;
 
+		console.log('getCustomData', options);
+
 		if (options.name == 'allYears') {
 
 			var filepath = fspath.join(__dirname, '../shared/globesar.allYears.js');
 
 			// read data
-			return fs.readJson(filepath, function (err, data) {
+			fs.readJson(filepath, function (err, data) {
 				
 				// return data to client
 				res.send(data);
 			});
 
+			
+			return;
+		}
+
+		if (options.name == 'scf.average.2000.2015') {
+
+			var filepath = fspath.join(__dirname, '../shared/globesar.scf.averages.2000-2015.json');
+
+			// read data
+			fs.readJson(filepath, function (err, data) {
+
+				// return data to client
+				res.send(data);
+			});
+
+			
+			return;
 		}
 
 		// return false
