@@ -176,6 +176,7 @@ module.exports = function(grunt) {
 					'public/js/lib/infinite/infinite.js',
 					'public/js/lib/topojson/topojson.v1.min.js',
 					'public/js/lib/chartist.js/chartist.js',
+					'public/js/lib/turf.js/turf.min.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
@@ -216,6 +217,7 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.guide.js',
 					'public/js/src/panes/pane.animator.js',
 					'public/js/src/panes/pane.graph.year.js',
+					'public/js/src/panes/pane.graph.annual.js',
 
 					// chrome
 					'public/js/src/chrome/chrome.js',	
