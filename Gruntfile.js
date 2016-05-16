@@ -19,15 +19,15 @@ module.exports = function(grunt) {
 		watch:{
 			// If change to any of the SASS files,
 			// compile new CSS file
-			cssLogin : {
-				files:[  'public/css/login.css' ],
-				tasks:[  'concat:cssLogin', 'cssmin:cssLogin' ]
-			},
+			// cssLogin : {
+			// 	files:[  'public/css/login.css' ],
+			// 	tasks:[  'concat:cssLogin', 'cssmin:cssLogin' ]
+			// },
 
-			jsLogin : {
-				files: [ 'public/js/src/controls/spinningmap.control.js', 'public/js/src/core/login.js' ],
-				tasks:[  'concat:jsLogin', 'uglify:jsLogin' ]
-			},
+			// jsLogin : {
+			// 	files: [ 'public/js/src/controls/spinningmap.control.js', 'public/js/src/core/login.js' ],
+			// 	tasks:[  'concat:jsLogin', 'uglify:jsLogin' ]
+			// },
 
 			css : {
 				files:[  'scss/*', 'public/css/**/*.css' ],
@@ -40,10 +40,10 @@ module.exports = function(grunt) {
 				tasks:[ 'concat:jsPortal', 'uglify:jsPortal' ]
 			},
 
-			jsDependencies : {
-				files:['public/js/lib/**/*.js'],				
-				tasks:[  'concat:jsDependencies', 'uglify:jsDependencies' ]
-			}			
+			// jsDependencies : {
+			// 	files:['public/js/lib/**/*.js'],				
+			// 	tasks:[  'concat:jsDependencies', 'uglify:jsDependencies' ]
+			// }			
 		},
 
 
@@ -108,22 +108,6 @@ module.exports = function(grunt) {
 					dest : 'public/dist/fonts.css'
 			}
 
-			// mobilestyle : {
-				 
-			// 		src : 'public/css/mobilestyle.css',
-			// 		dest : 'public/dist/css/mobilestyle.css'
-			// },
-
-			// mobilestyleLogin : {
-				 
-			// 		src : 'public/css/mobilestyle-login.css',
-			// 		dest : 'public/dist/css/mobilestyle-login.css'
-			// },
-			// padstyle : {
-				 
-			// 		src : 'public/css/padstyle.css',
-			// 		dest : 'public/dist/css/padstyle.css'
-			// },	
 		},
 
 		// TASK: Merge JS files
@@ -153,7 +137,7 @@ module.exports = function(grunt) {
 					'public/js/lib/async/async.js',
 					
 					// leaflet + mapbox
-					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
+					'public/js/lib/leaflet.js/leaflet-src.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
 					'public/js/lib/leaflet.js/plugins/leaflet-draw/leaflet.draw-src.js',
 
@@ -161,14 +145,10 @@ module.exports = function(grunt) {
 					'public/js/lib/dropzone.js/dropzone.min.js',
 					'public/js/lib/list.js/list.min.js',
 					'public/js/lib/sortable.js/Sortable.js',
+					'public/js/lib/html.sortable.js/html.sortable.js',
 
 					// resumable
 					'public/js/lib/resumable/resumable.js',
-
-					// // grande
-					// 'public/js/lib/grande/js/grande.class.js',
-					// 'public/js/lib/grande/js/grande.js',
-					// 'public/js/lib/grande/js/grande.attachments.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
@@ -191,7 +171,12 @@ module.exports = function(grunt) {
 					'public/js/lib/sniffer/sniffer.module.js',
 					'public/js/lib/cryptojs/sha3.js',
 					'public/js/lib/nouislider/nouislider.js',
-					'public/js/lib/jscookie/js.cookie.js'
+					'public/js/lib/jscookie/js.cookie.js',
+					'public/js/lib/pikaday/pikaday.js',
+					'public/js/lib/infinite/infinite.js',
+					'public/js/lib/topojson/topojson.v1.min.js',
+					'public/js/lib/chartist.js/chartist.js',
+					'public/js/lib/turf.js/turf.min.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
@@ -215,6 +200,7 @@ module.exports = function(grunt) {
 					'public/js/src/core/evented.js',
 					'public/js/src/ext/resumable.js',
 					'public/js/src/ext/phantom.js',
+					'public/js/src/ext/d3list.js',
 					
 					// Panes
 					'public/js/src/panes/pane.js',
@@ -229,7 +215,9 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.login.js',
 					'public/js/src/panes/pane.account.js',
 					'public/js/src/panes/pane.guide.js',
-					'public/js/src/panes/pane.bigslider.js',
+					'public/js/src/panes/pane.animator.js',
+					'public/js/src/panes/pane.graph.year.js',
+					'public/js/src/panes/pane.graph.annual.js',
 
 					// chrome
 					'public/js/src/chrome/chrome.js',	
@@ -253,6 +241,7 @@ module.exports = function(grunt) {
 					'public/js/src/chrome/settings/styler.point.js',
 					'public/js/src/chrome/settings/styler.line.js',
 					'public/js/src/chrome/settings/styler.legend.js',
+					'public/js/src/chrome/settings/styler.raster.js',
 					'public/js/src/chrome/settings/chrome.settings.layers.js',
 					'public/js/src/chrome/settings/chrome.settings.extras.js',
 
@@ -278,12 +267,14 @@ module.exports = function(grunt) {
 
 					// Models 
 					'public/js/src/models/model.js',
-					'public/js/src/models/model.projects.js',
-					'public/js/src/models/model.clients.js',
-					'public/js/src/models/model.users.js',
-					'public/js/src/models/model.layers.js',
-					'public/js/src/models/model.files.js',
-					'public/js/src/models/model.D3List.js',
+					'public/js/src/models/model.project.js',
+					'public/js/src/models/model.user.js',
+					'public/js/src/models/model.layer.js',
+					'public/js/src/models/model.layer.cube.js',
+					'public/js/src/models/model.layer.vector.js',
+					'public/js/src/models/model.layer.raster.js',
+					'public/js/src/models/model.layer.providers.js',
+					'public/js/src/models/model.file.js',
 
 					// Analytics
 					'public/js/src/ext/analytics.js',
@@ -323,11 +314,7 @@ module.exports = function(grunt) {
 				src : [  
 
 					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
-
-					// 'public/js/lib/grande/css/menu.css',                    
-					// 'public/js/lib/grande/css/editor.css',
 					'public/css/bootstrap.min.css',
-					// 'public/css/font-awesome-4.4.0/css/font-awesome.min.css',
 					'public/css/mapbox.css',        
 					'public/js/lib/leaflet.js/leaflet.css',
 					'public/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css',
@@ -339,7 +326,8 @@ module.exports = function(grunt) {
 					'public/js/lib/nouislider/nouislider.min.css',
 					'public/css/opentip.css',
 					'public/js/lib/c3/c3.css',
-					'public/js/lib/dc.js/dc.css'
+					'public/js/lib/dc.js/dc.css',
+					'public/js/lib/chartist.js/chartist.css'
 				],
 				
 				dest : 'public/dist/tmp/css.dependencies.css'
@@ -367,6 +355,7 @@ module.exports = function(grunt) {
 					'public/css/experiments.css',
 					'public/css/jevil.css',
 					'public/css/guide-stylesheet.css',
+					'public/css/more-experiments.css',
 				],
 
 				dest : 'public/dist/tmp/css.portal.css'
@@ -375,10 +364,6 @@ module.exports = function(grunt) {
 			cssLogin : {
 				
 				src : [
-					// 'public/css/mapbox.css',
-					// 'public/css/login.css'
-
-					// 'public/css/font-awesome-4.4.0/css/font-awesome.min.css',
 					'public/css/invitation.css'				
 				],
 
@@ -389,11 +374,6 @@ module.exports = function(grunt) {
 			jsLogin : {
 				
 				src : [
-					// 'public/js/lib/mapbox.js/mapbox.2.1.4.js',
-					// 'public/js/src/controls/control.spinningmap.js',
-					// 'public/js/src/config/login-config.js',
-					// 'public/js/src/core/login.js',
-
 					'public/js/src/core/class.js',
 					'public/js/src/core/invitation.js'
 
@@ -475,10 +455,6 @@ module.exports = function(grunt) {
 				dest : 'views/tmp/app.temp.ejs'
 			},
 
-			// login : {
-			// 	src : 'views/login.ejs',
-			// 	dest : 'views/login.serve.ejs'
-			// }
 		},
 
 
@@ -493,14 +469,7 @@ module.exports = function(grunt) {
 				}
 			},
 
-		// jshint: {
-		// 	ignore_warning: {
-		// 		options: {
-		// 			'-W015': true,
-		// 		},
-		// 		src: ['dist/tmp/systemapic.combined.js'],
-		// 	},
-		// },
+		
 		},
 
 		mochaTest: {
@@ -572,9 +541,6 @@ module.exports = function(grunt) {
 			'cssmin:cssPortal',
 			'cssmin:phantomJSthumb',
 			'cssmin:phantomJS',
-			// 'cssmin:mobilestyle',
-			// 'cssmin:mobilestyleLogin',
-			// 'cssmin:padstyle',
 			'concat:jsDependencies',
 			'uglify:jsDependencies',
 			'concat:jsPortal',
@@ -582,7 +548,6 @@ module.exports = function(grunt) {
 			'env:prod', 
 			'preprocess:prod',
 			'login',
-			// 'preprocess:login',
 			'htmlmin'
 
 
@@ -597,7 +562,6 @@ module.exports = function(grunt) {
 			'env:dev', 
 			'preprocess:dev',
 			'login',
-			// 'preprocess:login'
 	])});
 
 	grunt.registerTask('test', function () { grunt.task.run([

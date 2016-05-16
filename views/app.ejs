@@ -30,6 +30,8 @@
 			<link rel="stylesheet" type="text/css" href="/css/opentip.css">
 			<link rel="stylesheet" type="text/css" href="/js/lib/c3/c3.css">
 			<link rel="stylesheet" type="text/css" href="/js/lib/dc.js/dc.css">
+			<link rel="stylesheet" type="text/css" href="/js/lib/pikaday/pikaday.css">
+			<link rel="stylesheet" type="text/css" href="/js/lib/chartist.js/chartist.css">
 		
 			<!-- SYSTEMAPIC STYLESHEETS -->
 			<link rel="stylesheet" type="text/css" href="/css/fonts.css">
@@ -40,6 +42,7 @@
 			<link rel="stylesheet" type="text/css" href="/css/experiments.css">
 			<link rel="stylesheet" type="text/css" href="/css/jevil.css">
 			<link rel="stylesheet" type="text/css" href="/css/guide-stylesheet.css">
+			<link rel="stylesheet" type="text/css" href="/css/more-experiments.css">
 			
 
 		<!-- @endif -->
@@ -103,7 +106,7 @@
 			<script type="text/javascript" src="/js/lib/async/async.js"></script>
 			
 			<!-- leaflet.js -->
-			<script type="text/javascript" src="/js/lib/leaflet.js/leaflet-0.7.3-src.js"></script>
+			<script type="text/javascript" src="/js/lib/leaflet.js/leaflet-src.js"></script>
 			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet.utfgrid.js"></script>
 			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet-draw/leaflet.draw-src.js"></script>
 
@@ -111,6 +114,7 @@
 			<script type="text/javascript" src="/js/lib/dropzone.js/dropzone.min.js"></script> 
 			<script type="text/javascript" src="/js/lib/list.js/list.min.js"></script> 
 			<script type="text/javascript" src="/js/lib/sortable.js/Sortable.js"></script>
+			<script type="text/javascript" src="/js/lib/html.sortable.js/html.sortable.js"></script>
 
 			<!-- resumable.js -->
 			<script type="text/javascript" src="/js/lib/resumable/resumable.js"></script>
@@ -137,6 +141,11 @@
 			<script type="text/javascript" src="/js/lib/cryptojs/sha3.js"></script>
 			<script type="text/javascript" src="/js/lib/nouislider/nouislider.js"></script>
 			<script type="text/javascript" src="/js/lib/jscookie/js.cookie.js"></script>
+			<script type="text/javascript" src="/js/lib/pikaday/pikaday.js"></script>
+			<script type="text/javascript" src="/js/lib/infinite/infinite.js"></script>
+			<script type="text/javascript" src="/js/lib/topojson/topojson.v1.min.js"></script>
+			<script type="text/javascript" src="/js/lib/chartist.js/chartist.js"></script>
+			<script type="text/javascript" src="/js/lib/turf.js/turf.min.js"></script>
 			
 
 			<!-- SOURCE -->
@@ -153,6 +162,7 @@
 			<script type="text/javascript" src="/js/src/core/evented.js"></script>
 			<script type="text/javascript" src="/js/src/ext/resumable.js"></script>
 			<script type="text/javascript" src="/js/src/ext/phantom.js"></script>
+			<script type="text/javascript" src="/js/src/ext/d3list.js"></script>
 			
 			<!-- panes -->
 			<script type="text/javascript" src="/js/src/panes/pane.js"></script>
@@ -167,7 +177,9 @@
 			<script type="text/javascript" src="/js/src/panes/pane.login.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.account.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.guide.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.bigslider.js"></script>
+			<script type="text/javascript" src="/js/src/panes/pane.animator.js"></script>
+			<script type="text/javascript" src="/js/src/panes/pane.graph.year.js"></script>
+			<script type="text/javascript" src="/js/src/panes/pane.graph.annual.js"></script>
 
 
 			<!-- chrome -->
@@ -190,6 +202,8 @@
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.point.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.line.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.legend.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/styler.raster.js"></script>
+			
 			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.layers.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.extras.js"></script>
 
@@ -213,12 +227,14 @@
 			
 			<!-- models -->
 			<script type="text/javascript" src="/js/src/models/model.js"></script>
-			<script type="text/javascript" src="/js/src/models/model.projects.js"></script>
-			<script type="text/javascript" src="/js/src/models/model.clients.js"></script>
-			<script type="text/javascript" src="/js/src/models/model.users.js"></script>
-			<script type="text/javascript" src="/js/src/models/model.layers.js"></script>
-			<script type="text/javascript" src="/js/src/models/model.files.js"></script>
-			<script type="text/javascript" src="/js/src/models/model.D3List.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.project.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.user.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.layer.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.layer.cube.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.layer.vector.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.layer.raster.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.layer.providers.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.file.js"></script>
 
 			<script type="text/javascript" src="/js/src/ext/analytics.js"></script>
 			<script type="text/javascript" src="/js/src/ext/satelliteAngle.js"></script>
