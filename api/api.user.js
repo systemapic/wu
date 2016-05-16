@@ -943,12 +943,20 @@ module.exports = api.user = {
 		// get projects
 		ops.push(function (invitation, callback) {
 			
+			// WTF! FIXME ASAP!
 			console.log('invitation: ', invitation);
+			// callback('TODO!');
+			// return;
 
-			callback(null, {
-				read : invitation.access.read,
-				edit : invitation.access.edit
-			});
+			var options = {}
+			try {
+				options.read = invitation.access.read;
+				options.edit = invitation.access.edit;
+			} catch (e) {
+				return callback(e);
+			}
+
+			callback(null, options);
 		});
 
 
