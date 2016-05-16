@@ -595,9 +595,9 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/import/status
 	// app.get('/api/import/status', checkAccess, api.upload.getUploadStatus);
-	app.get('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.getUploadStatus, errorHandler);
+	app.get('/v2/data/import/status', checkAccess, api.upload.getUploadStatus, errorHandler);
 
-	app.post('/v2/data/import/status', checkAccess, analyticsHandler, api.upload.setUploadStatus, errorHandler);
+	app.post('/v2/data/import/status', checkAccess, api.upload.setUploadStatus, errorHandler);
 
 	/**
 	 * @apiIgnore
@@ -1298,10 +1298,40 @@ module.exports = function(app) {
 	// =====================================
 	// SHARE DATASET =======================
 	// =====================================
-	// change to /api/data/share
-	// app.post('/api/dataset/share', checkAccess, api.file.shareDataset, errorHandler);
 	app.post('/v2/data/share', checkAccess, analyticsHandler, api.file.shareDataset, errorHandler);
 	
+
+	/**
+	* @api {get} /v2/data/geojson Get vector dataset as GeoJSON
+	* @apiName get dataset as geojson
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {String} dataset_id Dataset/file id
+	* @apiSuccess {String} geojson GeoJSON representation of dataset
+	*/
+	// =====================================
+	// GET GEOJSON OF DATASET ==============
+	// =====================================
+	app.get('/v2/data/geojson', checkAccess, analyticsHandler, api.file.getGeojson, errorHandler); 
+
+
+
+	/**
+	* @api {post} /v2/data/several Get vector dataset as GeoJSON
+	* @apiName get info on several datasets
+	* @apiGroup File
+	* @apiUse token
+	* @apiParam {Array} dataset_ids Dataset/file id
+	* @apiSuccess {Array} datasets Representations of dataset
+	*/
+	// =====================================
+	// GET GEOJSON OF DATASET ==============
+	// =====================================
+	app.post('/v2/data/several', checkAccess, analyticsHandler, api.file.getSeveral, errorHandler); 
+
+
+
+
 	/**
 	* @api {post} /v2/data/delete Delete data
 	* @apiName delete
@@ -1359,6 +1389,14 @@ module.exports = function(app) {
 	// =====================================
 	// change to /api/data/delete
 	app.post('/v2/data/delete', checkAccess, analyticsHandler, api.file.deleteFile, errorHandler);
+
+
+
+
+
+
+
+
 
 	/**
 	* @api {post} /v2/projects/data Add file to the project

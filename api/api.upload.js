@@ -504,7 +504,6 @@ module.exports = api.upload = {
 		    file_id_key = 'uploadStatus:' + file_id;
 
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
-			console.log('looking or upload_status', file_id_key, 'got err?', err, 'status:', uploadStatus);
 			if (err) return api.error.general(req, res, err);
 			res.send(uploadStatus || { error : 'Upload ID not found or expired.' });
 		});

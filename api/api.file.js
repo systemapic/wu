@@ -226,6 +226,28 @@ module.exports = api.file = {
 	},
 
 
+	getSeveral : function (req, res) {
+
+		var options = req.body;
+		var datasets = options.datasets;
+		var statuses = [];
+
+		async.eachSeries(datasets, function (d, callback) {
+			var file_id_key = 'uploadStatus:' + d.id;
+			api.redis.layers.get(file_id_key, function (err, uploadStatus) {
+				var status = api.utils.parse(uploadStatus);
+				statuses.push(status);
+				callback(err);
+			});
+
+		}, function (err) {
+			if (err) return res.status(400).send(err);
+			res.send(statuses);
+		});
+
+	},
+
+
 	// handle file downloads
 	downloadPDF : function (req, res, next) {
 		var fileUuid = req.query.file;
@@ -1212,26 +1234,135 @@ module.exports = api.file = {
 	},
 
 
-	// todo: possibly old, to be removed?
-	// get geojson
-	getGeojsonFile : function (req, res) {
-		var uuid = req.body.uuid,	// file-1091209120-0129029
-		    user = req.user.uuid,	// user-1290192-adasas-1212
-		    projectUuid = req.body.projectUuid;
 
-		// return if invalid
-		if (!uuid || !user) return api.error.missingInformation(req, res);
+	getGeojson : function (req, res) {
+		// export vector in postgis as geosjon
+		// return geojson string to client
 
-		// get geojson file path from db
-		File
-		.where('data.geojson', uuid)							// must have this
-		.or([{'access.users' : user}, {'access.projects' : projectUuid}])	// either of these
-		.limit(1)	// safeguard
-		.exec(function(err, record) {
-			if (err) console.log('get geo exec err: '.red + err);
-			return api.file.sendGeoJsonFile(req, res, record[0]);
+		var options = req.params;
+
+		console.log('----------getGeojson-----------');
+		// console.log('req: ', req);
+		console.log('----------getGeojson-2----------');
+		console.log('params:', req.params);
+		console.log('query: ', req.query);
+		console.log('body: ', req.body);
+
+		var options = req.query;
+
+		var dataset_id = options.dataset_id;
+
+		var ops = [];
+
+
+		// get dataset
+		ops.push(function(callback) {
+			File
+			.findOne({uuid : dataset_id})
+			.lean()
+			.exec(callback);
 		});
+
+		// sanity check
+		ops.push(function (dataset, callback) {
+			console.log('dataset', dataset);
+
+			// if not postgis dataset
+			if (!dataset || !dataset.data || !dataset.data.postgis) return callback({error : 'Not a valid PostGIS vector.'});
+
+			// if too large without flag (10MB)
+			if (_.size(dataset.dataSize) > 10000000) return callback({error : 'Dataset is too large to export without flag. Please set options.nolimit=true in query.'});
+
+			// get options
+			var table_name = dataset.data.postgis.table_name;
+			var database_name = dataset.data.postgis.database_name;
+			var data_type = dataset.data.postgis.data_type;
+
+			// if not vector
+			if (data_type != 'vector') return callback({error : 'Not a valid PostGIS vector.'});
+
+			// if missing table/database names
+			if (!table_name || !database_name) return callback({error : 'Not a valid PostGIS vector.'});
+
+
+			var query_options = {
+				table_name : table_name,
+				database_name : database_name,
+				dataset : dataset
+			}
+
+			// all good
+			callback(null, query_options);
+
+		});
+
+		ops.push(function (query_options, callback) {
+
+
+
+			api.postgis.query({
+				postgis_db : query_options.database_name,
+				query : 'select st_asgeojson(the_geom_4326) from ' + query_options.table_name + ';',
+			}, function (err, result) {
+				console.log('query: ', err, result);
+
+				if (err) return callback(err);
+				
+				// // set upload status
+				// api.upload.updateStatus(file_id, {
+				// 	rows_count : result.rows[0].count
+				// }, callback);
+
+				try {
+					var geojson = result.rows[0].st_asgeojson;
+				} catch (e) {
+					return callback({error : 'Failed to parse GeoJSON.'});
+				}
+
+				
+				console.log('geojson: ', geojson);
+
+				callback(null, geojson);
+			});
+
+		});
+
+		async.waterfall(ops, function (err, geojson) {
+			console.log('async done, err, res', err, geojson, typeof geojson);
+
+			// return result gzipped
+			// res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
+			// zlib.gzip(geojson, function (err, zipped) {
+			// 	res.end(zipped);
+			// });
+
+			res.send(geojson);
+		})
+		
+
 	},
+
+
+	// // todo: possibly old, to be removed?
+	// // get geojson
+	// getGeojsonFile : function (req, res) {
+	// 	var uuid = req.body.uuid,	// file-1091209120-0129029
+	// 	    user = req.user.uuid,	// user-1290192-adasas-1212
+	// 	    projectUuid = req.body.projectUuid;
+
+	// 	// return if invalid
+	// 	if (!uuid || !user) return api.error.missingInformation(req, res);
+
+	// 	// get geojson file path from db
+	// 	File
+	// 	.where('data.geojson', uuid)							// must have this
+	// 	.or([{'access.users' : user}, {'access.projects' : projectUuid}])	// either of these
+	// 	.limit(1)	// safeguard
+	// 	.exec(function(err, record) {
+	// 		if (err) console.log('get geo exec err: '.red + err);
+	// 		return api.file.sendGeoJsonFile(req, res, record[0]);
+	// 	});
+	// },
 
 
 
@@ -1664,17 +1795,36 @@ module.exports = api.file = {
 
 		var options = req.query;
 
+		console.log('getCustomData', options);
+
 		if (options.name == 'allYears') {
 
 			var filepath = fspath.join(__dirname, '../shared/globesar.allYears.js');
 
 			// read data
-			return fs.readJson(filepath, function (err, data) {
+			fs.readJson(filepath, function (err, data) {
 				
 				// return data to client
 				res.send(data);
 			});
 
+			
+			return;
+		}
+
+		if (options.name == 'scf.average.2000.2015') {
+
+			var filepath = fspath.join(__dirname, '../shared/globesar.scf.averages.2000-2015.json');
+
+			// read data
+			fs.readJson(filepath, function (err, data) {
+
+				// return data to client
+				res.send(data);
+			});
+
+			
+			return;
 		}
 
 		// return false
