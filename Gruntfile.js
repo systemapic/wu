@@ -177,6 +177,7 @@ module.exports = function(grunt) {
 					'public/js/lib/topojson/topojson.v1.min.js',
 					'public/js/lib/chartist.js/chartist.js',
 					'public/js/lib/turf.js/turf.min.js',
+					'public/js/lib/forge/forge.bundle.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
