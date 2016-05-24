@@ -4,7 +4,6 @@ var fs = require('fs-extra');
 var kue = require('kue');
 var path = require('path');
 var zlib = require('zlib');
-var uuid = require('uuid');
 var async = require('async');
 var redis = require('redis');
 var carto = require('carto');
@@ -36,6 +35,8 @@ redisTemp.auth(config.serverConfig.redis.temp.auth);
 var whichRedis = process.argv[2];
 var searchKeys = process.argv[3];
 
+console.log('Searching redis instance', whichRedis, 'for key', searchKeys);
+
 if (!whichRedis) {
 	console.log('Please provide args: node search_redis_keys.js [layers|stats|temp] [searchKeys]')
 	process.exit(1);
@@ -54,9 +55,11 @@ if (whichRedis == 'temp') {
 	r = redisTemp;
 }
 
+var key = searchKeys ? searchKeys + '*' : '*';
+
 // search keys
-r.keys(searchKeys + '*', function (err, keys) {
-	console.log('found keys: ', keys);
+r.keys(key, function (err, keys) {
+	console.log('found keys: ', err, keys);
 
 	process.exit(0);
 });
