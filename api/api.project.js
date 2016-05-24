@@ -1130,8 +1130,11 @@ module.exports = api.project = {
 
 		var hashedUser = user.getUuid(); // todo: hash user ids
 
+		console.log('super?', user.isSuper());
+
 		// if phantomjs bot
 		if (user.isBot() || user.isSuper()) {
+			console.log('IS SUPER!!!');
 			Project
 				.find()
 				.populate('files')
