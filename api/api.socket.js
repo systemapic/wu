@@ -44,7 +44,6 @@ module.exports = api.socket = {
 
 
 	send : function (channel, user_id, data) {
-		console.log('socket send', channel, user_id, data);
 
 		var sock = api.socket._getSocket(user_id);
 

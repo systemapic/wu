@@ -47,7 +47,10 @@ var userSchema = mongoose.Schema({
             remaining_quota : { type: Number, default: '200000000' },
 
             // allowed private projects
-            private_projects : { type: Boolean, default: true }
+            private_projects : { type: Boolean, default: true },
+
+            // super
+            super : { type : Boolean, default : false}
 
         },
 
@@ -113,7 +116,8 @@ userSchema.methods.isBot = function () {
 };
 userSchema.methods.isSuper = function () {
     // return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
-    return this.access.account_type == 'super';
+    return this.access.super;
+    // return this.access.account_type == 'super';
 };
 
 // timestamps plugin
