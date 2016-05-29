@@ -1102,22 +1102,20 @@ module.exports = api.project = {
 		var	hashId = options.hashId;
 
 		Project
-			.findOne({uuid : projectUuid})
-			.exec(function (err, project) {
-				if (err) {
-					return callback(err);
-				}
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			if (err) return callback(err);
 
-				if (!project) {
-					return callback({
-						code: httpStatus.NOT_FOUND,
-						message: errors.no_such_project.errorMessage
-					})
-				}
+			if (!project) {
+				return callback({
+					code: httpStatus.NOT_FOUND,
+					message: errors.no_such_project.errorMessage
+				})
+			}
 
-				project.state = hashId;
-				project.save(callback);
-			});
+			project.state = hashId;
+			project.save(callback);
+		});
 
 	},
 
@@ -1136,26 +1134,29 @@ module.exports = api.project = {
 		if (user.isBot() || user.isSuper()) {
 			console.log('IS SUPER!!!');
 			Project
-				.find()
-				.populate('files')
-				.populate('roles')
-				.populate('layers')
-				.exec(done);
+			.find()
+			.lean()
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(done);
 
 			return;
 		}
 
 		// get all projects where user is in access.edit or access.read
 		Project
-			.find()
-			.or([	{'access.edit' : hashedUser },
-				{'access.read' : hashedUser },
-				{'createdBy' : hashedUser}
-			])
-			.populate('files')
-			.populate('roles')
-			.populate('layers')
-			.exec(done);
+		.find()
+		.or([
+			{'access.edit' : hashedUser },
+			{'access.read' : hashedUser },
+			{'createdBy' : hashedUser}
+		])
+		.lean()
+		.populate('files')
+		.populate('roles')
+		.populate('layers')
+		.exec(done);
 	},
 
 
@@ -1184,17 +1185,17 @@ module.exports = api.project = {
 				roles.forEach(function (role) { roleIds.push(role._id); });
 
 				Project
-						.findOne({roles : { $in : roleIds }})
-						.populate('files')
-						.populate('roles')
-						.populate('layers')
-						.exec(function (err, project) {
-							if (err) return done(err);
-							if (!project) return done('No project found.');
+				.findOne({roles : { $in : roleIds }})
+				.populate('files')
+				.populate('roles')
+				.populate('layers')
+				.exec(function (err, project) {
+					if (err) return done(err);
+					if (!project) return done('No project found.');
 
-							// success
-							done(null, project);
-						});
+					// success
+					done(null, project);
+				});
 			});
 	},
 
@@ -1211,9 +1212,9 @@ module.exports = api.project = {
 		ops.push(function (callback) {
 			// get all roles with user as read_project
 			Role
-				.find({ members : user.uuid })
-				.where(cap_filter, true)
-				.exec(callback);
+			.find({ members : user.uuid })
+			.where(cap_filter, true)
+			.exec(callback);
 		});
 
 		ops.push(function (roles, callback) {
@@ -1224,11 +1225,11 @@ module.exports = api.project = {
 			});
 
 			Project
-				.find({roles : { $in : roleIds }}) // todo: doesnt work?
-				.populate('files')
-				.populate('roles')
-				.populate('layers')
-				.exec(callback);
+			.find({roles : { $in : roleIds }}) // todo: doesnt work?
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(callback);
 		});
 
 		async.waterfall(ops, done);
