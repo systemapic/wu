@@ -285,6 +285,39 @@ module.exports = api.layer = {
 	},
 
 
+	getLayer : function (req, res, next) {
+
+		var options = req.body;
+
+		var user = req.user;
+		var layer_id = options.layer_id;
+
+		// validate
+		if (!layer_id) return next({
+			message: errors.missing_information.errorMessage,
+			code: httpStatus.BAD_REQUEST,
+			errors: {
+				missingRequiredFields: ['layer_id']
+			}
+		});
+
+
+		Layer
+		.findOne({uuid : layer_id})
+		.lean()
+		.exec(function (err, layer) {
+
+			// catch error
+			if (err) return res.status(400).send({error : 'No such layer.'});
+
+			// send layer to client
+			res.send(layer);
+			
+		});
+
+	},
+
+
 	// get layers and send to client
 	get : function (req, res, next) {
 		// var project = req.body.project;
