@@ -1929,7 +1929,10 @@ module.exports = function(app) {
 	// =====================================
 	app.post('/v2/users/delete', checkAccess, api.user.deleteUser, errorHandler);
 
-	
+
+
+	app.post('/v2/layers/getLayer', checkAccess, api.layer.getLayer, errorHandler);
+
 	/**
 	* @apiIgnore
 	* @api {post} /v2/users/email/unique Is unique email
