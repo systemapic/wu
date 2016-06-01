@@ -34,3 +34,8 @@ raster2pgsql \
     -l 4,32,128 \
 	${RASTERFILE} $TABLENAME |
 	psql -q --set ON_ERROR_STOP=1
+# raster2pgsql \
+#     -s 3857 -I -C -Y \
+#     -t ${TILESIZE} \
+#     ${RASTERFILE} $TABLENAME |
+#     psql -q --set ON_ERROR_STOP=1
