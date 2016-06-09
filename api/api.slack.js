@@ -111,7 +111,7 @@ module.exports = api.slack = {
 			File
 			.findOne({uuid : file_id})
 			.exec(function (err, file) {
-				if (err || !file) return callback('no screenshot');
+				if (err || !file) return callback('No screenshot found to send to Slack monitor.');
 
 				// return raw file
 				var imageFile = file.data.image;

@@ -3,13 +3,15 @@ var system = require('system');
 var args = JSON.parse(system.args[1]);
 var outPath = args.outPath || '/tmp/screenshot.png';
 var url = args.url;// || 'https://dev.systemapic.com/';
-
+console.log('url:', url);
 page = WebPage.create();
 page.viewportSize = { width : 1620, height: 1080 };	// set size...
 page.open(url, 'get', function (status, why) {
 
 	// timeout after 30 secs
 	setTimeout(phantom.exit, 30000);
+
+	console.log('trying this', status, why);
 	
 	// pings from client
 	page.onCallback = function(data){
