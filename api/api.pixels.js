@@ -71,6 +71,7 @@ module.exports = api.pixels = {
 			console.log('spawning!');
 
 			ls.stdout.on('data', function (data) {
+				console.log('data:', data);
 
 				var dataTextObj = api.utils.parse(data) || {};
 
