@@ -100,20 +100,8 @@ module.exports = api.import = {
 					}
 				});
 
+				// import to postgis
 				api.postgis.import(opts, callback);
-
-				// // get uploadStatus, get meta, set to file
-				// api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
-
-				// 	// if (0 && uploadStatus.data_type == 'raster') {
-				// 	// 	api.geo.handleRaster(opts, callback);
-
-				// 	// } else {
-				// 		// postgis import
-				// 		api.postgis.import(opts, callback);
-				// 	// }
-
-				// });
 
 			});
 		});
