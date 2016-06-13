@@ -782,6 +782,8 @@ module.exports = api.postgis = {
                 latfield: latfield,
                 lonfield: lngfield,
             }, function (err, geojson) {
+
+                console.log('CREATED GEOJSON --==>', geojson);
                 
                 // todo: catch other type errors
 
@@ -798,6 +800,8 @@ module.exports = api.postgis = {
 
             // reproject UTM32 to latlng
             _.forEach(geojson.features, function (f) {
+
+                console.log('f00', f);
 
                 // get coords
                 var coords = f.geometry.coordinates;
@@ -816,12 +820,14 @@ module.exports = api.postgis = {
             // parse floats
             _.forEach(geojson.features, function (f) {
                 _.forEach(f.properties, function (value, key) {
+                    console.log('key:', key);
                     f.properties[key] = _.isNaN(parseFloat(value)) ? value : parseFloat(value);
                 });
             });
 
             // write output
             fs.writeFile(geojson_output, JSON.stringify(geojson), function (err) {
+                console.log('wrote geojson_output', geojson_output);
                 callback(err);
             });
         });
@@ -847,6 +853,7 @@ module.exports = api.postgis = {
 
             exec(cmd, function (err) {
                 console.log('cmd, err', cmd, err);
+                console.log('wrote shapefile', shape_folder);
                 callback(err);
             });
         });
@@ -878,29 +885,43 @@ module.exports = api.postgis = {
 
         async.waterfall(ops, function (err, results) {
 
-            var meta = {};
-            meta.csv = [];
+            var csv_meta = [];
 
             // collect meta
             non_geo_rows.forEach(function (r) {
+                
                 // only non-geo data (not other errors)
                 if (r.message = 'A row contained an invalid value for latitude or longitude') {
-                    meta.csv.push(r.row);
+                    csv_meta.push(r.row);
                 }
             });
 
-            // set upload status
-            api.upload.updateStatus(file_id, {
-                csv_metadata : JSON.stringify(meta),
-                data_type : 'vector',
-                original_format : 'csv',
-                table_name : file_id,
-                database_name : postgis_database
-            }, function (err) {
-                console.log('update 3233 err', err);
-                done(null);;
+
+            // get upload status
+            var file_id_key = 'uploadStatus:' + file_id;
+            api.redis.layers.get(file_id_key, function (err, uploadStatus) {
+                var u = api.utils.parse(uploadStatus);
+
+                // parse existing meta
+                var current_meta = api.utils.parse(u.metadata);
+
+                // add csv fields to meta
+                current_meta.csv = csv_meta;
+
+
+                // save meta + extras
+                api.upload.updateStatus(file_id, {
+                    metadata : JSON.stringify(current_meta),
+                    data_type : 'vector',
+                    original_format : 'csv',
+                    table_name : file_id,
+                    database_name : postgis_database
+                }, function (err) {
+
+                    // return 
+                    done(null);;
+                });
             });
-             
         });
 
     },

@@ -1098,6 +1098,9 @@ module.exports = function(app) {
 	// app.post('/api/geo/json2carto', checkAccess, api.geo.json2carto, errorHandler);
 	app.post('/v2/layers/carto/json', checkAccess, analyticsHandler, api.geo.json2carto, errorHandler);
 
+	app.post('/v2/layers/carto/custom', checkAccess, analyticsHandler, api.geo.cartoCustom, errorHandler);
+	
+
 	/**
 	* @api {post} /v2/data/download Download dataset from file
 	* @apiName Download dataset from file
