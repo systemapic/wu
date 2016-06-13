@@ -856,10 +856,7 @@ module.exports = api.postgis = {
 
             // get content of dir
             fs.readdir(shape_folder, function (err, files) {
-                console.log('read dir err, files', err, files);
                 if (err) return callback(err);
-
-                console.log('read shape folder', err, files);
 
                 // add path to files, and add to options
                 options.files = [];
@@ -876,7 +873,6 @@ module.exports = api.postgis = {
 
             // do shapefile import
             api.postgis.importShapefile(options, callback);
-
         });
 
 
@@ -906,8 +902,6 @@ module.exports = api.postgis = {
             });
              
         });
-
-
 
     },
 
