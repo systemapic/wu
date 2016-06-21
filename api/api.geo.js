@@ -77,7 +77,7 @@ module.exports = api.geo = {
 
         var carto = '';
         carto += '@point_opacity: 1;\n';
-        carto += '@marker_size_factor: 2;\n';
+        carto += '@marker_size_factor: 1.2;\n';
         carto += '[zoom<10] { marker-width: 0.2 * @marker_size_factor; }\n';
         carto += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
         carto += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
@@ -110,12 +110,13 @@ module.exports = api.geo = {
         var csv_meta = meta.csv;
 
         var colors = {
-            t1 : '#00ccff',
-            t2 : '#00ff00',
-            t3 : '#ffff00',
-            t4 : '#ffcc00',
-            t5 : '#ff0000',
-            t6 : '#aa00cc'
+            t0 : '#00ccff',
+            t1 : '#00ff00',
+            t2 : '#ffff00',
+            t3 : '#ffcc00',
+            t4 : '#ff0000',
+            t5 : '#aa00cc',
+            t6 : 'black'
         }
 
         csv_meta.forEach(function (c) {
@@ -123,24 +124,25 @@ module.exports = api.geo = {
             console.log('cc --- >>', c);
 
             // add tilstandsklasse
-            // if (c.type == 't1') {
+            if (c.type == 't1') {
 
-            //     // add comment
-            //     carto += '\n\n    // ' + c.comments + '\n';
-            //     var n = 0;
+                // add comment
+                carto += '\n\n    // ' + c.comments + '\n';
+                var n = 0;
 
-            //     _.forEach(c, function (value, key) {
+                var sign = ' < ';
+                _.forEach(c, function (value, key) {
 
-            //         if (key != 'comments' && key != 'type' && key != 'lat' && key != 'lng' && !_.isEmpty(value)) {
-            //             n++;
-            //             if (n > 1) carto += ',\n'
-            //             carto += '    [' + key + '<' + value + ']';                 
-            //         }
-            //     });
+                    if (key != 'comments' && key != 'type' && key != 'lat' && key != 'lng' && !_.isEmpty(value)) {
+                        n++;
+                        if (n > 1) carto += ',\n'
+                        carto += '    [' + key + sign + value + ']';                 
+                    }
+                });
 
-            //     carto += '    { \n        marker-fill: ' + colors[c.type] + '; \n}\n';
+                carto += '    { \n        marker-fill: ' + colors[c.type] + '; \n}\n';
 
-            // };
+            };
 
             // add tilstandsklasse
             if (c.type == 't1' || c.type == 't2' || c.type == 't3' || c.type == 't4' || c.type == 't5' || c.type == 't6') {
@@ -149,7 +151,8 @@ module.exports = api.geo = {
                 carto += '\n\n    // ' + c.comments + '\n'  ;
                 var n = 0;
 
-                var sign = c.type == 't1' ? ' < ' : ' >= ';
+                // var sign = c.type == 't1' ? ' < ' : ' >= ';
+                var sign = ' >= ';
 
                 _.forEach(c, function (value, key) {
 
