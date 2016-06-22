@@ -50,18 +50,26 @@ module.exports = api.geo = {
 
     cartoCustom : function (req, res, next) {
 
+        // get options
         var options = req.body;
 
+        // type: csv
         if (options.type == 'csv') {
 
+            // convert csv to carto
             return api.geo.csv2carto(options, function (err, cartocss) {
+
+                // catch error
                 if (err) return res.status(400).send(err);
 
+                // return to client
                 res.send(cartocss);
             });
 
-        // unsupported
+        // type: unsupported
         } else {
+
+            // return error to client
             return res.status(400).send({
                 error : 'Carto type not supported.'
             });
@@ -174,115 +182,8 @@ module.exports = api.geo = {
         console.log('CREATED CARTOCSS -->>', carto);
 
 
+        // return
         done(null,carto);
-
-
-
-        // tilstandsklasser
-
-          
-        //     // Klasse # 1
-        //     [arsen<8],
-        //     [bly<60],
-        //     [kadmium<1.5],
-        //     [kvikksoelv<1],
-        //     [kobber<100],
-        //     [sink<200],
-        //     [krom<50],
-        //     [nikkel<60],
-        //     [sum_pah_16<2]
-        //     {       
-        //         marker-fill: #00ccff;
-        //     }
-
-          
-          
-          
-        //     // Klasse # 2
-        //     [arsen>=8],
-        //     [bly>=60],
-        //     [kadmium>=1.5],
-        //     [kvikksoelv>=1],
-        //     [kobber>=100],
-        //     [sink>=200],
-        //     [krom>=50],
-        //     [nikkel>=60],
-        //     [sum_pah_16>=2]
-        //     {       
-        //         marker-fill: #00ff00;
-        //     }
-          
-          
-
-          
-          
-        //     // Klasse # 3
-        //     [arsen>=20],
-        //     [bly>=100],
-        //     [kadmium>=10],
-        //     [kvikksoelv>=2],
-        //     [kobber>=200],
-        //     [sink>=500],
-        //     [krom>=200],
-        //     [nikkel>=135],
-        //     [sum_pah_16>=8] 
-        //     {
-        //         marker-fill: #ffff00;
-        //     }
-
-          
-
-        //     // Klasse # 4
-        //     [arsen>=50],
-        //     [bly>=300],
-        //     [kadmium>=15],
-        //     [kvikksoelv>=4],
-        //     [kobber>=1000],
-        //     [sink>=1000],
-        //     [krom>=500],
-        //     [nikkel>=200],
-        //     [sum_pah_16>=50]
-        //     {
-        //         marker-fill: #ffcc00;
-        //     }  
-            
-          
-          
-
-
-        //     // Klasse # 5
-        //     [arsen>=600],
-        //     [bly>=700],
-        //     [kadmium>=30],
-        //     [kvikksoelv>=10],
-        //     [kobber>=8500],
-        //     [sink>=5000],
-        //     [krom>=2800],
-        //     [nikkel>=1200],
-        //     [sum_pah_16>=150]
-        //     {
-        //         marker-fill: #ff0000;
-        //     }
-         
-           
-        //     // Klasse # 6
-        //     [arsen>1000],
-        //     [bly>2500],
-        //     [kadmium>1000],
-        //     [kvikksoelv>1000],
-        //     [kobber>25000],
-        //     [sink>25000],
-        //     [krom>25000],
-        //     [nikkel>2500],
-        //     [sum_pah_16>2500]
-        //     {
-        //         marker-fill: #aa00cc;
-        //     }
-          
-          
-        // }
-
-
 
     },
 
