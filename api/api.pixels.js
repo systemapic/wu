@@ -3,9 +3,9 @@
 // database schemas
 var Project 	= require('../models/project');
 var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
-var User  	= require('../models/user');
-var File 	= require('../models/file');
-var Layers 	= require('../models/layer');
+var User  		= require('../models/user');
+var File 		= require('../models/file');
+var Layers 		= require('../models/layer');
 
 // utils
 var _ 		= require('lodash');
@@ -22,7 +22,7 @@ var exec 	= require('child_process').exec;
 var dive 	= require('dive');
 var async 	= require('async');
 var carto 	= require('carto');
-var crypto      = require('crypto');
+var crypto  = require('crypto');
 var fspath 	= require('path');
 var mapnik 	= require('mapnik');
 var request 	= require('request');

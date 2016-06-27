@@ -34,9 +34,11 @@ page.open(url, 'get', function (status, why) {
 
 		// all done, capture!
 		if (data.text == 'ready') {
-			console.log('Capturing...', outPath);
-			page.render(outPath);
-			phantom.exit();
+			setTimeout(function () {
+				console.log('Capturing...', outPath);
+				page.render(outPath);
+				phantom.exit();
+			}, 1000);
 		}
 	};
 
