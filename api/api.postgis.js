@@ -888,7 +888,7 @@ module.exports = api.postgis = {
             var csv_meta = [];
 
             // collect meta
-            non_geo_rows.forEach(function (r) {
+            if (_.isArray(non_geo_rows)) non_geo_rows.forEach(function (r) {
                 
                 // only non-geo data (not other errors)
                 if (r.message = 'A row contained an invalid value for latitude or longitude') {
