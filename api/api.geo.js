@@ -148,7 +148,8 @@ module.exports = api.geo = {
                     }
                 });
 
-                carto += '    { \n        marker-fill: ' + colors[c.type] + '; \n}\n';
+                // carto += '    { \n        marker-fill: ' + colors[c.type] + '; \n}\n';
+                carto += '    { \n        marker-fill: ' + colors['t0'] + '; \n}\n';
 
             };
 
