@@ -140,6 +140,7 @@ module.exports = function(grunt) {
 					'public/js/lib/leaflet.js/leaflet-src.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
 					'public/js/lib/leaflet.js/plugins/leaflet-draw/leaflet.draw-src.js',
+					'public/js/lib/leaflet.js/plugins/leaflet.label-src.js',
 
 					// tools
 					'public/js/lib/dropzone.js/dropzone.min.js',
@@ -320,6 +321,7 @@ module.exports = function(grunt) {
 					'public/css/mapbox.css',        
 					'public/js/lib/leaflet.js/leaflet.css',
 					'public/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css',
+					'public/js/lib/leaflet.js/plugins/leaflet.label.css',
 					'public/js/lib/powerange/powerange.min.css',
 					'public/js/lib/codemirror/lib/codemirror.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.carto.css',
