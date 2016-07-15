@@ -102,7 +102,7 @@ module.exports = api.geo = {
         carto += '    marker-allow-overlap: true;\n';
         carto += '    marker-clip: false;\n';
         carto += '    marker-opacity: @point_opacity;\n';
-        carto += '    marker-fill: #ff0000;\n';
+        carto += '    marker-fill: black;\n'; // default color
         
 
         console.log('----------------');
