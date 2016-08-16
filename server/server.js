@@ -34,9 +34,9 @@ app.use(multipart()); // for resumable.js uploads
 // cookie session options
 var sessionOptions = {
 	cookieName: 'session',
-	secret: 'eg[isfd-8yF9-7w233315df{}+Ijsli;;to8', 
-	duration: 24 * 60 * 60 * 1000, // 24h
-	activeDuration: 60 * 60 * 1000, // 1h
+	secret: 'eg[isfd-8yF9-7w2335df{}+Ijsli;;to8', 
+	duration: 3 * 24 * 60 * 60 * 1000, // 3d
+	activeDuration: 60 * 60 * 10000, // 10h
 	cookie: {
 		path: '/', 
 		ephemeral: false, // when true, cookie expires when the browser closes
