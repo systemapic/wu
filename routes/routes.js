@@ -588,6 +588,8 @@ module.exports = function(app) {
     // app.post('/api/import', checkAccess, function (req, res) {
     app.post('/v2/data/import', checkAccess, analyticsHandler, api.upload.upload, errorHandler);
 
+    app.post('/v2/data/import/csv', checkAccess, analyticsHandler, api.upload.uploadCSV, errorHandler);
+
 
     // todo: document
     // =====================================

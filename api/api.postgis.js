@@ -690,11 +690,6 @@ module.exports = api.postgis = {
         var startTime = new Date().getTime();
 
         exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function (err, stdout, stdin) {
-            console.log('###############################');
-            console.log('postgis shapefile import err', err);
-            console.log('postgis shapefile import stdout', stdout);
-            console.log('postgis shapefile import stdin', stdin);
-            console.log('###############################');
 
             attempts++;
 
@@ -885,6 +880,12 @@ module.exports = api.postgis = {
 
         async.waterfall(ops, function (err, results) {
 
+            if (err) {
+
+                console.log(err);
+
+            }
+
             var csv_meta = [];
 
             // collect meta
@@ -899,7 +900,7 @@ module.exports = api.postgis = {
 
             // get upload status
             var file_id_key = 'uploadStatus:' + file_id;
-            api.redis.layers.get(file_id_key, function (err, uploadStatus) {
+            api.redis.layers.get(file_id_key, function (error, uploadStatus) {
                 var u = api.utils.parse(uploadStatus);
 
                 // parse existing meta
@@ -916,10 +917,10 @@ module.exports = api.postgis = {
                     original_format : 'csv',
                     table_name : file_id,
                     database_name : postgis_database
-                }, function (err) {
+                }, function (er) {
 
                     // return 
-                    done(null);;
+                    done(err);;
                 });
             });
         });
@@ -1445,7 +1446,7 @@ module.exports = api.postgis = {
             }, function (err, results) {
                 if (err) return callback(err);
                 console.log('results', results);
-                if (!results || !results.rows || !results.rows.length) return callback('The dataset contains no valid geodata.');
+                if (!results || !results.rows || !results.rows.length) return callback({message : 'The dataset contains no valid geodata.'});
                 var geometry_type = results.rows[0].st_geometrytype.split('ST_')[1];
                 callback(null, geometry_type);
             })
@@ -1584,7 +1585,7 @@ module.exports = api.postgis = {
         if (files.data) {
             var filename = files.data.originalFilename;
             var ext = filename.split('.').reverse()[0];
-            console.log('######### EXT #########', ext);
+            console.log('######### EXT #########', ext, filename);
             if (ext == 'geojson') return 'geojson';
             if (ext == 'ecw') return 'raster';
             if (ext == 'jp2') return 'raster';

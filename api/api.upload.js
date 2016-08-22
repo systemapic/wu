@@ -115,6 +115,98 @@ module.exports = api.upload = {
 
 	},
 
+	uploadCSV : function (req, res) {
+
+		console.log('uploadCSV');
+
+		var ops = [];
+		var user = req.user;
+		var options = req.body;
+		var filename = options.name;
+		var project_id = options.project_id;
+		var csv = options.csv;
+		var filesize = _.size(csv);
+		var uploadStatus;
+
+		// set upload status
+		ops.push(function (callback) {
+
+			// set upload status
+			uploadStatus = {
+				file_id : 'file_' + api.utils.getRandomChars(20),
+				user_id : user.uuid,
+				filename : filename,
+				timestamp : Date.now(),
+				status : 'Processing',
+				size : filesize,
+				upload_success : true,
+				error_code : null,
+				error_text : null
+				// processing_success : null,
+				// rows_count : null,
+				// import_took_ms : null,
+				// data_type : null,
+				// original_format : null,
+				// table_name : null,
+				// database_name : null,
+			};
+
+			console.log(uploadStatus);
+
+			// set upload status
+			var key = 'uploadStatus:' + uploadStatus.file_id;
+			api.redis.layers.set(key, JSON.stringify(uploadStatus), callback);
+		});
+
+
+		// create tmp file
+		ops.push(function (callback) {
+
+			var tmppath = '/data/tmp/' + uploadStatus.file_id + '.csv';
+			fs.outputFile(tmppath, csv, function (err) {
+				console.log('wrote file', tmppath);
+				uploadStatus.tmppath = tmppath;
+				callback(err);
+			})
+		});
+
+		ops.push(function (callback) {
+
+			var options = {
+				files : {
+					data : {
+						path : uploadStatus.tmppath,
+						originalFilename : uploadStatus.tmppath,
+						size : filesize
+					}
+				},
+				user : user,
+				uploadStatus : uploadStatus,
+				body : req.body,
+				use_sockets : false,
+				addToProject : project_id
+			};
+
+			api.import.import(options, function (err, results) {
+				console.log('api.import.import done: ', err, results);
+				callback(err);
+			});
+
+		})
+
+
+		async.series(ops, function (err, results) {
+
+			res.send({
+				error : err,
+				success : true
+			});
+
+		});
+
+
+	},
+
 	/**
 	 * Upload data to PostGIS with resumable.js  (client)
 	 *
@@ -137,7 +229,7 @@ module.exports = api.upload = {
 		var ops 		 = [];
 
 
-	    	// get or create file_id
+	    // get or create file_id
 		ops.push(function (callback) {
 
 			// check if upload_status exists
