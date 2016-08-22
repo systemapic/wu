@@ -71,6 +71,8 @@ module.exports = api.import = {
 				timestamp : uploadStatus.timestamp
 			};
 
+			console.log('import options', options);
+
 			// ping progress
 			use_sockets && api.socket.processingProgress({
 				user_id : user._id,
@@ -243,6 +245,8 @@ module.exports = api.import = {
 		options.size = files.data.size;
 		options.ext = ext;
 		options.originalFilename = files.data.originalFilename;
+
+		console.log('prepareImport --@@-- ext', ext);
 
 		// organize files so output is equal no matter what :)
 		if (ext == 'zip') ops.push(function (callback) {
