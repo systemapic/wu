@@ -103,33 +103,56 @@ module.exports = function () {
 
                 options.uuid =  testFile.uuid;
                 options.access_token = access_token;
+                console.log('access_token', access_token);
                 api.post(endpoints.data.update)
                     .send(options)
                     .expect(httpStatus.OK)
                     .end(function (err, res) {
-                        if (err) return done(err);
+                        console.log('test 5', err);
+                        // if (err) return done(err);
 
                         var result = helpers.parse(res.text);
+                        console.log('result:', result);
                         expect(result.updated).to.be.not.empty;
+                        console.log('1');
                         expect(result.updated).to.include('name');
+                        console.log('2');
                         expect(result.updated).to.include('description');
+                        console.log('3');
                         expect(result.updated).to.include('keywords');
+                        console.log('4');
                         expect(result.updated).to.include('status');
+                        console.log('5');
                         expect(result.updated).to.include('category');
+                        console.log('6');
                         expect(result.updated).to.include('version');
+                        console.log('7');
                         expect(result.updated).to.include('copyright');
+                        console.log('8');
                         expect(result.updated).to.include('data');
+                        console.log('9');
                         expect(result.file.name).to.be.equal(options.name);
+                        console.log('0');
                         expect(result.file.description).to.be.equal(options.description);
+                        console.log('1');
                         expect(result.file.keywords[0]).to.be.equal(options.keywords[0]);
+                        console.log('2');
                         expect(result.file.status).to.be.equal(options.status);
+                        console.log('3');
                         expect(result.file.category).to.be.equal(options.category);
+                        console.log('4');
                         expect(result.file.version).to.be.equal(options.version);
+                        console.log('5');
                         expect(result.file.copyright).to.be.equal(options.copyright);
+                        console.log('6');
                         expect(result.file.data.postgis.database_name).to.be.equal(options.data.postgis.database_name);
+                        console.log('7');
                         expect(result.file.data.postgis.table_name).to.be.equal(options.data.postgis.table_name);
+                        console.log('8');
                         expect(result.file.data.postgis.data_type).to.be.equal(options.data.postgis.data_type);
+                        console.log('9');
                         expect(result.file.data.postgis.original_format).to.be.equal(options.data.postgis.original_format);
+                        console.log('0');
                         expect(result.file.data.postgis.metadata).to.be.equal(options.data.postgis.metadata);
                         done();
                     });
