@@ -941,13 +941,12 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (file, callback) {
-			if (!file) {
-				callback({
-					code: httpStatus.NOT_FOUND,
-					message: errors.no_such_file.errorMessage
-				});
-			}
-
+			if (!file) return callback({
+				code: httpStatus.NOT_FOUND,
+				message: errors.no_such_file.errorMessage
+			});
+		
+			// check acess
 			api.file.access.toEdit({
 				file : file,
 				user : account
@@ -1060,7 +1059,14 @@ module.exports = api.file = {
 			File
 			.findOne({uuid : options.file.uuid})
 			.exec(function (err, f) {
+				if (err || !f) {
+					return done({
+						message: errors.no_access.errorMessage,
+						code: httpStatus.BAD_REQUEST
+					});
+				}
 
+				// OK
 				if (f.createdBy == options.user.uuid) {
 					return done(null, options);
 				}
