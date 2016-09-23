@@ -20,13 +20,14 @@ var layerSchema = mongoose.Schema({
     attribution : String,
     accessToken : String,   // some layers have access tokens, like mapbox
     opacity     : String,   
-    mask        : String,
+    active_mask : String,
     metadata    : String, // json string with loads of meta
     tooltip     : String,  // json string with cartocss tooltips
     legends     : String,  // json string with cartocss legends
     file        : String,     // file uuid that layer is connected to, if any
     style       : String,
     filter      : String,
+    filter_mask : Boolean,
     tileType    : String, // tiletype, eg. 'aerial', 'hybrid'
     satellite_position : String,
     

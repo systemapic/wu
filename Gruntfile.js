@@ -277,6 +277,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.layer.raster.js',
 					'public/js/src/models/model.layer.providers.js',
 					'public/js/src/models/model.layer.topojson.js',
+					'public/js/src/models/model.layer.geojson.js',
 					'public/js/src/models/model.file.js',
 
 					// Analytics
