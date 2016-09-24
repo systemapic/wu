@@ -217,9 +217,6 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.login.js',
 					'public/js/src/panes/pane.account.js',
 					'public/js/src/panes/pane.guide.js',
-					'public/js/src/panes/pane.animator.js',
-					'public/js/src/panes/pane.graph.year.js',
-					'public/js/src/panes/pane.graph.annual.js',
 
 					// chrome
 					'public/js/src/chrome/chrome.js',	
@@ -263,6 +260,9 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.style.js',
 					'public/js/src/controls/control.tooltip.js',				
 					'public/js/src/controls/control.spinningmap.js',
+					'public/js/src/controls/control.graph.js',
+					'public/js/src/controls/control.graph.snow.js',
+					'public/js/src/controls/control.animator.js',
 					'public/js/src/ext/popup.chart.js',
 					'public/js/src/controls/control.chart.js',
 					
