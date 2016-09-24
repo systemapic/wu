@@ -68,7 +68,7 @@
 		</script>
 
 		<style>
-		.welcome-flash {
+		.ghostface {
 			position: fixed;
 			top: 50%;
 			left: 50%;
@@ -111,15 +111,7 @@
 			95% { opacity: 1; }
 			100% { opacity: 0; }
 		}
-		/*img.welcome-flash {
-		    -webkit-animation: blink 1s;
-		    -webkit-animation-iteration-count: infinite;
-		    -moz-animation: blink 1s;
-		    -moz-animation-iteration-count: infinite;
-		    -o-animation: blink 1s;
-		    -o-animation-iteration-count: infinite;
-		}*/
-
+		
 		</style>
 
 	</head>
@@ -131,7 +123,7 @@
 
 	<body>
 
-		<img src="/css/mapic_logo_inverted_blank.png" class="welcome-flash">
+		<img src="/css/mapic_logo_inverted_blank.png" class="ghostface">
 		
 		
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
@@ -239,10 +231,6 @@
 			<script type="text/javascript" src="/js/src/panes/pane.login.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.account.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.guide.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.animator.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.graph.year.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.graph.annual.js"></script>
-
 
 			<!-- chrome -->
 			<script type="text/javascript" src="/js/src/chrome/chrome.js"></script>
@@ -265,7 +253,6 @@
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.line.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.legend.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.raster.js"></script>
-			
 			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.layers.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.extras.js"></script>
 
@@ -284,6 +271,9 @@
 			<script type="text/javascript" src="/js/src/controls/control.style.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.tooltip.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.spinningmap.js"></script>
+			<script type="text/javascript" src="/js/src/controls/control.graph.js"></script>
+			<script type="text/javascript" src="/js/src/controls/control.graph.snow.js"></script>
+			<script type="text/javascript" src="/js/src/controls/control.animator.js"></script>
 			<script type="text/javascript" src="/js/src/ext/popup.chart.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.chart.js"></script>
 			
