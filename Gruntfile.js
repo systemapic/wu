@@ -179,6 +179,8 @@ module.exports = function(grunt) {
 					'public/js/lib/chartist.js/chartist.js',
 					'public/js/lib/turf.js/turf.min.js',
 					'public/js/lib/forge/forge.bundle.js',
+					'public/js/lib/tether/tether.js',
+					'public/js/lib/tether/select.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'

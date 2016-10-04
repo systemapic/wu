@@ -30,6 +30,8 @@ var layerSchema = mongoose.Schema({
     filter_mask : Boolean,
     tileType    : String, // tiletype, eg. 'aerial', 'hybrid'
     satellite_position : String,
+    options : String, // JSON of custom options
+
     
     // data source for layer
     data : {

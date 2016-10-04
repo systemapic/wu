@@ -396,6 +396,7 @@ module.exports = api.layer = {
                 'data',
                 'active_mask',
                 'filter_mask',
+                'options',
             ];
             var ops = [];
 
