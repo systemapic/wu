@@ -181,6 +181,7 @@ module.exports = function(grunt) {
 					'public/js/lib/forge/forge.bundle.js',
 					'public/js/lib/tether/tether.js',
 					'public/js/lib/tether/select.js',
+					'public/js/lib/randomColor/randomColor.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
