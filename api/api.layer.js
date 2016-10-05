@@ -393,7 +393,10 @@ module.exports = api.layer = {
                 'legends',
                 'opacity',
                 'zIndex',
-                'data'
+                'data',
+                'active_mask',
+                'filter_mask',
+                'options',
             ];
             var ops = [];
 

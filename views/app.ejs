@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title></title>
-
-		<!-- app.ejs -->
 	
+		<!-- favicon -->
 		<link rel="icon" type="image/png" href="/favicon.ico">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		
 
+		<!-- viewport -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<!-- fonts -->
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800,300,300italic,400italic,600italic,700italic,800italic" rel="stylesheet" type="text/css">		
+		
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 
-			<!-- DEPENDENCIES STYLESHEETS -->
+			<!-- lib stylesheets -->
 			<link rel="stylesheet" href="../fonts/font-awesome-4.4.0/css/font-awesome.min.css">
-
 			<link rel="stylesheet" type="text/css" href="/js/lib/codemirror/mode/cartocss/spectrum.css">
 			<link rel="stylesheet" type="text/css" href="/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css">
 			<link rel="stylesheet" type="text/css" href="/js/lib/leaflet.js/leaflet.js/plugins/leaflet.label.css">
@@ -33,8 +33,8 @@
 			<link rel="stylesheet" type="text/css" href="/js/lib/dc.js/dc.css">
 			<link rel="stylesheet" type="text/css" href="/js/lib/pikaday/pikaday.css">
 			<link rel="stylesheet" type="text/css" href="/js/lib/chartist.js/chartist.css">
-		
-			<!-- SYSTEMAPIC STYLESHEETS -->
+
+			<!-- mapic stylesheets -->
 			<link rel="stylesheet" type="text/css" href="/css/fonts.css">
 			<link rel="stylesheet" type="text/css" href="/css/style.css">			
 			<link rel="stylesheet" type="text/css" href="/css/evil.css">			
@@ -45,28 +45,73 @@
 			<link rel="stylesheet" type="text/css" href="/css/guide-stylesheet.css">
 			<link rel="stylesheet" type="text/css" href="/css/more-experiments.css">
 			
-
+			<link rel="stylesheet" type="text/css" href="/js/lib/tether/dropdowns-enhancement.css" />
+			
 		<!-- @endif -->
-
 
 		<!-- @if NODE_ENV == 'PRODUCTION' -->
 
-			<!-- DEPENDENCIES STYLESHEETS -->
+			<!-- lib stylesheets -->
 			<link rel="stylesheet" href="../fonts/font-awesome-4.4.0/css/font-awesome.min.css">
 			<link rel="stylesheet" href="/dist/css.dependencies.min.css">
 
-			<!-- SYSTEMAPIC STYLESHEETS -->
+			<!-- mapic stylesheets -->
 			<link rel="stylesheet" href="/dist/fonts.css">
 			<link rel="stylesheet" href="/dist/css.portal.min.css">
 	
 		<!-- @endif -->
 
 
-		<script type="text/javascript">(function(){
-			window.hotlink = '<%- JSON.stringify(hotlink) %>';
+		<script type="text/javascript">
+			(function(){
+				window.hotlink = '<%- JSON.stringify(hotlink) %>';
 			}());
 		</script>
 
+		<style>
+		.ghostface {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 200px;
+			opacity: 0;
+			-webkit-animation: blink 5s;
+			-webkit-animation-iteration-count: 1;
+			-moz-animation: blink 5s;
+			-moz-animation-iteration-count: 1;
+			-o-animation: blink 5s;
+			-o-animation-iteration-count: 1;
+		}
+		@keyframes blink {
+			0% { opacity: 0; }
+			35% { opacity: 1; }
+			50% { opacity: 1; }
+			75% { opacity: 1; }
+			100% { opacity: 0; }
+		}
+		@-webkit-keyframes blink {
+			0% { opacity: 0; }
+			35% { opacity: 1; }
+			50% { opacity: 1; }
+			75% { opacity: 1; }
+			100% { opacity: 0; }
+		}
+		@-moz-keyframes blink {
+			0% { opacity: 0; }
+			35% { opacity: 1; }
+			50% { opacity: 1; }
+			75% { opacity: 1; }
+			100% { opacity: 0; }
+		}
+		@-o-keyframes blink { 
+			0% { opacity: 0; }
+			35% { opacity: 1; }
+			50% { opacity: 1; }
+			75% { opacity: 1; }
+			100% { opacity: 0; }
+		}
+		</style>
 
 	</head>
 
@@ -76,18 +121,15 @@
 
 
 	<body>
+
+		<!-- intro logo -->
+		<img src="/css/mapic_logo_inverted_blank.png" class="ghostface">
 		
 		
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 
-
-			<!-- JAVASCRIPTS -->
-			<!-- JAVASCRIPTS -->
-			<!-- JAVASCRIPTS -->
-
-			<!-- DEPENDENCIES -->
-			<!-- DEPENDENCIES -->
-			<!-- DEPENDENCIES -->
+			<!-- sentry.io error catching -->
+			<script src="https://cdn.ravenjs.com/3.7.0/raven.min.js"></script>
 
 			<!-- D3.js -->
 			<script type="text/javascript" src="/js/lib/d3.js/d3.js"></script>
@@ -112,12 +154,14 @@
 			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet-draw/leaflet.draw-src.js"></script>
 			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet.label-src.js"></script>
 
-			<!-- Other stuff -->
+			<!--div -->
 			<script type="text/javascript" src="/js/lib/dropzone.js/dropzone.min.js"></script> 
 			<script type="text/javascript" src="/js/lib/list.js/list.min.js"></script> 
 			<script type="text/javascript" src="/js/lib/sortable.js/Sortable.js"></script>
 			<script type="text/javascript" src="/js/lib/html.sortable.js/html.sortable.js"></script>
-
+			<script type="text/javascript" src="/js/lib/tether/dropdowns-enhancement.js"></script>
+			<script type="text/javascript" src="/js/lib/randomColor/randomColor.js"></script>
+			
 			<!-- resumable.js -->
 			<script type="text/javascript" src="/js/lib/resumable/resumable.js"></script>
 
@@ -149,12 +193,6 @@
 			<script type="text/javascript" src="/js/lib/chartist.js/chartist.js"></script>
 			<script type="text/javascript" src="/js/lib/turf.js/turf.min.js"></script>
 			<script type="text/javascript" src="/js/lib/forge/forge.bundle.js"></script>
-			
-
-			<!-- SOURCE -->
-			<!-- SOURCE -->
-			<!-- SOURCE -->
-
 
 			<!-- class.js must be added first -->
 			<script type="text/javascript" src="/js/src/core/class.js"></script>
@@ -180,10 +218,6 @@
 			<script type="text/javascript" src="/js/src/panes/pane.login.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.account.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.guide.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.animator.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.graph.year.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.graph.annual.js"></script>
-
 
 			<!-- chrome -->
 			<script type="text/javascript" src="/js/src/chrome/chrome.js"></script>
@@ -206,7 +240,6 @@
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.line.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.legend.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/styler.raster.js"></script>
-			
 			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.layers.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.extras.js"></script>
 
@@ -225,6 +258,9 @@
 			<script type="text/javascript" src="/js/src/controls/control.style.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.tooltip.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.spinningmap.js"></script>
+			<script type="text/javascript" src="/js/src/controls/control.graph.js"></script>
+			<script type="text/javascript" src="/js/src/controls/control.graph.snow.js"></script>
+			<script type="text/javascript" src="/js/src/controls/control.animator.js"></script>
 			<script type="text/javascript" src="/js/src/ext/popup.chart.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.chart.js"></script>
 			
@@ -238,8 +274,10 @@
 			<script type="text/javascript" src="/js/src/models/model.layer.raster.js"></script>
 			<script type="text/javascript" src="/js/src/models/model.layer.providers.js"></script>
 			<script type="text/javascript" src="/js/src/models/model.layer.topojson.js"></script>
+			<script type="text/javascript" src="/js/src/models/model.layer.geojson.js"></script>
 			<script type="text/javascript" src="/js/src/models/model.file.js"></script>
 
+			<!-- div  -->
 			<script type="text/javascript" src="/js/src/ext/analytics.js"></script>
 			<script type="text/javascript" src="/js/src/ext/satelliteAngle.js"></script>
 			<script type="text/javascript" src="/js/src/ext/buttons.js"></script>
@@ -259,14 +297,14 @@
 
 		<!-- @if NODE_ENV == 'PRODUCTION' -->		
 
-			<!-- DEPENDENCIES -->
+			<!-- lib -->
 			<script type="text/javascript" src="/dist/js.dependencies.min.js"></script>
 			<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 			
-			<!-- CONFIG -->
+			<!-- config -->
 			<script type="text/javascript" src="/clientConfig.js"></script>
 
-			<!-- LIBRARY -->
+			<!-- mapic -->
 			<script type="text/javascript" src="/dist/js.portal.min.js"></script>
 
 		<!-- @endif -->
@@ -281,8 +319,5 @@
 
 		</script>
 
-
-
 </body>	
-
 </html>

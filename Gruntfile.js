@@ -179,6 +179,9 @@ module.exports = function(grunt) {
 					'public/js/lib/chartist.js/chartist.js',
 					'public/js/lib/turf.js/turf.min.js',
 					'public/js/lib/forge/forge.bundle.js',
+					'public/js/lib/tether/tether.js',
+					'public/js/lib/tether/select.js',
+					'public/js/lib/randomColor/randomColor.js',
 				],
 				
 				dest : 'public/dist/tmp/systemapic.dependencies.combined.js'
@@ -217,9 +220,6 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.login.js',
 					'public/js/src/panes/pane.account.js',
 					'public/js/src/panes/pane.guide.js',
-					'public/js/src/panes/pane.animator.js',
-					'public/js/src/panes/pane.graph.year.js',
-					'public/js/src/panes/pane.graph.annual.js',
 
 					// chrome
 					'public/js/src/chrome/chrome.js',	
@@ -263,6 +263,9 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.style.js',
 					'public/js/src/controls/control.tooltip.js',				
 					'public/js/src/controls/control.spinningmap.js',
+					'public/js/src/controls/control.graph.js',
+					'public/js/src/controls/control.graph.snow.js',
+					'public/js/src/controls/control.animator.js',
 					'public/js/src/ext/popup.chart.js',
 					'public/js/src/controls/control.chart.js',
 					
@@ -277,6 +280,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.layer.raster.js',
 					'public/js/src/models/model.layer.providers.js',
 					'public/js/src/models/model.layer.topojson.js',
+					'public/js/src/models/model.layer.geojson.js',
 					'public/js/src/models/model.file.js',
 
 					// Analytics
