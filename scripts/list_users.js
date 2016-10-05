@@ -33,13 +33,15 @@ User
 	var t = new Table;
 
 	// console.log(err, users)
-	users.forEach(function (u) {
+	users.forEach(function (u, i) {
 		
 		// columns
+		t.cell('#', i);
 		t.cell('Username', u.username);
 		t.cell('First Name', u.firstName);
 		t.cell('Last Name', u.lastName);
 		t.cell('Email', u.local.email);
+		t.cell('ID', u.id);
 		t.newRow();
 
 	});
