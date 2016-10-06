@@ -27,7 +27,6 @@ var async 	= require('async');
 var carto 	= require('carto');
 var crypto      = require('crypto');
 var fspath 	= require('path');
-var mapnik 	= require('mapnik');
 var request 	= require('request');
 var nodepath    = require('path');
 var formidable  = require('formidable');
@@ -69,7 +68,7 @@ module.exports = api.project = {
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
 				// check if access to edit
-				var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
+				var canEdit = _.includes(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
 
 				if (!canEdit) {
 					return next({
@@ -150,7 +149,7 @@ module.exports = api.project = {
 
 			access.read.forEach(function (u) {
 				// add read (if not in edit)
-				if (!_.contains(project.access.edit, u)) {
+				if (!_.includes(project.access.edit, u)) {
 					project.access.read.addToSet(u);
 				}
 			});
@@ -327,10 +326,10 @@ module.exports = api.project = {
 		if (project.access.isPublic) return true;
 
 		// if user got read access
-		if (_.contains(project.access.read, user.uuid)) return true;
+		if (_.includes(project.access.read, user.uuid)) return true;
 
 		// if user got edit access
-		if (_.contains(project.access.edit, user.uuid)) return true;
+		if (_.includes(project.access.edit, user.uuid)) return true;
 
 		// no access
 		return false;
@@ -727,7 +726,7 @@ module.exports = api.project = {
 			}
 
 			// can edit if on edit list or created project
-			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
+			var canEdit = _.includes(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
 
 			// continue only if canEdit
 			canEdit ? callback(null, project) : callback({

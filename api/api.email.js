@@ -27,7 +27,6 @@ var async 	= require('async');
 var carto 	= require('carto');
 var crypto      = require('crypto');
 var fspath 	= require('path');
-var mapnik 	= require('mapnik');
 var request 	= require('request');
 var nodepath    = require('path');
 var formidable  = require('formidable');
@@ -61,7 +60,7 @@ module.exports = api.email = {
 		// options.to = 'knutole@systemapic.com';
 
 		// don't send mocha-test emails
-		if (_.contains(options.to, 'mocha_test')) return;
+		if (_.includes(options.to, 'mocha_test')) return;
 
 		// send email
 		transporter.sendMail(options);

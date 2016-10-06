@@ -27,7 +27,6 @@ var async 	= require('async');
 var carto 	= require('carto');
 var crypto      = require('crypto');
 var fspath 	= require('path');
-var mapnik 	= require('mapnik');
 var request 	= require('request');
 var nodepath    = require('path');
 var formidable  = require('formidable');
@@ -125,7 +124,7 @@ module.exports = api.user = {
 						if (!project.isEditable(account.getUuid())) return done('No access.');
 
 						// check if user is already editor
-						var isAlreadyEditor = _.contains(project.access.edit, invited_user.getUuid()) || project.createdBy == invited_user.getUuid();
+						var isAlreadyEditor = _.includes(project.access.edit, invited_user.getUuid()) || project.createdBy == invited_user.getUuid();
 
 						if (isAlreadyEditor) return done('Can\'t add viewer that\'s already editor.');
 

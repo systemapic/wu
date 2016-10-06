@@ -27,7 +27,6 @@ var async 	= require('async');
 var carto 	= require('carto');
 var crypto      = require('crypto');
 var fspath 	= require('path');
-var mapnik 	= require('mapnik');
 var request 	= require('request');
 var nodepath    = require('path');
 var formidable  = require('formidable');
@@ -268,26 +267,6 @@ module.exports = api.legend = {
 		});
 
 
-		// doesnt work!
-		//
-		// var map = new mapnik.Map(20, 20);
-		// map.load(stylepath, function(err, map) {
-		//     if (err) throw err;
-		//     map.zoomAll();
-		//     var im = new mapnik.Image(20, 20);
-		//     map.render(im, function(err, im) {
-		//       if (err) throw err;
-		//       im.encode('png', function(err, buffer) {
-		//           if (err) throw err;
-		//           fs.writeFile(outpath, buffer, function(err) {
-		//               if (err) throw err;
-		//               console.log('saved map image to22', outpath);
-		//               callback(null, outpath);
-		//           });
-		//       });
-		//     });
-		// });
-
 	},
 
 
@@ -300,11 +279,7 @@ module.exports = api.legend = {
 
 		api.legend._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
 
-		// if (fileUuid == 'osm') {
-		// 	api.layer._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
-		// } else {
-		// 	api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
-		// }
+	
 	},
 
 	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {

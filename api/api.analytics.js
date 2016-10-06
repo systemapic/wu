@@ -29,7 +29,6 @@ var carto 	= require('carto');
 var nodeSlack 	= require('../tools/slack');
 var crypto      = require('crypto');
 var fspath 	= require('path');
-var mapnik 	= require('mapnik');
 var request 	= require('request');
 var ogr2ogr 	= require('ogr2ogr');
 var nodepath    = require('path');

@@ -27,7 +27,6 @@ var async 	= require('async');
 var carto 	= require('carto');
 var crypto      = require('crypto');
 var fspath 	= require('path');
-var mapnik 	= require('mapnik');
 var request 	= require('request');
 var nodepath    = require('path');
 var formidable  = require('formidable');

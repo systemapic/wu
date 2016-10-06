@@ -28,7 +28,6 @@ var async = require('async');
 var carto = require('carto');
 var crypto = require('crypto');
 var fspath = require('path');
-var mapnik = require('mapnik');
 var request = require('request');
 var sanitize = require("sanitize-filename");
 var nodepath = require('path');
