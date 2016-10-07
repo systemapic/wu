@@ -156,12 +156,12 @@ module.exports = api.layer = {
             return next(api.error.code.missingRequiredRequestFields(errors.missing_information.errorMessage, missingRequiredFields));
         }
 
-        layer.uuid      = 'osm-layer-' + uuid.v4();
+        layer.uuid          = 'osm-layer-' + uuid.v4();
         layer.title         = title;
         layer.description   = 'Styleable vector tiles';
         layer.data.osm      = true;
         layer.legend        = '';
-        layer.file      = 'osm';
+        layer.file          = 'osm';
 
         ops.push(function (callback) {
             layer.save(function (err, doc) {
