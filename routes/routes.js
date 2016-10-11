@@ -1102,6 +1102,12 @@ module.exports = function(app) {
     app.post('/v2/layers/carto/custom', checkAccess, analyticsHandler, api.geo.cartoCustom, errorHandler);
     
 
+
+
+    // get list of wms layers
+    app.get('/v2/layers/wms', checkAccess, analyticsHandler, api.layer.getWMSLayers, errorHandler);
+    
+
     /**
     * @api {post} /v2/data/download Download dataset from file
     * @apiName Download dataset from file

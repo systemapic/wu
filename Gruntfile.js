@@ -133,7 +133,7 @@ module.exports = function(grunt) {
 
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
-					'public/js/lib/lodash/lodash.min.js',
+					'public/js/lib/lodash/lodash-4.16.4.js',
 					'public/js/lib/async/async.js',
 					
 					// leaflet + mapbox
@@ -268,6 +268,7 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.animator.js',
 					'public/js/src/ext/popup.chart.js',
 					'public/js/src/controls/control.chart.js',
+					'public/js/src/controls/control.wms.js',
 					
 
 					// Models 
@@ -281,6 +282,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.layer.providers.js',
 					'public/js/src/models/model.layer.topojson.js',
 					'public/js/src/models/model.layer.geojson.js',
+					'public/js/src/models/model.layer.wms.js',
 					'public/js/src/models/model.file.js',
 
 					// Analytics
