@@ -879,9 +879,12 @@ module.exports = api.layer = {
 
         layer.save(function (err, savedLayer) {
             if (err) return callback(err);
+            console.log('savedLayer', savedLayer);
 
             if (options.projectUuid) {
+                console.log('got projectUuid', options.projectUuid);
                 return api.layer.addToProject(layer._id, options.projectUuid, function (err) {
+                    console.log('added to project!', err);
                     callback && callback(err, savedLayer);
                 });
             }
@@ -908,7 +911,17 @@ module.exports = api.layer = {
                 callback && callback(err);
             });
         });
-    }
+    },
+
+
+    getWMSLayers : function (req, res) {
+
+        console.log('getWMSLayers', req.body);
+
+        
+        res.send({wms : 'debug'});
+
+    },
 };
 
 // systemapic hack
