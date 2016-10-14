@@ -11,30 +11,30 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash');
-var fs 		= require('fs-extra');
-var gm 		= require('gm');
-var kue 	= require('kue');
-var fss 	= require("q-io/fs");
-var srs 	= require('srs');
-var zlib 	= require('zlib');
-var uuid 	= require('node-uuid');
-var util 	= require('util');
-var utf8 	= require("utf8");
-var mime 	= require("mime");
-var exec 	= require('child_process').exec;
-var dive 	= require('dive');
-var async 	= require('async');
-var carto 	= require('carto');
+var _ 			= require('lodash');
+var fs 			= require('fs-extra');
+var gm 			= require('gm');
+var kue 		= require('kue');
+var fss 		= require("q-io/fs");
+var srs 		= require('srs');
+var zlib 		= require('zlib');
+var uuid 		= require('node-uuid');
+var util 		= require('util');
+var utf8 		= require("utf8");
+var mime 		= require("mime");
+var exec 		= require('child_process').exec;
+var dive 		= require('dive');
+var async 		= require('async');
+var carto 		= require('carto');
 var nodeSlack 	= require('../tools/slack');
 var crypto      = require('crypto');
-var fspath 	= require('path');
+var fspath 		= require('path');
 var request 	= require('request');
 var ogr2ogr 	= require('ogr2ogr');
 var nodepath    = require('path');
 var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
-var ua 		= require('universal-analytics');
+var ua 			= require('universal-analytics');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
@@ -43,6 +43,40 @@ var api = module.parent.exports;
 
 // exports
 module.exports = api.analytics = {
+
+
+
+
+
+
+	event : function (req) {
+
+		console.log('analytics event!', req);
+
+		var data = req.data;
+
+		console.log('analytics data:', data);
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
