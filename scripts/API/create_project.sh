@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USERNAME=knutole@systemapic.com
-PASSWORD=***REMOVED***
+PASSWORD=REDACTED
 SERVER=dev.systemapic.com
 
 PROJECTNAME=test_from_bash

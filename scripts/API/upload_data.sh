@@ -5,7 +5,7 @@
 
 # access details
 USERNAME=knutole@systemapic.com
-PASSWORD=***REMOVED***
+PASSWORD=REDACTED
 
 # file
 FILEPATH=/home/rasters/SCF_MOD_2014_008.tif
