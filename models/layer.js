@@ -47,6 +47,11 @@ var layerSchema = mongoose.Schema({
         norkart     : String,
         google      : String,
         cube        : String,
+        wms         : {
+            source  : String,
+            layers  : [String],
+            meta    : String,
+        },
 
         postgis : {
             sql                 : String,
